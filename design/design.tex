@@ -11,7 +11,7 @@
 \newcommand{\Rcs}{Resources}
 
 
-\title{Design concept: \gtitle\ (working title)}
+\title{Design: \gtitle\ (working title)}
 \author{Jason Rohrer}
 
 
@@ -38,14 +38,16 @@ There are only two firms left with agents in Angola.  We've gotten good takes wh
 
 Two players each control a team of corporate agents that move between diamond-producing regions.  Unoccupied regions accumulate diamonds during each round, making them more attractive to occupy in future rounds.  Accumulated diamonds are sold at a flat rate to a single agent, but they are sold by auction if two opposing agents move into the region simultaneously.  Moves and bids are specified simultaneously in secret, so one strategic aspect involves deciding when to move into a region as more and more diamonds accumulate under the same flat price.  If both players jump into a region at the same time, a potentially costly auction may result.
 
-A player's agents may be secretly bribed by the opponent.  Bribed agents reveal their secret information, such as move designations and bids, to the opponent.  Bribing costs money, though, so another strategic aspect involves deciding which of your opponent's agents to bribe and which of your own agents to trust.  Bribing the right opponent agents can reveal to you which of your own agents have been bribed, perhaps without your opponent knowing that you know.  You can then use the supposedly secret actions of these agents to mislead your opponent.  For example, if you know your opponent can see your secret bid, you might bid up an auction to push your opponent toward paying a higher price, then let your opponent win.
+A player's agents may be secretly bribed by the opponent.  Bribed agents reveal their secret information, such as move destinations and bids, to the opponent.  Bribing costs money, though, so another strategic aspect involves deciding which of your opponent's agents to bribe and which of your own agents to trust.  Bribing the right opponent agents can reveal to you which of your own agents have been bribed, perhaps without your opponent knowing that you know.  You can then use the supposedly secret actions of these agents to mislead your opponent.  For example, if you know your opponent can see your secret bid, you might bid up an auction to push your opponent toward paying a higher price, then let your opponent win.
 
-Collected diamonds can be converted into money through an open market sale process involving secret choices that are also subject to exposure through agent bribes.  Money earned through diamond sales can be used to purchase more diamonds, protect units from bribes, or bribe more opponent units.  The game lasts for a fixed number of rounds, and the player with the most money at the end of the final round wins.
+Each player receives a fixed allowance of money each turn, but collected diamonds can be converted into extra money through an open market sale process involving secret choices that are also subject to exposure through agent bribes.  Money earned in either fashion can be used to purchase more diamonds, protect units from bribes, or bribe opponent units.  
+
+The game lasts for a fixed number of rounds, and the player with the most diamonds at the end of the final round wins.
 
 
 \section{Mechanical overview}
 
-Play takes place on a map of Angola divided into 8 diamond-producing regions.  Two additional regions, Antwerp and London, serve as the home bases for each player's corporation.  Each player has 5 units that represent their corporate agents.  All units start in their home base regions.  Players each start with 50 units of money.  Money balances can go negative or positive throughout the game with no limitation.  Each player's current money balance is secret information.
+Play takes place on a map of Angola divided into 6 diamond-producing regions.  Two additional regions, Antwerp and London, serve as the home bases for each player's corporation.  Each player has 3 units that represent their corporate agents.  All units start in their home base regions.  Players each start with 18 units of money.  Money balances can never be negative.  Each player's current money balance is secret information.
 
 \subsection{Rounds}
 
@@ -63,7 +65,7 @@ The following subsections provide details about each action.
 
 \subsubsection{Diamond accumulation}
 
-At the start of each round, additional diamonds accumulate in each of the 8 regions.  Different regions accumulate diamonds at different rates, though the rates are set at the start of the game and never change.  The following distribution of accumulation rates applies:
+At the start of each round, additional diamonds accumulate in each of the 6 regions.  Different regions accumulate diamonds at different rates, though the rates are set at the start of the game and never change.  The following distribution of accumulation rates applies:
 \begin{itemize}
 \item Three regions accumulate 1 diamond per round.
 \item Two regions accumulate 2 diamonds per round.
