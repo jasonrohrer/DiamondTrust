@@ -55,7 +55,7 @@ The game takes place across 12 rounds, each representing a month in the year 200
 \begin{enumerate}
 
 \item Diamonds accumulate in each region.
-\item Players adjust salaries and bribes.
+\item Players pay salaries and bribes.
 \item Players move their units.
 \item Diamonds are sold or auctioned in occupied regions.
 \item Players sell diamonds on the open market. 
@@ -67,34 +67,31 @@ The following subsections provide details about each action.
 
 At the start of each round, additional diamonds accumulate in each of the 6 regions.  Different regions accumulate diamonds at different rates, though the rates are set at the start of the game and never change.  The following distribution of accumulation rates applies:
 \begin{itemize}
-\item Three regions accumulate 1 diamond per round.
-\item Two regions accumulate 2 diamonds per round.
-\item Two regions accumulate 3 diamonds per round.
-\item One region accumulates 4 diamonds per round.
+\item Four regions accumulate 1 diamond per round.
+\item One region accumulates 2 diamonds per round.
+\item One region accumulates 2 diamonds in even rounds and 1 diamond in odd rounds.
 \end{itemize}
-Each region displays its accumulation rate, along with the total of uncollected diamonds that have accumulated there.
+Each region displays the total of number of uncollected diamonds that have accumulated there.  The accumulation rate is displayed on the detailed view for a given region.
 
 
 \subsubsection{Salaries and bribes}
 
-After diamond accumulation, players can adjust the salaries of any units that are in their home base regions.  All units start there, so all salaries can be adjusted at the start of the first round.  To adjust the salary of a unit later in the game, the unit must return to the home base.  Salaries are specified in money units, and there is no limit on a given unit's salary.  The salary is paid from the player's balance every round.  Salaries for each unit in the game are always visible to both players.  The main purpose of salaries is to prevent a unit from being bribed, which is described below.
+After diamond accumulation, players can pay salaries to any units that are in their home base regions.  All units start there, so all salaries can be paid at the start of the first round.  To pay additional salary to a unit later in the game, the unit must return to the home base.  Salaries are specified in money units, and there is no limit on a given unit's salary payment.  Total salaries paid so far for each unit in the game are always visible to both players.  The main purpose of salaries is to prevent a unit from being bribed, which is described below.
 
-Any unit that occupies the same region as an opponent unit can secretly subject the opponent unit to a bribe.  After adjusting salaries for units in their own home base, a player can adjust bribes for any opponent units that they occupy regions with.  Bribes are set in money units, and like salaries, they are paid from the bribing player's balance every round.  Bribes are only effective if they are greater than the salary being paid by the unit's owner.  For example, a unit with a salary of 5 can only be successfully bribed with a payment of 6 or more.
+Any unit that occupies the same region as an opponent unit can secretly subject the opponent unit to a bribe.  After paying salaries to units in their own home base, a player can pay bribes to any opponent units that they occupy regions with.  Bribes are specified in money units with no upper limit on a given payment.  Bribes are only effective if the total of bribes paid so far to a unit is greater than the total salary paid so far by the unit's owner.  For example, a unit that has received total salary payments of 5 can only be successfully bribed with total bribe payments of 6 or more.  Salary and bribe payments effectively increase the unit's loyalty to its owner or to the opponent, respectively.  In the case of a tie (total salary equals total bribe), the unit's loyalty remains with its owner. 
 
-Once a unit has been bribed, it shares all secret information with the other player.  The bribed status of the unit is hidden from the unit's owner.  The bribe may be negated by raising the unit's salary up to or above the bribe amount.
+Once a unit has been bribed, it shares all secret information with the opponent.  The bribed status of the unit is hidden from the unit's owner.  The bribe may be thwarted by paying the unit additional salary so that the total salary is at or above the total bribe amount.  If the bribe level rises above the salary again, the unit becomes bribed. 
 
-Ineffective bribes---those that are too low---are still paid each round.  They become effective instantly if the unit's salary is ever lowered below the bribe amount.
-
-To adjust the bribe on a unit, an opponent unit must co-occupy a region with that unit again.  Any of the opponent's units may be used to adjust a bribe, not just the unit that originally set the bribe.  Whatever unit last adjusted the bribe becomes the bribing unit.
+To increase the bribe on a unit, an opponent unit must co-occupy a region with that unit again.  Any of the opponent's units may be used to pay more bribe money, not just the unit that originally set the bribe.  Whatever unit last paid bribe money becomes the bribing unit.
 
 \subsubsection{Moving units}
 
-After adjusting salaries and bribes, both players simultaneously select moves for their units.  Moving units during each round is optional, and each unit moved costs 1 money unit.  Units can jump from their current region to any region on the map in a single move.  Units can move back to their home region from producing regions, but they may never move into the opponent's home region.
+After paying salaries and bribes, both players simultaneously select moves for their units.  Moving units during each round is optional, and each unit moved costs 1 money unit.  Units can jump from their current region to any region on the map in a single move.  Units can move back to their home region from producing regions, but they may never move into the opponent's home region.
 
 At most one unit from each player can occupy a given producing region.  Units can occupy a producing region alone, or they can co-occupy the region with one opponent unit.  Any number of units can occupy a home region.  Moves are made using the following sequence:
 \begin{enumerate}
 \item Players specify their moves simultaneously, in secret.
-\item Bribed units secretly reveal their destination to the opponent.
+\item Bribed units secretly reveal their destinations to the opponent.
 \item Players modify their moves simultaneously, in secret.
 \item Moves are committed.
 \end{enumerate}
@@ -102,12 +99,12 @@ At most one unit from each player can occupy a given producing region.  Units ca
 \subsubsection{Diamond sale and auction}
 
 \paragraph{Sale}
-Along with its diamond accumulation rate, each region is also assigned a {\it flat rate price}.  This is the price for which all accumulated diamonds can be bought if there is only one lone unit present in the region.  If no unit is present in a region, the diamonds simply accumulate.  A unit that is alone in a region automatically buys all accumulated diamonds at the flat rate price.  Thus, the longer a region remains unoccupied, the more diamonds accumulate for the same total price, and the more attractive the region becomes.  Flat rate prices are fixed at random, at the start of the game, using the following distribution:
+Along with its diamond accumulation rate, each region is also assigned a {\it flat rate price}.  This is the price for which all accumulated diamonds can be bought if there is only one lone unit present in the region.  If no unit is present in a region, the diamonds simply accumulate.  A unit that is alone in a region automatically buys all accumulated diamonds at the flat rate price (assuming that the player has enough funds to make the purchase).  Thus, the longer a region remains unoccupied, the more diamonds accumulate for the same total price, and the more attractive the region becomes.  Flat rate prices are fixed at random, at the start of the game, using the following distribution:
 \begin{itemize}
-\item Three regions sell their accumulated diamonds for 5 money units.
-\item Two regions sell their accumulated diamonds for 4 money units.
-\item Two regions sell their accumulated diamonds for 3 money units.
-\item One region sells its accumulated diamonds for 2 money units.
+\item One region sells its accumulated diamonds for 5 money units.
+\item One region sells its accumulated diamonds for 3 money units.
+\item Three regions sell their accumulated diamonds for 2 money units.
+\item One region sells its accumulated diamonds for 1 money unit.
 \end{itemize}
 Each region displays its flat rate price.
 
@@ -126,14 +123,19 @@ Units carry whatever diamonds they purchase.  The number of diamonds carried by 
 
 
 \subsubsection{Converting diamonds to cash}
-At the end of each round, players can sell diamonds from their home balance on the open market in exchange for money units.  There are 100 money units available each round, and these are split between the two players based on how many diamonds they each decide to sell.  If neither player sells any diamonds in the round, the money is forfeited.  If only one player sells diamonds, that player gets all 100 money units, no matter how many diamonds that player sells.  If both players sell, they get a fraction of the money units according to their fraction of the total diamonds sold.  If one player sells 5 diamonds and the other sells 8, then the first player gets 38 money units and the second player gets 61 (fractions are always rounded down to the nearest whole money unit).  
+At the end of each round, players can sell diamonds from their home balance on the open market in exchange for money units.  
 
-The number of units to sell is specified simultaneously in secret.  If a bribed unit is present in a player's home base, however, the player's chosen quantity is visible to the opponent.  Thus, selling diamonds on the open market is conducted using the following sequence: 
+If a player decides not to sell any diamonds, the player receives a flat ``allowance'' payment of 18 money units from his or her corporation.  A player that decides to sell diamonds forfeits this allowance payment and instead receives income from the diamonds sold.
+
+There are 24 money units available in the open market each round, and these are split between the two players based on how many diamonds they each decide to sell.  If neither player sells any diamonds in the round, the open market money is forfeited, though each player still receives a flat rate allowance as described above.  If only one player sells diamonds, that player gets all 24 money units, no matter how many diamonds that player sells.  If both players sell, each gets a fraction of the money units according to his or her fraction of the total diamonds sold that round.  For example, if one player sells 1 diamond and the other sells 2, then the first player gets 8 money units and the second player gets 16 (fractions are always rounded down to the nearest whole money unit).  If both sell 2 diamonds each, they each get 12 money units.  
+
+The number of diamonds to sell is specified simultaneously in secret.  If a bribed unit is present in a player's home base, however, the player's chosen quantity is visible to the opponent.  Thus, selling diamonds on the open market is conducted using the following sequence: 
 \begin{enumerate}
 \item Players specify their quantities to sell, simultaneously, in secret.
 \item Bribed units in the home bases secretly reveal the quantities to the opponent.
 \item Players modify their quantities simultaneously, in secret.
 \item Players are paid based on their fraction of the total sold.
+\item Players who sell none receive their flat rate allowance.
 \end{enumerate}
 
 \subsection{Common play pattern}
@@ -154,14 +156,16 @@ Units maintain various pieces of hidden information throughout the game.  This i
 \item Which opponent units this unit has bribed.
 \item Bribe amounts for each bribed opponent unit.
 \end{enumerate}
-By bribing an opponent's unit, a player can find out which of his or her units have been bribed, and for how much.  A player can use this information to counteract the bribes by raising salaries.
+By bribing an opponent's unit, a player can find out which of his or her units have been bribed, and for how much.  A player can use this information to counteract the bribes with additional salary payments.
 
 The home base region also maintains hidden information, including the current money balance and the number of diamonds selected for sale at the end of a round.  This information is revealed to the opponent if a bribed unit is present in the home base region.
 
 
 
 \subsection{Win condition}
-The player with the most money (or least negative balance) at the end of the 12th round is the winner.  Unsold diamond balances at the end of the 12th round are worthless.
+At the end of the 12th round, all units automatically return to their home bases and deposit their last batch of collected diamonds.  Diamonds remaining in producing regions are lost.
+
+The player with the most diamonds at the end of the 12th round is the winner.  In the event of a tie, the player with the largest money balance wins.
 
 
 \section{Platform}
@@ -196,5 +200,88 @@ http://www.un.org/News/dh/latest/angolareport\_eng.htm
 \item A chronology of Angola history.\\
 http://www.c-r.org/our-work/accord/angola/chronology.php
 \end{itemize}
+
+
+\newpage
+
+\section{Balancing}
+This section contains more detailed information about how the design of \gtitle\ is balanced.
+
+\subsection{Flat rates on regions and money allowances}
+The flat rates on producing regions control how much a player might spend on diamonds if no competitive auctions take place.  A player's base allowance during each round is \$18.  If a player moves all 3 units, the remaining balance will be \$15 after paying for the moves.  If a player purchases diamonds at the flat rate from the most expensive regions, the player will spend \$5 + \$3 + \$2, leaving \$5 left over in each round for salaries and bribes.
+
+A player will have at most \$24 of income in a given round if that player sells diamonds, in wich case the player will have \$11 left over for salaries and bribes using the above scenareo.
+
+Setting one region to have a high flat rate of \$5 ensures that there will be a cat-and-mouse dynamic around moving into that region as players wait for more diamonds to accumulate there.
+
+
+\subsection{Diamond accumulation rates}
+The number of diamonds added to regions in each round affects the overall value of diamonds in the game, relative to money.  This relationship is important when it comes to selling diamonds in exchange for extra working money.  The sole parameter for victory in the game is the number of diamonds held, so selling diamonds is only useful if the extra money will lead to the acquisition of even more diamonds.
+
+To balance the diamond selling phase, as described below, it was determined that 7.5 diamonds needed to be added to the game during each round, on average, for a total of 90 diamonds added in a 12-round game.  It was necessary for one region to accumulate different amounts of diamonds in odd and even rounds to achieve the fractional average of 7.5 diamonds per round.
+
+
+\subsection{Diamond selling phase}
+We want to avoid pure Nash equilibria (NEs) during the selling phase (where both players stick with their strategy even if they both know the strategy of the other).  A pure NE is a dominant strategy that makes for an uninteresting game.  To avoid a pure NE, we need an intransitive relationship among the strategies.  For a symmetric two-strategy game, this is impossible, so at least a three-strategy game is needed.  The following would work, where ``$\longrightarrow$'' can be read as ``beats'':
+
+\[ sell(2) \longrightarrow sell(1) \longrightarrow sell(0) \longrightarrow sell(2)
+\]
+
+Building this kind of relationship, where selling 0 beats selling 2, requires giving a non-selling player a flat-rate allowance {\it and} taking diamond value into account for the selling player.  Thus, we must compute diamond value.
+
+As described above, 90 total diamonds are added to the game.  To compute their average value in money units, we need to find the total sum of money added to the game.  Some of this money will not be spent directly on diamonds, but it will all indirectly go toward acquiring diamonds (bribing an opponent unit to gain information that will help you get more diamonds, for example).  Any money spent in a way that does not result in diamond acquisition is not a rational expenditure, given that the diamond balances are the sole victory parameter.
+
+If both players sell diamonds in a given round, at total of \$24 is injected.  If one sells and the other does not, the non-seller gets a flat allowance, so \$24 + \$18 = \$42 is injected.  If both do not sell, they both get flat allowances for a total of \$36 injected.  Thus, the minimum injection per round is \$24, while the maximum is \$42.  Over 12 rounds, the total injected ranges between \$288 and \$504.
+
+Spread over the 90 diamonds available, we have an average value that ranges between \$3.2 and \$5.6 per diamond.
+
+Assume the lower value of \$3.2 for a few examples.  If a player sells 1 diamond when the other sells none, that player gains \$24 but loses \$3.2 for the diamond sold, for a net payoff of \$20.8, thus beating the non-selling player's allowance of \$18.  However, if the selling player sells 2 diamonds, she will lose \$6.4 in value for the diamonds sold---while still gaining \$24---for a net payoff of only \$17.6, making the non-selling player the winner.
+
+If one player sells 1 and the other sells 2, they split the \$24, with one receiving \$8 and the other receiving \$16.  But they lose \$3.2 and \$6.4 for their diamonds sold, respectively, making their net payoffs \$4.8 and \$9.6, so the second player wins.
+
+For the lower bound of \$3.2 on diamond values, the following payoff matrix applies:
+
+
+\newcommand{\payoff}[5]{
+\begin{tabular}{cc}
+{\sc #3}&{\sc #4}\\
+(#1)&(#2)\\
+\multicolumn{2}{c}{{\sc #5}}
+\end{tabular}
+}
+
+
+\begin{center}
+
+\begin{tabular}{r||c|c|c}
+&Sell 0 & Sell 1 & Sell 2\\
+\hline
+\hline
+Sell 0 & \payoff{18}{18}{}{}{tie} & \payoff{18}{24 - 3.2}{}{win}{} & \payoff{18}{24 - 6.4}{win}{}{} \\
+\hline
+Sell 1 & \payoff{24 - 3.2}{18}{win}{}{} & \payoff{12 - 3.2}{12 - 3.2}{}{}{tie} & \payoff{8 - 3.2}{16 - 6.4}{}{win}{} \\
+\hline
+Sell 2 & \payoff{24 - 6.4}{18}{}{win}{} & \payoff{16 - 6.4}{8 - 3.2}{win}{}{} & \payoff{12 - 6.4}{12 - 6.4}{}{}{tie} \\
+\end{tabular}
+
+\end{center}
+For the upper bound of \$5.6 on diamond values, the following payoff matrix applies:
+
+\begin{center}
+
+\begin{tabular}{r||c|c|c}
+&Sell 0 & Sell 1 & Sell 2\\
+\hline
+\hline
+Sell 0 & \payoff{18}{18}{}{}{tie} & \payoff{18}{24 - 5.6}{}{win}{} & \payoff{18}{24 - 11.2}{win}{}{} \\
+\hline
+Sell 1 & \payoff{24 - 5.6}{18}{win}{}{} & \payoff{12 - 5.6}{12 - 5.6}{}{}{tie} & \payoff{8 - 5.6}{16 - 11.2}{}{win}{} \\
+\hline
+Sell 2 & \payoff{24 - 11.2}{18}{}{win}{} & \payoff{16 - 11.2}{8 - 5.6}{win}{}{} & \payoff{12 - 11.2}{12 - 11.2}{}{}{tie} \\
+\end{tabular}
+
+
+\end{center}
+Note that for both tables, an intransitive relationship is present.  Thus, a losing player who knows the choice of the opponent can always switch strategies to win.  Note also that $sell(0)$ beats $sell(n)$ for all $n\geq 2$, so the other possible strategies are dominated by the three-strategy set.
 
 \end{document}
