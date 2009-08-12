@@ -40,14 +40,18 @@ Two players each control a team of corporate agents that move between diamond-pr
 
 A player's agents may be secretly bribed by the opponent.  Bribed agents reveal their secret information, such as move destinations and bids, to the opponent.  Bribing costs money, though, so another strategic aspect involves deciding which of your opponent's agents to bribe and which of your own agents to trust.  Bribing the right opponent agents can reveal to you which of your own agents have been bribed, perhaps without your opponent knowing that you know.  You can then use the supposedly secret actions of these agents to mislead your opponent.  For example, if you know your opponent can see your secret bid, you might bid up an auction to push your opponent toward paying a higher price, then let your opponent win.
 
+A UN inspector moves from region to region throughout the game and searches any agents that he encounters, confiscating whatever diamonds that they are carrying.  The inspector's movement can be controlled by players in each round through competitive bribes that are selected simultaneously in secret.  Agents can return to their home regions and deposit their diamonds, thus protecting them from seizure by the UN inspector.
+
 Each player receives a fixed allowance of money each turn, but collected diamonds can be converted into extra money through an open market sale process involving secret choices that are also subject to exposure through agent bribes.  Money earned in either fashion can be used to purchase more diamonds, protect units from bribes, or bribe opponent units.  
+
 
 The game lasts for a fixed number of rounds, and the player with the most diamonds at the end of the final round wins.
 
 
 \section{Mechanical overview}
 
-Play takes place on a map of Angola divided into 6 diamond-producing regions.  Two additional regions, Antwerp and London, serve as the home bases for each player's corporation.  Each player has 3 units that represent their corporate agents.  All units start in their home base regions.  Players each start with 18 units of money.  Money balances can never be negative.  Each player's current money balance is secret information.
+Play takes place on a map of Angola divided into 6 diamond-producing regions.  Two additional regions, Antwerp and London, serve as the home bases for each player's corporation.  Each player has 3 units that represent their corporate agents.  All units start in their home base regions.  Players each start with 18 units of money.  Money balances can never be negative.  Each player's current money balance is secret information.  The UN inspector starts in a randomly-selected region of Angola.
+
 
 \subsection{Rounds}
 
@@ -57,6 +61,7 @@ The game takes place across 12 rounds, each representing a month in the year 200
 \item Diamonds accumulate in each region.
 \item Players pay salaries and bribes.
 \item Players move their units.
+\item Players bribe and move the UN inspector.
 \item Diamonds are sold or auctioned in occupied regions.
 \item Players sell diamonds on the open market. 
 \end{enumerate}
@@ -96,6 +101,26 @@ At most one unit from each player can occupy a given producing region.  Units ca
 \item Moves are committed.
 \end{enumerate}
 
+If a unit that is carrying diamonds (see below) moves into the region occupied by the UN inspector, that unit loses all the diamonds that it is carrying.
+
+
+\subsubsection{Moving the UN inspector}
+
+Players who have units in the same region as the UN inspector have the opportunity to bribe him and move him to a different region.  If one player unit occupies the inspector's region, that player can move the inspector by paying a minimal bribe of 1 money unit.
+
+If two opposing units occupy the region, they select and pay bribes using the following sequence:
+\begin{enumerate}
+\item Players specify their inspector bribes simultaneously, in secret.
+\item Bribed units secretly reveal their inspector bribe to the opponent.
+\item Players modify their bribes simultaneously, in secret.
+\item Both players pay their chosen bribes.
+\item The high bribe wins, and that player selects a new region for the inspector.
+\end{enumerate}
+Note that the winner can also chose to keep the inspector in the same region.
+
+If the UN inspector moves into a region with a unit that is carrying diamonds, that unit loses all the diamonds that it is carrying.
+
+
 \subsubsection{Diamond sale and auction}
 
 \paragraph{Sale}
@@ -122,6 +147,8 @@ In the case of a tie, neither player wins the auction, and the diamonds simply a
 
 Units carry whatever diamonds they purchase.  The number of diamonds carried by any unit is visible to both players.  When units are moved back to their home bases, they automatically deposit their diamonds there.  The total balance of diamonds at each home base is visible to both players.
 
+The presence of a UN inspector in a region prevents any sale or auction from taking place there, though diamonds still accumulate in each round.  Once the UN inspector is moved away from that region, normal sales and auctions can take place there for all of the diamonds that have accumulated.
+
 
 \subsubsection{Converting diamonds to cash}
 At the end of each round, players can sell diamonds from their home balance on the open market in exchange for money units.  
@@ -140,7 +167,7 @@ The number of diamonds to sell is specified simultaneously in secret.  If a brib
 \end{enumerate}
 
 \subsection{Common play pattern}
-All three of the gameplay systems that involve possibly-revealed hidden information use the same 4-step play pattern:
+All four of the gameplay systems that involve possibly-revealed hidden information use the same 4-step play pattern:
 \begin{enumerate}
 \item Select.
 \item Peek.
@@ -153,6 +180,7 @@ All three of the gameplay systems that involve possibly-revealed hidden informat
 Units maintain various pieces of hidden information throughout the game.  This information is secretly revealed to the opponent, without the unit's owner knowing, if the unit is successfully bribed.  Hidden information includes:
 \begin{enumerate}
 \item Move destination.
+\item UN inspector bribe amounts.
 \item Bids.
 \item Which opponent units this unit has bribed.
 \item Bribe amounts for each bribed opponent unit.
