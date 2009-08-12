@@ -101,10 +101,11 @@ At most one unit from each player can occupy a given producing region.  Units ca
 \paragraph{Sale}
 Along with its diamond accumulation rate, each region is also assigned a {\it flat rate price}.  This is the price for which all accumulated diamonds can be bought if there is only one lone unit present in the region.  If no unit is present in a region, the diamonds simply accumulate.  A unit that is alone in a region automatically buys all accumulated diamonds at the flat rate price (assuming that the player has enough funds to make the purchase).  Thus, the longer a region remains unoccupied, the more diamonds accumulate for the same total price, and the more attractive the region becomes.  Flat rate prices are fixed at random, at the start of the game, using the following distribution:
 \begin{itemize}
-\item One region sells its accumulated diamonds for 5 money units.
-\item One region sells its accumulated diamonds for 3 money units.
-\item Three regions sell their accumulated diamonds for 2 money units.
 \item One region sells its accumulated diamonds for 1 money unit.
+\item Two regions sell their accumulated diamonds for 2 money units.
+\item One region sells its accumulated diamonds for 3 money units.
+\item One region sells its accumulated diamonds for 7 money units.
+\item One region sells its accumulated diamonds for 15 money units.
 \end{itemize}
 Each region displays its flat rate price.
 
@@ -208,15 +209,17 @@ http://www.c-r.org/our-work/accord/angola/chronology.php
 This section contains more detailed information about how the design of \gtitle\ is balanced.
 
 \subsection{Flat rates on regions and money allowances}
-The flat rates on producing regions control how much a player might spend on diamonds if no competitive auctions take place.  A player's base allowance during each round is \$18.  If a player moves all 3 units, the remaining balance will be \$15 after paying for the moves.  If a player purchases diamonds at the flat rate from the most expensive regions, the player will spend \$5 + \$3 + \$2, leaving \$5 left over in each round for salaries and bribes.
+The flat rates on producing regions control how much a player might spend on diamonds if no competitive auctions take place.  A player's base allowance during each round is \$18.  If a player moves all 3 units, the remaining balance will be \$15 after paying for the moves.  If a player purchases diamonds at the flat rate from the least expensive regions, the player will spend \$1 + \$2 + \$2, leaving \$10 left over in each round for salaries and bribes.  The player would also have enough money to purchase from the most expensive region (\$15), leaving no money left for salaries and bribes.
 
-A player will have at most \$24 of income in a given round if that player sells diamonds, in which case the player will have \$11 left over for salaries and bribes using the above scenario.
+A player will have at most \$24 of income in a given round if that player sells diamonds, in which case the player will have \$16 left over for salaries and bribes using the above least-expensive-purchase scenario.
 
-Setting one region to have a high flat rate of \$5 ensures that there will be a cat-and-mouse dynamic around moving into that region as players wait for more diamonds to accumulate there.
+Setting two regions to have a high flat rates of \$7 and \$15 ensures that there will be a cat-and-mouse dynamic around moving into those regions as players wait for more diamonds to accumulate there.  The cheaper region will become attractive several times during a game, while the most expensive region will become attractive at most one or two times during a game.
+
+The three cheapest regions (\$1, \$2, and \$2) are the most obvious destinations for each player's thee units during each round.  The slightly more expensive region (\$3) is attractive to a player who hopes to avoid an auction and hopes to guarantee a diamond take during the round.
 
 
 \subsection{Diamond accumulation rates}
-The number of diamonds added to regions in each round affects the overall value of diamonds in the game, relative to money.  This relationship is important when it comes to selling diamonds in exchange for extra working money.  The sole parameter for victory in the game is the number of diamonds held, so selling diamonds is only useful if the extra money will lead to the acquisition of even more diamonds.
+The number of diamonds added to regions in each round affects the overall value of diamonds in the game, relative to money.  This ``exchange rate'' relationship is important when it comes to selling diamonds in exchange for extra working money.  The sole parameter for victory in the game is the number of diamonds held, so selling diamonds is only useful if the extra money will lead to the acquisition of even more diamonds.
 
 To balance the diamond selling phase, as described below, it was determined that 7.5 diamonds needed to be added to the game during each round, on average, for a total of 90 diamonds added in a 12-round game.  It was necessary for one region to accumulate different amounts of diamonds in odd and even rounds to achieve the fractional average of 7.5 diamonds per round.
 
