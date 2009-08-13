@@ -42,7 +42,7 @@ A player's agents may be secretly bribed by the opponent.  Bribed agents reveal 
 
 A UN inspector moves from region to region throughout the game and searches any agents that he encounters, confiscating whatever diamonds that they are carrying.  The inspector's movement can be controlled by players in each round through competitive bribes that are selected simultaneously in secret.  Agents can return to their home regions and deposit their diamonds, thus protecting them from seizure by the UN inspector.
 
-Each player receives a fixed allowance of money each turn, but collected diamonds can be converted into extra money through an open market sale process involving secret choices that are also subject to exposure through agent bribes.  Money earned in either fashion can be used to purchase more diamonds, protect units from bribes, or bribe opponent units.  
+Each player receives a fixed allowance of money each turn, but collected diamonds can be converted into extra money through an open market sale process involving secret choices that are also subject to exposure through agent bribes.  Money earned in either fashion can be used to purchase more diamonds, protect units from bribes, bribe opponent units, or bribe the UN inspector.  
 
 
 The game lasts for a fixed number of rounds, and the player with the most diamonds at the end of the final round wins.
@@ -59,7 +59,7 @@ The game takes place across 12 rounds, each representing a month in the year 200
 \begin{enumerate}
 
 \item Diamonds accumulate in each region.
-\item Players pay salaries and bribes.
+\item Players pay unit salaries and bribes.
 \item Players move their units.
 \item Players bribe and move the UN inspector.
 \item Diamonds are sold or auctioned in occupied regions.
@@ -79,7 +79,7 @@ At the start of each round, additional diamonds accumulate in each of the 6 regi
 Each region displays the total of number of uncollected diamonds that have accumulated there.  The accumulation rate is displayed on the detailed view for a given region.
 
 
-\subsubsection{Salaries and bribes}
+\subsubsection{Unit Salaries and bribes}
 
 After diamond accumulation, players can pay salaries to any units that are in their home base regions.  All units start there, so all salaries can be paid at the start of the first round.  To pay additional salary to a unit later in the game, the unit must return to the home base.  Salaries are specified in money units, and there is no limit on a given unit's salary payment.  Total salaries paid so far for each unit in the game are always visible to both players.  The main purpose of salaries is to prevent a unit from being bribed, which is described below.
 
@@ -209,7 +209,7 @@ The game makes use of ad hoc WiFi for 2-player games between two nearby DSi unit
 The game makes use of the DSi's cameras in the following ways:
 \begin{enumerate}
 
-\item During an auction, if your unit's bid is being secretly revealed to your opponent during auction step 2, your DSi's inner camera will be used to secretly snap a picture of your face.  This picture will be sent across the WiFi connection and displayed to your opponent.  The same applies for step 2 of the diamond-selling process.
+\item During an auction, if your unit's bid is being secretly revealed to your opponent during auction step 2, your DSi's inner camera will be used to secretly snap a picture of your face.  This picture will be sent across the WiFi connection and displayed to your opponent.  The same applies for step 2 of the diamond-selling process and step 2 of the inspector-bribing process.
 
 \item If you have successfully bribed the opponent unit that bribed your unit, so that you know your unit has been bribed, you will be secretly informed when you are about to have your picture taken.  ``Smile, you're being watched!'' \  The picture will still be sent to your opponent, who may not know that you know you're being watched.  Thus, you need to avoid smiling in the photo and maintain a bluffing face.  The same applies during the diamond-selling process.
 
@@ -237,7 +237,7 @@ http://www.c-r.org/our-work/accord/angola/chronology.php
 This section contains more detailed information about how the design of \gtitle\ is balanced.
 
 \subsection{Flat rates on regions and money allowances}
-The flat rates on producing regions control how much a player might spend on diamonds if no competitive auctions take place.  A player's base allowance during each round is \$18.  If a player moves all 3 units, the remaining balance will be \$15 after paying for the moves.  If a player purchases diamonds at the flat rate from the least expensive regions, the player will spend \$1 + \$2 + \$2, leaving \$10 left over in each round for salaries and bribes.  The player would also have enough money to purchase from the most expensive region (\$15), leaving no money left for salaries and bribes.
+The flat rates on producing regions control how much a player might spend on diamonds if no competitive auctions take place.  A player's base allowance during each round is \$18.  If a player moves all 3 units, the remaining balance will be \$15 after paying for the moves.  If a player purchases diamonds at the flat rate from the least expensive regions, the player will spend \$1 + \$2 + \$2, leaving \$10 left over in each round for salaries and bribes.  The player would also have enough money to purchase only from the most expensive region (\$15), leaving no money left for salaries and bribes.
 
 A player will have at most \$24 of income in a given round if that player sells diamonds, in which case the player will have \$16 left over for salaries and bribes using the above least-expensive-purchase scenario.
 
