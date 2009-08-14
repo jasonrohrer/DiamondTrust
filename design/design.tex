@@ -81,11 +81,11 @@ Each region displays the total of number of uncollected diamonds that have accum
 
 \subsubsection{Unit Salaries and bribes}
 
-After diamond accumulation, players can pay salaries to any units that are in their home base regions.  All units start there, so all salaries can be paid at the start of the first round.  To pay additional salary to a unit later in the game, the unit must return to the home base.  Salaries are specified in money units, and there is no limit on a given unit's salary payment.  Total salaries paid so far for each unit in the game are always visible to both players.  The main purpose of salaries is to prevent a unit from being bribed, which is described below.
+After diamond accumulation, players can pay salaries to any units that are in their home base regions.  All units start there, so all salaries can be paid at the start of the first round.  To pay additional salary to a unit later in the game, the unit must return to the home base.  Salaries are specified in money units, and there is no limit on a given unit's salary payment.  Total salaries paid so far for each unit in the game are secret information.  The main purpose of salaries is to prevent a unit from being bribed, which is described below.
 
 Any unit that occupies the same region as an opponent unit can secretly subject the opponent unit to a bribe.  After paying salaries to units in their own home base, a player can pay bribes to any opponent units that they occupy regions with.  Bribes are specified in money units with no upper limit on a given payment.  Bribes are only effective if the total of bribes paid so far to a unit is greater than the total salary paid so far by the unit's owner.  For example, a unit that has received total salary payments of 5 can only be successfully bribed with total bribe payments of 6 or more.  Salary and bribe payments effectively increase the unit's loyalty to its owner or to the opponent, respectively.  In the case of a tie (total salary equals total bribe), the unit's loyalty remains with its owner. 
 
-Once a unit has been bribed, it shares all secret information with the opponent.  The bribed status of the unit is hidden from the unit's owner.  The bribe may be thwarted by paying the unit additional salary so that the total salary is at or above the total bribe amount.  If the bribe level rises above the salary again, the unit becomes bribed again. 
+Once a unit has been successfully bribed, it shares all secret information with the opponent, including its current salary.  The bribed status of the unit is hidden from the unit's owner.  The bribe may be thwarted by paying the unit additional salary so that the total salary is at or above the total bribe amount.  If the bribe level rises above the salary again, the unit becomes bribed again. 
 
 To increase the bribe on a unit, an opponent unit must co-occupy a region with that unit again.  Any of the opponent's units may be used to pay more bribe money, not just the unit that originally paid the bribe.  Whatever unit last paid bribe money becomes the bribing unit.
 
@@ -179,13 +179,14 @@ All four of the gameplay systems that involve possibly-revealed hidden informati
 \subsection{Hidden information}
 Units maintain various pieces of hidden information throughout the game.  This information is secretly revealed to the opponent, without the unit's owner knowing, if the unit is successfully bribed.  Hidden information includes:
 \begin{enumerate}
+\item Unit's total salary.
+\item Which opponent units this unit has bribed.
+\item Bribe totals for each bribed opponent unit.
 \item Move destination.
 \item UN inspector bribe amounts.
 \item Bids.
-\item Which opponent units this unit has bribed.
-\item Bribe amounts for each bribed opponent unit.
 \end{enumerate}
-By bribing an opponent's unit, a player can find out which of his or her units have been bribed, and for how much.  A player can use this information to counteract the bribes with additional salary payments.
+By bribing an opponent's unit, a player can find out which of his or her units have been bribed, and for how much.  A player can use this information to counteract the bribes with additional salary payments.  Alternately, the player can use these bribed units to feed misleading information to the opponent.
 
 The home base region also maintains hidden information, including the current money balance and the number of diamonds selected for sale at the end of a round.  This information is revealed to the opponent if a bribed unit is present in the home base region.
 
@@ -236,6 +237,36 @@ http://www.c-r.org/our-work/accord/angola/chronology.php
 \section{Balancing}
 This section contains more detailed information about how the design of \gtitle\ is balanced.
 
+\subsection{Salaries and bribes}
+We want to avoid pure Nash equilibria (NEs) for salaries and bribes (where both players stick with their strategy even if they both know the strategy of the other).  A pure NE is a dominant strategy that makes for an uninteresting game.  To avoid a pure NE, we need an intransitive relationship among the strategies.  In the case of salaries and bribes of a given unit, the game is assymetric, so an intransitive relationship is possible in a 2-strategy model.
+
+Suppose that a successful bribe, along with it's cost in money, has some gameplay benefit $x$, independent of the cost of the bribe, where $x$ is also expressed in money units.  Suppose both owner and opponent have paid $z$ money units of salary and bribe respectively to a given unit (thus they are tied---both are losing the same amount of money and the opponent is reaping no benefit).  As a base case, let them each consider a 1-unit increment of their salary or bribe.  We get the following 2-strategy payoff matrix:
+\newcommand{\payoff}[5]{
+\begin{tabular}{cc}
+{\sc #3}&{\sc #4}\\
+(#1)&(#2)\\
+\multicolumn{2}{c}{{\sc #5}}
+\end{tabular}
+}
+
+
+\begin{center}
+
+\begin{tabular}{r||c|c}
+&Salary = $z + 0$& Salary = $z + 1$\\
+\hline
+\hline
+Bribe = $z + 0$& \payoff{$-z$}{$-z$}{}{}{tie} & \payoff{$-z$}{$-(z+1)$}{}{win}{} \\
+\hline
+Bribe  = $z + 1$& \payoff{$x-(z+1)$}{$-z$}{win}{}{} & \payoff{$-(z+1)$}{$-(z+1)$}{}{}{tie} \\
+\end{tabular}
+
+\end{center}
+Note that the win for the opponent in the case of (Bribe+1,Salary+0) requires that $x>1$.  If this is the case, then we have the required intransitive relationship.  While the benefit of a bribe has not been computed, we can speculate that it will be at least greater than one money unit.  For example, if a player knows the opponent's choice during the diamond selling phase because of a successful bribe, the player can force an advantage of at least one money unit on average (see below).
+
+Using this 2-strategy matrix as a base case, it is possible to prove that an intransitive relationship exists in an N-strategy matrix for any N, assuming only that $x>1$. 
+
+
 \subsection{Flat rates on regions and money allowances}
 The flat rates on producing regions control how much a player might spend on diamonds if no competitive auctions take place.  A player's base allowance during each round is \$18.  If a player moves all 3 units, the remaining balance will be \$15 after paying for the moves.  If a player purchases diamonds at the flat rate from the least expensive regions, the player will spend \$1 + \$2 + \$2, leaving \$10 left over in each round for salaries and bribes.  The player would also have enough money to purchase only from the most expensive region (\$15), leaving no money left for salaries and bribes.
 
@@ -253,12 +284,12 @@ To balance the diamond selling phase, as described below, it was determined that
 
 
 \subsection{Diamond selling phase}
-We want to avoid pure Nash equilibria (NEs) during the selling phase (where both players stick with their strategy even if they both know the strategy of the other).  A pure NE is a dominant strategy that makes for an uninteresting game.  To avoid a pure NE, we need an intransitive relationship among the strategies.  For a symmetric two-strategy game, this is impossible, so at least a three-strategy game is needed.  The following would work, where ``$\longrightarrow$'' can be read as ``beats'':
+We want to avoid pure NEs during the selling phase.  The selling phase is inherently symmetric, and for a symmetric two-strategy game, an intransitive relationship is impossible, so at least a three-strategy game is needed.  The following would work, where ``$\longrightarrow$'' can be read as ``beats'':
 
 \[ sell(2) \longrightarrow sell(1) \longrightarrow sell(0) \longrightarrow sell(2)
 \]
 
-Building this kind of relationship, where selling 0 beats selling 2, requires giving a non-selling player a flat-rate allowance {\it and} taking diamond value into account for the selling player.  Thus, we must compute diamond value.
+Building this kind of relationship, where selling 0 beats selling 2, requires giving a non-selling player a flat-rate allowance {\it and} taking diamond value into account for the selling player when computing payoffs.  Thus, we must compute diamond value.
 
 As described above, 90 total diamonds are added to the game.  To compute their average value in money units, we need to find the total sum of money added to the game.  Some of this money will not be spent directly on diamonds, but it will all indirectly go toward acquiring diamonds (bribing an opponent unit to gain information that will help you get more diamonds, for example).  Any money spent in a way that does not result in diamond acquisition is not a rational expenditure, given that the diamond balances are the sole victory parameter.
 
@@ -273,13 +304,6 @@ If one player sells 1 and the other sells 2, they split the \$24, with one recei
 For the lower bound of \$3.2 on diamond values, the following payoff matrix applies:
 
 
-\newcommand{\payoff}[5]{
-\begin{tabular}{cc}
-{\sc #3}&{\sc #4}\\
-(#1)&(#2)\\
-\multicolumn{2}{c}{{\sc #5}}
-\end{tabular}
-}
 
 
 \begin{center}
