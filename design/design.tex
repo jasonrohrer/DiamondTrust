@@ -126,7 +126,7 @@ Units carry whatever diamonds they purchase.  The number of diamonds carried by 
 
 The presence of a UN inspector in a region prevents any sale from taking place there, though diamonds still accumulate in each round.  Once the UN inspector is moved away from that region, normal sales and auctions can take place there for all of the diamonds that have accumulated.
 
-Any bids that were specified immediately befor the UN inspector moves into a region are lost and no diamond sale takes place.  In other words, bidding players still pay their bids even if the UN inspector moves in and blocks the diamond sale.  When a UN inspector leavs a region, no diamond sale takes place there until the following round.
+Any bids that were specified immediately before the UN inspector moves into a region are lost and no diamond sale takes place.  In other words, bidding players still pay their bids even if the UN inspector moves in and blocks the diamond sale.  When a UN inspector leaves a region, no diamond sale takes place there until the following round.
 
 \subsubsection{Converting diamonds to cash}
 At the end of each round, players can sell diamonds from their home balance on the open market in exchange for money units.  
@@ -215,14 +215,14 @@ http://www.c-r.org/our-work/accord/angola/chronology.php
 \section{Balancing}
 This section contains more detailed information about how the design of \gtitle\ is balanced.
 
-\subsection{Nash Equlibria}
+\subsection{Nash Equilibria}
 A pure Nash equilibrium (pure NE), where both player stick with their single, chosen strategies even if they both know the strategy of the other, generally should be avoided in multiplayer game designs.  A pure NE is a dominant strategy set that makes for an uninteresting game, since both players can pick their strategies mechanically.  Pure NEs are especially troublesome in simultaneous-decision games, because they thwart the tension of the simultaneous decisions---if knowledge of the opponent's choice doesn't change your choice, the decisions might as well be made sequentially.
 
 Furthermore, in the game \gtitle, your opponent's secret choices can be revealed to you through well-chosen bribes.  If knowledge of those choices doesn't change your choices, you might as well not pay the bribes.  In other words, if there are pure NEs surrounding other choices in the game, ``don't bribe'' becomes the pure NE for the bribing portion of the game, since bribes would have no value.
 
-Thus, a substatial effort has been made to eliminate all single-decision, pure NEs from all parts ofthe game.  Playtesting has confirmed that the game is more interesting once all of these NEs have been eliminated.
+Thus, a substantial effort has been made to eliminate all single-decision, pure NEs from all parts of the game.  Play-testing has confirmed that the game is more interesting once all of these NEs have been eliminated.
 
-One method of eliminating pure NEs is to build mechanics with an intransitive relationship amoung the available strategies.
+One method of eliminating pure NEs is to build mechanics with an intransitive relationship among the available strategies.
 
 
 \subsection{Salaries and bribes}
@@ -263,7 +263,7 @@ Auction-like systems are used in two parts of the game:  bidding for diamond pur
 
 First-bid and second-bid auctions, where only the winner pays, have a dominant strategy where both players bid the exact value of the item being auctioned.  Bidding more results in a net loss for the winner, so that is beaten by any other bid by the loser.  A low bid is always beaten or tied by any higher bid, up to the actual value of the item (where the winner has a net payoff of zero---the value of the item minus the cost paid).
 
-A game based around winner-pay auctions effectively become games about estimating the value of the items being auctioned.  As players learn this estimation, their decisons become more and more mechanical.
+A game based around winner-pay auctions effectively become games about estimating the value of the items being auctioned.  As players learn this estimation, their decisions become more and more mechanical.
 
 Both-pay auctions, where even the loser must pay her bid, are unfamiliar, but they offer much more interesting gameplay without pure NEs.
 
@@ -284,12 +284,12 @@ By rolling move selection into the bidding or inspector-bribing decision, pure N
 
 The same is true for moving into the inspector's region and specifying a bribe, where $x$ becomes the value of getting to move the inspector.
 
-Note that switching a move destination only figures into a strategy change if moves and bids are specified together.  If moves are made and revealed before bids are set, then a player has no motivation to move elsewhere after learning about an opponent's move, since this would allow the oponent to have the diamonds for 1 money unit in the subsequent bidding phase (the opponent would be able to see that she is alone in the region).  To avoid pure NEs for moving, players must set their bids without knowing whether they are alone in their regions.
+Note that switching a move destination only figures into a strategy change if moves and bids are specified together.  If moves are made and revealed before bids are set, then a player has no motivation to move elsewhere after learning about an opponent's move, since this would allow the opponent to have the diamonds for 1 money unit in the subsequent bidding phase (the opponent would be able to see that she is alone in the region).  To avoid pure NEs for moving, players must set their bids without knowing whether they are alone in their regions.
 
 \subsection{Money allowances}
-To avoid as much fraction rounding as possible during the diamond-selling phase, the total allowance for open-market sales should be divisible by 2, 3, and 4.  This covers a wide variety of possible player choices for selling diamonds (one player selling 1, the other selling 3, both selling 2, and so on).  Thus, the smallest possible open-market allowance is 12.  Moving all three units consumes 3 of those money units.  If each unit bids 1 in its region, only 6 are left for salaries and bribes.  This would allow for only 1 unit of salary per owned unit and 1 unit of bribe per opponent unit---not enough room for expressivity.
+To avoid as much fraction rounding as possible during the diamond-selling phase, the total allowance for open-market sales should be divisible by 2, 3, and 4.  This covers a wide variety of possible player choices for selling diamonds (one player selling 1, the other selling 3, both selling 2, and so on).  Thus, the smallest possible open-market allowance is 12.  Moving all three units consumes 3 of those money units.  If each unit bids 1 in its region, only 6 are left for salaries and bribes.  This would allow for only 1 unit of salary per owned unit and 1 unit of bribe per opponent unit---not enough room for player expression.
 
-The next appropriately-divisible value is 24.  Moving and minimal bids would consume 6 units, leaving 18 for salaries and bribes, at an average of 3 per unit.  This allows for much more expressivity without overwhelming players with large numbers.
+The next appropriately-divisible value is 24.  Moving and minimal bids would consume 6 units, leaving 18 for salaries and bribes, at an average of 3 per unit.  This allows for much more player expression without overwhelming players with large numbers.
 
 The fixed-rate allowance of 18 was selected, based on the choice of 24, to fulfill the NE-elimination requirements described below.
 
