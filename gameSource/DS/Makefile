@@ -4,7 +4,7 @@ TARGET_PLATFORM = TWL NITRO
 
 SUBDIRS = 
 
-SRCS = main.c
+SRCS = main.cpp
 TARGET_BIN = main.srl
 
 
