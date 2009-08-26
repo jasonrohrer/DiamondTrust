@@ -7,6 +7,11 @@ SUBDIRS =
 SRCS = main.cpp
 TARGET_BIN = main.srl
 
+MAKEROM_ROMROOT = ../gameData 
+MAKEROM_ROMFILES = * 
+
+
+INCDIR = ..
 
 # use defaults for these
 # SRCDIR =

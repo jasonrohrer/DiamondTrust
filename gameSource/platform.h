@@ -8,6 +8,30 @@
 // **
 
 
+void *allocMem( unsigned int inSizeInBytes );
+void  freeMem( void *inRegion );
+
+// reads full contents of a file into newly-allocated memory
+unsigned char *readFile( char *inFileName, int *outSize );
+
+
+struct rgbaColorStruct {
+        unsigned char r;
+        unsigned char g;
+        unsigned char b;
+        unsigned char a;
+    };
+typedef struct rgbaColorStruct rgbaColor;
+
+
+// creates sprite from 32-bit image data
+// returns handle to sprite
+int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
+
+// draws sprite at position and with color, including alpha for transparency
+void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
+
+
 
 
 // **
