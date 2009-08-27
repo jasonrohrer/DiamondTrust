@@ -29,6 +29,7 @@ typedef struct rgbaColorStruct rgbaColor;
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 
 // draws sprite at position and with color, including alpha for transparency
+// sprite is drawn on the currently-drawing screen
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
 
 
@@ -44,6 +45,12 @@ void gameInit();
 
 // called during each iteration of main loop
 void gameLoopTick();
+
+// called when drawing is initiated for each screen
+// all drawSprite must occur in these functions.
+void drawTopScreen();
+void drawBottomScreen();
+
 
 
 

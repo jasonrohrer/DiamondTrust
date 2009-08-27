@@ -4,7 +4,15 @@ TARGET_PLATFORM = TWL NITRO
 
 SUBDIRS = 
 
-SRCS = main.cpp
+DS_SOURCE = main.cpp
+
+GAME_SOURCE = game.cpp
+# append path
+PATH_GAME_SOURCE = $(patsubst %,../%,$(GAME_SOURCE))
+
+
+SRCS = $(DS_SOURCE) $(PATH_GAME_SOURCE)
+
 TARGET_BIN = main.srl
 
 MAKEROM_ROMROOT = ../gameData 
