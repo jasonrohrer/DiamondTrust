@@ -6,7 +6,10 @@ SUBDIRS =
 
 DS_SOURCE = main.cpp
 
-GAME_SOURCE = game.cpp
+GAME_SOURCE = \
+game.cpp \
+tga.cpp \
+
 # append path
 PATH_GAME_SOURCE = $(patsubst %,../%,$(GAME_SOURCE))
 

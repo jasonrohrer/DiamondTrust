@@ -55,6 +55,18 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
 
 
 
+void printOut( const char *inFormatString, ... ) {
+    va_list argList;
+    va_start( argList, inFormatString );
+
+    OS_VPrintf( inFormatString, argList );
+
+    va_end( argList );
+    }
+
+
+
+
 
 // stuff for drawing 3D on both screens (one screen each vblank)
 
@@ -344,7 +356,11 @@ static void VBlankCallback() {
     OS_WaitVBlankIntr();
     GX_DispOn();
     GXS_DispOn();
-
+    
+    // init in platform-independent code
+    gameInit();
+    
+    
     while( true ){
         G3X_Reset();
 
@@ -358,6 +374,9 @@ static void VBlankCallback() {
 
         if( isEvenFrame ) {
             drawTopScreen();
+            
+            // game loop every-other screen
+            gameLoopTick();
             }
         else {
             drawBottomScreen();

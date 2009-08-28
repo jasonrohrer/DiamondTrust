@@ -1,3 +1,6 @@
+#ifndef PLATFORM_INCLUDED
+#define PLATFORM_INCLUDED
+
 // interface for a game platform
 // separates platform-dependent code from platform independent code
 // platform-dependent code provides the main loop
@@ -13,6 +16,11 @@ void  freeMem( void *inRegion );
 
 // reads full contents of a file into newly-allocated memory
 unsigned char *readFile( char *inFileName, int *outSize );
+
+
+// conforms to specification for printf, generally
+void printOut( const char *inFormatString, ... );
+
 
 
 struct rgbaColorStruct {
@@ -52,5 +60,6 @@ void drawTopScreen();
 void drawBottomScreen();
 
 
+#endif
 
 
