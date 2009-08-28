@@ -154,10 +154,9 @@ void swapThreadProcess( void *inData ) {
                 }
             shouldSwap = false;
             isEvenFrame = !isEvenFrame;
-        
-
-            OS_SleepThread( NULL );
             }
+        
+        OS_SleepThread( NULL );    
         }
     }
 
