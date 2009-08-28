@@ -34,6 +34,7 @@ typedef struct rgbaColorStruct rgbaColor;
 
 // creates sprite from 32-bit image data
 // returns handle to sprite
+// data destroyed by caller
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 
 // draws sprite at position and with color, including alpha for transparency

@@ -66,6 +66,170 @@ void printOut( const char *inFormatString, ... ) {
 
 
 
+#define MAX_TEXTURES  256
+
+struct textureInfoStruct {
+        unsigned int slotAddress;
+        GXTexSizeS w;
+        GXTexSizeT h;
+        // FIXME:  store W and H too
+    };
+
+typedef struct textureInfoStruct textureInfo;
+
+textureInfo textureInfoArray[ MAX_TEXTURES ];
+
+int nextTextureInfoIndex = 0;
+unsigned int nextTextureSlotAddress = 0x1000;
+
+
+int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
+    
+    textureInfo t = { nextTextureSlotAddress, 0, 0 };
+    
+    switch( inWidth ) {
+        case 8:
+            t.w = GX_TEXSIZE_S8;
+            break;
+        case 16:
+            t.w = GX_TEXSIZE_S16;
+            break;
+        case 32:
+            t.w = GX_TEXSIZE_S32;
+            break;
+        case 64:
+            t.w = GX_TEXSIZE_S64;
+            break;
+        case 128:
+            t.w = GX_TEXSIZE_S128;
+            break;
+        case 256:
+            t.w = GX_TEXSIZE_S256;
+            break;
+        case 512:
+            t.w = GX_TEXSIZE_S512;
+            break;
+        case 1024:
+            t.w = GX_TEXSIZE_S1024;
+            break;
+        default:
+            printOut( "Unsupported texture width, %d\n", inWidth );
+        }
+    switch( inHeight ) {
+        case 8:
+            t.h = GX_TEXSIZE_T8;
+            break;
+        case 16:
+            t.h = GX_TEXSIZE_T16;
+            break;
+        case 32:
+            t.h = GX_TEXSIZE_T32;
+            break;
+        case 64:
+            t.h = GX_TEXSIZE_T64;
+            break;
+        case 128:
+            t.h = GX_TEXSIZE_T128;
+            break;
+        case 256:
+            t.h = GX_TEXSIZE_T256;
+            break;
+        case 512:
+            t.h = GX_TEXSIZE_T512;
+            break;
+        case 1024:
+            t.h = GX_TEXSIZE_T1024;
+            break;
+        default:
+            printOut( "Unsupported texture width, %d\n", inWidth );
+        }
+
+    textureInfoArray[ nextTextureInfoIndex ] = t;
+    int returnIndex = nextTextureInfoIndex;
+    
+    nextTextureInfoIndex++;
+    
+
+    unsigned int numPixels = (unsigned int)( inWidth * inHeight );
+    
+    unsigned short *textureData = (unsigned short *)allocMem( numPixels * 2 );
+    
+    for( int i=0; i<numPixels; i++ ) {
+        // discard lowest 3 bits for each color
+        // discard all but 1 bit for alpha
+        
+        rgbaColor c = inDataRGBA[i];
+        
+        textureData[i] =
+            ( c.r >> 3 ) << 11 ||
+            ( c.g >> 3 ) << 6 ||
+            ( c.b >> 3 ) << 1 ||
+            ( c.a >> 7 );
+        }
+    
+            
+            
+
+    GX_BeginLoadTex();
+    
+    GX_LoadTex( textureData, 
+                t.slotAddress,
+                numPixels * 2 );
+    
+    GX_EndLoadTex(); 
+
+    nextTextureSlotAddress += numPixels * 2;
+
+    freeMem( textureData );
+    
+
+    return returnIndex;
+    }
+
+
+
+void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
+
+    G3_TexImageParam( GX_TEXFMT_DIRECT,
+                      GX_TEXGEN_TEXCOORD,
+                      textureInfoArray[ inHandle ].w,
+                      textureInfoArray[ inHandle ].h,
+                      GX_TEXREPEAT_NONE,
+                      GX_TEXFLIP_NONE,
+                      GX_TEXPLTTCOLOR0_USE,
+                      textureInfoArray[ inHandle ].slotAddress );
+    
+    
+    // 5 high-order bits
+    int a = inColor.a >> 3;
+    
+    // avoid wireframe
+    if( a = 0 ) {
+        a = 1;
+        }
+    
+    G3_PolygonAttr( GX_LIGHTMASK_0,
+                    GX_POLYGONMODE_DECAL,
+                    GX_CULL_NONE,
+                    0,
+                    a,
+                    0 );
+
+
+    G3_Begin( GX_BEGIN_QUADS );
+
+    // FIXME:  need W and H here
+    G3_Direct1( G3OP_TEXCOORD, GX_ST( 0, 64 * FX32_ONE ) );
+    G3_Vtx( FX16_ONE, FX16_ONE, FX16_ONE );
+    
+    G3_End();
+
+    }
+
+
+
+
+
 
 
 // stuff for drawing 3D on both screens (one screen each vblank)
@@ -239,6 +403,8 @@ static void VBlankCallback() {
     G3X_Init();
     G3X_InitTable();
     G3X_InitMtxStack();
+    GX_SetBankForTex( GX_VRAM_TEX_0_A );
+
     G3X_AntiAlias(TRUE);
 
 
@@ -370,7 +536,18 @@ static void VBlankCallback() {
         VecFx32 upVector = { 0, FX32_ONE, 0 };
 
         G3_LookAt( &cameraPos, &upVector, &lookAt, NULL );
+        
+        // dead on white light from front
+        G3_LightVector( GX_LIGHTID_0, 0, 0, -FX16_ONE );
+        G3_LightColor( GX_LIGHTID_0, GX_RGB( 31, 31, 31 ) );
+
         G3_PushMtx();
+
+        
+        G3_MtxMode( GX_MTXMODE_TEXTURE );
+        G3_Identity();
+        G3_MtxMode( GX_MTXMODE_POSITION_VECTOR );
+
 
         if( isEvenFrame ) {
             drawTopScreen();
