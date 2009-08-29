@@ -70,9 +70,11 @@ void printOut( const char *inFormatString, ... ) {
 
 struct textureInfoStruct {
         unsigned int slotAddress;
-        GXTexSizeS w;
-        GXTexSizeT h;
-        // FIXME:  store W and H too
+        int w;
+        int h;
+        GXTexSizeS sizeS;
+        GXTexSizeT sizeT;
+        GXSt texCoordCorners[4];
     };
 
 typedef struct textureInfoStruct textureInfo;
@@ -87,62 +89,71 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     
     textureInfo t = { nextTextureSlotAddress, 0, 0 };
     
+    t.w = inWidth;
+    t.h = inHeight;
+
     switch( inWidth ) {
         case 8:
-            t.w = GX_TEXSIZE_S8;
+            t.sizeS = GX_TEXSIZE_S8;
             break;
         case 16:
-            t.w = GX_TEXSIZE_S16;
+            t.sizeS = GX_TEXSIZE_S16;
             break;
         case 32:
-            t.w = GX_TEXSIZE_S32;
+            t.sizeS = GX_TEXSIZE_S32;
             break;
         case 64:
-            t.w = GX_TEXSIZE_S64;
+            t.sizeS = GX_TEXSIZE_S64;
             break;
         case 128:
-            t.w = GX_TEXSIZE_S128;
+            t.sizeS = GX_TEXSIZE_S128;
             break;
         case 256:
-            t.w = GX_TEXSIZE_S256;
+            t.sizeS = GX_TEXSIZE_S256;
             break;
         case 512:
-            t.w = GX_TEXSIZE_S512;
+            t.sizeS = GX_TEXSIZE_S512;
             break;
         case 1024:
-            t.w = GX_TEXSIZE_S1024;
+            t.sizeS = GX_TEXSIZE_S1024;
             break;
         default:
             printOut( "Unsupported texture width, %d\n", inWidth );
         }
     switch( inHeight ) {
         case 8:
-            t.h = GX_TEXSIZE_T8;
+            t.sizeT = GX_TEXSIZE_T8;
             break;
         case 16:
-            t.h = GX_TEXSIZE_T16;
+            t.sizeT = GX_TEXSIZE_T16;
             break;
         case 32:
-            t.h = GX_TEXSIZE_T32;
+            t.sizeT = GX_TEXSIZE_T32;
             break;
         case 64:
-            t.h = GX_TEXSIZE_T64;
+            t.sizeT = GX_TEXSIZE_T64;
             break;
         case 128:
-            t.h = GX_TEXSIZE_T128;
+            t.sizeT = GX_TEXSIZE_T128;
             break;
         case 256:
-            t.h = GX_TEXSIZE_T256;
+            t.sizeT = GX_TEXSIZE_T256;
             break;
         case 512:
-            t.h = GX_TEXSIZE_T512;
+            t.sizeT = GX_TEXSIZE_T512;
             break;
         case 1024:
-            t.h = GX_TEXSIZE_T1024;
+            t.sizeT = GX_TEXSIZE_T1024;
             break;
         default:
             printOut( "Unsupported texture width, %d\n", inWidth );
         }
+    
+    t.texCoordCorners[0] = GX_ST( 0, 0 );
+    t.texCoordCorners[1] = GX_ST( 0,  inHeight * FX32_ONE );
+    t.texCoordCorners[2] = GX_ST( inWidth * FX32_ONE,  inHeight * FX32_ONE );
+    t.texCoordCorners[3] = GX_ST( inWidth * FX32_ONE,  0 );
+    
 
     textureInfoArray[ nextTextureInfoIndex ] = t;
     int returnIndex = nextTextureInfoIndex;
@@ -190,38 +201,82 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
+    textureInfo t = textureInfoArray[ inHandle ];
+    
+    /*
+      // turn texture off for testing
     G3_TexImageParam( GX_TEXFMT_DIRECT,
                       GX_TEXGEN_TEXCOORD,
-                      textureInfoArray[ inHandle ].w,
-                      textureInfoArray[ inHandle ].h,
+                      t.sizeS,
+                      t.sizeT,
                       GX_TEXREPEAT_NONE,
                       GX_TEXFLIP_NONE,
                       GX_TEXPLTTCOLOR0_USE,
                       textureInfoArray[ inHandle ].slotAddress );
-    
+    */
     
     // 5 high-order bits
     int a = inColor.a >> 3;
     
     // avoid wireframe
-    if( a = 0 ) {
+    if( a == 0 ) {
         a = 1;
         }
     
-    G3_PolygonAttr( GX_LIGHTMASK_0,
+    G3_PolygonAttr( GX_LIGHTMASK_NONE,//GX_LIGHTMASK_0,
                     GX_POLYGONMODE_DECAL,
                     GX_CULL_NONE,
                     0,
-                    a,
+                    31,//a,
                     0 );
+
+
+    // FIXME:  fx16 only has 3-bit integer part
+    // not enough room to house inX or inY, which will be screen coordinates
+    
+    // maybe set vertices as (0, FX1_ONE) style coordinates and then use
+    // these functions beforehand to position sprite:
+
+    // void G3_Scale(fx32 x, fx32 y, fx32 z)
+    // G3_Translate(fx32 x, fx32 y, fx32 z);
+    G3_Translate(0, 0, -5 * FX32_ONE);
 
 
     G3_Begin( GX_BEGIN_QUADS );
 
-    // FIXME:  need W and H here
-    G3_Direct1( G3OP_TEXCOORD, GX_ST( 0, 64 * FX32_ONE ) );
-    G3_Vtx( FX16_ONE, FX16_ONE, FX16_ONE );
+    // set color once
+    //G3_Color( GX_RGB( inColor.r >> 3, inColor.g >> 3, inColor.b >> 3 ) );
+    G3_Color( GX_RGB( 31, 31, 31 ) );
+
     
+    // set z coord once
+    G3_Vtx( 0, 0, -5 * FX16_ONE );
+
+
+    
+    inX = 0;
+    inY = 0;
+    t.h = 2;
+    t.w = 2;
+
+    // four corners
+    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
+    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( inX << FX32_SHIFT, FX32_ONE ) ), 
+              FX_F32_TO_FX16( FX_Mul( inY << FX32_SHIFT, FX32_ONE ) ) );
+
+    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
+    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( inX << FX32_SHIFT, FX16_ONE ) ), 
+              FX_F32_TO_FX16( FX_Mul( (inY + t.h) << FX32_SHIFT, FX32_ONE ) ) );
+    
+
+    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
+    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( (inX + t.w) << FX32_SHIFT, FX32_ONE ) ), 
+              FX_F32_TO_FX16( FX_Mul( (inY + t.h) << FX32_SHIFT, FX32_ONE ) ) );
+
+    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
+    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( (inX + t.w) << FX32_SHIFT, FX32_ONE ) ), 
+              FX_F32_TO_FX16( FX_Mul( inY << FX32_SHIFT, FX32_ONE ) ) );
+        
     G3_End();
 
     }
@@ -536,10 +591,12 @@ static void VBlankCallback() {
         VecFx32 upVector = { 0, FX32_ONE, 0 };
 
         G3_LookAt( &cameraPos, &upVector, &lookAt, NULL );
-        
+
+        /*
         // dead on white light from front
         G3_LightVector( GX_LIGHTID_0, 0, 0, -FX16_ONE );
         G3_LightColor( GX_LIGHTID_0, GX_RGB( 31, 31, 31 ) );
+        */
 
         G3_PushMtx();
 
