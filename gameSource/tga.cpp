@@ -107,7 +107,7 @@ rgbaColor *extractTGAData( unsigned char *inData, int inNumBytes,
                 rgbaData[i].b = raster[ rasterIndex++ ];
                 rgbaData[i].g = raster[ rasterIndex++ ];
                 rgbaData[i].r = raster[ rasterIndex++ ];
-                rgbaData[i].a = 0;
+                rgbaData[i].a = 255;
                 }
             }
         else {
@@ -120,7 +120,7 @@ rgbaColor *extractTGAData( unsigned char *inData, int inNumBytes,
                     rgbaData[ imageIndex ].b = raster[ rasterIndex++ ];
                     rgbaData[ imageIndex ].g = raster[ rasterIndex++ ];
                     rgbaData[ imageIndex ].r = raster[ rasterIndex++ ];
-                    rgbaData[ imageIndex ].a = 0;
+                    rgbaData[ imageIndex ].a = 255;
                     }
                 }
             }

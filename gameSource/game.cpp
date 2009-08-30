@@ -43,4 +43,12 @@ void drawTopScreen() {
     }
 
 
-void drawBottomScreen() {}
+void drawBottomScreen() {
+    rgbaColor c;
+    c.r = 255;
+    c.g = 255;
+    c.b = 255;
+    c.a = 255;
+    
+    drawSprite( spriteID, 100, 100, c );
+    }

@@ -87,8 +87,9 @@ unsigned int nextTextureSlotAddress = 0x1000;
 
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     
-    textureInfo t = { nextTextureSlotAddress, 0, 0 };
-    
+    textureInfo t;
+
+    t.slotAddress = nextTextureSlotAddress;
     t.w = inWidth;
     t.h = inHeight;
 
@@ -148,12 +149,18 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         default:
             printOut( "Unsupported texture width, %d\n", inWidth );
         }
-    
+    /*
     t.texCoordCorners[0] = GX_ST( 0, 0 );
-    t.texCoordCorners[1] = GX_ST( 0,  inHeight * FX32_ONE );
-    t.texCoordCorners[2] = GX_ST( inWidth * FX32_ONE,  inHeight * FX32_ONE );
-    t.texCoordCorners[3] = GX_ST( inWidth * FX32_ONE,  0 );
-    
+    t.texCoordCorners[1] = GX_ST( 0,  inHeight << FX32_SHIFT );
+    t.texCoordCorners[2] = GX_ST( inWidth << FX32_SHIFT,  
+                                  inHeight << FX32_SHIFT );
+    t.texCoordCorners[3] = GX_ST( inWidth << FX32_SHIFT,  0 );
+    */
+    t.texCoordCorners[0] = GX_ST( 0, 0 );
+    t.texCoordCorners[1] = GX_ST( 0,  16 * FX32_ONE );
+    t.texCoordCorners[2] = GX_ST( 16 * FX32_ONE,  
+                                  16 * FX32_ONE );
+    t.texCoordCorners[3] = GX_ST( 16 * FX32_ONE,  0 );
 
     textureInfoArray[ nextTextureInfoIndex ] = t;
     int returnIndex = nextTextureInfoIndex;
@@ -164,18 +171,20 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     unsigned int numPixels = (unsigned int)( inWidth * inHeight );
     
     unsigned short *textureData = (unsigned short *)allocMem( numPixels * 2 );
-    
+ 
+
     for( int i=0; i<numPixels; i++ ) {
         // discard lowest 3 bits for each color
         // discard all but 1 bit for alpha
         
         rgbaColor c = inDataRGBA[i];
         
-        textureData[i] =
-            ( c.r >> 3 ) << 11 ||
-            ( c.g >> 3 ) << 6 ||
-            ( c.b >> 3 ) << 1 ||
-            ( c.a >> 7 );
+        textureData[i] = (unsigned short)( 
+            ( c.a >> 7 ) << 15 |
+            ( c.b >> 3 ) << 10 |
+            ( c.g >> 3 ) << 5 |
+            ( c.r >> 3 ) );
+        
         }
     
             
@@ -203,8 +212,8 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
     textureInfo t = textureInfoArray[ inHandle ];
     
-    /*
-      // turn texture off for testing
+    
+    
     G3_TexImageParam( GX_TEXFMT_DIRECT,
                       GX_TEXGEN_TEXCOORD,
                       t.sizeS,
@@ -212,8 +221,8 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
                       GX_TEXREPEAT_NONE,
                       GX_TEXFLIP_NONE,
                       GX_TEXPLTTCOLOR0_USE,
-                      textureInfoArray[ inHandle ].slotAddress );
-    */
+                      t.slotAddress );
+
     
     // 5 high-order bits
     int a = inColor.a >> 3;
@@ -222,13 +231,13 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     if( a == 0 ) {
         a = 1;
         }
-    
+
     G3_PolygonAttr( GX_LIGHTMASK_NONE,//GX_LIGHTMASK_0,
                     GX_POLYGONMODE_DECAL,
                     GX_CULL_NONE,
                     0,
                     31,//a,
-                    0 );
+                    GX_POLYGON_ATTR_MISC_NONE );
 
 
     // FIXME:  fx16 only has 3-bit integer part
@@ -239,7 +248,7 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
     // void G3_Scale(fx32 x, fx32 y, fx32 z)
     // G3_Translate(fx32 x, fx32 y, fx32 z);
-    G3_Translate(0, 0, -5 * FX32_ONE);
+    G3_Translate(0, 0, (-5  << FX32_SHIFT ) );
 
 
     G3_Begin( GX_BEGIN_QUADS );
@@ -250,7 +259,7 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
     
     // set z coord once
-    G3_Vtx( 0, 0, -5 * FX16_ONE );
+    //G3_Vtx( 0, 0, 0 );//FX_F32_TO_FX16( -5 << FX32_SHIFT ) );
 
 
     
@@ -260,23 +269,41 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     t.w = 2;
 
     // four corners
-    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
-    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( inX << FX32_SHIFT, FX32_ONE ) ), 
-              FX_F32_TO_FX16( FX_Mul( inY << FX32_SHIFT, FX32_ONE ) ) );
 
+    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
+    //G3_Color( GX_RGB( 31, 0, 0 ) );
+    G3_Vtx( -FX16_ONE, FX16_ONE, FX16_ONE );
+    
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
-    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( inX << FX32_SHIFT, FX16_ONE ) ), 
-              FX_F32_TO_FX16( FX_Mul( (inY + t.h) << FX32_SHIFT, FX32_ONE ) ) );
+    //G3_Color( GX_RGB( 0, 31, 0 ) );
+    G3_Vtx( -FX16_ONE, -FX16_ONE, FX16_ONE );
+    
+    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
+    //G3_Color( GX_RGB( 0, 0, 31 ) );
+    G3_Vtx( FX16_ONE, -FX16_ONE, FX16_ONE );
+    
+    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[3] );
+    //G3_Color( GX_RGB( 31, 31, 31 ) );
+    G3_Vtx( FX16_ONE, FX16_ONE, FX16_ONE );
+
+    /*
+    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
+    G3_VtxXY( FX_F32_TO_FX16( inX << FX32_SHIFT ), 
+              FX_F32_TO_FX16( inY << FX32_SHIFT ) );
+
+    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
+    G3_VtxXY( FX_F32_TO_FX16( inX << FX32_SHIFT ), 
+              FX_F32_TO_FX16( (inY + t.h) << FX32_SHIFT ) );
     
 
-    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
-    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( (inX + t.w) << FX32_SHIFT, FX32_ONE ) ), 
-              FX_F32_TO_FX16( FX_Mul( (inY + t.h) << FX32_SHIFT, FX32_ONE ) ) );
+    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
+    G3_VtxXY( FX_F32_TO_FX16( (inX + t.w) << FX32_SHIFT ), 
+              FX_F32_TO_FX16( (inY + t.h) << FX32_SHIFT ) );
 
-    G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
-    G3_VtxXY( FX_F32_TO_FX16( FX_Mul( (inX + t.w) << FX32_SHIFT, FX32_ONE ) ), 
-              FX_F32_TO_FX16( FX_Mul( inY << FX32_SHIFT, FX32_ONE ) ) );
-        
+    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
+    G3_VtxXY( FX_F32_TO_FX16( (inX + t.w) << FX32_SHIFT ), 
+              FX_F32_TO_FX16( inY << FX32_SHIFT ) );
+    */  
     G3_End();
 
     }
