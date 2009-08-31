@@ -22,6 +22,10 @@ unsigned char *readFile( char *inFileName, int *outSize );
 void printOut( const char *inFormatString, ... );
 
 
+// random value greater than or equal to 0 and less than inMax
+unsigned int getRandom( unsigned int inMax );
+
+
 
 struct rgbaColorStruct {
         unsigned char r;
@@ -40,6 +44,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 // draws sprite at position and with color, including alpha for transparency
 // sprite is drawn on the currently-drawing screen
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
+
+
 
 
 

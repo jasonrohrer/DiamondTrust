@@ -66,6 +66,15 @@ void printOut( const char *inFormatString, ... ) {
 
 
 
+MATHRandContext32 randContext;
+
+unsigned int getRandom( unsigned int inMax ) {
+    return MATH_Rand32( &randContext, inMax );
+    }
+
+
+
+
 #define MAX_TEXTURES  256
 
 struct textureInfoStruct {
@@ -149,19 +158,13 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         default:
             printOut( "Unsupported texture width, %d\n", inWidth );
         }
-    /*
-    t.texCoordCorners[0] = GX_ST( 0, 0 );
-    t.texCoordCorners[1] = GX_ST( 0,  inHeight << FX32_SHIFT );
-    t.texCoordCorners[2] = GX_ST( inWidth << FX32_SHIFT,  
+    
+    t.texCoordCorners[0] = GX_ST( 0,  inHeight << FX32_SHIFT );
+    t.texCoordCorners[1] = GX_ST( 0, 0 );
+    t.texCoordCorners[2] = GX_ST( inWidth << FX32_SHIFT,  0 );
+    t.texCoordCorners[3] = GX_ST( inWidth << FX32_SHIFT,  
                                   inHeight << FX32_SHIFT );
-    t.texCoordCorners[3] = GX_ST( inWidth << FX32_SHIFT,  0 );
-    */
-    t.texCoordCorners[0] = GX_ST( 0, 0 );
-    t.texCoordCorners[1] = GX_ST( 0,  16 * FX32_ONE );
-    t.texCoordCorners[2] = GX_ST( 16 * FX32_ONE,  
-                                  16 * FX32_ONE );
-    t.texCoordCorners[3] = GX_ST( 16 * FX32_ONE,  0 );
-
+    
     textureInfoArray[ nextTextureInfoIndex ] = t;
     int returnIndex = nextTextureInfoIndex;
     
@@ -208,6 +211,12 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
 
 
+// fake z buffer values to force proper sorting (later sprites on top)
+fx16 farZ = -7 * FX16_ONE;
+fx16 drawZ = farZ;
+fx16 drawZIncrement = 0x0004;
+
+
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
     textureInfo t = textureInfoArray[ inHandle ];
@@ -229,33 +238,37 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     
     // avoid wireframe
     if( a == 0 ) {
-        a = 1;
+        // draw nothing
+        return;
         }
 
     G3_PolygonAttr( GX_LIGHTMASK_NONE,//GX_LIGHTMASK_0,
-                    GX_POLYGONMODE_DECAL,
+                    GX_POLYGONMODE_MODULATE,
                     GX_CULL_NONE,
                     0,
-                    31,//a,
+                    a,
                     GX_POLYGON_ATTR_MISC_NONE );
 
+    G3_PushMtx();
 
-    // FIXME:  fx16 only has 3-bit integer part
-    // not enough room to house inX or inY, which will be screen coordinates
+
+    // fx16 used to specify vertices only has 3-bit integer part
+    // not enough room to house inX or inY, which will be pixel coordinates
     
-    // maybe set vertices as (0, FX1_ONE) style coordinates and then use
+    // set vertices as (0, FX1_ONE) style coordinates and then use
     // these functions beforehand to position sprite:
-
-    // void G3_Scale(fx32 x, fx32 y, fx32 z)
-    // G3_Translate(fx32 x, fx32 y, fx32 z);
-    G3_Translate(0, 0, (-5  << FX32_SHIFT ) );
+    G3_Translate( inX << FX32_SHIFT, inY << FX32_SHIFT, drawZ );
+    G3_Scale( t.w << FX32_SHIFT, t.h << FX32_SHIFT, FX32_ONE );
+    
+    drawZ += drawZIncrement;
+    
 
 
     G3_Begin( GX_BEGIN_QUADS );
 
     // set color once
-    //G3_Color( GX_RGB( inColor.r >> 3, inColor.g >> 3, inColor.b >> 3 ) );
-    G3_Color( GX_RGB( 31, 31, 31 ) );
+    G3_Color( GX_RGB( inColor.r >> 3, inColor.g >> 3, inColor.b >> 3 ) );
+    //G3_Color( GX_RGB( 31, 31, 31 ) );
 
     
     // set z coord once
@@ -272,19 +285,19 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
     //G3_Color( GX_RGB( 31, 0, 0 ) );
-    G3_Vtx( -FX16_ONE, FX16_ONE, FX16_ONE );
+    G3_Vtx( 0, FX16_ONE, 0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
     //G3_Color( GX_RGB( 0, 31, 0 ) );
-    G3_Vtx( -FX16_ONE, -FX16_ONE, FX16_ONE );
+    G3_Vtx( 0, 0, 0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
     //G3_Color( GX_RGB( 0, 0, 31 ) );
-    G3_Vtx( FX16_ONE, -FX16_ONE, FX16_ONE );
+    G3_Vtx( FX16_ONE, 0, 0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[3] );
     //G3_Color( GX_RGB( 31, 31, 31 ) );
-    G3_Vtx( FX16_ONE, FX16_ONE, FX16_ONE );
+    G3_Vtx( FX16_ONE, FX16_ONE, 0 );
 
     /*
     //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
@@ -306,6 +319,7 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     */  
     G3_End();
 
+    G3_PopMtx( 1 );
     }
 
 
@@ -441,6 +455,10 @@ static void VBlankCallback() {
     OS_Init();
     FX_Init();
 
+    MATH_InitRand32( &randContext, 13728749 );
+    
+
+
     GX_Init();
 
     GX_DispOff();
@@ -487,8 +505,9 @@ static void VBlankCallback() {
     G3X_InitMtxStack();
     GX_SetBankForTex( GX_VRAM_TEX_0_A );
 
-    G3X_AntiAlias(TRUE);
-
+    G3X_AntiAlias( TRUE );
+    G3X_AlphaBlend( TRUE );
+    
 
 
     // setup OAM stuff for lower screen
@@ -527,7 +546,9 @@ static void VBlankCallback() {
 
     
     // setup 3D
-    G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
+    //G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
+    G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
+    
     G3X_SetClearColor( GX_RGB( 0, 0, 0 ),
                        0,
                        0x7fff,
@@ -537,11 +558,20 @@ static void VBlankCallback() {
     G3_ViewPort( 0, 0, 255, 191 );
 
     // projection matrix
+    /*    
     G3_Perspective( FX32_SIN30, FX32_COS30,
                     FX32_ONE * 4 / 3,
                     FX32_ONE,
                     FX32_ONE * 400,
                     NULL );
+    */
+    G3_Ortho(
+        0, 191 * FX32_ONE,
+        0, 255 * FX32_ONE,
+        -FX32_ONE,
+        8 * FX32_ONE,
+        NULL );
+
     G3_StoreMtx( 0 );
 
 
@@ -613,8 +643,8 @@ static void VBlankCallback() {
         G3X_Reset();
 
         // camera
-        VecFx32 cameraPos = { 0, 0, FX32_ONE * 5 };
-        VecFx32 lookAt = { 0, 0, 0 };
+        VecFx32 cameraPos = { 0, 0, 0 };
+        VecFx32 lookAt = { 0, 0, -FX32_ONE };
         VecFx32 upVector = { 0, FX32_ONE, 0 };
 
         G3_LookAt( &cameraPos, &upVector, &lookAt, NULL );
@@ -632,7 +662,10 @@ static void VBlankCallback() {
         G3_Identity();
         G3_MtxMode( GX_MTXMODE_POSITION_VECTOR );
 
-
+        
+        // reset fake z buffer coordinate
+        drawZ = farZ;
+        
         if( isEvenFrame ) {
             drawTopScreen();
             

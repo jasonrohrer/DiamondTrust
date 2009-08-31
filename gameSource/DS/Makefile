@@ -1,8 +1,12 @@
-
+TWLSDK_PLATFORM = TWL
+TWL_DEBUG = TRUE
 
 TARGET_PLATFORM = TWL NITRO
 
-SUBDIRS = 
+# make invoked automatically in these dirs
+# this makes our romfiles 
+SUBDIRS = ..
+
 
 DS_SOURCE = main.cpp
 
@@ -10,7 +14,7 @@ GAME_SOURCE = \
 game.cpp \
 tga.cpp \
 
-# append path
+# prepend path
 PATH_GAME_SOURCE = $(patsubst %,../%,$(GAME_SOURCE))
 
 
@@ -22,6 +26,7 @@ MAKEROM_ROMROOT = ../gameData
 MAKEROM_ROMFILES = * 
 
 
+
 INCDIR = ..
 
 # use defaults for these
@@ -31,6 +36,8 @@ INCDIR = ..
 
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
+# force rebuild of targets if romfiles change
+$(TARGETS): $(MAKEROM_ROMROOT)/$(MAKEROM_ROMFILES)
 
 do-build:  $(TARGETS)
 

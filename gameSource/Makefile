@@ -1,16 +1,19 @@
 
 
 GAME_GRAPHICS = \
-gameData/testTexture.tga \
+testTexture.tga \
+testTexture2.tga \
+
+# prepend path
+PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))
 
 
 
-
-all: ${GAME_GRAPHICS}
+all: ${PATH_GAME_GRAPHICS}
 
 
 clean:
-	rm -f ${GAME_GRAPHICS}
+	rm -f ${PATH_GAME_GRAPHICS}
 
 
 # 
