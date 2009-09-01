@@ -251,8 +251,6 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     int a = inColor.a >> 3;
     
     
-
-    
     // avoid wireframe
     if( a == 0 ) {
         // draw nothing
@@ -260,115 +258,59 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
         }
 
 
-    G3_PolygonAttr( GX_LIGHTMASK_NONE,//GX_LIGHTMASK_0,
+    G3_PolygonAttr( GX_LIGHTMASK_NONE,
                     GX_POLYGONMODE_MODULATE,
                     GX_CULL_NONE,
                     polyID,
                     a,
-                    0 );//GX_POLYGON_ATTR_MISC_XLU_DEPTH_UPDATE |
-    //GX_POLYGON_ATTR_MISC_DEPTHTEST_DECAL );
-    
+                    0 );
 
     G3_PushMtx();
 
 
-    // fx16 used to specify vertices only has 3-bit integer part
-    // not enough room to house inX or inY, which will be pixel coordinates
-    
-    // set vertices as (0, FX1_ONE) style coordinates and then use
-    // these functions beforehand to position sprite:
-    /*
-    G3_Translate( inX << FX32_SHIFT, 
-                  inY << FX32_SHIFT, 
-                  drawZ );
-    G3_Scale( t.w << FX32_SHIFT, 
-              t.h << FX32_SHIFT, 
-              FX32_ONE );
-    */
     G3_Translate( 0, 
                   0, 
                   drawZ );
-    /*
-    G3_Scale( 1 << (6 + FX32_SHIFT), 
-              1 << (5 + FX32_SHIFT), 
-              FX32_ONE );
-    */
-    //drawZ += drawZIncrement;
-    
+
 
 
     G3_Begin( GX_BEGIN_QUADS );
 
     // set color once
     G3_Color( GX_RGB( inColor.r >> 3, inColor.g >> 3, inColor.b >> 3 ) );
-    //G3_Color( GX_RGB( 31, 31, 31 ) );
-
-    
-    // set z coord once
-    //G3_Vtx( 0, 0, 0 );//FX_F32_TO_FX16( -5 << FX32_SHIFT ) );
 
 
-    /*
-    inX = 0;
-    inY = 0;
-    t.h = 2;
-    t.w = 2;
-    */
     // four corners
 
     // 16 bit fixed point not enough to hold integer values in range 0..255
-    // so some shifting is necessary
-    // Make up for this in the definition of Ortho in main function
+    // (screen pixel coordinates) so some shifting is necessary
+    // Make up for this in the setup of Ortho in main function
     // (shifting by 6 is like dividing by 64, and 256x192 divided by 64
     //   is 4x3, which is used in Ortho).
 
     // Note that this was the ONLY coordinate conversion method that didn't
     // result in distortion as polygons moved in y direction.
-    // Distortion now only present for sprites that hang off of bottom of
-    // screen.
 
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
-    //G3_Color( GX_RGB( 31, 0, 0 ) );
     G3_Vtx( (short)( inX << (FX16_SHIFT - 6) ), 
             (short)( (inY + t.h) << (FX16_SHIFT - 6) ), 
             0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
-    //G3_Color( GX_RGB( 0, 31, 0 ) );
     G3_Vtx( (short)( inX << (FX16_SHIFT - 6) ), 
             (short)( inY << (FX16_SHIFT - 6) ), 
             0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
-    //G3_Color( GX_RGB( 0, 0, 31 ) );
     G3_Vtx( (short)( (inX + t.w) << (FX16_SHIFT - 6) ), 
             (short)( inY << (FX16_SHIFT - 6) ), 
             0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[3] );
-    //G3_Color( GX_RGB( 31, 31, 31 ) );
     G3_Vtx( (short)( (inX + t.w) << (FX16_SHIFT - 6) ), 
             (short)( (inY + t.h) << (FX16_SHIFT - 6) ), 
             0 );
 
-    /*
-    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
-    G3_VtxXY( FX_F32_TO_FX16( inX << FX32_SHIFT ), 
-              FX_F32_TO_FX16( inY << FX32_SHIFT ) );
-
-    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
-    G3_VtxXY( FX_F32_TO_FX16( inX << FX32_SHIFT ), 
-              FX_F32_TO_FX16( (inY + t.h) << FX32_SHIFT ) );
-    
-
-    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
-    G3_VtxXY( FX_F32_TO_FX16( (inX + t.w) << FX32_SHIFT ), 
-              FX_F32_TO_FX16( (inY + t.h) << FX32_SHIFT ) );
-
-    //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
-    G3_VtxXY( FX_F32_TO_FX16( (inX + t.w) << FX32_SHIFT ), 
-              FX_F32_TO_FX16( inY << FX32_SHIFT ) );
-    */  
     G3_End();
 
     G3_PopMtx( 1 );
@@ -612,18 +554,10 @@ static void VBlankCallback() {
 
     G3_ViewPort( 0, 0, 255, 191 );
 
-    // projection matrix
-    /*    
-    G3_Perspective( FX32_SIN30, FX32_COS30,
-                    FX32_ONE * 4 / 3,
-                    FX32_ONE,
-                    FX32_ONE * 400,
-                    NULL );
-    */
     G3_Ortho(
         0, 3 * FX32_ONE,
         0, 4 * FX32_ONE,
-        0,//-FX32_ONE,
+        0,
         8 * FX32_ONE,
         NULL );
 
@@ -667,9 +601,6 @@ static void VBlankCallback() {
 
 
 
-    OS_Printf( "Hello, World\n" );
-    
-
     // test file system
     int fileSize;
     unsigned char *fileContents = readFile( "test.txt", &fileSize );
@@ -703,12 +634,6 @@ static void VBlankCallback() {
         VecFx32 upVector = { 0, FX32_ONE, 0 };
 
         G3_LookAt( &cameraPos, &upVector, &lookAt, NULL );
-
-        /*
-        // dead on white light from front
-        G3_LightVector( GX_LIGHTID_0, 0, 0, -FX16_ONE );
-        G3_LightColor( GX_LIGHTID_0, GX_RGB( 31, 31, 31 ) );
-        */
 
         G3_PushMtx();
 

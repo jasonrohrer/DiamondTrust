@@ -77,8 +77,8 @@ void gameInit() {
     spriteID = loadSprite( "testTexture.tga", true );
     spriteIDB = loadSprite( "testTexture2.tga" );
     
-    int currentX = 0;
-    int currentY = 0;
+    int currentX = 10;
+    int currentY = 10;
     
     for( int i=0; i<NUM_DRAWN; i++ ) {
         rgbaColor *c = &( drawColors[i] );
