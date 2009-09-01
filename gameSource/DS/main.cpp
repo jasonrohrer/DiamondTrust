@@ -318,6 +318,22 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
 
 
+char getTouch( int *outX, int *outY ) {
+    TPData result;
+    
+    if( TP_RequestCalibratedSampling( &result ) == 0 ) {
+        if( result.touch == TP_TOUCH_ON && 
+            result.validity == TP_VALIDITY_VALID ) { 
+            
+            *outX = result.x;
+            *outY = result.y;
+            return true;
+            }
+        }
+    return false;
+    }
+
+
 
 
 
@@ -448,8 +464,21 @@ static void VBlankCallback() {
 
     OS_Init();
     FX_Init();
+    TP_Init();
+    
 
     MATH_InitRand32( &randContext, 13728749 );
+    
+    
+    printOut( "Calibrating touch panel\n" );
+    
+    TPCalibrateParam tpCalibrate;
+
+    if( !TP_GetUserInfo( &tpCalibrate ) ) {
+        OS_Panic( "Failed to read touch panel calibration\n" );
+        }
+
+    TP_SetCalibrateParam( &tpCalibrate );
     
 
 

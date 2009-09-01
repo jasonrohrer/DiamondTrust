@@ -9,6 +9,8 @@
 
 rgbaColor drawColors[ NUM_DRAWN ];
 
+int indexToTouch = 0;
+
 int drawX[ NUM_DRAWN ];
 int drawY[ NUM_DRAWN ];
 
@@ -181,6 +183,21 @@ void gameLoopTick() {
             }
         }
     
+    int tx, ty;
+    if( getTouch( &tx, &ty ) ) {
+        // add new sprite to lower panel
+        
+        drawX[ indexToTouch ] = tx;
+        drawY[ indexToTouch ] = ty;
+        
+        indexToTouch ++;
+        if( indexToTouch >= NUM_DRAWN ) {
+            indexToTouch = 0;
+            }
+        
+        }
+    
+        
     }
 
 

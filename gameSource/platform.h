@@ -52,6 +52,12 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
 void startNewSpriteLayer();
 
 
+// gets the current position of a pressed mouse or stylus
+// returns true if pressed
+char getTouch( int *outX, int *outY );
+
+
+
 
 
 // **
