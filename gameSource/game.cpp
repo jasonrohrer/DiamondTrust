@@ -4,7 +4,7 @@
 #include "tga.h"
 
 
-#define NUM_DRAWN 500
+#define NUM_DRAWN 10
 
 
 rgbaColor drawColors[ NUM_DRAWN ];
@@ -22,7 +22,7 @@ int deltaFade[ NUM_DRAWN ];
 int spriteID = -1;
 int spriteIDB = -1;
 
-static int loadSprite( char *inFileName ) {
+static int loadSprite( char *inFileName, char inCornerTransparent = false ) {
     int returnID = -1;
     
     int fileDataSize;
@@ -36,6 +36,31 @@ static int loadSprite( char *inFileName ) {
                                                 &width, &height );
         
         if( spriteRGBA != NULL ) {
+            
+            if( inCornerTransparent ) {
+                // use corner color as transparency
+                spriteRGBA[0].a = 0;
+                unsigned char tr, tg, tb;
+                tr = spriteRGBA[0].r;
+                tg = spriteRGBA[0].g;
+                tb = spriteRGBA[0].b;
+
+                int numPixels = width * height; 
+                for( int i=0; i<numPixels; i++ ) {
+                    if( spriteRGBA[i].r == tr 
+                        &&
+                        spriteRGBA[i].g == tg 
+                        &&
+                        spriteRGBA[i].b == tb ) {
+                        
+                        spriteRGBA[i].a = 0;
+                        }
+                    }
+                }
+            
+                        
+                        
+                        
             returnID = addSprite( spriteRGBA, width, height );
             
             freeMem( spriteRGBA );
@@ -49,24 +74,38 @@ static int loadSprite( char *inFileName ) {
 
 
 void gameInit() {
-    spriteID = loadSprite( "testTexture.tga" );
+    spriteID = loadSprite( "testTexture.tga", true );
     spriteIDB = loadSprite( "testTexture2.tga" );
+    
+    int currentX = 0;
+    int currentY = 0;
     
     for( int i=0; i<NUM_DRAWN; i++ ) {
         rgbaColor *c = &( drawColors[i] );
         c->r = (unsigned char)getRandom( 256 );
         c->g = (unsigned char)getRandom( 256 );
         c->b = (unsigned char)getRandom( 256 );
-        c->a = 255;//(unsigned char)getRandom( 256 );
+        c->a = 128;//(unsigned char)getRandom( 256 );
 
         //deltaFade[i] = -8;
         deltaFade[i] = 0;
         
+        /*
         drawX[i] = (int)getRandom( 256 );
         drawY[i] = (int)getRandom( 192 );
         
         deltaX[i] = (int)getRandom( 2 ) - 1;
         deltaY[i] = (int)getRandom( 2 ) - 1;
+        */
+        
+        drawX[i] = currentX;
+        drawY[i] = currentY;
+        
+        deltaX[i] = 0;
+        deltaY[i] = 0;
+        
+        currentX += 8;
+        currentY += 8;
         }
     
     }
