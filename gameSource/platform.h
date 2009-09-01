@@ -45,7 +45,11 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 // sprite is drawn on the currently-drawing screen
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
 
-
+// puts the next batch of sprites on top of the previous batches
+// within a batch, between calls to startNewSpriteLayer, sprites should
+// not overlap (to avoid sorting artifacts)
+// If two sprites overlap, the top one should be drawn during a later layer
+void startNewSpriteLayer();
 
 
 

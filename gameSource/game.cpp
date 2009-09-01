@@ -4,7 +4,7 @@
 #include "tga.h"
 
 
-#define NUM_DRAWN 2
+#define NUM_DRAWN 60
 
 
 rgbaColor drawColors[ NUM_DRAWN ];
@@ -85,32 +85,33 @@ void gameInit() {
         c->r = 255;//(unsigned char)getRandom( 256 );
         c->g = 255;//(unsigned char)getRandom( 256 );
         c->b = 255;//(unsigned char)getRandom( 256 );
-        c->a = (unsigned char)getRandom( 192 );
+        c->a = (unsigned char)getRandom( 256 );
 
         deltaFade[i] = -8;
         //deltaFade[i] = 0;
         
         
-        drawX[i] = (int)getRandom( 14 ) + 8;
-        drawY[i] = (int)getRandom( 14 );
-        
+        drawX[i] = (int)getRandom( 256 );
+        drawY[i] = (int)getRandom( 192 );
+        /*
         if( i==0 ) {
             drawX[i] = 20;
             drawY[i] = 20;
-            deltaFade[i] = 0;
-            c->a = 255;
+            //deltaFade[i] = 0;
+            //c->a = 255;
             }
         else {
             drawX[i] = 30;
             drawY[i] = 30;
             }
-        deltaFade[i] = 0;
-        c->a = 255;
+        //deltaFade[i] = 0;
+        //c->a = 255;
+        */
 
-        deltaX[i] = 1;//(int)getRandom( 2 ) - 1;
-        deltaY[i] = 1;//(int)getRandom( 2 ) - 1;
+        deltaX[i] = (int)getRandom( 2 ) - 1;
+        deltaY[i] = (int)getRandom( 2 ) - 1;
         
-        /*
+        
         drawX[i] = currentX;
         drawY[i] = currentY;
         
@@ -118,7 +119,7 @@ void gameInit() {
         deltaY[i] = 0;
         currentX += 3;
         currentY += 3;
-        
+        /*
         currentX += 16;
         //currentY += 3;
         if( currentX >= 256 ) {
@@ -142,18 +143,18 @@ void gameLoopTick() {
     for( int i=0; i<NUM_DRAWN; i++ ) {
         int f = drawColors[i].a;
 
-        /*        
+                
         f += deltaFade[i];
     
         if( f < 0 ) {
             f = 0;
             deltaFade[i] = 8;
             }
-        if( f > 191 ) {
-            f = 191;
+        if( f > 255 ) {
+            f = 255;
             deltaFade[i] = -8;
             }
-        */
+        
         drawColors[i].a = (unsigned char)f;
         
         
@@ -189,6 +190,7 @@ void drawTopScreen() {
 
     for( int i=0; i<NUM_DRAWN; i++ ) {
         drawSprite( spriteID, drawX[i], drawY[i], drawColors[i] );
+        startNewSpriteLayer();
         }
     }
 
@@ -196,5 +198,6 @@ void drawTopScreen() {
 void drawBottomScreen() {
     for( int i=0; i<NUM_DRAWN; i++ ) {
         drawSprite( spriteIDB, drawX[i], drawY[i], drawColors[i] );
+        startNewSpriteLayer();
         }
     }
