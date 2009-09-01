@@ -4,7 +4,7 @@
 #include "tga.h"
 
 
-#define NUM_DRAWN 10
+#define NUM_DRAWN 192
 
 
 rgbaColor drawColors[ NUM_DRAWN ];
@@ -82,30 +82,35 @@ void gameInit() {
     
     for( int i=0; i<NUM_DRAWN; i++ ) {
         rgbaColor *c = &( drawColors[i] );
-        c->r = (unsigned char)getRandom( 256 );
-        c->g = (unsigned char)getRandom( 256 );
-        c->b = (unsigned char)getRandom( 256 );
-        c->a = 128;//(unsigned char)getRandom( 256 );
+        c->r = 255;//(unsigned char)getRandom( 256 );
+        c->g = 255;//(unsigned char)getRandom( 256 );
+        c->b = 255;//(unsigned char)getRandom( 256 );
+        c->a = 255;//(unsigned char)getRandom( 256 );
 
         //deltaFade[i] = -8;
         deltaFade[i] = 0;
         
-        /*
+        
         drawX[i] = (int)getRandom( 256 );
         drawY[i] = (int)getRandom( 192 );
         
         deltaX[i] = (int)getRandom( 2 ) - 1;
         deltaY[i] = (int)getRandom( 2 ) - 1;
-        */
         
+        /*
         drawX[i] = currentX;
         drawY[i] = currentY;
         
         deltaX[i] = 0;
         deltaY[i] = 0;
         
-        currentX += 8;
-        currentY += 8;
+        currentX += 16;
+        //currentY += 3;
+        if( currentX >= 256 ) {
+            currentX = 0;
+            currentY += 16;
+            }
+        */
         }
     
     }
