@@ -216,6 +216,8 @@ fx16 farZ = -7 * FX16_ONE;
 fx16 drawZ = farZ;
 fx16 drawZIncrement = 0x0004;
 
+int nextPolyID = 1;
+
 
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
@@ -242,12 +244,29 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
         return;
         }
 
+    // all opaque polygons in group 0
+    int polyID = 0;
+
+    if( a < 31 ) {
+        // transparent
+        // assign to a transparency group
+        polyID = nextPolyID;
+            
+        nextPolyID++;
+        if( nextPolyID > 63 ) {
+            nextPolyID = 0;
+            }
+        }
+    
+
+
     G3_PolygonAttr( GX_LIGHTMASK_NONE,//GX_LIGHTMASK_0,
                     GX_POLYGONMODE_MODULATE,
                     GX_CULL_NONE,
-                    0,
+                    polyID,
                     a,
                     GX_POLYGON_ATTR_MISC_NONE );
+    
 
     G3_PushMtx();
 
@@ -546,8 +565,8 @@ static void VBlankCallback() {
 
     
     // setup 3D
-    //G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
-    G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
+    G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
+    //G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
     
     G3X_SetClearColor( GX_RGB( 0, 0, 0 ),
                        0,
