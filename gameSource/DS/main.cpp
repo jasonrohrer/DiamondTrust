@@ -159,7 +159,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             printOut( "Unsupported texture width, %d\n", inWidth );
         }
     
-    t.texCoordCorners[0] = GX_ST( 0,  inHeight << FX32_SHIFT );
+    t.texCoordCorners[0] = GX_ST( 0, inHeight << FX32_SHIFT );
     t.texCoordCorners[1] = GX_ST( 0, 0 );
     t.texCoordCorners[2] = GX_ST( inWidth << FX32_SHIFT,  0 );
     t.texCoordCorners[3] = GX_ST( inWidth << FX32_SHIFT,  
@@ -276,9 +276,22 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     
     // set vertices as (0, FX1_ONE) style coordinates and then use
     // these functions beforehand to position sprite:
-    G3_Translate( inX << FX32_SHIFT, inY << FX32_SHIFT, drawZ );
-    G3_Scale( t.w << FX32_SHIFT, t.h << FX32_SHIFT, FX32_ONE );
-    
+    /*
+    G3_Translate( inX << FX32_SHIFT, 
+                  inY << FX32_SHIFT, 
+                  drawZ );
+    G3_Scale( t.w << FX32_SHIFT, 
+              t.h << FX32_SHIFT, 
+              FX32_ONE );
+    */
+    G3_Translate( 0, 
+                  0, 
+                  drawZ );
+    /*
+    G3_Scale( 1 << (6 + FX32_SHIFT), 
+              1 << (5 + FX32_SHIFT), 
+              FX32_ONE );
+    */
     drawZ += drawZIncrement;
     
 
@@ -294,29 +307,48 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     //G3_Vtx( 0, 0, 0 );//FX_F32_TO_FX16( -5 << FX32_SHIFT ) );
 
 
-    
+    /*
     inX = 0;
     inY = 0;
     t.h = 2;
     t.w = 2;
-
+    */
     // four corners
+
+    // 16 bit fixed point not enough to hold integer values in range 0..255
+    // so some shifting is necessary
+    // Make up for this in the definition of Ortho in main function
+    // (shifting by 6 is like dividing by 64, and 256x192 divided by 64
+    //   is 4x3, which is used in Ortho).
+
+    // Note that this was the ONLY coordinate conversion method that didn't
+    // result in distortion as polygons moved in y direction.
+    // Distortion now only present for sprites that hang off of bottom of
+    // screen.
 
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
     //G3_Color( GX_RGB( 31, 0, 0 ) );
-    G3_Vtx( 0, FX16_ONE, 0 );
+    G3_Vtx( (short)( inX << (FX16_SHIFT - 6) ), 
+            (short)( (inY + t.h) << (FX16_SHIFT - 6) ), 
+            0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
     //G3_Color( GX_RGB( 0, 31, 0 ) );
-    G3_Vtx( 0, 0, 0 );
+    G3_Vtx( (short)( inX << (FX16_SHIFT - 6) ), 
+            (short)( inY << (FX16_SHIFT - 6) ), 
+            0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
     //G3_Color( GX_RGB( 0, 0, 31 ) );
-    G3_Vtx( FX16_ONE, 0, 0 );
+    G3_Vtx( (short)( (inX + t.w) << (FX16_SHIFT - 6) ), 
+            (short)( inY << (FX16_SHIFT - 6) ), 
+            0 );
     
     G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[3] );
     //G3_Color( GX_RGB( 31, 31, 31 ) );
-    G3_Vtx( FX16_ONE, FX16_ONE, 0 );
+    G3_Vtx( (short)( (inX + t.w) << (FX16_SHIFT - 6) ), 
+            (short)( (inY + t.h) << (FX16_SHIFT - 6) ), 
+            0 );
 
     /*
     //G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
@@ -585,8 +617,8 @@ static void VBlankCallback() {
                     NULL );
     */
     G3_Ortho(
-        0, 191 * FX32_ONE,
-        0, 255 * FX32_ONE,
+        0, 3 * FX32_ONE,
+        0, 4 * FX32_ONE,
         -FX32_ONE,
         8 * FX32_ONE,
         NULL );
