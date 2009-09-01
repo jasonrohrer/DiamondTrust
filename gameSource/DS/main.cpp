@@ -238,18 +238,15 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     // 5 high-order bits
     int a = inColor.a >> 3;
     
-    // avoid wireframe
-    if( a == 0 ) {
-        // draw nothing
-        return;
-        }
 
     // all opaque polygons in group 0
     int polyID = 0;
 
-    if( a < 31 ) {
+    if( a <= 31 ) {
         // transparent
         // assign to a transparency group
+        // (use up a group ID even if it is fully transparent and we don't draw
+        //  it)
         polyID = nextPolyID;
             
         nextPolyID++;
@@ -257,7 +254,13 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
             nextPolyID = 0;
             }
         }
+
     
+    // avoid wireframe
+    if( a == 0 ) {
+        // draw nothing
+        return;
+        }
 
 
     G3_PolygonAttr( GX_LIGHTMASK_NONE,//GX_LIGHTMASK_0,
@@ -265,7 +268,8 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
                     GX_CULL_NONE,
                     polyID,
                     a,
-                    GX_POLYGON_ATTR_MISC_NONE );
+                    GX_POLYGON_ATTR_MISC_XLU_DEPTH_UPDATE |
+                    GX_POLYGON_ATTR_MISC_DEPTHTEST_DECAL );
     
 
     G3_PushMtx();
@@ -284,9 +288,14 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
               t.h << FX32_SHIFT, 
               FX32_ONE );
     */
+    /*
     G3_Translate( 0, 
                   0, 
                   drawZ );
+*/
+    G3_Translate( 0, 
+                  0, 
+                  0 );
     /*
     G3_Scale( 1 << (6 + FX32_SHIFT), 
               1 << (5 + FX32_SHIFT), 
@@ -597,12 +606,12 @@ static void VBlankCallback() {
 
     
     // setup 3D
-    G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
-    //G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
+    //G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
+    G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
     
     G3X_SetClearColor( GX_RGB( 0, 0, 0 ),
                        0,
-                       0x7fff,
+                       0,//0x7fff,
                        63,
                        FALSE );
 
@@ -619,7 +628,7 @@ static void VBlankCallback() {
     G3_Ortho(
         0, 3 * FX32_ONE,
         0, 4 * FX32_ONE,
-        -FX32_ONE,
+        0,//-FX32_ONE,
         8 * FX32_ONE,
         NULL );
 
@@ -730,7 +739,7 @@ static void VBlankCallback() {
 
         // swap buffers
         OSIntrMode oldMode = OS_DisableInterrupts();
-        G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
+        G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
         shouldSwap = true;
         OS_RestoreInterrupts( oldMode );
         
