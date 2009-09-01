@@ -211,12 +211,24 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
 
 
-// fake z buffer values to force proper sorting (later sprites on top)
+// fake z buffer values to force proper sorting (later sprites layers on top)
 fx16 farZ = -7 * FX16_ONE;
 fx16 drawZ = farZ;
 fx16 drawZIncrement = 0x0004;
 
-int nextPolyID = 1;
+int polyID = 0;
+
+
+void startNewSpriteLayer() {
+    drawZ += drawZIncrement;
+
+    // also start a new ID group 
+    polyID++;
+    if( polyID > 63 ) {
+        polyID = 0;
+        }
+    }
+
 
 
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
@@ -238,22 +250,7 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     // 5 high-order bits
     int a = inColor.a >> 3;
     
-
-    // all opaque polygons in group 0
-    int polyID = 0;
-
-    if( a <= 31 ) {
-        // transparent
-        // assign to a transparency group
-        // (use up a group ID even if it is fully transparent and we don't draw
-        //  it)
-        polyID = nextPolyID;
-            
-        nextPolyID++;
-        if( nextPolyID > 63 ) {
-            nextPolyID = 0;
-            }
-        }
+    
 
     
     // avoid wireframe
@@ -268,8 +265,8 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
                     GX_CULL_NONE,
                     polyID,
                     a,
-                    GX_POLYGON_ATTR_MISC_XLU_DEPTH_UPDATE |
-                    GX_POLYGON_ATTR_MISC_DEPTHTEST_DECAL );
+                    0 );//GX_POLYGON_ATTR_MISC_XLU_DEPTH_UPDATE |
+    //GX_POLYGON_ATTR_MISC_DEPTHTEST_DECAL );
     
 
     G3_PushMtx();
@@ -288,20 +285,15 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
               t.h << FX32_SHIFT, 
               FX32_ONE );
     */
-    /*
     G3_Translate( 0, 
                   0, 
                   drawZ );
-*/
-    G3_Translate( 0, 
-                  0, 
-                  0 );
     /*
     G3_Scale( 1 << (6 + FX32_SHIFT), 
               1 << (5 + FX32_SHIFT), 
               FX32_ONE );
     */
-    drawZ += drawZIncrement;
+    //drawZ += drawZIncrement;
     
 
 
@@ -609,9 +601,12 @@ static void VBlankCallback() {
     //G3_SwapBuffers( GX_SORTMODE_AUTO, GX_BUFFERMODE_Z );
     G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
     
+    // Forcing A_b to max prevents polygon's A values from affecting 
+    // the pixel buffer's A values, eliminating weird effects when
+    // translucent polygons overlap
     G3X_SetClearColor( GX_RGB( 0, 0, 0 ),
-                       0,
-                       0,//0x7fff,
+                       31,  // A_b remains opaque no matter what is drawn
+                       0x7fff,
                        63,
                        FALSE );
 
@@ -725,7 +720,9 @@ static void VBlankCallback() {
         
         // reset fake z buffer coordinate
         drawZ = farZ;
+        polyID = 0;
         
+
         if( isEvenFrame ) {
             drawTopScreen();
             
