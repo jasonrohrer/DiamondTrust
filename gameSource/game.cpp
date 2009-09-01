@@ -4,7 +4,7 @@
 #include "tga.h"
 
 
-#define NUM_DRAWN 192
+#define NUM_DRAWN 2
 
 
 rgbaColor drawColors[ NUM_DRAWN ];
@@ -85,17 +85,30 @@ void gameInit() {
         c->r = 255;//(unsigned char)getRandom( 256 );
         c->g = 255;//(unsigned char)getRandom( 256 );
         c->b = 255;//(unsigned char)getRandom( 256 );
-        c->a = 255;//(unsigned char)getRandom( 256 );
+        c->a = (unsigned char)getRandom( 192 );
 
-        //deltaFade[i] = -8;
+        deltaFade[i] = -8;
+        //deltaFade[i] = 0;
+        
+        
+        drawX[i] = (int)getRandom( 14 ) + 8;
+        drawY[i] = (int)getRandom( 14 );
+        
+        if( i==0 ) {
+            drawX[i] = 20;
+            drawY[i] = 20;
+            deltaFade[i] = 0;
+            c->a = 255;
+            }
+        else {
+            drawX[i] = 30;
+            drawY[i] = 30;
+            }
         deltaFade[i] = 0;
-        
-        
-        drawX[i] = (int)getRandom( 256 );
-        drawY[i] = (int)getRandom( 192 );
-        
-        deltaX[i] = (int)getRandom( 2 ) - 1;
-        deltaY[i] = (int)getRandom( 2 ) - 1;
+        c->a = 255;
+
+        deltaX[i] = 1;//(int)getRandom( 2 ) - 1;
+        deltaY[i] = 1;//(int)getRandom( 2 ) - 1;
         
         /*
         drawX[i] = currentX;
@@ -103,6 +116,8 @@ void gameInit() {
         
         deltaX[i] = 0;
         deltaY[i] = 0;
+        currentX += 3;
+        currentY += 3;
         
         currentX += 16;
         //currentY += 3;
@@ -126,17 +141,19 @@ void gameLoopTick() {
 
     for( int i=0; i<NUM_DRAWN; i++ ) {
         int f = drawColors[i].a;
-        
+
+        /*        
         f += deltaFade[i];
     
         if( f < 0 ) {
             f = 0;
             deltaFade[i] = 8;
             }
-        if( f > 255 ) {
-            f = 255;
+        if( f > 191 ) {
+            f = 191;
             deltaFade[i] = -8;
             }
+        */
         drawColors[i].a = (unsigned char)f;
         
         
