@@ -59,6 +59,42 @@ char getTouch( int *outX, int *outY );
 
 
 
+// true if platform is auto-connecting to a server at startup
+// no need to acceptConnection or connectToServer
+// check if connection ready with checkConnectionReady
+char isAutoconnecting();
+
+
+// local address (where clients should connect) as a newly allocated string
+// NULL on address-free platforms (like DS)
+char *getLocalAddress();
+
+// start a server that waits for a connection
+void acceptConnection();
+
+// start a client connection process
+// inAddress can be NULL on address-free platforms
+void connectToServer( char *inAddress );
+
+
+// 1 if a connection has been established and is still up, 
+// 0 if still connecting, 
+// -1 on error
+int checkConnectionStatus();
+
+
+// inMessage destroyed by caller
+void sendMessage( unsigned char *inMessage, int inLength );
+
+
+// poll for new incoming message
+// returns NULL if no message ready
+// result freed by caller
+unsigned char *getMessage( int *outLength );
+
+
+
+
 
 // **
 // functions that must be implemented by the platform-independent code
