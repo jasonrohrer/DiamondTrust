@@ -337,6 +337,122 @@ char getTouch( int *outX, int *outY ) {
 
 
 
+// wireless stuff
+static unsigned char wmBuffer[ WM_SYSTEM_BUF_SIZE ] ATTRIBUTE_ALIGN( 32 );
+
+int wmStatus = 0;
+
+// true for parent, false for child
+char isParent = false;
+
+#define WM_DMA_NO  2
+#define LOCAL_GGID 0x003fff63
+
+unsigned short tgid = 0;
+
+static WMParentParam parentParam ATTRIBUTE_ALIGN(32);
+
+    
+
+static void wmSetParentParamCallback( void *inArg ) {
+    WMErrCode result;
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        }
+    else {
+        //
+        }
+    }
+
+
+
+static void wmInitializeCallback( void *inArg ) {
+    WMErrCode result;
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        }
+    else {
+        if( isParent ) {
+            
+            tgid ++;
+            
+            // fixme:  need to measure channel strengths and pick a channel
+            // first
+            parentParam.tgid = tgid;
+            parentParam.channel = channel;  // FIXME
+            parentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
+            parentParam.parentMaxSize = 512;
+            parentParam.childMaxSize = 512;
+            parentParam.maxEntry = 1;
+            parentParam.CS_Flag = 0;
+            parentParam.multiBootFlag = 0;
+            parentParam.entryFlag = 1;
+            parentParam.KS_Flag = 0;
+            
+            WMErrCode result =
+                WM_SetParentParameter( wmSetParentParamCallback,  
+                                       &parentParam );
+             if( result != WM_ERRCODE_OPERATING ) {
+                 wmStatus = -1;
+                 }
+            }
+        }
+    }
+
+
+
+static initWM() {
+    
+    WMErrCode result = WM_Initialize( &wmBuffer, wmInitializeCallback, 
+                                      WM_DMA_NO );
+    if( result != WM_ERRCODE_OPERATING ) {
+        wmStatus = -1;
+        }
+    }
+
+
+
+char isAutoconnecting() {
+    return false;
+    }
+
+
+char *getLocalAddress() {
+    return NULL;
+    }
+
+
+void acceptConnection() {
+    isParent = true;
+    initWM();
+    }
+
+
+void connectToServer( char *inAddress ) {
+    isParent = false;
+    initWM();
+    }
+
+
+int checkConnectionStatus() {
+    return wmStatus;
+    }
+
+
+void sendMessage( unsigned char *inMessage, int inLength ) {
+    }
+
+
+unsigned char *getMessage( int *outLength ) {
+    }
+
+
+
+
 
 // stuff for drawing 3D on both screens (one screen each vblank)
 
