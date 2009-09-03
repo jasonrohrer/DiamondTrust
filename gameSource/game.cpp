@@ -24,6 +24,18 @@ int deltaFade[ NUM_DRAWN ];
 int spriteID = -1;
 int spriteIDB = -1;
 
+int parentSpriteID = -1;
+int childSpriteID = -1;
+
+int parentButtonX = 10;
+int parentButtonY = 150;
+int childButtonX = 10;
+int childButtonY = 170;
+
+char buttonsVisible = true;
+
+
+ 
 static int loadSprite( char *inFileName, char inCornerTransparent = false ) {
     int returnID = -1;
     
@@ -75,9 +87,26 @@ static int loadSprite( char *inFileName, char inCornerTransparent = false ) {
 
 
 
+static char isInside( int inX, int inY, 
+                      int inStartX, int inStartY, int inWidth, int inHeight ) {
+    if( inStartX <= inX && inX < inStartX + inWidth 
+        &&
+        inStartY <= inY && inY < inStartY + inHeight ) {
+        return true;
+        }
+    return false;
+    }
+
+
+
 void gameInit() {
     spriteID = loadSprite( "testTexture.tga", true );
     spriteIDB = loadSprite( "testTexture2.tga" );
+
+
+    parentSpriteID = loadSprite( "parentButton.tga" );
+    childSpriteID = loadSprite( "childButton.tga" );
+
     
     int currentX = 10;
     int currentY = 10;
@@ -185,20 +214,42 @@ void gameLoopTick() {
     
     int tx, ty;
     if( getTouch( &tx, &ty ) ) {
-        // add new sprite to lower panel
         
-        drawX[ indexToTouch ] = tx;
-        drawY[ indexToTouch ] = ty;
-        
-        indexToTouch ++;
-        if( indexToTouch >= NUM_DRAWN ) {
-            indexToTouch = 0;
+        if( buttonsVisible ) {
+            
+            if( isInside( tx, ty, parentButtonX, parentButtonY, 32, 16 ) ) {
+                acceptConnection();
+                buttonsVisible = false;
+                }
+            else if ( isInside( tx, ty, childButtonX,
+                                childButtonY, 32, 16 ) ) {
+                connectToServer( NULL );
+                buttonsVisible = false;
+                }
             }
+        else {
+            
+            
+            // add new sprite to lower panel
+            
+            drawX[ indexToTouch ] = tx;
+            drawY[ indexToTouch ] = ty;
+            
+            indexToTouch ++;
+            if( indexToTouch >= NUM_DRAWN ) {
+                indexToTouch = 0;
+                }
+            }
+        
         
         }
     
         
     }
+
+
+rgbaColor white = { 255, 255, 255, 255 };
+
 
 
 
@@ -213,8 +264,17 @@ void drawTopScreen() {
 
 
 void drawBottomScreen() {
-    for( int i=0; i<NUM_DRAWN; i++ ) {
-        drawSprite( spriteIDB, drawX[i], drawY[i], drawColors[i] );
-        startNewSpriteLayer();
+    if( buttonsVisible ) {
+
+        drawSprite( parentSpriteID, parentButtonX, parentButtonY, white );
+        drawSprite( childSpriteID, childButtonX, childButtonY, white );
         }
+    else {
+        
+        for( int i=0; i<NUM_DRAWN; i++ ) {
+            drawSprite( spriteIDB, drawX[i], drawY[i], drawColors[i] );
+            startNewSpriteLayer();
+            }
+        }
+    
     }

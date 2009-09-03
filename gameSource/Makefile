@@ -3,6 +3,9 @@
 GAME_GRAPHICS = \
 testTexture.tga \
 testTexture2.tga \
+parentButton.tga \
+childButton.tga \
+
 
 # prepend path
 PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))
