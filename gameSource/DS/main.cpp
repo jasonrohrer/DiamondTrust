@@ -361,6 +361,15 @@ int bestBusyRatio = 101;
 
 static WMParentParam parentParam ATTRIBUTE_ALIGN(32);
 
+// for child scanning
+static WMScanParam scanParam;
+static WMBssDesc scanBssDesc;
+
+// FIXME:  add later to send parent specific data on connect
+// NULL for now (all zeros sent)
+//static unsigned char childSSID[ WM_SIZE_CHILD_SSID ];
+
+
 
 static unsigned char *sendBuffer = NULL;
 static unsigned char *receiveBuffer = NULL;
@@ -408,61 +417,63 @@ static void wmStartParentCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        WM_End( wmEndCallback );
         }
     else {
-        if( callbackArg->errcode == WM_ERRCODE_SUCCESS ) {
-            switch( callbackArg->state ) {
-                case WM_STATECODE_PARENT_START: {
-                                        
-                    unsigned short sendBufferSize = 
-                        (unsigned short)WM_GetMPSendBufferSize();
-                    unsigned short receiveBufferSize = 
-                        (unsigned short)WM_GetMPReceiveBufferSize();
-                    printOut( "Send,receive buffer sizes are: %d,%d\n" );
+        switch( callbackArg->state ) {
+            case WM_STATECODE_PARENT_START: {
+                
+                unsigned short sendBufferSize = 
+                    (unsigned short)WM_GetMPSendBufferSize();
+                unsigned short receiveBufferSize = 
+                    (unsigned short)WM_GetMPReceiveBufferSize();
+                printOut( "Send,receive buffer sizes are: %d,%d\n",
+                          sendBufferSize, receiveBufferSize );
                     
-                    sendBuffer = 
-                        (unsigned char *)allocMem( sendBufferSize );
-                    receiveBuffer = 
-                        (unsigned char *)allocMem( receiveBufferSize );
+                sendBuffer = 
+                    (unsigned char *)allocMem( sendBufferSize );
+                receiveBuffer = 
+                    (unsigned char *)allocMem( receiveBufferSize );
                     
                     
-                    // start multiplayer
-                    WMErrCode result =
-                        WM_StartMP(
-                            wmStartMPCallback,
-                            (u16*)receiveBuffer,
-                            receiveBufferSize,
-                            (u16*)sendBuffer,
-                            sendBufferSize,
-                            1 );  // one communication per frame
+                // start multiplayer
+                WMErrCode result =
+                    WM_StartMP(
+                        wmStartMPCallback,
+                        (u16*)receiveBuffer,
+                        receiveBufferSize,
+                        (u16*)sendBuffer,
+                        sendBufferSize,
+                        1 );  // one communication per frame
 
-                    if( result !=  WM_ERRCODE_OPERATING ) {
-                        wmStatus = -1;
-                        WM_End( wmEndCallback );
-                        }
+                if( result !=  WM_ERRCODE_OPERATING ) {
+                    wmStatus = -1;
+                    WM_End( wmEndCallback );
                     }
-                    break;
-                case WM_STATECODE_CONNECTED:
-
-                    // FIXME:
-                    //parent_load_status();
-                    
-                    return;
-                case WM_STATECODE_DISCONNECTED:
-
-                    // FIXME:
-                    //parent_load_status();
-                    
-                    return;
-                    
-                default:
-                    
-                    return;
                 }
+                break;
+            case WM_STATECODE_CONNECTED:
+
+                // FIXME:
+                //parent_load_status();
+                    
+                return;
+            case WM_STATECODE_DISCONNECTED:
+
+                // FIXME:
+                //parent_load_status();
+                    
+                return;
+                    
+            default:
+                    
+                return;
             }
-        //
         }
     }
+
+
+
     
 
 
@@ -521,7 +532,12 @@ static void wmMeasureChannelCallback( void *inArg ) {
             else {
                 // found one
                 
+                tgid = WM_GetNextTgid();
+                
+
                 // set parent params
+                // FIXME:  use userGameInfo to specify identifying
+                // info for child lobby, like parent name
                 parentParam.userGameInfo = NULL;
                 parentParam.userGameInfoLength = 0;
                 parentParam.tgid = tgid;
@@ -548,6 +564,7 @@ static void wmMeasureChannelCallback( void *inArg ) {
         
         }
     }
+
 
 
 void measureNextChannel() {
@@ -582,6 +599,174 @@ void measureNextChannel() {
     }
 
 
+
+static void wmStartConnectCallback( void *inArg ) {
+    WMStartConnectCallback *callbackArg = (WMStartConnectCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    else {
+        switch( callbackArg->state ) {
+            case WM_STATECODE_CONNECTED: {
+                
+                unsigned short sendBufferSize = 
+                    (unsigned short)WM_GetMPSendBufferSize();
+                unsigned short receiveBufferSize = 
+                    (unsigned short)WM_GetMPReceiveBufferSize();
+                printOut( "Send,receive buffer sizes are: %d,%d\n", 
+                          sendBufferSize,
+                          receiveBufferSize );
+                 
+                // make sure they are sane before allocating memory based
+                // on them, because these sizes come from what the
+                // parent sends
+                if( sendBufferSize > 1920 || receiveBufferSize > 1920 ) {
+                    // bad sizes, bail out    
+                    wmStatus = -1;
+                    WM_End( wmEndCallback );
+                    return;
+                    }
+                
+                // sizes okay to allocate memory with
+                sendBuffer = 
+                    (unsigned char *)allocMem( sendBufferSize );
+                receiveBuffer = 
+                    (unsigned char *)allocMem( receiveBufferSize );
+
+                // start multiplayer
+                WMErrCode result =
+                    WM_StartMP(
+                        wmStartMPCallback,
+                        (u16*)receiveBuffer,
+                        receiveBufferSize,
+                        (u16*)sendBuffer,
+                        sendBufferSize,
+                        1 );  // one communication per frame
+                
+                if( result !=  WM_ERRCODE_OPERATING ) {
+                    wmStatus = -1;
+                    WM_End( wmEndCallback );
+                    return;
+                    }
+
+                //aid = cb->aid;
+                }
+        
+                break;
+
+            case WM_STATECODE_BEACON_LOST:
+                
+                //__callback(CHILD_BEACONLOST, 0);
+                
+                break;
+                
+            case WM_STATECODE_DISCONNECTED:
+                
+                //__callback(CHILD_DISCONNECTED, 0);
+                
+                break;
+                
+            default:
+            }
+        }
+    }
+
+
+
+
+void scanNextChannel();
+
+
+static void wmStartScanCallback( void *inArg ) {
+    WMStartScanCallback *callbackArg = (WMStartScanCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    else {
+        if( callbackArg->state == WM_STATECODE_PARENT_FOUND ) {
+            if( callbackArg->gameInfo.ggid == LOCAL_GGID ) {
+                
+                // use this game
+                
+                WMErrCode result = WM_StartConnect(
+                    wmStartConnectCallback,
+                    &scanBssDesc,
+                    // FIXME:
+                    // can specify a 24-byte SSID here that parent
+                    // can check... parent not checking, so NULL for now
+                    // which forces all zeros as SSID
+                    NULL );
+                
+                if( result != WM_ERRCODE_OPERATING ) {
+                    wmStatus = -1;
+                    WM_End( wmEndCallback );
+                    }
+                
+                // FIXME:  in future, should present a list of parents to
+                // user and let them pick (lobby interface)
+
+                // FIXME:  don't forget to use callbackArg->linkLevel
+                // to display official wifi level icon in lobby interface
+                return;
+                }
+            }
+
+        // parent not found or ggid didn't match
+
+        nextChannel++;
+        
+        if( nextChannel >= 13 ) {
+            nextChannel = 0;
+            }
+        scanNextChannel();
+        }
+    }
+
+        
+
+
+
+
+
+
+void scanNextChannel() {
+    if( ! allowedChannels ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        return;
+        }
+    while( ! ( (1 << nextChannel) & allowedChannels ) ) {
+        nextChannel++;
+        
+        // 14 broken?
+        // wrap back around
+        if( nextChannel >= 13 ) {
+            nextChannel = 0;
+            }
+        }
+    
+
+    scanParam.channel = nextChannel;
+
+    DC_InvalidateRange( &scanBssDesc, sizeof(WMBssDesc) );
+    
+    WMErrCode result = 
+        WM_StartScan( wmStartScanCallback, 
+                      &scanParam );
+    
+    if( result != WM_ERRCODE_OPERATING ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    }
+
+
+
+
 static void wmInitializeCallback( void *inArg ) {
     WMCallback *callbackArg = (WMCallback *)inArg;
     
@@ -589,15 +774,37 @@ static void wmInitializeCallback( void *inArg ) {
         wmStatus = -1;
         }
     else {
+        
+        allowedChannels = WM_GetAllowedChannel();
+        nextChannel = 0;
+
         if( isParent ) {
             
             tgid ++;
-            
-            allowedChannels = WM_GetAllowedChannel();
-            nextChannel = 0;
-            
+                        
             measureNextChannel();
             }
+        else {
+            // child
+            
+            // scan for parent's beacon
+            
+            // Scan for any MAC address
+            scanParam.bssid[0] = 0xFF;
+            scanParam.bssid[1] = 0xFF;
+            scanParam.bssid[2] = 0xFF;
+            scanParam.bssid[3] = 0xFF;
+            scanParam.bssid[4] = 0xFF;
+            scanParam.bssid[5] = 0xFF;
+            
+            scanParam.maxChannelTime = WM_GetDispersionScanPeriod();
+            scanParam.scanBuf = &scanBssDesc;
+            
+
+            nextChannel = 0;
+            scanNextChannel();
+            
+            }        
         }
     }
 
