@@ -350,26 +350,239 @@ char isParent = false;
 
 unsigned short tgid = 0;
 
+unsigned short allowedChannels = 0;
+unsigned short nextChannel = 0;
+
+// FIXME:  replace with actual measurement of traffic when game runs
+int requiredTraffic = 20;
+int bestChannel = -1;
+int bestBusyRatio = 101;
+
+
 static WMParentParam parentParam ATTRIBUTE_ALIGN(32);
 
-    
 
-static void wmSetParentParamCallback( void *inArg ) {
-    WMErrCode result;
+static unsigned char *sendBuffer = NULL;
+static unsigned char *receiveBuffer = NULL;
+
+
+
+static void wmEndCallback( void *inArg ) {
     WMCallback *callbackArg = (WMCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
         }
     else {
-        //
+        if( sendBuffer != NULL ) {
+            freeMem( sendBuffer );
+            sendBuffer = NULL;
+            }
+        if( receiveBuffer != NULL ) {
+            freeMem( receiveBuffer );
+            receiveBuffer = NULL;
+            }
         }
     }
 
 
 
+static void wmStartMPCallback( void *inArg ) {
+    WMStartMPCallback *callbackArg = (WMStartMPCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    else {
+        if( callbackArg->state == WM_STATECODE_MP_START ) {
+            wmStatus = 1;
+            }
+        }
+    }
+
+
+
+static void wmStartParentCallback( void *inArg ) {
+    WMStartParentCallback *callbackArg = (WMStartParentCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        }
+    else {
+        if( callbackArg->errcode == WM_ERRCODE_SUCCESS ) {
+            switch( callbackArg->state ) {
+                case WM_STATECODE_PARENT_START: {
+                                        
+                    unsigned short sendBufferSize = 
+                        (unsigned short)WM_GetMPSendBufferSize();
+                    unsigned short receiveBufferSize = 
+                        (unsigned short)WM_GetMPReceiveBufferSize();
+                    printOut( "Send,receive buffer sizes are: %d,%d\n" );
+                    
+                    sendBuffer = 
+                        (unsigned char *)allocMem( sendBufferSize );
+                    receiveBuffer = 
+                        (unsigned char *)allocMem( receiveBufferSize );
+                    
+                    
+                    // start multiplayer
+                    WMErrCode result =
+                        WM_StartMP(
+                            wmStartMPCallback,
+                            (u16*)receiveBuffer,
+                            receiveBufferSize,
+                            (u16*)sendBuffer,
+                            sendBufferSize,
+                            1 );  // one communication per frame
+
+                    if( result !=  WM_ERRCODE_OPERATING ) {
+                        wmStatus = -1;
+                        WM_End( wmEndCallback );
+                        }
+                    }
+                    break;
+                case WM_STATECODE_CONNECTED:
+
+                    // FIXME:
+                    //parent_load_status();
+                    
+                    return;
+                case WM_STATECODE_DISCONNECTED:
+
+                    // FIXME:
+                    //parent_load_status();
+                    
+                    return;
+                    
+                default:
+                    
+                    return;
+                }
+            }
+        //
+        }
+    }
+    
+
+
+static void wmSetParentParamCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    else {
+        WMErrCode result = WM_StartParent( wmStartParentCallback );
+        
+        if( result != WM_ERRCODE_OPERATING ) {
+            wmStatus = -1;
+            WM_End( wmEndCallback );
+            }
+        }
+    
+    }
+
+
+void measureNextChannel();
+
+
+
+static void wmMeasureChannelCallback( void *inArg ) {
+    WMMeasureChannelCallback *callbackArg = ( WMMeasureChannelCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    else {
+        // ignore channels too busy for our traffic
+        if( callbackArg->ccaBusyRatio + requiredTraffic < 100 ) {
+            if( callbackArg->ccaBusyRatio < bestBusyRatio ) {
+                // best yet
+                bestBusyRatio = callbackArg->ccaBusyRatio;
+                bestChannel = callbackArg->channel;
+                }
+            }
+        if( nextChannel < 12 ) {
+            nextChannel ++;
+            measureNextChannel();
+            }
+        else {
+            // done measuring
+
+            if( bestChannel == -1 ) {
+                wmStatus = -1;
+                WM_End( wmEndCallback );
+
+                return;
+                }
+            else {
+                // found one
+                
+                // set parent params
+                parentParam.userGameInfo = NULL;
+                parentParam.userGameInfoLength = 0;
+                parentParam.tgid = tgid;
+                parentParam.ggid = LOCAL_GGID;
+                parentParam.channel = (unsigned short)bestChannel;
+                parentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
+                parentParam.parentMaxSize = 512;
+                parentParam.childMaxSize = 512;
+                parentParam.maxEntry = 1;
+                parentParam.CS_Flag = 0;
+                parentParam.multiBootFlag = 0;
+                parentParam.entryFlag = 1;
+                parentParam.KS_Flag = 0;
+            
+                WMErrCode result =
+                    WM_SetParentParameter( wmSetParentParamCallback,  
+                                           &parentParam );
+                if( result != WM_ERRCODE_OPERATING ) {
+                    wmStatus = -1;
+                    WM_End( wmEndCallback );
+                    }
+                }
+            }
+        
+        }
+    }
+
+
+void measureNextChannel() {
+    if( ! allowedChannels ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        return;
+        }
+    while( ! ( (1 << nextChannel) & allowedChannels ) ) {
+        nextChannel++;
+        
+        // 14 broken?
+        if( nextChannel >= 13 ) {
+            return;
+            }
+        }
+    
+            
+    
+    WMErrCode result = 
+        WM_MeasureChannel(
+            wmMeasureChannelCallback,
+            3,
+            17,
+            (unsigned short)( nextChannel + 1 ),
+            30 );
+    
+    if( result != WM_ERRCODE_OPERATING ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    }
+
+
 static void wmInitializeCallback( void *inArg ) {
-    WMErrCode result;
     WMCallback *callbackArg = (WMCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
@@ -380,32 +593,17 @@ static void wmInitializeCallback( void *inArg ) {
             
             tgid ++;
             
-            // fixme:  need to measure channel strengths and pick a channel
-            // first
-            parentParam.tgid = tgid;
-            parentParam.channel = channel;  // FIXME
-            parentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
-            parentParam.parentMaxSize = 512;
-            parentParam.childMaxSize = 512;
-            parentParam.maxEntry = 1;
-            parentParam.CS_Flag = 0;
-            parentParam.multiBootFlag = 0;
-            parentParam.entryFlag = 1;
-            parentParam.KS_Flag = 0;
+            allowedChannels = WM_GetAllowedChannel();
+            nextChannel = 0;
             
-            WMErrCode result =
-                WM_SetParentParameter( wmSetParentParamCallback,  
-                                       &parentParam );
-             if( result != WM_ERRCODE_OPERATING ) {
-                 wmStatus = -1;
-                 }
+            measureNextChannel();
             }
         }
     }
 
 
 
-static initWM() {
+static void initWM() {
     
     WMErrCode result = WM_Initialize( &wmBuffer, wmInitializeCallback, 
                                       WM_DMA_NO );
