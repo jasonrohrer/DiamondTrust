@@ -706,6 +706,10 @@ static void wmStartScanCallback( void *inArg ) {
                     WM_End( wmEndCallback );
                     }
                 
+                
+                // Actually, if end goal is Download play only (cloneboot)
+                // then these may not be relevant (one known parent, no lobby)
+
                 // FIXME:  in future, should present a list of parents to
                 // user and let them pick (lobby interface)
 
