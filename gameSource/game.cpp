@@ -239,12 +239,42 @@ void gameLoopTick() {
             if( indexToTouch >= NUM_DRAWN ) {
                 indexToTouch = 0;
                 }
+
+            if( checkConnectionStatus() == 1 ) {
+                unsigned char message[2];
+                message[0] = (unsigned char)tx;
+                message[1] = (unsigned char)ty;
+                
+                sendMessage( message, 2 );
+                }
+            
             }
         
         
         }
     
+    if( checkConnectionStatus() == 1 ) {
+        unsigned int numBytes;  
+        unsigned char *message = getMessage( &numBytes );
         
+        if( message != NULL ) {
+            
+            if( numBytes == 2 ) {
+                
+                drawX[ indexToTouch ] = message[0];
+                
+                drawY[ indexToTouch ] = message[1];
+                            
+                indexToTouch ++;
+                if( indexToTouch >= NUM_DRAWN ) {
+                    indexToTouch = 0;
+                    }
+                }
+            
+            delete [] message;
+            }
+        }
+    
     }
 
 

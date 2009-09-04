@@ -12,7 +12,10 @@
 
 
 void *allocMem( unsigned int inSizeInBytes );
-void  freeMem( void *inRegion );
+void freeMem( void *inRegion );
+
+// matches signature of stdc memcpy
+void copyMem( void *inDest, void *inSource, unsigned int inSizeInBytes );
 
 
 // some platforms must override new and delete
@@ -22,6 +25,7 @@ void  freeMem( void *inRegion );
   void operator delete( void *inRegion ) throw();
   void operator delete[] ( void *inRegion )throw();
 #endif
+
 
 
 // reads full contents of a file into newly-allocated memory
@@ -37,13 +41,12 @@ unsigned int getRandom( unsigned int inMax );
 
 
 
-struct rgbaColorStruct {
+typedef struct rgbaColor {
         unsigned char r;
         unsigned char g;
         unsigned char b;
         unsigned char a;
-    };
-typedef struct rgbaColorStruct rgbaColor;
+    } rgbaColor;
 
 
 // creates sprite from 32-bit image data
@@ -94,13 +97,13 @@ int checkConnectionStatus();
 
 
 // inMessage destroyed by caller
-void sendMessage( unsigned char *inMessage, int inLength );
+void sendMessage( unsigned char *inMessage, unsigned int inLength );
 
 
 // poll for new incoming message
 // returns NULL if no message ready
 // result freed by caller
-unsigned char *getMessage( int *outLength );
+unsigned char *getMessage( unsigned int *outLength );
 
 
 
