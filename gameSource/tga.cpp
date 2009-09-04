@@ -96,8 +96,8 @@ rgbaColor *extractTGAData( unsigned char *inData, int inNumBytes,
     unsigned char *raster = &( inData[ offset ] );
     
     // return data
-    rgbaColor *rgbaData = 
-        (rgbaColor *)( allocMem( numPixels * sizeof( rgbaColor ) ) );
+    rgbaColor *rgbaData = new rgbaColor[ numPixels ];
+    
     
     int rasterIndex = 0;
     

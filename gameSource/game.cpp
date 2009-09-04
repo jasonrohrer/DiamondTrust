@@ -77,10 +77,10 @@ static int loadSprite( char *inFileName, char inCornerTransparent = false ) {
                         
             returnID = addSprite( spriteRGBA, width, height );
             
-            freeMem( spriteRGBA );
+            delete [] spriteRGBA;
             }
 
-        freeMem( spriteFileData );
+        delete [] spriteFileData;
         }
     return returnID;
     }

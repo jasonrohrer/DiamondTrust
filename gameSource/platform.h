@@ -14,6 +14,16 @@
 void *allocMem( unsigned int inSizeInBytes );
 void  freeMem( void *inRegion );
 
+
+// some platforms must override new and delete
+#if defined( SDK_TWL ) || defined( SDK_NITRO )
+  void *operator new( std::size_t inSizeInBytes );
+  void *operator new[] ( std::size_t inSizeInBytes );
+  void operator delete( void *inRegion ) throw();
+  void operator delete[] ( void *inRegion )throw();
+#endif
+
+
 // reads full contents of a file into newly-allocated memory
 unsigned char *readFile( char *inFileName, int *outSize );
 
