@@ -22,6 +22,11 @@ void freeMem( void *inRegion ) {
     OS_Free( inRegion );
     }
 
+void copyMem( void *inDest, void *inSource, unsigned int inSizeInBytes ) {
+    MI_CpuCopy8( inSource, inDest, inSizeInBytes );
+    }
+
+
 
 void* operator new ( std::size_t inSizeInBytes ) {
     return OS_Alloc( inSizeInBytes );
@@ -407,7 +412,7 @@ int bestBusyRatio = 101;
 
 static WMParentParam parentParam ATTRIBUTE_ALIGN(32);
 
-static unsigned short connectedChildAID;
+static unsigned short remoteAID = 0;
 
 static unsigned short portNumber = 13;
 
@@ -462,7 +467,7 @@ static void wmDisconnectCallback( void *inArg ) {
 
 static void disconnect() {
     if( isParent ) {
-        WM_Disconnect( wmDisconnectCallback, connectedChildAID );
+        WM_Disconnect( wmDisconnectCallback, remoteAID );
         }
     else {
         // parent AID is 0
@@ -486,6 +491,105 @@ static void wmEndMPCallback( void *inArg ) {
 
 
 
+typedef struct dataFifoElement {
+        unsigned char *data;
+        unsigned int numBytes;
+        dataFifoElement *next;
+        dataFifoElement *previous;
+    } dataFIFO;
+
+
+
+class dataFifo {
+    public:
+        
+        dataFifo() 
+            : mHead( NULL ), mTail( NULL ){
+            }
+
+        
+        ~dataFifo() {
+            clearData();
+            }
+        
+
+        // inData copied internally
+        void addData( unsigned char *inData, unsigned int inNumBytes ) {
+            dataFifoElement *f = new dataFifoElement;
+            
+            f->next = mHead;
+            f->previous = NULL;
+            
+            if( mHead != NULL ) {
+                mHead->previous = f;
+                }
+            else{
+                //empty
+                mTail = f;
+                }
+
+            mHead = f;
+            f->numBytes = inNumBytes;
+            
+            f->data = new unsigned char[ inNumBytes ];
+            
+            copyMem( f->data, inData, inNumBytes );
+            }
+        
+        
+        // NULL if empty
+        // caller destroys
+        unsigned char *getData( unsigned int *outSize ) {
+            if( mTail == NULL ) {
+                return NULL;
+                }
+            else {
+                unsigned char *returnData = mTail->data;
+                *outSize = mTail->numBytes;
+
+                dataFifoElement *oldTail = mTail;
+                mTail = mTail->previous;
+                
+                if( mTail == NULL ) {
+                    mHead = NULL;
+                    }
+                else {
+                    mTail->next = NULL;
+                    }
+                delete oldTail;
+                
+                return returnData;
+                }
+            }
+
+
+        void clearData() {
+            unsigned int numBytes;
+            unsigned char *data = getData( &numBytes );
+            
+            
+            while( data != NULL ) {
+                delete [] data;
+                data = getData( &numBytes );
+                }
+            }
+
+        
+                    
+    private:
+        dataFifoElement *mHead;
+        dataFifoElement *mTail;
+    };
+
+
+dataFifo sendFifo;
+dataFifo receiveFifo;
+
+char sendPending = false;
+
+
+
+
 
 static void wmPortCallback( void *inArg ) {
     WMPortRecvCallback *callbackArg = (WMPortRecvCallback *)inArg;
@@ -496,7 +600,9 @@ static void wmPortCallback( void *inArg ) {
         }
     else {
         if( callbackArg->state == WM_STATECODE_PORT_RECV ) {
-            //
+            
+            receiveFifo.addData( (unsigned char*)callbackArg->data, 
+                                 (unsigned int)callbackArg->length );
             }
         }
     }
@@ -540,7 +646,14 @@ static void wmStartParentCallback( void *inArg ) {
         switch( callbackArg->state ) {
             case WM_STATECODE_PARENT_START: {
                 
-                connectedChildAID = callbackArg->aid;
+                
+                }
+                break;
+            case WM_STATECODE_CONNECTED: {
+                
+                
+                // don't start multiplayer until we're connected
+                remoteAID = callbackArg->aid;
                 
                 unsigned short sendBufferSize = 
                     (unsigned short)WM_GetMPSendBufferSize();
@@ -569,13 +682,11 @@ static void wmStartParentCallback( void *inArg ) {
                     wmStatus = -1;
                     WM_End( wmEndCallback );
                     }
-                }
-                break;
-            case WM_STATECODE_CONNECTED:
 
                 // FIXME:
                 //parent_load_status();
-                    
+                
+                }
                 return;
             case WM_STATECODE_DISCONNECTED:
 
@@ -913,6 +1024,51 @@ void scanNextChannel() {
 
 
 
+void startNextSend();
+
+static void wmPortSendCallback( void *inArg ) {
+    WMPortSendCallback *callbackArg = (WMPortSendCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_EndMP( wmEndMPCallback );
+        }
+    else {
+        printOut( "Data send successful\n" );
+        
+        delete [] callbackArg->data;
+        startNextSend();
+        }
+    }
+
+
+
+void startNextSend() {
+    
+    unsigned int numBytes;
+    
+    unsigned char *data = sendFifo.getData( &numBytes );
+    
+    if( data != NULL ) {
+        sendPending = true;
+        
+        printOut( "Starting data send\n" );
+        
+        WMErrCode result = WM_SetMPDataToPort(
+            wmPortSendCallback,
+            (unsigned short *)data,
+            (unsigned short)numBytes ,
+            remoteAID,
+            portNumber,
+            0 );
+        }
+    else{
+        sendPending = false;
+        }
+    }
+
+
+
 
 static void wmInitializeCallback( void *inArg ) {
     WMCallback *callbackArg = (WMCallback *)inArg;
@@ -967,7 +1123,6 @@ static void initWM() {
     }
 
 
-
 char isAutoconnecting() {
     return false;
     }
@@ -1003,11 +1158,18 @@ int checkConnectionStatus() {
     }
 
 
-void sendMessage( unsigned char *inMessage, int inLength ) {
+void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
+    sendFifo.addData( inMessage, inLength );
+    if( !sendPending ) {
+        // start a new one 
+        startNextSend();
+        }
+    // else new one will start when current one finishes (in callback)
     }
 
 
-unsigned char *getMessage( int *outLength ) {
+unsigned char *getMessage( unsigned int *outLength ) {
+    return receiveFifo.getData( outLength );
     }
 
 
