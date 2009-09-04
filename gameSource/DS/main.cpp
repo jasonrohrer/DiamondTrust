@@ -532,7 +532,7 @@ static void wmMeasureChannelCallback( void *inArg ) {
             else {
                 // found one
                 
-                tgid = WM_GetNextTgid();
+                
                 
 
                 // set parent params
@@ -568,7 +568,7 @@ static void wmMeasureChannelCallback( void *inArg ) {
 
 
 void measureNextChannel() {
-    if( ! allowedChannels ) {
+    if( allowedChannels == 0 ) {
         wmStatus = -1;
         WM_End( wmEndCallback );
         return;
@@ -669,10 +669,41 @@ static void wmStartConnectCallback( void *inArg ) {
                 break;
                 
             default:
+                break;
             }
         }
     }
 
+
+
+static void wmEndScanCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+    else {
+        // ending scan only when we found a connection
+
+        // use this game
+                
+        WMErrCode result = WM_StartConnect(
+            wmStartConnectCallback,
+            &scanBssDesc,
+            // FIXME:
+            // can specify a 24-byte SSID here that parent
+            // can check... parent not checking, so NULL for now
+            // which forces all zeros as SSID
+            NULL );
+                
+        if( result != WM_ERRCODE_OPERATING ) {
+            wmStatus = -1;
+            WM_End( wmEndCallback );
+            }
+
+        }
+    }
 
 
 
@@ -689,23 +720,16 @@ static void wmStartScanCallback( void *inArg ) {
     else {
         if( callbackArg->state == WM_STATECODE_PARENT_FOUND ) {
             if( callbackArg->gameInfo.ggid == LOCAL_GGID ) {
+ 
+                // use the first parent that we find (ignore rest)
                 
-                // use this game
-                
-                WMErrCode result = WM_StartConnect(
-                    wmStartConnectCallback,
-                    &scanBssDesc,
-                    // FIXME:
-                    // can specify a 24-byte SSID here that parent
-                    // can check... parent not checking, so NULL for now
-                    // which forces all zeros as SSID
-                    NULL );
-                
+                // end our scan before connecting
+                WMErrCode result = WM_EndScan( wmEndScanCallback );
+                                
                 if( result != WM_ERRCODE_OPERATING ) {
                     wmStatus = -1;
                     WM_End( wmEndCallback );
                     }
-                
                 
                 // Actually, if end goal is Download play only (cloneboot)
                 // then these may not be relevant (one known parent, no lobby)
@@ -738,7 +762,7 @@ static void wmStartScanCallback( void *inArg ) {
 
 
 void scanNextChannel() {
-    if( ! allowedChannels ) {
+    if( allowedChannels == 0 ) {
         wmStatus = -1;
         WM_End( wmEndCallback );
         return;
@@ -754,7 +778,7 @@ void scanNextChannel() {
         }
     
 
-    scanParam.channel = nextChannel;
+    scanParam.channel = (unsigned short)( nextChannel + 1 );
 
     DC_InvalidateRange( &scanBssDesc, sizeof(WMBssDesc) );
     
@@ -783,9 +807,9 @@ static void wmInitializeCallback( void *inArg ) {
         nextChannel = 0;
 
         if( isParent ) {
-            
-            tgid ++;
-                        
+            // can't call this from inside a callback
+            //tgid = WM_GetNextTgid();
+
             measureNextChannel();
             }
         else {
@@ -837,6 +861,14 @@ char *getLocalAddress() {
 
 void acceptConnection() {
     isParent = true;
+
+    printOut( "Getting TGID\n" );
+    
+    tgid = WM_GetNextTgid();
+    
+    printOut( "Tgid = %d\n", (int)tgid );
+
+    
     initWM();
     }
 
@@ -1017,10 +1049,11 @@ static void VBlankCallback() {
     // turn on VBLANK interrupt handling
     OS_SetIrqFunction( OS_IE_V_BLANK, VBlankCallback );
     OS_EnableIrqMask( OS_IE_V_BLANK );
-    OS_EnableIrq();
 
     GX_VBlankIntr( true );  
 
+    OS_EnableIrq();
+    OS_EnableInterrupts();
 
 
     // init vram
@@ -1168,6 +1201,9 @@ static void VBlankCallback() {
     else {
         OS_Printf( "File read failed\n" );
         }
+
+
+
     
     
     // start display
