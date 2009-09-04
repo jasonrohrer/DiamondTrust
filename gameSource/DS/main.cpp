@@ -23,13 +23,59 @@ void freeMem( void *inRegion ) {
     }
 
 
+void* operator new ( std::size_t inSizeInBytes ) {
+    return OS_Alloc( inSizeInBytes );
+    }
+
+
+void* operator new[] ( std::size_t inSizeInBytes ) {
+    return OS_Alloc( inSizeInBytes );
+    }
+
+
+void operator delete ( void *inRegion ) throw() {
+    OS_Free( inRegion );
+    }
+
+
+void operator delete[] ( void *inRegion ) throw() {
+    OS_Free( inRegion );
+    }
+
+
+// called by system before C++ static constructor calls
+// set our heap system up here for use by new and delete operators
+void NitroStartUp( void ) {
+    OS_Init();
+    
+
+    // setup memory heap    
+    OS_Printf( "Setting up heap\n" );
+    void *arenaLo = OS_InitAlloc( OS_ARENA_MAIN, 
+                                  OS_GetMainArenaLo(),
+                                  OS_GetMainArenaHi(), 1 );
+
+    OS_SetArenaLo( OS_ARENA_MAIN, arenaLo );
+
+    OSHeapHandle heapHandle = OS_CreateHeap( OS_ARENA_MAIN, 
+                                             OS_GetMainArenaLo(), 
+                                             OS_GetMainArenaHi() );
+    if( heapHandle < 0 ) {
+        OS_TPanic( "Failed to create main heap.\n");
+        }
+
+    OS_SetCurrentHeap( OS_ARENA_MAIN, heapHandle );
+    }
+
+
+
 unsigned char *readFile( char *inFileName, int *outSize ) {
     FSFile file;
     
     if( FS_OpenFileEx( &file, inFileName, FS_FILEMODE_R ) ) {
         unsigned int length = FS_GetLength( &file );
         
-        unsigned char *buffer = (unsigned char *)allocMem( length );
+        unsigned char *buffer = new unsigned char[ length ];
         
         int numRead = FS_ReadFile( &file, buffer, (int)length );
         
@@ -173,7 +219,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
     unsigned int numPixels = (unsigned int)( inWidth * inHeight );
     
-    unsigned short *textureData = (unsigned short *)allocMem( numPixels * 2 );
+    unsigned short *textureData = new unsigned short[ numPixels ];
  
 
     for( int i=0; i<numPixels; i++ ) {
@@ -361,6 +407,12 @@ int bestBusyRatio = 101;
 
 static WMParentParam parentParam ATTRIBUTE_ALIGN(32);
 
+static unsigned short connectedChildAID;
+
+static unsigned short portNumber = 13;
+
+
+
 // for child scanning
 static WMScanParam scanParam;
 static WMBssDesc scanBssDesc;
@@ -396,16 +448,81 @@ static void wmEndCallback( void *inArg ) {
 
 
 
+static void wmDisconnectCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        }
+    else {
+        WM_End( wmEndCallback );
+        }
+    }
+
+
+static void disconnect() {
+    if( isParent ) {
+        WM_Disconnect( wmDisconnectCallback, connectedChildAID );
+        }
+    else {
+        // parent AID is 0
+        WM_Disconnect( wmDisconnectCallback, 0 );
+        }
+    }
+
+
+
+static void wmEndMPCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        }
+    else {
+
+        disconnect();
+        }
+    }
+
+
+
+
+static void wmPortCallback( void *inArg ) {
+    WMPortRecvCallback *callbackArg = (WMPortRecvCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        WM_EndMP( wmEndMPCallback );
+        }
+    else {
+        if( callbackArg->state == WM_STATECODE_PORT_RECV ) {
+            //
+            }
+        }
+    }
+
+
+
+
 static void wmStartMPCallback( void *inArg ) {
     WMStartMPCallback *callbackArg = (WMStartMPCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
-        WM_End( wmEndCallback );
+        disconnect();
         }
     else {
         if( callbackArg->state == WM_STATECODE_MP_START ) {
             wmStatus = 1;
+
+            // prepare to receive data
+            WMErrCode result = WM_SetPortCallback(
+                portNumber, wmPortCallback, NULL );
+
+            if( result !=  WM_ERRCODE_SUCCESS ) {
+                wmStatus = -1;
+                WM_End( wmEndCallback );
+                }
             }
         }
     }
@@ -422,6 +539,8 @@ static void wmStartParentCallback( void *inArg ) {
     else {
         switch( callbackArg->state ) {
             case WM_STATECODE_PARENT_START: {
+                
+                connectedChildAID = callbackArg->aid;
                 
                 unsigned short sendBufferSize = 
                     (unsigned short)WM_GetMPSendBufferSize();
@@ -1018,8 +1137,14 @@ static void VBlankCallback() {
     void NitroMain( void )
 #endif
 {
+    
+    
+    // already called in NitroStartUp
+    //OS_Init();
+    
+    OS_Printf( "Main starting\n" );
 
-    OS_Init();
+
     FX_Init();
     TP_Init();
     
@@ -1164,24 +1289,7 @@ static void VBlankCallback() {
 
 
 
-    // setup memory heap    
-    OS_Printf( "Setting up heap\n" );
-    void *arenaLo = OS_InitAlloc( OS_ARENA_MAIN, 
-                                  OS_GetMainArenaLo(),
-                                  OS_GetMainArenaHi(), 1 );
-
-    OS_SetArenaLo( OS_ARENA_MAIN, arenaLo );
-
-    OSHeapHandle heapHandle = OS_CreateHeap( OS_ARENA_MAIN, 
-                                             OS_GetMainArenaLo(), 
-                                             OS_GetMainArenaHi() );
-    if( heapHandle < 0 ) {
-        OS_TPanic( "Failed to create main heap.\n");
-        }
-
-    OS_SetCurrentHeap( OS_ARENA_MAIN, heapHandle );
     
-    OS_EnableIrq();
 
     OS_Printf( "Init file system\n" );
     FS_Init( 3 );
