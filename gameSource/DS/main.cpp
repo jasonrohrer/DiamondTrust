@@ -654,6 +654,7 @@ static void wmStartParentCallback( void *inArg ) {
                 
                 // don't start multiplayer until we're connected
                 remoteAID = callbackArg->aid;
+                printOut( "Parent sees child remote AID of %d\n", remoteAID );
                 
                 unsigned short sendBufferSize = 
                     (unsigned short)WM_GetMPSendBufferSize();
@@ -662,10 +663,11 @@ static void wmStartParentCallback( void *inArg ) {
                 printOut( "Send,receive buffer sizes are: %d,%d\n",
                           sendBufferSize, receiveBufferSize );
                     
+                // allocations are automatically 32-byte aligned
                 sendBuffer = 
-                    (unsigned char *)allocMem( sendBufferSize );
+                    new unsigned char[ sendBufferSize ];
                 receiveBuffer = 
-                    (unsigned char *)allocMem( receiveBufferSize );
+                    new unsigned char[ receiveBufferSize ];
                     
                     
                 // start multiplayer
@@ -860,10 +862,11 @@ static void wmStartConnectCallback( void *inArg ) {
                     }
                 
                 // sizes okay to allocate memory with
+                // allocations are automatically 32-byte aligned
                 sendBuffer = 
-                    (unsigned char *)allocMem( sendBufferSize );
+                    new unsigned char[ sendBufferSize ];
                 receiveBuffer = 
-                    (unsigned char *)allocMem( receiveBufferSize );
+                    new unsigned char[ receiveBufferSize ];
 
                 // start multiplayer
                 WMErrCode result =
@@ -1054,11 +1057,14 @@ void startNextSend() {
         
         printOut( "Starting data send\n" );
         
+        unsigned short receiverBitmap = (unsigned short)( 1 << remoteAID );
+        
+        
         WMErrCode result = WM_SetMPDataToPort(
             wmPortSendCallback,
             (unsigned short *)data,
             (unsigned short)numBytes ,
-            remoteAID,
+            receiverBitmap,
             portNumber,
             0 );
         }
