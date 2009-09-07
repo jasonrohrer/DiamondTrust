@@ -13,6 +13,7 @@ DS_SOURCE = main.cpp
 GAME_SOURCE = \
 game.cpp \
 tga.cpp \
+Font.cpp \
 
 MINOR_GEMS_SOURCE = \
 util/stringUtils.cpp \

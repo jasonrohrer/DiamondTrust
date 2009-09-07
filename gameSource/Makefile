@@ -5,6 +5,8 @@ testTexture.tga \
 testTexture2.tga \
 parentButton.tga \
 childButton.tga \
+font8.tga \
+
 
 
 # prepend path

@@ -2,6 +2,7 @@
 
 #include "platform.h"
 #include "tga.h"
+#include "Font.h"
 #include "minorGems/util/stringUtils.h"
 
 #define NUM_DRAWN 60
@@ -33,6 +34,10 @@ int childButtonX = 10;
 int childButtonY = 170;
 
 char buttonsVisible = true;
+
+
+Font *font8;
+
 
 
  
@@ -160,11 +165,12 @@ void gameInit() {
         */
         }
 
-    char *result = autoSprintf( "test x=%d, s=%s\n", 4123, "test this thing" );
+    char *result = autoSprintf( "test x=%d, s=%s\n", 4123, 
+                                "quick brown fox jumped lazy" );
     printOut( result );
     delete [] result;
     
-    
+    font8 = new Font( "font8.tga", 0, 6, false );
     }
 
 
@@ -303,6 +309,11 @@ void drawBottomScreen() {
 
         drawSprite( parentSpriteID, parentButtonX, parentButtonY, white );
         drawSprite( childSpriteID, childButtonX, childButtonY, white );
+
+        font8->drawString( "Quick brown fox jumped over Lazy Dog", 
+                           parentButtonX, 
+                           parentButtonY - 20, white, alignLeft );
+        
         }
     else {
         
