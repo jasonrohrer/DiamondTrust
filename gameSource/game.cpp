@@ -2,7 +2,7 @@
 
 #include "platform.h"
 #include "tga.h"
-
+#include "minorGems/util/stringUtils.h"
 
 #define NUM_DRAWN 60
 
@@ -159,6 +159,11 @@ void gameInit() {
             }
         */
         }
+
+    char *result = autoSprintf( "test x=%d, s=%s\n", 4123, "test this thing" );
+    printOut( result );
+    delete [] result;
+    
     
     }
 
