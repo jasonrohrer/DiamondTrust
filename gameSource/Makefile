@@ -27,5 +27,5 @@ clean:
 # $@   represents the name.tga file
 # $<   represents the name.png file
 #
-gameData/%.tga: %.png
+gameData/%.tga: graphics/%.png
 	convert $< $@
