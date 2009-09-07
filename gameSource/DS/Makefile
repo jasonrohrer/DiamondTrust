@@ -14,11 +14,19 @@ GAME_SOURCE = \
 game.cpp \
 tga.cpp \
 
-# prepend path
+MINOR_GEMS_SOURCE = \
+util/stringUtils.cpp \
+
+
+# prepend paths
 PATH_GAME_SOURCE = $(patsubst %,../%,$(GAME_SOURCE))
 
+PATH_MINOR_GEMS_SOURCE = $(patsubst %,../../../minorGems/%,$(MINOR_GEMS_SOURCE))
 
-SRCS = $(DS_SOURCE) $(PATH_GAME_SOURCE)
+
+
+SRCS = $(DS_SOURCE) $(PATH_GAME_SOURCE) $(PATH_MINOR_GEMS_SOURCE)
+
 
 TARGET_BIN = main.srl
 
@@ -27,7 +35,7 @@ MAKEROM_ROMFILES = *
 
 
 
-INCDIR = ..
+INCDIR = .. ../../..
 
 # use defaults for these
 # SRCDIR =

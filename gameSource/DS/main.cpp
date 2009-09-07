@@ -1490,6 +1490,8 @@ static void VBlankCallback() {
     // init in platform-independent code
     gameInit();
     
+    printOut( "Free bytes on heap=%d\n",
+              OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
     
     while( true ){
         G3X_Reset();
