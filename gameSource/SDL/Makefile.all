@@ -7,9 +7,9 @@
 
 
 ##
-# The portion of game1 Makefiles common to all platforms.
+# The portion of Diamonds Makefiles common to all SDL platforms.
 #
-# Should not be made manually---used by game1/configure to build Makefiles.
+# Should not be made manually---used by SDL/configure to build Makefiles.
 ##
 
 
@@ -18,54 +18,21 @@
 ROOT_PATH = ../../..
 
 
-LAYER_SOURCE = \
-gameSDL.cpp \
-game.cpp \
-common.cpp \
-spriteBank.cpp \
-GridSpace.cpp \
-NextPieceDisplay.cpp \
-numeral.cpp \
-ColorPool.cpp \
-Button.cpp \
-Panel.cpp \
-MenuPanel.cpp \
-EditNamePanel.cpp \
-HighScoreLoadingPanel.cpp \
-WebRequest.cpp \
-ScoreBundle.cpp \
-HighScorePanel.cpp \
-TutorialPanel.cpp \
-TutorialPanelB.cpp \
-TutorialPanelC.cpp \
-networkInterfaceGeneric.cpp \
-BringNetworkUpThread.cpp \
-sound.cpp \
+SDL_SOURCE = \
+main.cpp \
 
 
-LAYER_OBJECTS = ${LAYER_SOURCE:.cpp=.o}
+EXE_FILE = ../gameApp
 
 
+SDL_OBJECTS = ${SDL_SOURCE:.cpp=.o}
 
-GAME_GRAPHICS = \
-graphics/gridLineTop.tga \
-graphics/gridLineBottom.tga \
-graphics/gridLineLeft.tga \
-graphics/gridLineRight.tga \
-graphics/plus.tga \
-graphics/piece.tga \
-graphics/pieceCenter.tga \
-graphics/pieceHalo.tga \
-graphics/pieceBrightHalo.tga \
-graphics/pieceBrightCenter.tga \
-graphics/numerals.tga \
-graphics/numeralsBig.tga \
-graphics/abcdefghijkl.tga \
-graphics/mnopqrstuvwx.tga \
-graphics/yzplus.tga \
-graphics/abcdefghijkl_big.tga \
-graphics/mnopqrstuvwx_big.tga \
-graphics/yzplus_big.tga \
+# for GAME_SOURCE definitions
+include ../makeDefs
+
+# prepend paths
+PATH_GAME_SOURCE = $(patsubst %,../%,$(GAME_SOURCE))
+
 
 
 
@@ -104,15 +71,21 @@ DEPENDENCY_FILE = Makefile.dependencies
 
 # targets
 
-all: Primrose ${GAME_GRAPHICS}
+.PHONY: all clean gameDataDir
+
+all: ${EXE_FILE} gameDataDir
+
 clean:
-	rm -f ${DEPENDENCY_FILE} ${LAYER_OBJECTS} ${TEST_OBJECTS} ${NEEDED_MINOR_GEMS_OBJECTS} Primrose ${GAME_GRAPHICS}
+	rm -f ${DEPENDENCY_FILE} ${SDL_OBJECTS} ${TEST_OBJECTS} ${NEEDED_MINOR_GEMS_OBJECTS} ${EXE_FILE}
+	$(MAKE) -C .. clean
 
 
+gameDataDir:
+	$(MAKE) -C ..
 
 
-Primrose: ${LAYER_OBJECTS} ${NEEDED_MINOR_GEMS_OBJECTS}
-	${EXE_LINK} -o Primrose ${LAYER_OBJECTS} ${NEEDED_MINOR_GEMS_OBJECTS} ${PLATFORM_LINK_FLAGS} 
+${EXE_FILE}: ${SDL_OBJECTS} ${NEEDED_MINOR_GEMS_OBJECTS}
+	${EXE_LINK} -o ${EXE_FILE} ${SDL_OBJECTS} ${NEEDED_MINOR_GEMS_OBJECTS} ${PLATFORM_LINK_FLAGS} 
 
 
 
@@ -132,9 +105,9 @@ GAME_1_SED_FIX_COMMAND = sed ' \
 
 
 # build the dependency file
-${DEPENDENCY_FILE}: ${LAYER_SOURCE} ${TEST_SOURCE}
+${DEPENDENCY_FILE}: ${SDL_SOURCE} ${TEST_SOURCE}
 	rm -f ${DEPENDENCY_FILE}
-	${COMPILE} -MM ${LAYER_SOURCE} ${TEST_SOURCE} >> ${DEPENDENCY_FILE}.temp
+	${COMPILE} -MM ${SDL_SOURCE} ${TEST_SOURCE} >> ${DEPENDENCY_FILE}.temp
 	cat ${DEPENDENCY_FILE}.temp | ${GAME_1_SED_FIX_COMMAND} >> ${DEPENDENCY_FILE}
 	rm -f ${DEPENDENCY_FILE}.temp
 
@@ -142,16 +115,5 @@ include ${DEPENDENCY_FILE}
 
 
 
-
-# 
-# Generic:
-#
-# Map all png files into .tga files
-#
-# $@   represents the name.tga file
-# $<   represents the name.png file
-#
-graphics/%.tga: %.png
-	convert $< $@
 
 
