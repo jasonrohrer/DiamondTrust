@@ -11,12 +11,13 @@
 // **
 
 
+/*
 void *allocMem( unsigned int inSizeInBytes );
 void freeMem( void *inRegion );
 
 // matches signature of stdc memcpy
 void copyMem( void *inDest, void *inSource, unsigned int inSizeInBytes );
-
+*/
 
 // some platforms must override new and delete
 #if defined( SDK_TWL ) || defined( SDK_NITRO )

@@ -62,15 +62,15 @@ char mapSDLKeyToASCII( int inSDLKey );
 void cleanUpAtExit() {
     printf( "Exiting...\n" );
 
-    SDL_CloseAudio();
+    //SDL_CloseAudio();
     
-    gameFree();    
+    //gameFree();    
     }
 
 
 
 void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
-    getSoundSamples( inStream, inLengthToFill );
+    //getSoundSamples( inStream, inLengthToFill );
     }
 
 
@@ -78,6 +78,9 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
 
 int w = 256;
 int h = 384;
+
+int bottomScreenYOffset = 192;
+int singleScreenH = 192;
 
 
 // 60 fps
@@ -87,6 +90,11 @@ int frameMS = 17;
 // s and f keys to slow down and speed up for testing
 char enableSlowdownKeys = false;
 //char enableSlowdownKeys = true;
+
+
+char touchDown = false;
+int touchX = 0;
+int touchY = 0;
 
 
 
@@ -158,7 +166,7 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     SDL_AudioSpec audioFormat;
 
     /* Set 16-bit stereo audio at 22Khz */
-    audioFormat.freq = gameSoundSampleRate;
+    //audioFormat.freq = gameSoundSampleRate;
     audioFormat.format = AUDIO_S16;
     audioFormat.channels = 2;
     audioFormat.samples = 512;        /* A good value for games */
@@ -198,6 +206,8 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     
     // main loop
     while( true ) {
+        
+        gameLoopTick();
         
         callbackDisplay();
         
@@ -334,25 +344,49 @@ void setSoundPlaying( char inPlaying ) {
 
 
 
+int spriteYOffset = 0;
+
 
 void callbackDisplay() {
 		
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glDisable( GL_TEXTURE_2D );
+	glDisable( GL_CULL_FACE );
+    glDisable( GL_DEPTH_TEST );
+
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho( 0, 320, 480, 0, -1.0f, 1.0f);
+    glOrtho( 0, w, singleScreenH, 0, -1.0f, 1.0f);
     
     
     glMatrixMode(GL_MODELVIEW);
 
-    glDisable( GL_TEXTURE_2D );
-	glDisable( GL_CULL_FACE );
-    glDisable( GL_DEPTH_TEST );
+    glViewport( 0, h - singleScreenH, w, singleScreenH );
     
-    drawFrame();
     
-	
+    spriteYOffset = 0;
+    drawTopScreen();
+    
+    
+	//spriteYOffset = bottomScreenYOffset;
+    glViewport( 0, 0, w, singleScreenH );
+    drawBottomScreen();
+
+
+    // separating line:
+    glColor4ub( 255, 255, 255, 255 );
+    const GLfloat lineVertices[] = {
+        0, 0,
+        w, 0 
+        };
+    
+    glVertexPointer( 2, GL_FLOAT, 0, lineVertices );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    
+        
+    glDrawArrays( GL_LINES, 0, 2 );
+
     SDL_GL_SwapBuffers();
 	}
 
@@ -360,17 +394,25 @@ void callbackDisplay() {
 
 
 void callbackMotion( int inX, int inY ) {
-    pointerMove( inX, inY );
+    if( inY >= bottomScreenYOffset ) {
+        
+        touchX = inX;
+        touchY = inY - bottomScreenYOffset;
+        touchDown = true;
+        }
+    else {
+        touchDown = false;
+        } 
 	}
 		
 	
 	
 void callbackMouse( int inButton, int inState, int inX, int inY ) {
 	if( inState == SDL_PRESSED ) {
-        pointerDown( inX, inY );
+        callbackMotion( inX, inY );
         }
     else if( inState == SDL_RELEASED ) {
-        pointerUp( inX, inY );
+        touchDown = false;
         }
     else {
         printf( "Error:  Unknown mouse state received from SDL\n" );
@@ -511,4 +553,205 @@ char mapSDLKeyToASCII( int inSDLKey ) {
 
     
 
+
+
+
+
+// implement the platform.h stuff here:
+
+
+#include "minorGems/io/file/File.h"
+#include "minorGems/io/file/Path.h"
+
+unsigned char *readFile( char *inFileName, int *outSize ) {
+    // files are inside gameData directory
+
+
+    File f( new Path( "gameData" ), inFileName );
+    
+    if( ! f.exists() ) {
+        return NULL;
+        }
+    
+    *outSize = f.getLength();
+    
+    return (unsigned char*) f.readFileContents();
+    }
+
+
+
+#include <stdarg.h>
+
+void printOut( const char *inFormatString, ... ) {
+    va_list argList;
+    va_start( argList, inFormatString );
+    
+    vprintf( inFormatString, argList );
+    
+    va_end( argList );
+    }
+
+
+#include "minorGems/util/random/StdRandomSource.h"
+
+StdRandomSource randSource;
+
+unsigned int getRandom( unsigned int inMax ) {
+    return randSource.getRandomBoundedInt( 0, inMax - 1 );
+    }
+
+
+
+
+#include "minorGems/util/SimpleVector.h"
+
+#include "minorGems/graphics/openGL/SingleTextureGL.h"
+
+
+SimpleVector<SingleTextureGL*> spriteTextures;
+SimpleVector<unsigned int> spriteWidths;
+SimpleVector<unsigned int> spriteHeights;
+
+
+int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
+    SingleTextureGL *s = new SingleTextureGL( (unsigned char*)inDataRGBA,
+                                              inWidth, inHeight );
+    spriteTextures.push_back( s );
+    
+    spriteWidths.push_back( inWidth );
+    spriteHeights.push_back( inHeight );
+    
+
+    return spriteTextures.size() - 1;
+    }
+
+
+
+void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
+    
+    // account for "screen" being drawn on
+    inY += spriteYOffset;
+    
+
+    glColor4ub( inColor.r, inColor.g, inColor.b, inColor.a );
+        
+    SingleTextureGL *texture = *( spriteTextures.getElement( inHandle ) );
+    
+
+    texture->enable(); 
+    unsigned int spriteW = *( spriteWidths.getElement( inHandle ) );
+    unsigned int spriteH = *( spriteHeights.getElement( inHandle ) );
+    
+
+    
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST ); 
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+
+    const GLfloat squareVertices[] = {
+        inX, inY,
+        inX + spriteW, inY,
+        inX, inY + spriteH,
+        inX + spriteW, inY + spriteH,
+        };
+
+
+    const GLfloat squareTextureCoords[] = {
+        0, 0,
+        1, 0,
+        0, 1,
+        1, 1
+        };
+
+    
+
+    glVertexPointer( 2, GL_FLOAT, 0, squareVertices );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    
+    
+    glTexCoordPointer( 2, GL_FLOAT, 0, squareTextureCoords );
+    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+    
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    /*
+
+    glBegin( GL_QUADS ); {
+    
+        glTexCoord2f( 0, inSubsectionOffset );
+        glVertex2f( inCenterX - inXRadius, inCenterY - inYRadius );
+        
+        glTexCoord2f( 1, inSubsectionOffset );
+        glVertex2f( inCenterX + inXRadius, inCenterY - inYRadius );
+        
+        glTexCoord2f( 1, inSubsectionOffset + inSubsectionExtent );
+        glVertex2f( inCenterX + inXRadius, inCenterY + inYRadius );
+        
+        glTexCoord2f( 0, inSubsectionOffset + inSubsectionExtent );
+        glVertex2f( inCenterX - inXRadius, inCenterY + inYRadius );        
+        }
+    glEnd();
+    */
+    texture->disable();
+    }
+
+
+void startNewSpriteLayer() {
+    // no layering necessary in SDL version
+    }
+
+
+
+// gets the current position of a pressed mouse or stylus
+// returns true if pressed
+char getTouch( int *outX, int *outY ) {
+    if( touchDown ) {
+        *outX = touchX;
+        *outY = touchY;
+        
+        return true;
+        }
+    
+    return false;
+    }
+
+
+
+
+
+char isAutoconnecting() {
+    return false;
+    }
+
+
+
+char *getLocalAddress() {
+    return NULL;
+    }
+
+
+void acceptConnection() {
+    }
+
+
+void connectToServer( char *inAddress ) {
+    //
+    }
+
+
+
+int checkConnectionStatus() {
+    return 0;
+    }
+
+
+
+void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
+    //
+    }
+
+
+unsigned char *getMessage( unsigned int *outLength ) {
+    return NULL;
+    }
 
