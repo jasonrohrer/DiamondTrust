@@ -60,6 +60,8 @@ char mapSDLKeyToASCII( int inSDLKey );
 
 
 
+void freeSprites();
+void freeNetwork();
 
 
 void cleanUpAtExit() {
@@ -67,7 +69,9 @@ void cleanUpAtExit() {
 
     //SDL_CloseAudio();
     
-    //gameFree();    
+    gameFree();    
+    freeSprites();
+    freeNetwork();
     }
 
 
@@ -619,6 +623,14 @@ SimpleVector<unsigned int> spriteWidths;
 SimpleVector<unsigned int> spriteHeights;
 
 
+void freeSprites() {
+    for( int i=0; i<spriteTextures.size(); i++ ) {
+        SingleTextureGL *t = *( spriteTextures.getElement( i ) );
+        delete t;
+        }
+    }
+
+
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     SingleTextureGL *s = new SingleTextureGL( (unsigned char*)inDataRGBA,
                                               inWidth, inHeight );
@@ -991,6 +1003,7 @@ void stepNetwork() {
                     // prepare for next
                     nextIncomingMessageSize = 0;
                     delete [] nextIncomingMessage;
+                    nextIncomingMessage = NULL;
                     nextIncomingBytesRecievedSoFar = 0;
                     }
                                     
@@ -999,4 +1012,20 @@ void stepNetwork() {
             
             }
         }
+    }
+
+
+void freeNetwork() {
+    if( server != NULL ) {
+        delete server;
+        server = NULL;
+        }
+    if( connectionSock != NULL ) {
+        delete connectionSock;
+        connectionSock = NULL;
+        }
+    if( nextIncomingMessage != NULL ) {
+        delete [] nextIncomingMessage;
+        nextIncomingMessage = NULL;
+        }    
     }

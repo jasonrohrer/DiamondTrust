@@ -177,6 +177,16 @@ void gameInit() {
 
 
 
+void gameFree() {
+    delete font8;
+
+    if( serverAddress != NULL ) {
+        delete [] serverAddress;
+        }
+    }
+
+
+
 int fade = 255;
 int dFade = -8;
 int x = 0;
@@ -320,7 +330,9 @@ void drawBottomScreen() {
         }
     else {
         
-        if( serverAddress != NULL ) {
+        int netStatus = checkConnectionStatus();
+        
+        if( netStatus == 0 && serverAddress != NULL ) {
             char *message = autoSprintf( 
                 "Waiting for friend to connect to: %s\n", serverAddress );
             
@@ -330,10 +342,19 @@ void drawBottomScreen() {
             
             delete [] message;
             }
-        for( int i=0; i<NUM_DRAWN; i++ ) {
-            drawSprite( spriteIDB, drawX[i], drawY[i], drawColors[i] );
-            startNewSpriteLayer();
+        else if( netStatus == 1 ) {
+            
+            for( int i=0; i<NUM_DRAWN; i++ ) {
+                drawSprite( spriteIDB, drawX[i], drawY[i], drawColors[i] );
+                startNewSpriteLayer();
+                }
             }
+        else if( netStatus == -1 ) {
+            font8->drawString( "Connection error", 
+                               parentButtonX, 
+                               parentButtonY - 20, white, alignLeft );
+            }
+            
         }
     
     }
