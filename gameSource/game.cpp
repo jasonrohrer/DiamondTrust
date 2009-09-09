@@ -35,6 +35,8 @@ int childButtonY = 170;
 
 char buttonsVisible = true;
 
+char *serverAddress = NULL;
+
 
 Font *font8;
 
@@ -231,6 +233,7 @@ void gameLoopTick() {
             if( isInside( tx, ty, parentButtonX, parentButtonY, 32, 16 ) ) {
                 acceptConnection();
                 buttonsVisible = false;
+                serverAddress = getLocalAddress();
                 }
             else if ( isInside( tx, ty, childButtonX,
                                 childButtonY, 32, 16 ) ) {
@@ -317,6 +320,16 @@ void drawBottomScreen() {
         }
     else {
         
+        if( serverAddress != NULL ) {
+            char *message = autoSprintf( 
+                "Waiting for friend to connect to: %s\n", serverAddress );
+            
+            font8->drawString( message, 
+                               parentButtonX, 
+                               parentButtonY - 20, white, alignLeft );
+            
+            delete [] message;
+            }
         for( int i=0; i<NUM_DRAWN; i++ ) {
             drawSprite( spriteIDB, drawX[i], drawY[i], drawColors[i] );
             startNewSpriteLayer();

@@ -44,6 +44,9 @@ void callbackKeyboard( unsigned char inKey, int inX, int inY );
 void callbackReshape( int inW, int inH );
 
 
+void stepNetwork();
+
+
 
 
 // maps SDL-specific special (non-ASCII) key-codes (SDLK) to minorGems key 
@@ -206,6 +209,8 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     
     // main loop
     while( true ) {
+        
+        stepNetwork();
         
         gameLoopTick();
         
@@ -720,39 +725,278 @@ char getTouch( int *outX, int *outY ) {
 
 
 
+int netStatus = 0;
+
+
+
 char isAutoconnecting() {
     return false;
     }
 
 
 
+#include "minorGems/network/HostAddress.h"
+
+
 char *getLocalAddress() {
-    return NULL;
+    HostAddress *localAddr = HostAddress::getLocalAddress();
+    char *returnValue = stringDuplicate( localAddr->mAddressString );
+    
+    delete localAddr;
+    
+    return returnValue;
     }
+
+
+#include "minorGems/network/SocketServer.h"
+#include "minorGems/network/SocketClient.h"
+#include "minorGems/network/Socket.h"
+
+Socket *connectionSock = NULL;
+
+SocketServer *server = NULL;
+
+int portNumber = 8641;
+
 
 
 void acceptConnection() {
+    netStatus = 0;
+    server = new SocketServer( portNumber, 5 );
     }
 
 
+
 void connectToServer( char *inAddress ) {
-    //
+    
+    // ignore address for now
+
+    // read address from file
+    File f( new Path( "gameData" ), "serverAddress.ini" );
+    
+    if( ! f.exists() ) {
+        printOut( "Failed to read serverAddress.ini\n" );
+        
+        netStatus = -1;
+        return;
+        }
+        
+    char *address = f.readFileContents();
+    
+    if( address == NULL ) {
+        printOut( "Failed to read serverAddress.ini\n" );
+        
+        netStatus = -1;
+        return;
+        }
+    
+
+    printOut( "Connecting to %s\n", address );
+    
+    HostAddress h( address, portNumber );
+    
+    char timedOut;
+    // non-blocking
+    // check socket later for connection status
+    connectionSock = SocketClient::connectToServer( &h,
+                                                    0,
+                                                    &timedOut );
+
+    if( connectionSock == NULL ) {
+        netStatus = -1;
+        }
+    else {
+        netStatus = 0;
+        }    
     }
 
 
 
 int checkConnectionStatus() {
-    return 0;
+    return netStatus;
     }
+
+
+#include "DataFifo.h"
+
+DataFifo sendFifo;
+DataFifo receiveFifo;
+
+unsigned int nextIncomingMessageSize = 0;
+unsigned char *nextIncomingMessage = NULL;
+unsigned int nextIncomingBytesRecievedSoFar = 0;
 
 
 
 void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
-    //
+    sendFifo.addData( inMessage, inLength );
     }
 
 
 unsigned char *getMessage( unsigned int *outLength ) {
-    return NULL;
+    return receiveFifo.getData( outLength );
     }
 
+
+
+void stepNetwork() {
+    if( netStatus == 0 ) {
+        
+        if( server != NULL ) {
+        
+            char timedOut;
+            
+            connectionSock = server->acceptConnection( 0, &timedOut );
+            
+            if( connectionSock != NULL ) {
+                printOut( "Got connection\n" );
+                
+                netStatus = 1;
+                }
+            else if( !timedOut ) {
+                // error
+                netStatus = -1;
+                printOut( "Incoming connection error\n");
+                }
+            }        
+        else if( connectionSock != NULL ) {
+            if( netStatus == 0 ) {
+                // check if connected
+                netStatus = connectionSock->isConnected();
+                
+                if( netStatus == -1 ) {
+                    printOut( "Error connecting to server\n");
+                    }
+                }
+            }
+        }
+    else if( netStatus == 1 ) {
+
+        // try sending next message
+        unsigned int numBytes;
+            
+        unsigned char *nextData = sendFifo.peekData( &numBytes );
+            
+        if( nextData != NULL ) {
+            // first 4 bytes are size
+            unsigned int sendSize = numBytes + 4;
+            unsigned char *sendData = new unsigned char[ sendSize ];
+                
+            sendData[0] = ( numBytes >> 24 ) & 0xFF;
+            sendData[1] = ( numBytes >> 16 ) & 0xFF;
+            sendData[2] = ( numBytes >> 8 ) & 0xFF;
+            sendData[3] = ( numBytes ) & 0xFF;
+                
+            memcpy( &( sendData[4] ), nextData, numBytes );
+                
+            delete [] nextData;
+                
+            // non-blocking
+            int numSent = 
+                connectionSock->send( sendData, sendSize, false );
+
+            
+            delete [] sendData;
+                
+            if( numSent == -1 ) {
+                // error
+                netStatus = -1;
+                printOut( "Send error\n");
+                return;
+                }
+            else if( numSent == (int)sendSize ) {
+                // done
+                    
+                // remove from fifo
+                nextData = sendFifo.getData( &numBytes );
+                delete [] nextData;
+                }
+            // else if -2, would block, try again next time
+            }
+
+
+            
+
+        // try receiving next message
+
+        if( nextIncomingMessageSize == 0 ) {
+                
+            // size bytes first
+            unsigned char sizeBuffer[4];
+            
+            // non-block
+            int numRecv = connectionSock->receive( sizeBuffer, 4, 0 );
+            
+                
+            if( numRecv == -1 ) {
+                // error
+                netStatus = -1;
+                printOut( "Receive error\n");
+                return;
+                }
+            else if( numRecv == 4 ) {
+                nextIncomingMessageSize =
+                    sizeBuffer[0] << 24 |
+                    sizeBuffer[1] << 16 |
+                    sizeBuffer[2] << 8 |
+                    sizeBuffer[3];
+
+                // make sure size is sane
+                if( nextIncomingMessageSize > 10000000 ) {
+                    printOut( "Huge message size of %u received\n",
+                              nextIncomingMessageSize );
+                    netStatus = -1;
+                    return;
+                    }                
+
+
+                nextIncomingMessage = 
+                    new unsigned char[ nextIncomingMessageSize ];
+                nextIncomingBytesRecievedSoFar = 0;
+                }
+            else if( numRecv == -2 ) {
+                // would block, try again next time
+                return;
+                }
+            }
+        if( nextIncomingMessageSize != 0 ) {
+            // got the size, need more of the body
+
+            // non-block
+            int numRecv = connectionSock->receive( 
+                &( nextIncomingMessage[ nextIncomingBytesRecievedSoFar ] ), 
+                nextIncomingMessageSize - nextIncomingBytesRecievedSoFar,
+                0 );
+            
+                
+            if( numRecv == -1 ) {
+                // error
+                netStatus = -1;
+                printOut( "Receive error\n");
+                return;
+                }
+            else if( numRecv > 0 ) {
+
+
+                nextIncomingBytesRecievedSoFar += numRecv;
+                
+                if( nextIncomingBytesRecievedSoFar == 
+                    nextIncomingMessageSize ) {
+                    
+                    // got it all
+
+                    receiveFifo.addData( nextIncomingMessage, 
+                                         nextIncomingMessageSize );
+
+                    // prepare for next
+                    nextIncomingMessageSize = 0;
+                    delete [] nextIncomingMessage;
+                    nextIncomingBytesRecievedSoFar = 0;
+                    }
+                                    
+                }
+            // else -2, would block, try again
+            
+            }
+        }
+    }

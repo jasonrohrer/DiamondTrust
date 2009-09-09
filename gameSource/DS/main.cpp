@@ -491,99 +491,11 @@ static void wmEndMPCallback( void *inArg ) {
 
 
 
-typedef struct dataFifoElement {
-        unsigned char *data;
-        unsigned int numBytes;
-        dataFifoElement *next;
-        dataFifoElement *previous;
-    } dataFIFO;
+#include "DataFifo.h"
 
 
-
-class dataFifo {
-    public:
-        
-        dataFifo() 
-            : mHead( NULL ), mTail( NULL ){
-            }
-
-        
-        ~dataFifo() {
-            clearData();
-            }
-        
-
-        // inData copied internally
-        void addData( unsigned char *inData, unsigned int inNumBytes ) {
-            dataFifoElement *f = new dataFifoElement;
-            
-            f->next = mHead;
-            f->previous = NULL;
-            
-            if( mHead != NULL ) {
-                mHead->previous = f;
-                }
-            else{
-                //empty
-                mTail = f;
-                }
-
-            mHead = f;
-            f->numBytes = inNumBytes;
-            
-            f->data = new unsigned char[ inNumBytes ];
-            
-            copyMem( f->data, inData, inNumBytes );
-            }
-        
-        
-        // NULL if empty
-        // caller destroys
-        unsigned char *getData( unsigned int *outSize ) {
-            if( mTail == NULL ) {
-                return NULL;
-                }
-            else {
-                unsigned char *returnData = mTail->data;
-                *outSize = mTail->numBytes;
-
-                dataFifoElement *oldTail = mTail;
-                mTail = mTail->previous;
-                
-                if( mTail == NULL ) {
-                    mHead = NULL;
-                    }
-                else {
-                    mTail->next = NULL;
-                    }
-                delete oldTail;
-                
-                return returnData;
-                }
-            }
-
-
-        void clearData() {
-            unsigned int numBytes;
-            unsigned char *data = getData( &numBytes );
-            
-            
-            while( data != NULL ) {
-                delete [] data;
-                data = getData( &numBytes );
-                }
-            }
-
-        
-                    
-    private:
-        dataFifoElement *mHead;
-        dataFifoElement *mTail;
-    };
-
-
-dataFifo sendFifo;
-dataFifo receiveFifo;
+DataFifo sendFifo;
+DataFifo receiveFifo;
 
 char sendPending = false;
 
