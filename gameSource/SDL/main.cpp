@@ -86,6 +86,8 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
 int w = 256;
 int h = 384;
 
+int blowupFactor = 1;
+
 int bottomScreenYOffset = 192;
 int singleScreenH = 192;
 
@@ -120,13 +122,14 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     //flags = flags | SDL_FULLSCREEN;
     
     // current color depth
-    SDL_Surface *screen = SDL_SetVideoMode( w, h, 0, flags);
+    SDL_Surface *screen = SDL_SetVideoMode( w * blowupFactor, 
+                                            h * blowupFactor, 0, flags);
 
 
     if ( screen == NULL ) {
         printf( "Couldn't set %dx%d GL video mode: %s\n", 
-                w, 
-                h,
+                w * blowupFactor, 
+                h * blowupFactor,
                 SDL_GetError() );
         return 0;
         }
@@ -372,7 +375,8 @@ void callbackDisplay() {
     
     glMatrixMode(GL_MODELVIEW);
 
-    glViewport( 0, h - singleScreenH, w, singleScreenH );
+    glViewport( 0, blowupFactor * (h - singleScreenH), 
+                blowupFactor * w, blowupFactor * singleScreenH );
     
     
     spriteYOffset = 0;
@@ -380,7 +384,8 @@ void callbackDisplay() {
     
     
 	//spriteYOffset = bottomScreenYOffset;
-    glViewport( 0, 0, w, singleScreenH );
+    glViewport( 0, 0, 
+                blowupFactor * w, blowupFactor * singleScreenH );
     drawBottomScreen();
 
 
@@ -388,7 +393,7 @@ void callbackDisplay() {
     glColor4ub( 255, 255, 255, 255 );
     const GLfloat lineVertices[] = {
         0, 0,
-        w, 0 
+        w * blowupFactor, 0 
         };
     
     glVertexPointer( 2, GL_FLOAT, 0, lineVertices );
