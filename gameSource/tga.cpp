@@ -41,8 +41,8 @@ rgbaColor *extractTGAData( unsigned char *inData, int inNumBytes,
     // y origin coordinate (2 bytes starting at inData[10])
 
     // little endian shorts
-    int width = inData[13] << 1 | inData[12];
-    int height = inData[15] << 1 | inData[14];
+    int width = inData[13] << 8 | inData[12];
+    int height = inData[15] << 8 | inData[14];
 
     *outWidth = width;
     *outHeight = height;

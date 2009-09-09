@@ -39,6 +39,7 @@ char *serverAddress = NULL;
 
 
 Font *font8;
+Font *font16;
 
 
 
@@ -173,12 +174,14 @@ void gameInit() {
     delete [] result;
     
     font8 = new Font( "font8.tga", 0, 6, false );
+    font16 = new Font( "font16.tga", 0, 6, false );
     }
 
 
 
 void gameFree() {
     delete font8;
+    delete font16;
 
     if( serverAddress != NULL ) {
         delete [] serverAddress;
@@ -323,9 +326,9 @@ void drawBottomScreen() {
         drawSprite( parentSpriteID, parentButtonX, parentButtonY, white );
         drawSprite( childSpriteID, childButtonX, childButtonY, white );
 
-        font8->drawString( "Quick brown fox jumped over Lazy Dog", 
-                           parentButtonX, 
-                           parentButtonY - 20, white, alignLeft );
+        font16->drawString( "Quick brown fox jumped over Lazy Dog", 
+                            parentButtonX, 
+                            parentButtonY - 20, white, alignLeft );
         
         }
     else {
