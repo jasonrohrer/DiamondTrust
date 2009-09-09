@@ -1,0 +1,6 @@
+# file lists common to various makefiles
+
+GAME_SOURCE = \
+game.cpp \
+tga.cpp \
+Font.cpp \

@@ -117,6 +117,11 @@ unsigned char *getMessage( unsigned int *outLength );
 // called by platform before entering main loop 
 void gameInit();
 
+// frees the game
+// called when app exits
+void gameFree();
+
+
 // called during each iteration of main loop
 void gameLoopTick();
 

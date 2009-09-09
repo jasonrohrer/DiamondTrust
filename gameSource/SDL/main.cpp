@@ -17,7 +17,7 @@ int main( int inArgCount, char **inArgs ) {
 
 
 
-#include "game.h"
+#include "platform.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -64,7 +64,7 @@ void cleanUpAtExit() {
 
     SDL_CloseAudio();
     
-    freeFrameDrawer();    
+    gameFree();    
     }
 
 
@@ -76,12 +76,12 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
 
 
 
-int w = 320;
-int h = 480;
+int w = 256;
+int h = 384;
 
 
-// 25 fps
-int frameMS = 40;
+// 60 fps
+int frameMS = 17;
 //int frameMS = 500;
 
 // s and f keys to slow down and speed up for testing
@@ -117,7 +117,7 @@ int mainFunction( int inNumArgs, char **inArgs ) {
         }
     
 
-    SDL_WM_SetCaption( "Primrose", NULL );
+    SDL_WM_SetCaption( "gameApp", NULL );
     
 
     // turn off repeat
@@ -137,7 +137,7 @@ int mainFunction( int inNumArgs, char **inArgs ) {
         char *appDirectoryPath = stringDuplicate( inArgs[0] );
     
         char *appNamePointer = strstr( appDirectoryPath,
-                                       "tileGame1.app" );
+                                       "gameApp.app" );
 
         if( appNamePointer != NULL ) {
             // terminate full app path to get parent directory
@@ -168,15 +168,19 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     audioFormat.userdata = NULL;
 
     /* Open the audio device and start playing sound! */
+    /*
+      // Audio disabled for now
     if( SDL_OpenAudio( &audioFormat, NULL ) < 0 ) {
         printf( "Unable to open audio: %s\n", SDL_GetError() );
         }
+    */
+
 
     // set pause to 0 to start audio
     //SDL_PauseAudio(0);
 
 
-    initFrameDrawer( w, h );
+    gameInit();
     
     // to free frame drawer, stop audio, etc
     atexit( cleanUpAtExit );

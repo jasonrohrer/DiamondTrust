@@ -10,10 +10,9 @@ SUBDIRS = ..
 
 DS_SOURCE = main.cpp
 
-GAME_SOURCE = \
-game.cpp \
-tga.cpp \
-Font.cpp \
+# for GAME_SOURCE definition
+include ../makeDefs
+
 
 MINOR_GEMS_SOURCE = \
 util/stringUtils.cpp \
