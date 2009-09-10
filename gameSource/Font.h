@@ -45,7 +45,9 @@ class Font {
         int mSpriteMap[ 128 ];
         
         // for kerning (ignored if fixed width flag on)
+        int mCharLeftEdgeOffset[ 128 ];
         int mCharWidth[ 128 ];
+        
         
     };
 

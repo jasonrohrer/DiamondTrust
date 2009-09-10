@@ -70,8 +70,47 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
                 mSpriteMap[i] = 
                     addSprite( charRGBA, mSpriteWidth, mSpriteWidth );
                 
-                // FIXME:  implement kerning here
-                mCharWidth[i] = mSpriteWidth;
+
+                if( mFixedWidth ) {
+                    mCharLeftEdgeOffset[i] = 0;
+                    mCharWidth[i] = mSpriteWidth;
+                    }
+                else {
+                    // implement pseudo-kerning
+                    
+                    int farthestLeft = mSpriteWidth;
+                    int farthestRight = 0;
+                    
+                    char someInk = false;
+                    
+                    for( int y=0; y<mSpriteWidth; y++ ) {
+                        for( int x=0; x<mSpriteWidth; x++ ) {
+                            
+                            unsigned char r = 
+                                charRGBA[ y * mSpriteWidth + x ].r;
+                            
+                            if( r > 0 ) {
+                                someInk = true;
+
+                                if( x < farthestLeft ) {
+                                    farthestLeft = x;
+                                    }
+                                if( x > farthestRight ) {
+                                    farthestRight = x;
+                                    }
+                                }
+                            }
+                        }
+                    
+                    if( ! someInk  ) {
+                        mCharLeftEdgeOffset[i] = 0;
+                        mCharWidth[i] = mSpriteWidth;
+                        }
+                    else {
+                        mCharLeftEdgeOffset[i] = farthestLeft;
+                        mCharWidth[i] = farthestRight - farthestLeft + 1;
+                        }
+                    }
                 
 
                 delete [] charRGBA;
@@ -111,9 +150,12 @@ int Font::drawString( char *inString, int inX, int inY, rgbaColor inColor,
         case alignRight:
             x -= stringWidth;
             break;
+        default:
+            // left?  do nothing
+            break;            
         }
     
-    for( int i=0; i<numChars; i++ ) {
+    for( unsigned int i=0; i<numChars; i++ ) {
         int charWidth = drawCharacter( inString[i], x, inY, inColor );
         x += charWidth + mCharSpacing;
         }
@@ -129,15 +171,22 @@ int Font::drawCharacter( char inC, int inX, int inY, rgbaColor inColor ) {
     if( inC == ' ' ) {
         return mSpaceWidth;
         }
+
+    int charStartX = inX;
     
-    drawSprite( mSpriteMap[ inC ], inX, inY, inColor );
+    if( !mFixedWidth ) {
+        charStartX -= mCharLeftEdgeOffset[ (int)inC ];
+        }
+    
+    
+    drawSprite( mSpriteMap[ (int)inC ], charStartX, inY, inColor );
     
     
     if( mFixedWidth ) {
         return mSpriteWidth;
         }
     else {
-        return mCharWidth[ inC ];
+        return mCharWidth[ (int)inC ];
         }
     }
 
@@ -148,7 +197,7 @@ int Font::measureString( char *inString ) {
 
     int width = 0;
     
-    for( int i=0; i<numChars; i++ ) {
+    for( unsigned int i=0; i<numChars; i++ ) {
         char c = inString[i];
         
         if( c == ' ' ) {
@@ -158,7 +207,7 @@ int Font::measureString( char *inString ) {
             width += mSpriteWidth;
             }
         else {
-            width += mCharWidth[ c ];
+            width += mCharWidth[ (int)c ];
             }
     
         width += mCharSpacing;

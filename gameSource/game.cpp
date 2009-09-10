@@ -173,8 +173,8 @@ void gameInit() {
     printOut( result );
     delete [] result;
     
-    font8 = new Font( "font8.tga", 0, 6, false );
-    font16 = new Font( "font16.tga", 0, 6, false );
+    font8 = new Font( "font8.tga", 1, 6, false );
+    font16 = new Font( "font16.tga", 2, 8, false );
     }
 
 
@@ -337,9 +337,9 @@ void drawBottomScreen() {
         
         if( netStatus == 0 && serverAddress != NULL ) {
             char *message = autoSprintf( 
-                "Waiting for friend to connect to: %s\n", serverAddress );
+                "Waiting for connection on: %s\n", serverAddress );
             
-            font8->drawString( message, 
+            font16->drawString( message, 
                                parentButtonX, 
                                parentButtonY - 20, white, alignLeft );
             
