@@ -175,8 +175,8 @@ void gameInit() {
 
     initMap();
 
-    setRegionSelectable( 2, true );
-    setRegionSelectable( 4, true );
+    //setRegionSelectable( 2, true );
+    //setRegionSelectable( 4, true );
     
     }
 
@@ -246,6 +246,13 @@ void gameLoopTick() {
     
     int tx, ty;
     if( getTouch( &tx, &ty ) ) {
+
+        int regionHit = getChosenRegion( tx, ty );
+        
+        if( regionHit >= 0 ) {
+            setRegionSelectable( regionHit, true );
+            }
+        
         
         if( buttonsVisible ) {
             

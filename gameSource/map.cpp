@@ -194,5 +194,17 @@ void setRegionSelectable( int inRegion, char inSelectable ) {
     }
 
 
-int getChosenRegion( int inClickX, int inClickY );
+
+int getChosenRegion( int inClickX, int inClickY ) {
+    rgbaColor clickColor = mapRegionImage[ inClickY * mapW + inClickX ];
+    
+    for( int i=0; i<numMapRegions; i++ ) {
+        if( equals( regionColor[i], clickColor ) ) {
+            return i;
+            }
+        }
+
+    return -1;
+    }
+
 
