@@ -13,20 +13,6 @@
 
 // implement plaform functions
 
-void *allocMem( unsigned int inSizeInBytes ) {
-    return OS_Alloc( inSizeInBytes );
-    }
-
-
-void freeMem( void *inRegion ) {
-    OS_Free( inRegion );
-    }
-
-void copyMem( void *inDest, void *inSource, unsigned int inSizeInBytes ) {
-    MI_CpuCopy8( inSource, inDest, inSizeInBytes );
-    }
-
-
 
 void* operator new ( std::size_t inSizeInBytes ) {
     return OS_Alloc( inSizeInBytes );
@@ -85,7 +71,7 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
         int numRead = FS_ReadFile( &file, buffer, (int)length );
         
         if( numRead != length ) {
-            freeMem( buffer );
+            delete [] buffer;
             buffer = NULL;
             *outSize = -1;
             }
@@ -143,6 +129,8 @@ textureInfo textureInfoArray[ MAX_TEXTURES ];
 
 int nextTextureInfoIndex = 0;
 unsigned int nextTextureSlotAddress = 0x1000;
+
+int numTextureBytesAdded = 0;
 
 
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
@@ -254,7 +242,11 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
     nextTextureSlotAddress += numPixels * 2;
 
-    freeMem( textureData );
+    numTextureBytesAdded += numPixels * 2;
+    
+    printOut( "Added %d texture bytes so far.\n", numTextureBytesAdded );
+    
+    delete [] textureData;
     
 
     return returnIndex;
@@ -441,11 +433,11 @@ static void wmEndCallback( void *inArg ) {
         }
     else {
         if( sendBuffer != NULL ) {
-            freeMem( sendBuffer );
+            delete [] sendBuffer;
             sendBuffer = NULL;
             }
         if( receiveBuffer != NULL ) {
-            freeMem( receiveBuffer );
+            delete [] receiveBuffer;
             receiveBuffer = NULL;
             }
         }
@@ -1289,7 +1281,7 @@ static void VBlankCallback() {
     G3X_Init();
     G3X_InitTable();
     G3X_InitMtxStack();
-    GX_SetBankForTex( GX_VRAM_TEX_0_A );
+    GX_SetBankForTex( GX_VRAM_TEX_01_AB );// GX_VRAM_TEX_0_A );
 
     G3X_AntiAlias( TRUE );
     G3X_AlphaBlend( TRUE );
@@ -1384,7 +1376,7 @@ static void VBlankCallback() {
         for( int i=0; i<fileSize; i++ ) {
             OS_Printf( "%c", fileContents[ i ] );
             }
-        freeMem( fileContents );
+        delete [] fileContents;
         }
     else {
         OS_Printf( "File read failed\n" );

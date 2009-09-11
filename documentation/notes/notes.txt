@@ -1,0 +1,6 @@
+2009-September-11
+
+Out of texture VRAM on DS.  Need to auto-detect low-color textures and convert them to palette mode to save space.  VRAM-E can be used for texture palettes.  4-color textures, which will work for almost all of the textures used so far, are stored in only 2 bits per pixel (instead of the current 16).
+
+Do this in DS code AFTER converting incoming data to 16-bit color.
+
