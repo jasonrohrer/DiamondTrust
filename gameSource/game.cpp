@@ -33,6 +33,10 @@ int parentButtonY = 150;
 int childButtonX = 10;
 int childButtonY = 170;
 
+
+int mapSpriteID = -1;
+
+
 char buttonsVisible = true;
 
 char *serverAddress = NULL;
@@ -80,7 +84,8 @@ static int loadSprite( char *inFileName, char inCornerTransparent = false ) {
                     }
                 }
             
-                        
+            
+            
                         
                         
             returnID = addSprite( spriteRGBA, width, height );
@@ -114,7 +119,10 @@ void gameInit() {
 
     parentSpriteID = loadSprite( "parentButton.tga" );
     childSpriteID = loadSprite( "childButton.tga" );
+    
 
+    mapSpriteID = loadSprite( "angola_map.tga" );
+    
     
     int currentX = 10;
     int currentY = 10;
@@ -306,6 +314,8 @@ void gameLoopTick() {
 
 
 rgbaColor white = { 255, 255, 255, 255 };
+rgbaColor transBlack = { 0, 0, 0, 128 };
+rgbaColor black = { 0, 0, 0, 255 };
 
 
 
@@ -321,11 +331,23 @@ void drawTopScreen() {
 
 
 void drawBottomScreen() {
+    drawSprite( mapSpriteID, 0, 0, white );
+    startNewSpriteLayer();
+    
     if( buttonsVisible ) {
 
         drawSprite( parentSpriteID, parentButtonX, parentButtonY, white );
         drawSprite( childSpriteID, childButtonX, childButtonY, white );
 
+
+        font16->drawString( "Quick brown fox jumped over Lazy Dog", 
+                            parentButtonX + 2, 
+                            parentButtonY - 20 + 1, black, alignLeft );
+
+        
+
+        startNewSpriteLayer();
+        
         font16->drawString( "Quick brown fox jumped over Lazy Dog", 
                             parentButtonX, 
                             parentButtonY - 20, white, alignLeft );

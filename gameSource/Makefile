@@ -5,6 +5,7 @@ testTexture.tga \
 testTexture2.tga \
 parentButton.tga \
 childButton.tga \
+angola_map.tga \
 font8.tga \
 font16.tga \
 
