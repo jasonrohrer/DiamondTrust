@@ -92,8 +92,8 @@ int bottomScreenYOffset = 192;
 int singleScreenH = 192;
 
 
-// 60 fps
-int frameMS = 17;
+// 30 fps
+int frameMS = 33;
 //int frameMS = 500;
 
 // s and f keys to slow down and speed up for testing

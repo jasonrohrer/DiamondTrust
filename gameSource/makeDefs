@@ -5,6 +5,7 @@ game.cpp \
 tga.cpp \
 Font.cpp \
 map.cpp \
+sprite.cpp \
 common.cpp \
 DataFifo.cpp \
 
@@ -22,6 +23,7 @@ s/^game\.o/\.\.\/game\.o/; \
 s/^tga\.o/\.\.\/tga\.o/; \
 s/^Font\.o/\.\.\/Font\.o/; \
 s/^map\.o/\.\.\/map\.o/; \
+s/^sprite\.o/\.\.\/sprite\.o/; \
 s/^common\.o/\.\.\/common\.o/; \
 s/^DataFifo\.o/\.\.\/DataFifo\.o/; \
 '

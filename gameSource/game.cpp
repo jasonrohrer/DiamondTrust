@@ -4,6 +4,7 @@
 #include "tga.h"
 #include "Font.h"
 #include "map.h"
+#include "sprite.h"
 #include "minorGems/util/stringUtils.h"
 
 #define NUM_DRAWN 60
@@ -173,6 +174,10 @@ void gameInit() {
     font16 = new Font( "font16.tga", 2, 8, false );
 
     initMap();
+
+    setRegionSelectable( 2, true );
+    setRegionSelectable( 4, true );
+    
     }
 
 
@@ -196,7 +201,8 @@ int x = 0;
 int dX = 1;
 
 void gameLoopTick() {
-
+    stepSprites();
+    
     for( int i=0; i<NUM_DRAWN; i++ ) {
         int f = drawColors[i].a;
 

@@ -3,6 +3,7 @@
 #include "tga.h"
 #include "platform.h"
 #include "common.h"
+#include "sprite.h"
 
 
 #include <string.h>
@@ -16,6 +17,9 @@ static int mapBackgroundSpriteID;
 static int mapRegionSpriteID[ numMapRegions ];
 
 static intPair mapRegionOffset[ numMapRegions ];
+
+static char mapRegionSelectable[ numMapRegions ];
+
 
 // for checking region clicks
 static rgbaColor *mapRegionImage;
@@ -52,6 +56,8 @@ void initMap() {
         
         regionColor[ i ] = thisRegionColor;
         
+        mapRegionSelectable[ i ] = false;
+        
 
         // hide key on map
         mapRGBA[ i + 1 ] = backgroundColor;
@@ -82,8 +88,8 @@ void initMap() {
                     }
                 }
             }
-        int regionW = lastX - firstX;
-        int regionH = lastY - firstY;
+        int regionW = lastX - firstX + 1;
+        int regionH = lastY - firstY + 1;
         
         mapRegionOffset[i].x = firstX;
         mapRegionOffset[i].y = firstY;
@@ -163,11 +169,30 @@ static rgbaColor white = { 255, 255, 255, 255 };
 
 void drawMap() {
     drawSprite( mapBackgroundSpriteID, 0, 0, white );
+    
+    startNewSpriteLayer();
+    
+    for( int i=0; i<numMapRegions; i++ ) {
+        if( mapRegionSelectable[ i ] ) {
+            
+            drawBlinkingSprite( mapRegionSpriteID[i], 
+                                mapRegionOffset[i].x, mapRegionOffset[i].y,
+                                white );
+            }
+        else {
+            drawSprite( mapRegionSpriteID[i], 
+                        mapRegionOffset[i].x, mapRegionOffset[i].y,
+                        white );
+            }
+        }
     }
 
 
 
-void setSelectable( int inRegion );
+void setRegionSelectable( int inRegion, char inSelectable ) {
+    mapRegionSelectable[ inRegion ] = inSelectable;
+    }
+
 
 int getChosenRegion( int inClickX, int inClickY );
 

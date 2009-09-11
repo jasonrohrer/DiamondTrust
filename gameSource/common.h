@@ -32,4 +32,5 @@ inline void setColor( rgbaColor *inColor,
     inColor->a = inA;
     }
 
+
                       

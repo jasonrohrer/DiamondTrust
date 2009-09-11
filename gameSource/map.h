@@ -11,7 +11,7 @@ void freeMap();
 void drawMap();
 
 
-void setSelectable( int inRegion );
+void setRegionSelectable( int inRegion, char inSelectable );
 
 int getChosenRegion( int inClickX, int inClickY );
 
