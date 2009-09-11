@@ -157,3 +157,25 @@ rgbaColor *extractTGAData( unsigned char *inData, int inNumBytes,
 
     return rgbaData;
     }
+
+
+
+rgbaColor *readTGAFile( char *inFileName, int *outWidth, int *outHeight ) {
+    int fileDataSize;
+    unsigned char *spriteFileData = readFile( inFileName, 
+                                              &fileDataSize );
+    if( spriteFileData != NULL ) {
+        
+        rgbaColor *spriteRGBA = extractTGAData( spriteFileData, fileDataSize,
+                                                outWidth, outHeight );
+
+        delete [] spriteFileData;
+        
+        return spriteRGBA;
+        }
+
+
+    return NULL;
+    }
+
+    

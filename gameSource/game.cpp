@@ -3,6 +3,7 @@
 #include "platform.h"
 #include "tga.h"
 #include "Font.h"
+#include "map.h"
 #include "minorGems/util/stringUtils.h"
 
 #define NUM_DRAWN 60
@@ -34,9 +35,6 @@ int childButtonX = 10;
 int childButtonY = 170;
 
 
-int mapSpriteID = -1;
-
-
 char buttonsVisible = true;
 
 char *serverAddress = NULL;
@@ -51,49 +49,41 @@ Font *font16;
 static int loadSprite( char *inFileName, char inCornerTransparent = false ) {
     int returnID = -1;
     
-    int fileDataSize;
-    unsigned char *spriteFileData = readFile( inFileName, 
-                                              &fileDataSize );
-    if( spriteFileData != NULL ) {
+    int width, height;
+    
+    rgbaColor *spriteRGBA = readTGAFile( inFileName,
+                                         &width, &height );
         
-        int width, height;
-        
-        rgbaColor *spriteRGBA = extractTGAData( spriteFileData, fileDataSize,
-                                                &width, &height );
-        
-        if( spriteRGBA != NULL ) {
+    if( spriteRGBA != NULL ) {
             
-            if( inCornerTransparent ) {
-                // use corner color as transparency
-                spriteRGBA[0].a = 0;
-                unsigned char tr, tg, tb;
-                tr = spriteRGBA[0].r;
-                tg = spriteRGBA[0].g;
-                tb = spriteRGBA[0].b;
+        if( inCornerTransparent ) {
+            // use corner color as transparency
+            spriteRGBA[0].a = 0;
+            unsigned char tr, tg, tb;
+            tr = spriteRGBA[0].r;
+            tg = spriteRGBA[0].g;
+            tb = spriteRGBA[0].b;
 
-                int numPixels = width * height; 
-                for( int i=0; i<numPixels; i++ ) {
-                    if( spriteRGBA[i].r == tr 
-                        &&
-                        spriteRGBA[i].g == tg 
-                        &&
-                        spriteRGBA[i].b == tb ) {
-                        
-                        spriteRGBA[i].a = 0;
-                        }
+            int numPixels = width * height; 
+            for( int i=0; i<numPixels; i++ ) {
+                if( spriteRGBA[i].r == tr 
+                    &&
+                    spriteRGBA[i].g == tg 
+                    &&
+                    spriteRGBA[i].b == tb ) {
+                    
+                    spriteRGBA[i].a = 0;
                     }
                 }
-            
-            
-            
-                        
-                        
-            returnID = addSprite( spriteRGBA, width, height );
-            
-            delete [] spriteRGBA;
             }
-
-        delete [] spriteFileData;
+            
+            
+            
+                        
+                        
+        returnID = addSprite( spriteRGBA, width, height );
+            
+        delete [] spriteRGBA;
         }
     return returnID;
     }
@@ -121,8 +111,6 @@ void gameInit() {
     childSpriteID = loadSprite( "childButton.tga" );
     
 
-    mapSpriteID = loadSprite( "angola_map.tga" );
-    
     
     int currentX = 10;
     int currentY = 10;
@@ -183,6 +171,8 @@ void gameInit() {
     
     font8 = new Font( "font8.tga", 1, 6, false );
     font16 = new Font( "font16.tga", 2, 8, false );
+
+    initMap();
     }
 
 
@@ -194,6 +184,8 @@ void gameFree() {
     if( serverAddress != NULL ) {
         delete [] serverAddress;
         }
+
+    freeMap();
     }
 
 
@@ -331,7 +323,7 @@ void drawTopScreen() {
 
 
 void drawBottomScreen() {
-    drawSprite( mapSpriteID, 0, 0, white );
+    drawMap();
     startNewSpriteLayer();
     
     if( buttonsVisible ) {
