@@ -116,6 +116,9 @@ unsigned int getRandom( unsigned int inMax ) {
 
 struct textureInfoStruct {
         unsigned int slotAddress;
+        GXTexFmt texFormat;
+        // if format is DIRECT, this is not set:
+        unsigned int paletteSlotAddress;
         int w;
         int h;
         GXTexSizeS sizeS;
@@ -129,8 +132,12 @@ textureInfo textureInfoArray[ MAX_TEXTURES ];
 
 int nextTextureInfoIndex = 0;
 unsigned int nextTextureSlotAddress = 0x1000;
+unsigned int nextTexturePaletteAddress = 0x1000;
 
 int numTextureBytesAdded = 0;
+
+// used as temporary storage when adding a sprite
+unsigned short textureColors[ 256 ];
 
 
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
@@ -215,6 +222,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     unsigned short *textureData = new unsigned short[ numPixels ];
  
 
+    int numUniqueColors = 0;
+    
     for( int i=0; i<numPixels; i++ ) {
         // discard lowest 3 bits for each color
         // discard all but 1 bit for alpha
@@ -227,23 +236,83 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             ( c.g >> 3 ) << 5 |
             ( c.r >> 3 ) );
         
+        if( numUniqueColors < 257 ) {
+            
+            // unique?
+            unsigned short c = textureData[i];
+            
+            char found = false;
+            for( int j=0; j<numUniqueColors && !found; j++ ) {
+                if( c == textureColors[ j ] ) {
+                    found = true;
+                    }
+                }
+            if( !found ) {
+                if( numUniqueColors < 256 ) {
+                    // add to palette
+                    textureColors[ numUniqueColors ] = c;
+                    }
+                // this may push us past 256, in which case
+                // we cannot use a palette for this texture
+                numUniqueColors ++;
+                }
+            }        
         }
     
+    if( numUniqueColors > 256 ) {
+        // direct color
+        t.texFormat = GX_TEXFMT_DIRECT;
+        
+        GX_BeginLoadTex();
+    
+        GX_LoadTex( textureData, 
+                    t.slotAddress,
+                    numPixels * 2 );
+        
+        GX_EndLoadTex(); 
+
+        nextTextureSlotAddress += numPixels * 2;
+        
+        numTextureBytesAdded += numPixels * 2;
+        }
+    else if( numUniqueColors <= 4 ) {
+        t.texFormat = GX_TEXFMT_PLTT4;
+        
+        // FIXME:  rearrange so that transparent color, if any, is
+        // in palette location 0
+
+
+        // pack into 2 bits per pixel (4 pixels per byte)
+        int numBytes = numPixels / 4;
+        unsigned char *packedData = new unsigned char[ numPixels / 4 ];
+
+        int pixIndex = 0;
+        
+        for( int i=0; i<numPixels; i++ ) {
+            packedData[i] = 0;
             
-            
+            for( int j=3; j>=0; j-- ) {
+                unsigned short c = textureData[ pixIndex++ ];
+                
+                char found = false;
+                
+                int colorIndex;
+                
+                for( int k=0; k<numUniqueColors && !found; k++ ) {
+                    if( c == textureColors[ k ] ) {
+                        found = true;
+                        colorIndex = k;
+                        }
+                    }
+                
+                packedData[i] = packedData[i] | (colorIndex << (j * 2));
+                }
+            }
 
-    GX_BeginLoadTex();
+        // FIXME:  add texture data here
+        }
     
-    GX_LoadTex( textureData, 
-                t.slotAddress,
-                numPixels * 2 );
-    
-    GX_EndLoadTex(); 
 
-    nextTextureSlotAddress += numPixels * 2;
-
-    numTextureBytesAdded += numPixels * 2;
-    
     printOut( "Added %d texture bytes so far.\n", numTextureBytesAdded );
     
     delete [] textureData;
@@ -1281,7 +1350,14 @@ static void VBlankCallback() {
     G3X_Init();
     G3X_InitTable();
     G3X_InitMtxStack();
-    GX_SetBankForTex( GX_VRAM_TEX_01_AB );// GX_VRAM_TEX_0_A );
+
+    // GX_SetBankForTex( GX_VRAM_TEX_0_A );
+    // 256K for texture data
+    GX_SetBankForTex( GX_VRAM_TEX_01_AB );
+
+    // 64K for texture palettes
+    GX_SetBankForTexPltt( GX_VRAM_TEXPLTT_0123_E ); 
+
 
     G3X_AntiAlias( TRUE );
     G3X_AlphaBlend( TRUE );
