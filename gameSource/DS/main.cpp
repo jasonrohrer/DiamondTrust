@@ -8,6 +8,7 @@
 #define true 1
 
 
+#include <string.h>
 
 #include "platform.h"
 
@@ -135,8 +136,9 @@ unsigned int nextTextureSlotAddress = 0x1000;
 unsigned int nextTexturePaletteAddress = 0x1000;
 
 int numTextureBytesAdded = 0;
+int numTexturePaletteBytesAdded = 0;
 
-// used as temporary storage when adding a sprite
+// used as temporary storage when adding a sprite to build up a palette
 unsigned short textureColors[ 256 ];
 
 
@@ -220,9 +222,14 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     unsigned int numPixels = (unsigned int)( inWidth * inHeight );
     
     unsigned short *textureData = new unsigned short[ numPixels ];
- 
 
-    int numUniqueColors = 0;
+    // track palette indices for each pixel, even if we don't end up
+    // using it
+    unsigned char *texturePaletteIndices =  new unsigned char[ numPixels ];
+    
+
+    // reserve color 0 for transparency
+    int numUniqueColors = 1;
     
     for( int i=0; i<numPixels; i++ ) {
         // discard lowest 3 bits for each color
@@ -239,18 +246,30 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         if( numUniqueColors < 257 ) {
             
             // unique?
-            unsigned short c = textureData[i];
-            
+            unsigned short c16 = textureData[i];
+
             char found = false;
-            for( int j=0; j<numUniqueColors && !found; j++ ) {
-                if( c == textureColors[ j ] ) {
+
+            int alpha = c.a >> 7;
+            if( alpha == 0 ) {
+                // matches palette color 0
+                texturePaletteIndices[i] = 0;
+                found = true;
+                }
+            
+
+            for( unsigned char j=1; j<numUniqueColors && !found; j++ ) {
+                if( c16 == textureColors[ j ] ) {
                     found = true;
+                    texturePaletteIndices[i] = j;
                     }
                 }
             if( !found ) {
                 if( numUniqueColors < 256 ) {
                     // add to palette
-                    textureColors[ numUniqueColors ] = c;
+                    textureColors[ numUniqueColors ] = c16;
+                    
+                    texturePaletteIndices[i] = (unsigned char)numUniqueColors;
                     }
                 // this may push us past 256, in which case
                 // we cannot use a palette for this texture
@@ -259,64 +278,135 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             }        
         }
     
+
+    unsigned char *packedTextureData = NULL;
+    unsigned int numTextureBytes;
+    
+
     if( numUniqueColors > 256 ) {
         // direct color
+        printOut( "Texture requires direct color\n" );
+
         t.texFormat = GX_TEXFMT_DIRECT;
         
-        GX_BeginLoadTex();
-    
-        GX_LoadTex( textureData, 
-                    t.slotAddress,
-                    numPixels * 2 );
+        numTextureBytes = numPixels * 2;
+        packedTextureData = (unsigned char *)textureData;
         
-        GX_EndLoadTex(); 
-
-        nextTextureSlotAddress += numPixels * 2;
-        
-        numTextureBytesAdded += numPixels * 2;
         }
-    else if( numUniqueColors <= 4 ) {
-        t.texFormat = GX_TEXFMT_PLTT4;
+    else {
+        printOut( "Texture uses only %d colors\n", numUniqueColors );
         
-        // FIXME:  rearrange so that transparent color, if any, is
-        // in palette location 0
-
-
-        // pack into 2 bits per pixel (4 pixels per byte)
-        int numBytes = numPixels / 4;
-        unsigned char *packedData = new unsigned char[ numPixels / 4 ];
-
-        int pixIndex = 0;
-        
-        for( int i=0; i<numPixels; i++ ) {
-            packedData[i] = 0;
-            
-            for( int j=3; j>=0; j-- ) {
-                unsigned short c = textureData[ pixIndex++ ];
-                
-                char found = false;
-                
-                int colorIndex;
-                
-                for( int k=0; k<numUniqueColors && !found; k++ ) {
-                    if( c == textureColors[ k ] ) {
-                        found = true;
-                        colorIndex = k;
-                        }
-                    }
-                
-                packedData[i] = packedData[i] | (colorIndex << (j * 2));
-                }
+        // palette colors are RGB 555 (alpha bit (bit 15) ignored... set to
+        // 0 just to be safe
+        for( int k=0; k<numUniqueColors; k++ ) {
+            textureColors[k] &= 0x7FFF;
             }
 
-        // FIXME:  add texture data here
+        // don't need direct colors anymore
+        delete [] textureData;
+
+        unsigned int paletteSize = 0;
+        
+        if( numUniqueColors <= 4 ) {
+            t.texFormat = GX_TEXFMT_PLTT4;
+            paletteSize = 4;
+            
+            // pack into 2 bits per pixel (4 pixels per byte)
+            numTextureBytes = numPixels / 4;
+            packedTextureData = new unsigned char[ numTextureBytes ];
+            
+            int pixIndex = 0;
+            
+            for( int i=0; i<numTextureBytes; i++ ) {
+                packedTextureData[i] = 0;
+                
+                for( int j=3; j>=0; j-- ) {
+                    unsigned char palIndex = 
+                        texturePaletteIndices[ pixIndex++ ];
+                    packedTextureData[i] = (unsigned char)(
+                        packedTextureData[i] | (palIndex << (j * 2)) );
+                    }
+                }
+            }
+        else if( numUniqueColors <= 16 ) {
+            t.texFormat = GX_TEXFMT_PLTT16;
+            paletteSize = 16;
+            
+            // pack into 4 bits per pixel (2 pixels per byte)
+            numTextureBytes = numPixels / 2;
+            packedTextureData = new unsigned char[ numTextureBytes ];
+            
+            int pixIndex = 0;
+            
+            for( int i=0; i<numTextureBytes; i++ ) {
+                packedTextureData[i] = 0;
+                
+                for( int j=1; j>=0; j-- ) {
+                    unsigned char palIndex = 
+                        texturePaletteIndices[ pixIndex++ ];
+                    packedTextureData[i] = (unsigned char)(
+                        packedTextureData[i] | (palIndex << (j * 4)) );
+                    }
+                }
+            }
+        else if( numUniqueColors <= 256 ) {
+            t.texFormat = GX_TEXFMT_PLTT256;
+            paletteSize = 256;
+            
+            // pack into 8 bits per pixel (1 pixel per byte)
+            numTextureBytes = numPixels;
+            packedTextureData = new unsigned char[ numTextureBytes ];
+            
+            memcpy( packedTextureData, texturePaletteIndices, 
+                    numTextureBytes );
+            }
+
+        printOut( "Using a %d color palette\n", paletteSize );
+
+
+        // zero unused part of palette
+        for( int k=numUniqueColors; k<paletteSize; k++ ) {
+            textureColors[k] = 0;
+            }
+
+        t.paletteSlotAddress = nextTexturePaletteAddress;
+        unsigned int paletteBytes = paletteSize * 2;
+        
+        GX_BeginLoadTexPltt();
+        GX_LoadTexPltt( textureColors,
+                        t.paletteSlotAddress,
+                        paletteBytes );
+        GX_EndLoadTexPltt();
+
+        nextTexturePaletteAddress += paletteBytes;
+        
+        numTexturePaletteBytesAdded += paletteBytes;
+
+        printOut( "Added %d paletteBytes bytes so far.\n", 
+                  numTexturePaletteBytesAdded );
         }
     
 
+    GX_BeginLoadTex();
+    
+    GX_LoadTex( (unsigned short *)packedTextureData, 
+                t.slotAddress,
+                numTextureBytes );
+    
+    GX_EndLoadTex(); 
+    
+    nextTextureSlotAddress += numTextureBytes;
+    
+    numTextureBytesAdded += numTextureBytes;
+    
     printOut( "Added %d texture bytes so far.\n", numTextureBytesAdded );
     
-    delete [] textureData;
+    printOut( "AA\n" );
+    delete [] packedTextureData;
+    printOut( "A\n" );
     
+    delete [] texturePaletteIndices;
+    printOut( "B\n" );
 
     return returnIndex;
     }
