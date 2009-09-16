@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "platform.h"
+#include "common.h"
 
 // implement plaform functions
 
@@ -132,14 +133,14 @@ typedef struct textureInfoStruct textureInfo;
 textureInfo textureInfoArray[ MAX_TEXTURES ];
 
 int nextTextureInfoIndex = 0;
-unsigned int nextTextureSlotAddress = 0x1000;
-unsigned int nextTexturePaletteAddress = 0x1000;
+unsigned int nextTextureSlotAddress = 0x0000;
+unsigned int nextTexturePaletteAddress = 0x0000;
 
 int numTextureBytesAdded = 0;
 int numTexturePaletteBytesAdded = 0;
 
 // used as temporary storage when adding a sprite to build up a palette
-unsigned short textureColors[ 256 ];
+unsigned short textureColors[ 256 ] ATTRIBUTE_ALIGN(4);
 
 
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
@@ -280,6 +281,9 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
                     // add to palette
                     textureColors[ numUniqueColors ] = c16;                    
                     texturePaletteIndices[i] = (unsigned char)numUniqueColors;
+                    printOut( "Adding color to palette: " );
+                    printColor( c );
+                    printOut( "\n" );
                     }
                 // this may push us past 256, in which case
                 // we cannot use a palette for this texture
@@ -290,8 +294,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         }
     
 
-    unsigned char *packedTextureData = NULL;
-    unsigned int numTextureBytes;
+    unsigned short *packedTextureData = NULL;
+    unsigned int numTextureShorts;
     
 
     if( numUniqueColors > 256 ) {
@@ -300,17 +304,17 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
         t.texFormat = GX_TEXFMT_DIRECT;
         
-        numTextureBytes = numPixels * 2;
-        packedTextureData = (unsigned char *)textureData;
+        numTextureShorts = numPixels;
+        packedTextureData = textureData;
         
         }
     else {
         printOut( "Texture uses only %d colors\n", numUniqueColors );
         
         // palette colors are RGB 555 (alpha bit (bit 15) ignored... set to
-        // 0 just to be safe
+        // 1 just to be safe
         for( int k=0; k<numUniqueColors; k++ ) {
-            textureColors[k] &= 0x7FFF;
+            textureColors[k] |= 0x8000;
             }
 
         // don't need direct colors anymore
@@ -322,19 +326,19 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             t.texFormat = GX_TEXFMT_PLTT4;
             paletteSize = 4;
             
-            // pack into 2 bits per pixel (4 pixels per byte)
-            numTextureBytes = numPixels / 4;
-            packedTextureData = new unsigned char[ numTextureBytes ];
+            // pack into 2 bits per pixel (8 pixels per short)
+            numTextureShorts = numPixels / 8;
+            packedTextureData = new unsigned short[ numTextureShorts ];
             
             int pixIndex = 0;
             
-            for( int i=0; i<numTextureBytes; i++ ) {
+            for( int i=0; i<numTextureShorts; i++ ) {
                 packedTextureData[i] = 0;
                 
-                for( int j=0; j<4; j++ ) {
-                    unsigned char palIndex = 
+                for( int j=0; j<8; j++ ) {
+                    unsigned int palIndex = 
                         texturePaletteIndices[ pixIndex++ ];
-                    packedTextureData[i] = (unsigned char)(
+                    packedTextureData[i] = (unsigned short)(
                         packedTextureData[i] | (palIndex << (j * 2)) );
                     }
                 }
@@ -343,19 +347,19 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             t.texFormat = GX_TEXFMT_PLTT16;
             paletteSize = 16;
             
-            // pack into 4 bits per pixel (2 pixels per byte)
-            numTextureBytes = numPixels / 2;
-            packedTextureData = new unsigned char[ numTextureBytes ];
+            // pack into 4 bits per pixel (4 pixels per short)
+            numTextureShorts = numPixels / 4;
+            packedTextureData = new unsigned short[ numTextureShorts ];
             
             int pixIndex = 0;
             
-            for( int i=0; i<numTextureBytes; i++ ) {
+            for( int i=0; i<numTextureShorts; i++ ) {
                 packedTextureData[i] = 0;
                 
-                for( int j=0; j<2; j++ ) {
-                    unsigned char palIndex = 
+                for( int j=0; j<4; j++ ) {
+                    unsigned int palIndex = 
                         texturePaletteIndices[ pixIndex++ ];
-                    packedTextureData[i] = (unsigned char)(
+                    packedTextureData[i] = (unsigned short)(
                         packedTextureData[i] | (palIndex << (j * 4)) );
                     }
                 }
@@ -364,12 +368,22 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             t.texFormat = GX_TEXFMT_PLTT256;
             paletteSize = 256;
             
-            // pack into 8 bits per pixel (1 pixel per byte)
-            numTextureBytes = numPixels;
-            packedTextureData = new unsigned char[ numTextureBytes ];
+            // pack into 8 bits per pixel (2 pixel per short)
+            numTextureShorts = numPixels / 2;
+            packedTextureData = new unsigned short[ numTextureShorts ];
             
-            memcpy( packedTextureData, texturePaletteIndices, 
-                    numTextureBytes );
+            int pixIndex = 0;
+            
+            for( int i=0; i<numTextureShorts; i++ ) {
+                packedTextureData[i] = 0;
+                
+                for( int j=0; j<2; j++ ) {
+                    unsigned int palIndex = 
+                        texturePaletteIndices[ pixIndex++ ];
+                    packedTextureData[i] = (unsigned short)(
+                        packedTextureData[i] | (palIndex << (j * 8)) );
+                    }
+                }
             }
 
         printOut( "Using a %d color palette\n", paletteSize );
@@ -380,20 +394,37 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         t.paletteSlotAddress = nextTexturePaletteAddress;
         unsigned int paletteBytes = paletteSize * 2;
         
+        printOut( "Adding %d palette bytes\n", paletteBytes );
+        
+        DC_FlushRange( textureColors, paletteBytes );
+
         GX_BeginLoadTexPltt();
         GX_LoadTexPltt( textureColors,
                         t.paletteSlotAddress,
                         paletteBytes );
         GX_EndLoadTexPltt();
 
-        nextTexturePaletteAddress += paletteBytes;
+        int offset = paletteBytes;
         
-        numTexturePaletteBytesAdded += paletteBytes;
+        if( offset < 16 ) {
+            // FIXME:  for some reason, if offset is not a multiple
+            // of 16, next texture is broken...
+            offset = 16;
+            printOut( "Added extra offset after a 4-color palette\n" );
+            }
+
+        nextTexturePaletteAddress += offset;
+        
+        numTexturePaletteBytesAdded += offset;
 
         printOut( "Added %d paletteBytes bytes so far.\n", 
                   numTexturePaletteBytesAdded );
         }
     
+
+    unsigned int numTextureBytes = numTextureShorts * 2;
+
+    DC_FlushRange( packedTextureData, numTextureBytes );
 
     GX_BeginLoadTex();
     
@@ -453,7 +484,7 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     
     textureInfo t = textureInfoArray[ inHandle ];
     
-    printOut( "Drawing sprite at address %d\n", t.slotAddress );
+    //printOut( "Drawing sprite at address %d\n", t.slotAddress );
 
 
     // only use color zero as transparent for paletted textures
@@ -475,7 +506,11 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
                       colorZeroFlag,
                       t.slotAddress );
 
-
+    if( inHandle == 5 ) {
+        printOut( "texture format = %d\n", t.texFormat );
+        }
+    
+    
     if( t.texFormat != GX_TEXFMT_DIRECT ) {        
         G3_TexPlttBase( t.paletteSlotAddress,
                         t.texFormat );
@@ -1593,7 +1628,7 @@ static void VBlankCallback() {
     // init in platform-independent code
     gameInit();
     
-    printOut( "Free bytes on heap=%d\n",
+    printOut( "Free bytes on heap after init=%d\n",
               OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
     
     while( true ){
@@ -1621,12 +1656,17 @@ static void VBlankCallback() {
 
         if( isEvenFrame ) {
             drawTopScreen();
+            //printOut( "Free bytes on heap after drawTop=%d\n",
+            //  OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
             
             // game loop every-other screen
             gameLoopTick();
             }
         else {
             drawBottomScreen();
+
+            //printOut( "Free bytes on heap after drawBottom=%d\n",
+            //         OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
             }
         G3_PopMtx( 1 );
 

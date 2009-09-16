@@ -108,13 +108,15 @@ static char isInside( int inX, int inY,
 
 
 void gameInit() {
+
+    
     spriteID = loadSprite( "testTexture.tga", true );
     spriteIDB = loadSprite( "testTexture2.tga" );
-
-
+    
     parentSpriteID = loadSprite( "parentButton.tga" );
     childSpriteID = loadSprite( "childButton.tga" );
 
+    
 
     testDirectSpriteID = loadSprite( "testDirectColor.tga" );
     test250SpriteID = loadSprite( "test250Color.tga" );
@@ -183,8 +185,8 @@ void gameInit() {
 
     initMap();
 
-    //setRegionSelectable( 2, true );
-    //setRegionSelectable( 4, true );
+    setRegionSelectable( 2, true );
+    setRegionSelectable( 4, true );
     
     }
 
@@ -355,7 +357,7 @@ void drawBottomScreen() {
         drawSprite( parentSpriteID, parentButtonX, parentButtonY, white );
         drawSprite( childSpriteID, childButtonX, childButtonY, white );
 
-
+        
         font16->drawString( "Quick brown fox jumped over Lazy Dog", 
                             parentButtonX + 2, 
                             parentButtonY - 20 + 1, black, alignLeft );

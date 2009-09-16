@@ -34,3 +34,6 @@ inline void setColor( rgbaColor *inColor,
 
 
                       
+inline void printColor( rgbaColor inC ) {
+    printOut( "(%d,%d,%d,%d)", inC.r, inC.g, inC.b, inC.a );
+    }

@@ -10,7 +10,13 @@
 
 
 
-static int mapBackgroundSpriteID;
+// split 192-row sprite into two power-of-two-height parts
+
+// top 128 rows
+static int mapBackgroundTopSpriteID;
+// bottom 64 rows
+static int mapBackgroundBottomSpriteID;
+static int bottomHalfOffset = 128;
 
 
 
@@ -155,7 +161,15 @@ void initMap() {
             }
         }
 
-    mapBackgroundSpriteID = addSprite( mapRGBA, mapW, mapH );
+    mapBackgroundTopSpriteID = addSprite( mapRGBA, mapW, bottomHalfOffset );
+
+    rgbaColor *bottomHalfPointer = 
+        &( mapRGBA[ bottomHalfOffset * mapW ] );
+    
+    mapBackgroundBottomSpriteID = addSprite( bottomHalfPointer, mapW, 
+                                             mapH - bottomHalfOffset );
+
+    delete [] mapRGBA;
     }
 
 
@@ -168,7 +182,8 @@ void freeMap() {
 static rgbaColor white = { 255, 255, 255, 255 }; 
 
 void drawMap() {
-    drawSprite( mapBackgroundSpriteID, 0, 0, white );
+    drawSprite( mapBackgroundTopSpriteID, 0, 0, white );
+    drawSprite( mapBackgroundBottomSpriteID, 0, bottomHalfOffset, white );
     
     startNewSpriteLayer();
     
