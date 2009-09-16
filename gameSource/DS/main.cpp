@@ -113,7 +113,7 @@ unsigned int getRandom( unsigned int inMax ) {
 
 
 
-#define MAX_TEXTURES  256
+#define MAX_TEXTURES  512
 
 struct textureInfoStruct {
         unsigned int slotAddress;
@@ -149,6 +149,10 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     t.slotAddress = nextTextureSlotAddress;
     t.w = inWidth;
     t.h = inHeight;
+    
+    printOut( "Adding %dx%d texture at address %d, handle %d\n", 
+              t.w, t.h, t.slotAddress, nextTextureInfoIndex );
+    
 
     switch( inWidth ) {
         case 8:
@@ -213,10 +217,6 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     t.texCoordCorners[3] = GX_ST( inWidth << FX32_SHIFT,  
                                   inHeight << FX32_SHIFT );
     
-    textureInfoArray[ nextTextureInfoIndex ] = t;
-    int returnIndex = nextTextureInfoIndex;
-    
-    nextTextureInfoIndex++;
     
 
     unsigned int numPixels = (unsigned int)( inWidth * inHeight );
@@ -227,6 +227,11 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     // using it
     unsigned char *texturePaletteIndices =  new unsigned char[ numPixels ];
     
+
+    // zero palette (so unused colors are 0 later)
+    for( int k=0; k<256; k++ ) {
+        textureColors[k] = 0;
+        }
 
     // reserve color 0 for transparency
     int numUniqueColors = 1;
@@ -257,25 +262,31 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
                 found = true;
                 }
             
+            int jLimit = numUniqueColors;
+            if( jLimit > 256 ) {
+                jLimit = 256;
+                }
+            
 
-            for( unsigned char j=1; j<numUniqueColors && !found; j++ ) {
+            for( int j=1; j<jLimit && !found; j++ ) {
                 if( c16 == textureColors[ j ] ) {
                     found = true;
-                    texturePaletteIndices[i] = j;
+                    texturePaletteIndices[i] = (unsigned char)j;
                     }
                 }
             if( !found ) {
+                
                 if( numUniqueColors < 256 ) {
                     // add to palette
-                    textureColors[ numUniqueColors ] = c16;
-                    
+                    textureColors[ numUniqueColors ] = c16;                    
                     texturePaletteIndices[i] = (unsigned char)numUniqueColors;
                     }
                 // this may push us past 256, in which case
                 // we cannot use a palette for this texture
                 numUniqueColors ++;
                 }
-            }        
+            }
+        
         }
     
 
@@ -320,7 +331,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             for( int i=0; i<numTextureBytes; i++ ) {
                 packedTextureData[i] = 0;
                 
-                for( int j=3; j>=0; j-- ) {
+                for( int j=0; j<4; j++ ) {
                     unsigned char palIndex = 
                         texturePaletteIndices[ pixIndex++ ];
                     packedTextureData[i] = (unsigned char)(
@@ -341,7 +352,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
             for( int i=0; i<numTextureBytes; i++ ) {
                 packedTextureData[i] = 0;
                 
-                for( int j=1; j>=0; j-- ) {
+                for( int j=0; j<2; j++ ) {
                     unsigned char palIndex = 
                         texturePaletteIndices[ pixIndex++ ];
                     packedTextureData[i] = (unsigned char)(
@@ -364,10 +375,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         printOut( "Using a %d color palette\n", paletteSize );
 
 
-        // zero unused part of palette
-        for( int k=numUniqueColors; k<paletteSize; k++ ) {
-            textureColors[k] = 0;
-            }
+        
 
         t.paletteSlotAddress = nextTexturePaletteAddress;
         unsigned int paletteBytes = paletteSize * 2;
@@ -394,6 +402,13 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
                 numTextureBytes );
     
     GX_EndLoadTex(); 
+
+    
+    textureInfoArray[ nextTextureInfoIndex ] = t;
+    int returnIndex = nextTextureInfoIndex;
+    
+    nextTextureInfoIndex++;
+
     
     nextTextureSlotAddress += numTextureBytes;
     
@@ -434,20 +449,38 @@ void startNewSpriteLayer() {
 
 
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
-
+    //if( true ) return;
+    
     textureInfo t = textureInfoArray[ inHandle ];
     
+    printOut( "Drawing sprite at address %d\n", t.slotAddress );
+
+
+    // only use color zero as transparent for paletted textures
+    // (direct color textures have 1-bit alpha
+    GXTexPlttColor0 colorZeroFlag;
+    if( t.texFormat == GX_TEXFMT_DIRECT ) {
+        colorZeroFlag = GX_TEXPLTTCOLOR0_USE;
+        }
+    else {
+        colorZeroFlag = GX_TEXPLTTCOLOR0_TRNS;
+        }
     
-    
-    G3_TexImageParam( GX_TEXFMT_DIRECT,
+    G3_TexImageParam( t.texFormat,
                       GX_TEXGEN_TEXCOORD,
                       t.sizeS,
                       t.sizeT,
                       GX_TEXREPEAT_NONE,
                       GX_TEXFLIP_NONE,
-                      GX_TEXPLTTCOLOR0_USE,
+                      colorZeroFlag,
                       t.slotAddress );
 
+
+    if( t.texFormat != GX_TEXFMT_DIRECT ) {        
+        G3_TexPlttBase( t.paletteSlotAddress,
+                        t.texFormat );
+        }
+    
     
     // 5 high-order bits
     int a = inColor.a >> 3;
