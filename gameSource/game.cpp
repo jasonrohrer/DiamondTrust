@@ -30,6 +30,10 @@ int spriteIDB = -1;
 int parentSpriteID = -1;
 int childSpriteID = -1;
 
+int testDirectSpriteID = -1;
+int test250SpriteID = -1;
+
+
 int parentButtonX = 10;
 int parentButtonY = 150;
 int childButtonX = 10;
@@ -110,6 +114,10 @@ void gameInit() {
 
     parentSpriteID = loadSprite( "parentButton.tga" );
     childSpriteID = loadSprite( "childButton.tga" );
+
+
+    testDirectSpriteID = loadSprite( "testDirectColor.tga" );
+    test250SpriteID = loadSprite( "test250Color.tga" );
     
 
     
@@ -327,8 +335,11 @@ rgbaColor black = { 0, 0, 0, 255 };
 
 void drawTopScreen() {
     
+    drawSprite( testDirectSpriteID, 100, 50, white );
+    drawSprite( test250SpriteID, 100, 120, white );
+    
 
-    for( int i=0; i<NUM_DRAWN; i++ ) {
+    for( int i=0; i<1; i++ ) { //NUM_DRAWN; i++ ) {
         drawSprite( spriteID, drawX[i], drawY[i], drawColors[i] );
         startNewSpriteLayer();
         }

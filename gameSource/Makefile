@@ -8,6 +8,8 @@ childButton.tga \
 angola_map.tga \
 font8.tga \
 font16.tga \
+testDirectColor.tga \
+test250Color.tga \
 
 
 
