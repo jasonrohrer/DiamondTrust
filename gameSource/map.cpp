@@ -34,6 +34,12 @@ static int mapW, mapH;
 static rgbaColor regionColor[ numMapRegions ];
 
 
+// a color unused in map image, used for tagging during processing
+static rgbaColor tagColor = { 255, 0, 255, 255 }; 
+
+static int regionBorderWidth = 3;
+
+
 
 void initMap() {
     rgbaColor *mapRGBA = readTGAFile( "angola_map.tga",
@@ -159,16 +165,66 @@ void initMap() {
     memcpy( mapRegionImage, mapRGBA, numMapPixels * sizeof( rgbaColor ) );
 
 
-    // clear out all region colors for map background
+    // clear out all region colors for map background, leaving a thin
+    // border of color
     for( i=0; i<numMapRegions; i++ ) {
         rgbaColor thisRegionColor = regionColor[ i ];
         
-        for( int j=0; j<numMapPixels; j++ ) {
+        // tag border, n-pixels wide
+        for( int b=0; b<regionBorderWidth; b++ ) {
+            char *tagMap = new char[ numMapPixels ];
+            
+            for( int y=1; y<mapH-1; y++ ) {
+                for( int x=1; x<mapW-1; x++ ) {
+                    
+                    int j = y * mapW + x;
+                    tagMap[j] = false;
+                    if( equals( mapRGBA[ j ], thisRegionColor ) ) {
+                        int upJ = j - mapW;
+                        int downJ = j + mapW;
+                        int leftJ = j - 1;
+                        int rightJ = j + 1;
+
+                        if( !equals( mapRGBA[ downJ ], thisRegionColor ) ||
+                            !equals( mapRGBA[ upJ ], thisRegionColor ) ||
+                            !equals( mapRGBA[ leftJ ], thisRegionColor ) ||
+                            !equals( mapRGBA[ rightJ ], thisRegionColor ) ) {
+                            
+                            // edge
+                            tagMap[j] = true;
+                            }
+                        }
+                    }
+                }
+            
+            for( int j=0; j<numMapPixels; j++ ) {
+                if( tagMap[j] ) {
+                    mapRGBA[j] = tagColor;
+                    }
+                }
+            }
+        
+
+        // clear out center, ignoring tagged border
+        int j;
+        for( j=0; j<numMapPixels; j++ ) {
             if( equals( mapRGBA[j], thisRegionColor ) ) {
                 mapRGBA[j] = backgroundColor;
                 }
             }
-        }
+
+        // restore border color
+        // make it darker
+        rgbaColor darkRegionColor = thisRegionColor;
+        darkRegionColor.r /= 2;
+        darkRegionColor.g /= 2;
+        darkRegionColor.b /= 2;
+                
+        for( j=0; j<numMapPixels; j++ ) {
+            if( equals( mapRGBA[j], tagColor ) ) {
+                mapRGBA[j] = darkRegionColor;
+                }
+            }        }
 
     mapBackgroundTopSpriteID = addSprite( mapRGBA, mapW, bottomHalfOffset );
 
