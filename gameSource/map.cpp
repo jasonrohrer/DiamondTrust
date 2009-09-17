@@ -97,13 +97,22 @@ void initMap() {
         int regionW = lastX - firstX + 1;
         int regionH = lastY - firstY + 1;
         
-        mapRegionOffset[i].x = firstX;
-        mapRegionOffset[i].y = firstY;
-
-        
         int regionSpriteW = roundUpToPowerOfTwo( regionW );
         int regionSpriteH = roundUpToPowerOfTwo( regionH );
         
+        // make sure expanded sprite is not hanging off the edge of the 
+        // screen
+        if( firstX + regionSpriteW > mapW ) {
+            firstX = mapW - regionSpriteW;
+            }
+        if( firstY + regionSpriteH > mapH ) {
+            firstY = mapH - regionSpriteH;
+            }
+        
+
+        mapRegionOffset[i].x = firstX;
+        mapRegionOffset[i].y = firstY;
+
         printOut( "Region %d offset = (%d,%d), size = (%d,%d)\n",
                   i, firstX, firstY, regionW, regionH );
         
@@ -117,8 +126,8 @@ void initMap() {
 
         
         // copy out of map and into sprite
-        for( int y=0; y<regionH; y++ ) {
-            for( int x=0; x<regionW; x++ ) {
+        for( int y=0; y<regionSpriteH; y++ ) {
+            for( int x=0; x<regionSpriteW; x++ ) {
                 
                 int mapIndex = (y + firstY) * mapW
                     + x + firstX;

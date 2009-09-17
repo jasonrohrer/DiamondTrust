@@ -281,9 +281,9 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
                     // add to palette
                     textureColors[ numUniqueColors ] = c16;                    
                     texturePaletteIndices[i] = (unsigned char)numUniqueColors;
-                    printOut( "Adding color to palette: " );
-                    printColor( c );
-                    printOut( "\n" );
+                    //printOut( "Adding color to palette: " );
+                    //printColor( c );
+                    //printOut( "\n" );
                     }
                 // this may push us past 256, in which case
                 // we cannot use a palette for this texture
