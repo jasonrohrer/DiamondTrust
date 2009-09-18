@@ -10,6 +10,9 @@
  *
  * 2008-September-17    Jason Rohrer
  * Support for setting language data directly.
+ *
+ * 2008-September-17    Jason Rohrer
+ * Customized for Diamonds project (so it doesn't touch files).
  */
 
 #include "minorGems/common.h"
@@ -40,59 +43,6 @@ class TranslationManager {
 
 
     public:
-
-
-
-        /**
-         * Sets the directory name where translation files are stored.
-         * Defaults to "languages".
-         *
-         * @param inName the name of the directory (relative to the
-         *   program's working directory).
-         *   Must be destroyed by caller.
-         */
-        static void setDirectoryName( char *inName );
-
-
-
-        /**
-         * Gets the directory name where translation files are stored.
-         *
-         * @return the name of the directory (relative to the
-         *   program's working directory).
-         *   Must be destroyed by caller.
-         */
-        static char *getDirectoryName();
-
-        
-
-        /**
-         * Gets a list of available languages.
-         *
-         * @param outNumLanguages pointer to where the number of languages
-         *   should be returned.
-         *
-         * @return an array of language names.
-         *   Array and the strings it contains must be destroyed by caller.
-         */
-        static char **getAvailableLanguages( int *outNumLanguages );
-
-        
-
-        /**
-         * Sets the natural language to translate keys into.
-         * Defaults to "English".
-         *
-         * @param inLanguageName the name of the language.
-         *   This name, when .txt is appended, is the name of
-         *   the translation file.  Thus, setLanguage( "English" ) would
-         *   select the English.txt language file.
-         *   Language names must not contain spaces.
-         *   Must be destroyed by caller.
-         */
-        static void setLanguage( char *inLanguageName );
-        
-
 
         // Sets the language data directly without reading it from 
         // the file system.
@@ -163,20 +113,6 @@ class TranslationManagerStaticMembers {
         TranslationManagerStaticMembers();
         ~TranslationManagerStaticMembers();
 
-        
-
-        /**
-         * Sets the directory name and language name to use, and reads
-         * the translation table from file.
-         *
-         * @param inDirectoryName the directory name.
-         *   Must be destroyed by caller.
-         * @param inLanguageName the language name.
-         *   Must be destroyed by caller.
-         */
-        void setDirectoryAndLanguage( char *inDirectoryName,
-                                      char *inLanguageName );
-
 
         // sets the data from a string
         // string contains same contents as a language file
@@ -185,8 +121,6 @@ class TranslationManagerStaticMembers {
 
         
         
-        char *mDirectoryName;
-        char *mLanguageName;
         
         // vectors mapping keys to strings
         SimpleVector<char *> *mTranslationKeys;

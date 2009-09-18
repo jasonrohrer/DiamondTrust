@@ -9,89 +9,20 @@
  *
  * 2008-September-17    Jason Rohrer
  * Support for setting language data directly.
+ *
+ * 2008-September-17    Jason Rohrer
+ * Customized for Diamonds project (so it doesn't touch files).
  */
 
 #include "TranslationManager.h"
 
-#include <stdio.h>
-
-#include "minorGems/io/file/File.h"
+#include "minorGems/util/stringUtils.h"
 
 
 
 // will be destroyed automatically at program termination
 TranslationManagerStaticMembers TranslationManager::mStaticMembers;
 
-
-
-void TranslationManager::setDirectoryName( char *inName ) {
-    mStaticMembers.setDirectoryAndLanguage( inName,
-                                             mStaticMembers.mLanguageName );
-    }
-
-
-
-char *TranslationManager::getDirectoryName() {
-    return stringDuplicate( mStaticMembers.mDirectoryName );
-    }
-
-
-
-char **TranslationManager::getAvailableLanguages( int *outNumLanguages ) {
-    File *languageDirectory = new File( NULL, mStaticMembers.mDirectoryName );
-
-    if( languageDirectory->exists() && languageDirectory->isDirectory() ) {
-
-        int numChildFiles;
-        File **childFiles = languageDirectory->getChildFiles( &numChildFiles );
-                
-        if( childFiles != NULL ) {
-            SimpleVector<char*> *languageNames = new SimpleVector<char*>();
-
-            for( int i=0; i<numChildFiles; i++ ) {
-
-                char *name = childFiles[i]->getFileName();
-
-                char *extensionPointer = strstr( name, ".txt" );
-
-                if( extensionPointer != NULL ) {
-                    // terminate string, cutting off extension
-                    extensionPointer[0] = '\0';
-
-                    languageNames->push_back( stringDuplicate( name ) );
-                    }
-
-                delete [] name;
-                delete childFiles[i];
-                }
-            delete [] childFiles;
-
-            char **returnArray = languageNames->getElementArray();
-
-            *outNumLanguages = languageNames->size();
-
-            delete languageNames;
-
-
-            delete languageDirectory;
-            return returnArray;
-            }
-
-        }
-
-    delete languageDirectory;
-    
-    // default, if we didn't return above
-    *outNumLanguages = 0;
-    return new char*[0];
-    }
-
-
-
-void TranslationManager::setLanguage( char *inLanguageName ) {
-    mStaticMembers.setDirectoryAndLanguage( mStaticMembers.mDirectoryName,
-                                            inLanguageName );
-    }
 
 
 
@@ -150,25 +81,15 @@ const char *TranslationManager::translate( char *inTranslationKey ) {
 
         
 TranslationManagerStaticMembers::TranslationManagerStaticMembers()
-    : mDirectoryName( NULL ),
-      mLanguageName( NULL ),
-      mTranslationKeys( NULL ),
-      mNaturalLanguageStrings( NULL ) {
+        : mTranslationKeys( NULL ),
+          mNaturalLanguageStrings( NULL ) {
 
     // default
-    setDirectoryAndLanguage( "languages", "English" );
     }
 
 
 
 TranslationManagerStaticMembers::~TranslationManagerStaticMembers() {
-    if( mDirectoryName != NULL ) {
-        delete [] mDirectoryName;
-        }
-    
-    if( mLanguageName != NULL ) {
-        delete [] mLanguageName;
-        }
 
     if( mTranslationKeys != NULL ) {
         int numKeys = mTranslationKeys->size();
@@ -192,58 +113,9 @@ TranslationManagerStaticMembers::~TranslationManagerStaticMembers() {
 
 
         
-void TranslationManagerStaticMembers::setDirectoryAndLanguage(
-    char *inDirectoryName,
-    char *inLanguageName ) {
-
-    // save temp copies first to allow caller to pass our own members in to us
-    char *tempDirectoryName = stringDuplicate( inDirectoryName );
-    char *tempLanguageName = stringDuplicate( inLanguageName );
-
-    
-    if( mDirectoryName != NULL ) {
-        delete [] mDirectoryName;
-        }
-    
-    if( mLanguageName != NULL ) {
-        delete [] mLanguageName;
-        }
-
-    mDirectoryName = tempDirectoryName;
-    mLanguageName = tempLanguageName;    
-
-    
-    File *directoryFile = new File( NULL, mDirectoryName );
-
-    if( directoryFile->exists() && directoryFile->isDirectory() ) {
-
-        char *languageFileName = autoSprintf( "%s.txt", mLanguageName );
-        
-        File *languageFile = directoryFile->getChildFile( languageFileName );
-
-        delete [] languageFileName;
 
 
-        if( languageFile != NULL ) {
-
-
-            char *languageData = languageFile->readFileContents();
-            
-            if( languageData != NULL ) {
-                
-                setTranslationData( languageData );
-                delete [] languageData;
-                }
-            delete languageFile;
-            }
-        }
-
-    delete directoryFile;
-    
-    }
-
-
-static inline char *stringSkip( char *inString, int inNumChars ) {
+static inline char *stringSkip( char *inString, unsigned int inNumChars ) {
     return &( inString[ inNumChars ] );
     }
 
