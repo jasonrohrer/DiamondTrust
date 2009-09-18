@@ -9,7 +9,8 @@
 #include "units.h"
 #include "sprite.h"
 #include "minorGems/util/stringUtils.h"
-#include "minorGems/util/TranslationManager.h"
+#include "TranslationManager.h"
+#include "GameState.h"
 
 
 #define NUM_DRAWN 60
@@ -55,13 +56,16 @@ Font *font16;
 
 
 
-enum gamePhase{ moveUnits };
+//enum gamePhase{ moveUnits };
 
 
 char *statusMessage = NULL;
-gamePhase currentPhase;
+//gamePhase currentPhase;
 
-int activeUnit = -1;
+
+GameState *currentGameState;
+
+extern GameState *moveUnitsState;
 
 
 Button *doneButton;
@@ -182,8 +186,8 @@ void gameInit() {
     //setRegionSelectable( 4, true );
     
 
-    currentPhase = moveUnits;
-    statusMessage = translate( "phaseStatus_move" );
+    currentGameState = moveUnitsState;
+    currentGameState->enterState();
     }
 
 
@@ -210,8 +214,10 @@ int dX = 1;
 
 void gameLoopTick() {
     stepSprites();
-    stepUnits();
+
+    currentGameState->stepState();
     
+
     for( int i=0; i<NUM_DRAWN; i++ ) {
         int f = drawColors[i].a;
 
@@ -255,7 +261,9 @@ void gameLoopTick() {
     
     int tx, ty;
     if( getTouch( &tx, &ty ) ) {
-
+        
+        currentGameState->clickState( tx, ty );
+        
         /*
         int regionHit = getChosenRegion( tx, ty );
         
@@ -301,65 +309,6 @@ void gameLoopTick() {
             }
         
 
-        if( currentPhase == moveUnits ) {
-            if( activeUnit == -1 ) {
-                activeUnit = getChosenUnit( tx, ty );
-                        
-                if( activeUnit != -1 ) {
-                    setAllUnitsNotSelectable();
-                    
-                    //int unitRegion = getUnitRegion( activeUnit );
-                    int unitDest = getUnitDestination( activeUnit );
-                    
-                    // unit can move to any region that's not already
-                    // a destination of friendly units
-
-                    // can always move back home
-                    if( unitDest != 0 ) {
-                        setRegionSelectable( 0, true );
-                        }
-                    else {
-                        setRegionSelectable( 0, false );
-                        }
-                    
-                    
-                    // never move into region 1 (enemy home)
-
-                    for( int r=2; r<numMapRegions; r++ ) {
-                        char alreadyDest = false;
-                        
-                        for( int u=0; u<numUnits-1 && !alreadyDest; u++ ) {
-                            if( getUnitDestination( u ) == r ) {
-                                alreadyDest = true;
-                                }
-                            }
-
-                        if( !alreadyDest ) {
-                            setRegionSelectable( r, true );
-                            }
-                        else {
-                            setRegionSelectable( r, false );
-                            }
-                        
-                        }
-                    }
-                }
-            else {
-                // unit already selected
-                
-                // region picked?
-                int chosenRegion = getChosenRegion( tx, ty );
-            
-                if( chosenRegion != -1 ) {
-                    setUnitDestination( activeUnit, chosenRegion );
-                    activeUnit = -1;
-                    setPlayerUnitsSelectable( true );
-                    }
-                
-                }
-            
-            
-            }
         
         
         
@@ -389,14 +338,6 @@ void gameLoopTick() {
     
     
 
-    if( currentPhase == moveUnits ) {
-        
-        if( activeUnit == -1 ) {
-            // user needs to pick one
-            setPlayerUnitsSelectable( true );
-            }
-        
-        }
     
     
 
@@ -431,10 +372,9 @@ void drawTopScreen() {
 
 
 void drawBottomScreen() {
-    drawMap();
-    startNewSpriteLayer();
     
-    drawUnits();
+    currentGameState->drawState();
+    
 
     if( buttonsVisible ) {
 
@@ -484,9 +424,5 @@ void drawBottomScreen() {
             
         }
     
-
-    if( currentPhase == moveUnits ) {
-        doneButton->draw();
-        }
     
     }
