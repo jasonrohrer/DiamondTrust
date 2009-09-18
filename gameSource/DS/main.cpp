@@ -404,13 +404,14 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
                         paletteBytes );
         GX_EndLoadTexPltt();
 
-        int offset = paletteBytes;
+        unsigned int offset = paletteBytes;
         
         if( offset < 16 ) {
-            // FIXME:  for some reason, if offset is not a multiple
-            // of 16, next texture is broken...
+            // offset to next palette must be 16 bytes for 
+            //   16- and 256-color palettes
+            // so our 8-byte offset (for this 4-color palette) is
+            // not enough.
             offset = 16;
-            printOut( "Added extra offset after a 4-color palette\n" );
             }
 
         nextTexturePaletteAddress += offset;

@@ -87,7 +87,7 @@ void gameInit() {
     
     if( languageData != NULL ) {
         char *textData = new char[ dataSize + 1 ];
-        memcpy( textData, languageData, dataSize );
+        memcpy( textData, languageData, (unsigned int)dataSize );
         textData[ dataSize ] = '\0';
         
         delete [] languageData;

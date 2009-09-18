@@ -4,7 +4,7 @@
 
 class Unit {
     public:
-        Unit( int inRegion );
+        Unit();
         
         int mRegion;
         int mDest;
