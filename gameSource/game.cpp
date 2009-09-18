@@ -96,6 +96,7 @@ void gameInit() {
         delete [] textData;
         }
     
+    printOut( "Loading test sprites\n" );
     
     spriteID = loadSprite( "testTexture.tga", true );
     spriteIDB = loadSprite( "testTexture2.tga" );
@@ -161,13 +162,13 @@ void gameInit() {
             }
         */
         }
-
-    char *result = autoSprintf( "test x=%d, s=%s\n", 4123, 
-                                "quick brown fox jumped lazy" );
-    printOut( result );
-    delete [] result;
+    printOut( "\n" );
     
+    
+    printOut( "Loading 8-pixel font\n" );
     font8 = new Font( "font8.tga", 1, 6, false );
+
+    printOut( "Loading 16-pixel font\n" );
     font16 = new Font( "font16.tga", 2, 8, false );
     
     initButton();

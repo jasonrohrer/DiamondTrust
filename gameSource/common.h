@@ -29,6 +29,11 @@ inline char equals( rgbaColor inA, rgbaColor inB ) {
         inA.a == inB.a;
     }
 
+// rgba as 32-bit int
+inline unsigned int toInt( rgbaColor inC ) {
+    return (unsigned int)( inC.r << 24 | inC.g << 16 | inC.b << 8 | inC.a );
+    }
+
 
 
 inline void setColor( rgbaColor *inColor,

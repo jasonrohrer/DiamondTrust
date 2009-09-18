@@ -7,6 +7,7 @@
 
 
 #include <string.h>
+#include <stdio.h>
 
 
 
@@ -57,14 +58,26 @@ void initMap() {
     
     int numMapPixels = mapW * mapH;
 
+    
+    unsigned int *mapPixelInts = new unsigned int[ numMapPixels ];
+    for( int j=0; j<numMapPixels; j++ ) {
+        mapPixelInts[j] = toInt( mapRGBA[j] );
+        }
+    
+
+    intPair regionFirstCorner[ numMapRegions ];
+    intPair regionLastCorner[ numMapRegions ];
+    
 
     // first pixels in first row show region colors
     
     rgbaColor backgroundColor = mapRGBA[0];
+    unsigned int backgroundColorInt = toInt( backgroundColor );
     
     int i;
     for( i=0; i<numMapRegions; i++ ) {
         rgbaColor thisRegionColor = mapRGBA[ i + 1 ];
+        unsigned int thisRegionColorInt = toInt( thisRegionColor );
         
         regionColor[ i ] = thisRegionColor;
         
@@ -73,6 +86,7 @@ void initMap() {
 
         // hide key on map
         mapRGBA[ i + 1 ] = backgroundColor;
+        mapPixelInts[ i + 1 ] = backgroundColorInt;
         
 
         // window around region
@@ -84,7 +98,8 @@ void initMap() {
         for( int y=0; y<mapH; y++ ) {
             for( int x=0; x<mapW; x++ ) {
                 
-                if( equals( mapRGBA[ y * mapW + x ], thisRegionColor ) ) {
+                if( mapPixelInts[ y * mapW + x ] == thisRegionColorInt ) {
+
                     if( y < firstY ) {
                         firstY = y;
                         }
@@ -103,24 +118,34 @@ void initMap() {
         int regionW = lastX - firstX + 1;
         int regionH = lastY - firstY + 1;
         
+        regionFirstCorner[i].x = firstX;
+        regionFirstCorner[i].y = firstY;
+        regionLastCorner[i].x = lastX;
+        regionLastCorner[i].y = lastY;
+        
+        
+
         int regionSpriteW = roundUpToPowerOfTwo( regionW );
         int regionSpriteH = roundUpToPowerOfTwo( regionH );
         
         // make sure expanded sprite is not hanging off the edge of the 
         // screen
-        if( firstX + regionSpriteW > mapW ) {
-            firstX = mapW - regionSpriteW;
+        int spriteX = firstX;
+        int spriteY = firstY;
+        
+        if( spriteX + regionSpriteW > mapW ) {
+            spriteX = mapW - regionSpriteW;
             }
-        if( firstY + regionSpriteH > mapH ) {
-            firstY = mapH - regionSpriteH;
+        if( spriteY + regionSpriteH > mapH ) {
+            spriteY = mapH - regionSpriteH;
             }
         
 
-        mapRegionOffset[i].x = firstX;
-        mapRegionOffset[i].y = firstY;
+        mapRegionOffset[i].x = spriteX;
+        mapRegionOffset[i].y = spriteY;
 
         printOut( "Region %d offset = (%d,%d), size = (%d,%d)\n",
-                  i, firstX, firstY, regionW, regionH );
+                  i, spriteX, spriteY, regionW, regionH );
         
 
         int numSpritePixels = regionSpriteW * regionSpriteH;
@@ -128,19 +153,31 @@ void initMap() {
         rgbaColor *regionRGBA = new rgbaColor[ numSpritePixels ];
         
         // first set all to transparent
-        memset( regionRGBA, 0, numSpritePixels * sizeof( rgbaColor ) );
+        // don't do this... we set the outside pixels to trans below
+        //memset( regionRGBA, 0, numSpritePixels * sizeof( rgbaColor ) );
 
         
         // copy out of map and into sprite
         for( int y=0; y<regionSpriteH; y++ ) {
+            
+            // memcpy whole row
+            int mapRowStart = (y + spriteY) * mapW + spriteX;
+            int spriteRowStart = y * regionSpriteW;
+            
+            memcpy( &( regionRGBA[ spriteRowStart ] ),
+                    &( mapRGBA[ mapRowStart ] ),
+                    regionSpriteW * sizeof( rgbaColor ) );
+            
+            /*
             for( int x=0; x<regionSpriteW; x++ ) {
                 
-                int mapIndex = (y + firstY) * mapW
-                    + x + firstX;
+                int mapIndex = (y + spriteY) * mapW
+                    + x + spriteX;
                 int spriteIndex = y * regionSpriteW + x;
                 
                 regionRGBA[ spriteIndex ] = mapRGBA[ mapIndex ];
                 }
+            */
             }
 
         // set any non-region-color pixels transparent
@@ -153,9 +190,10 @@ void initMap() {
                 }
             }
         
-                
+        //printOut( "Adding region sprite\n" );
         mapRegionSpriteID[i] = addSprite( regionRGBA, regionSpriteW,
                                           regionSpriteH );
+        //printOut( "Done adding region sprite\n" );
         
         delete [] regionRGBA;
         }
@@ -167,28 +205,45 @@ void initMap() {
 
     // clear out all region colors for map background, leaving a thin
     // border of color
+    char *tagMap = new char[ numMapPixels ];
+    
+    
+    
+    unsigned int tagColorInt = toInt( tagColor );
+    
+
     for( i=0; i<numMapRegions; i++ ) {
         rgbaColor thisRegionColor = regionColor[ i ];
+        unsigned int thisRegionColorInt = toInt( thisRegionColor );
         
+        printOut( "Creating border in background for region %d\n", i );
+        printf( "Test\n" );
+        
+        int firstX = regionFirstCorner[i].x;
+        int firstY = regionFirstCorner[i].y;
+        int lastX = regionLastCorner[i].x;
+        int lastY = regionLastCorner[i].y;
+        
+
         // tag border, n-pixels wide
         for( int b=0; b<regionBorderWidth; b++ ) {
-            char *tagMap = new char[ numMapPixels ];
-            
-            for( int y=1; y<mapH-1; y++ ) {
-                for( int x=1; x<mapW-1; x++ ) {
+            memset( tagMap, false, (unsigned int)numMapPixels );
+
+            for( int y=firstY; y<=lastY; y++ ) {
+                for( int x=firstX; x<lastX; x++ ) {
                     
                     int j = y * mapW + x;
                     tagMap[j] = false;
-                    if( equals( mapRGBA[ j ], thisRegionColor ) ) {
+                    if( mapPixelInts[ j ] == thisRegionColorInt ) {
                         int upJ = j - mapW;
                         int downJ = j + mapW;
                         int leftJ = j - 1;
                         int rightJ = j + 1;
 
-                        if( !equals( mapRGBA[ downJ ], thisRegionColor ) ||
-                            !equals( mapRGBA[ upJ ], thisRegionColor ) ||
-                            !equals( mapRGBA[ leftJ ], thisRegionColor ) ||
-                            !equals( mapRGBA[ rightJ ], thisRegionColor ) ) {
+                        if( mapPixelInts[ downJ ] != thisRegionColorInt ||
+                            mapPixelInts[ upJ ] != thisRegionColorInt ||
+                            mapPixelInts[ leftJ ] != thisRegionColorInt ||
+                            mapPixelInts[ rightJ ] != thisRegionColorInt ) {
                             
                             // edge
                             tagMap[j] = true;
@@ -199,16 +254,18 @@ void initMap() {
             
             for( int j=0; j<numMapPixels; j++ ) {
                 if( tagMap[j] ) {
-                    mapRGBA[j] = tagColor;
+                    //mapRGBA[j] = tagColor;
+                    mapPixelInts[j] = tagColorInt;
                     }
                 }
             }
+        
         
 
         // clear out center, ignoring tagged border
         int j;
         for( j=0; j<numMapPixels; j++ ) {
-            if( equals( mapRGBA[j], thisRegionColor ) ) {
+            if( mapPixelInts[j] == thisRegionColorInt ) {
                 mapRGBA[j] = backgroundColor;
                 }
             }
@@ -221,10 +278,19 @@ void initMap() {
         darkRegionColor.b /= 2;
                 
         for( j=0; j<numMapPixels; j++ ) {
-            if( equals( mapRGBA[j], tagColor ) ) {
+            if( mapPixelInts[j] == tagColorInt ) {
                 mapRGBA[j] = darkRegionColor;
+
+                // doesn't matter what we set int to, as long as it's
+                // not tag color
+                // done with region color, use that
+                mapPixelInts[j] = thisRegionColorInt;
                 }
-            }        }
+            } 
+        }
+   
+    delete [] tagMap;
+    
 
     mapBackgroundTopSpriteID = addSprite( mapRGBA, mapW, bottomHalfOffset );
 
@@ -235,6 +301,7 @@ void initMap() {
                                              mapH - bottomHalfOffset );
 
     delete [] mapRGBA;
+    delete [] mapPixelInts;
     }
 
 

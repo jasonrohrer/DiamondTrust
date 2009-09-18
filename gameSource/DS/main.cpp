@@ -151,8 +151,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     t.w = inWidth;
     t.h = inHeight;
     
-    printOut( "Adding %dx%d texture at address %d, handle %d\n", 
-              t.w, t.h, t.slotAddress, nextTextureInfoIndex );
+    //printOut( "Adding %dx%d texture at address %d, handle %d\n", 
+    //          t.w, t.h, t.slotAddress, nextTextureInfoIndex );
     
 
     switch( inWidth ) {
@@ -300,7 +300,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
     if( numUniqueColors > 256 ) {
         // direct color
-        printOut( "Texture requires direct color\n" );
+        //printOut( "Texture requires direct color\n" );
 
         t.texFormat = GX_TEXFMT_DIRECT;
         
@@ -309,7 +309,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         
         }
     else {
-        printOut( "Texture uses only %d colors\n", numUniqueColors );
+        //printOut( "Texture uses only %d colors\n", numUniqueColors );
         
         // palette colors are RGB 555 (alpha bit (bit 15) ignored... set to
         // 1 just to be safe
@@ -385,8 +385,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
                     }
                 }
             }
-
-        printOut( "Using a %d color palette\n", paletteSize );
+        
+        //printOut( "Using a %d color palette\n", paletteSize );
 
 
         
@@ -394,7 +394,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         t.paletteSlotAddress = nextTexturePaletteAddress;
         unsigned int paletteBytes = paletteSize * 2;
         
-        printOut( "Adding %d palette bytes\n", paletteBytes );
+        //printOut( "Adding %d palette bytes\n", paletteBytes );
         
         DC_FlushRange( textureColors, paletteBytes );
 
@@ -418,8 +418,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         
         numTexturePaletteBytesAdded += offset;
 
-        printOut( "Added %d paletteBytes bytes so far.\n", 
-                  numTexturePaletteBytesAdded );
+        //printOut( "Added %d paletteBytes bytes so far.\n", 
+        //          numTexturePaletteBytesAdded );
         }
     
 
@@ -446,15 +446,12 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     
     numTextureBytesAdded += numTextureBytes;
     
-    printOut( "Added %d texture bytes so far.\n", numTextureBytesAdded );
+    //printOut( "Added %d texture bytes so far.\n", numTextureBytesAdded );
     
-    printOut( "AA\n" );
     delete [] packedTextureData;
-    printOut( "A\n" );
     
     delete [] texturePaletteIndices;
-    printOut( "B\n" );
-
+    
     return returnIndex;
     }
 
@@ -506,10 +503,6 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
                       GX_TEXFLIP_NONE,
                       colorZeroFlag,
                       t.slotAddress );
-
-    if( inHandle == 5 ) {
-        printOut( "texture format = %d\n", t.texFormat );
-        }
     
     
     if( t.texFormat != GX_TEXFMT_DIRECT ) {        
