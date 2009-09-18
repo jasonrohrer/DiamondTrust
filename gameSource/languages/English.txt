@@ -1,0 +1,5 @@
+status_next  "Next:"
+
+button_done "Done"
+
+phaseStatus_move  "Move your agents"

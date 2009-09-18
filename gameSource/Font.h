@@ -1,3 +1,7 @@
+#ifndef FONT_INCLUDED
+#define FONT_INCLUDED
+
+
 #include "platform.h"
 
 
@@ -51,3 +55,5 @@ class Font {
         
     };
 
+
+#endif

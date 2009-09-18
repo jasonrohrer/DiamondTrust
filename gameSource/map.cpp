@@ -280,7 +280,12 @@ int getChosenRegion( int inClickX, int inClickY ) {
     
     for( int i=0; i<numMapRegions; i++ ) {
         if( equals( regionColor[i], clickColor ) ) {
-            return i;
+            if( mapRegionSelectable[i] ) {
+                return i;
+                }
+            else {
+                return -1;
+                }
             }
         }
 

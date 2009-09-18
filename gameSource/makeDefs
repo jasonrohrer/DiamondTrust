@@ -4,7 +4,9 @@ GAME_SOURCE = \
 game.cpp \
 tga.cpp \
 Font.cpp \
+Button.cpp \
 map.cpp \
+units.cpp \
 sprite.cpp \
 common.cpp \
 DataFifo.cpp \
@@ -22,7 +24,9 @@ GAME_SOURCE_SED_FIX_COMMAND = sed ' \
 s/^game\.o/\.\.\/game\.o/; \
 s/^tga\.o/\.\.\/tga\.o/; \
 s/^Font\.o/\.\.\/Font\.o/; \
+s/^Button\.o/\.\.\/Button\.o/; \
 s/^map\.o/\.\.\/map\.o/; \
+s/^units\.o/\.\.\/units\.o/; \
 s/^sprite\.o/\.\.\/sprite\.o/; \
 s/^common\.o/\.\.\/common\.o/; \
 s/^DataFifo\.o/\.\.\/DataFifo\.o/; \

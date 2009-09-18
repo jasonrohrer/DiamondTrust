@@ -10,8 +10,15 @@ void freeUnits();
 // draws them on map
 void drawUnits();
 
+void stepUnits();
+
 
 void setUnitSelectable( int inUnit, char inSelectable );
+
+void setAllUnitsNotSelectable();
+
+void setPlayerUnitsSelectable( char inSelectable );
+            
 
 
 // -1 if no unit hit
@@ -25,8 +32,12 @@ int getUnitRegion( int inUnit );
 // set back to current region to cancel move
 void setUnitDestination( int inUnit, int inRegion );
 
+// returns unit's current region if unit has no destination
+int getUnitDestination( int inUnit );
 
-// does nothing if unit not moving
+
+
+// does nothing if unit not moving to a new region
 void executeMove( int inUnit );
 
 

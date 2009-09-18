@@ -1,11 +1,16 @@
 
 
 #include "platform.h"
+#include "common.h"
 #include "tga.h"
 #include "Font.h"
+#include "Button.h"
 #include "map.h"
+#include "units.h"
 #include "sprite.h"
 #include "minorGems/util/stringUtils.h"
+#include "minorGems/util/TranslationManager.h"
+
 
 #define NUM_DRAWN 60
 
@@ -50,48 +55,16 @@ Font *font16;
 
 
 
- 
-static int loadSprite( char *inFileName, char inCornerTransparent = false ) {
-    int returnID = -1;
-    
-    int width, height;
-    
-    rgbaColor *spriteRGBA = readTGAFile( inFileName,
-                                         &width, &height );
-        
-    if( spriteRGBA != NULL ) {
-            
-        if( inCornerTransparent ) {
-            // use corner color as transparency
-            spriteRGBA[0].a = 0;
-            unsigned char tr, tg, tb;
-            tr = spriteRGBA[0].r;
-            tg = spriteRGBA[0].g;
-            tb = spriteRGBA[0].b;
+enum gamePhase{ moveUnits };
 
-            int numPixels = width * height; 
-            for( int i=0; i<numPixels; i++ ) {
-                if( spriteRGBA[i].r == tr 
-                    &&
-                    spriteRGBA[i].g == tg 
-                    &&
-                    spriteRGBA[i].b == tb ) {
-                    
-                    spriteRGBA[i].a = 0;
-                    }
-                }
-            }
-            
-            
-            
-                        
-                        
-        returnID = addSprite( spriteRGBA, width, height );
-            
-        delete [] spriteRGBA;
-        }
-    return returnID;
-    }
+
+char *statusMessage = NULL;
+gamePhase currentPhase;
+
+int activeUnit = -1;
+
+
+Button *doneButton;
 
 
 
@@ -108,7 +81,21 @@ static char isInside( int inX, int inY,
 
 
 void gameInit() {
+    
+    int dataSize;
+    unsigned char *languageData = readFile( "English.txt", &dataSize );
+    
+    if( languageData != NULL ) {
+        char *textData = new char[ dataSize + 1 ];
+        memcpy( textData, languageData, dataSize );
+        textData[ dataSize ] = '\0';
+        
+        delete [] languageData;
 
+        TranslationManager::setLanguageData( textData );
+        delete [] textData;
+        }
+    
     
     spriteID = loadSprite( "testTexture.tga", true );
     spriteIDB = loadSprite( "testTexture2.tga" );
@@ -182,12 +169,20 @@ void gameInit() {
     
     font8 = new Font( "font8.tga", 1, 6, false );
     font16 = new Font( "font16.tga", 2, 8, false );
+    
+    initButton();
+
+    doneButton = new Button( font16, translate( "button_done" ), 7, 84 );
+    
 
     initMap();
-
-    setRegionSelectable( 2, true );
-    setRegionSelectable( 4, true );
+    initUnits();
+    //setRegionSelectable( 2, true );
+    //setRegionSelectable( 4, true );
     
+
+    currentPhase = moveUnits;
+    statusMessage = translate( "phaseStatus_move" );
     }
 
 
@@ -195,12 +190,14 @@ void gameInit() {
 void gameFree() {
     delete font8;
     delete font16;
-
+    delete doneButton;
+    
     if( serverAddress != NULL ) {
         delete [] serverAddress;
         }
 
     freeMap();
+    freeUnits();
     }
 
 
@@ -212,6 +209,7 @@ int dX = 1;
 
 void gameLoopTick() {
     stepSprites();
+    stepUnits();
     
     for( int i=0; i<NUM_DRAWN; i++ ) {
         int f = drawColors[i].a;
@@ -257,12 +255,13 @@ void gameLoopTick() {
     int tx, ty;
     if( getTouch( &tx, &ty ) ) {
 
+        /*
         int regionHit = getChosenRegion( tx, ty );
         
         if( regionHit >= 0 ) {
             setRegionSelectable( regionHit, true );
             }
-        
+        */
         
         if( buttonsVisible ) {
             
@@ -300,6 +299,68 @@ void gameLoopTick() {
             
             }
         
+
+        if( currentPhase == moveUnits ) {
+            if( activeUnit == -1 ) {
+                activeUnit = getChosenUnit( tx, ty );
+                        
+                if( activeUnit != -1 ) {
+                    setAllUnitsNotSelectable();
+                    
+                    //int unitRegion = getUnitRegion( activeUnit );
+                    int unitDest = getUnitDestination( activeUnit );
+                    
+                    // unit can move to any region that's not already
+                    // a destination of friendly units
+
+                    // can always move back home
+                    if( unitDest != 0 ) {
+                        setRegionSelectable( 0, true );
+                        }
+                    else {
+                        setRegionSelectable( 0, false );
+                        }
+                    
+                    
+                    // never move into region 1 (enemy home)
+
+                    for( int r=2; r<numMapRegions; r++ ) {
+                        char alreadyDest = false;
+                        
+                        for( int u=0; u<numUnits-1 && !alreadyDest; u++ ) {
+                            if( getUnitDestination( u ) == r ) {
+                                alreadyDest = true;
+                                }
+                            }
+
+                        if( !alreadyDest ) {
+                            setRegionSelectable( r, true );
+                            }
+                        else {
+                            setRegionSelectable( r, false );
+                            }
+                        
+                        }
+                    }
+                }
+            else {
+                // unit already selected
+                
+                // region picked?
+                int chosenRegion = getChosenRegion( tx, ty );
+            
+                if( chosenRegion != -1 ) {
+                    setUnitDestination( activeUnit, chosenRegion );
+                    activeUnit = -1;
+                    setPlayerUnitsSelectable( true );
+                    }
+                
+                }
+            
+            
+            }
+        
+        
         
         }
     
@@ -325,6 +386,19 @@ void gameLoopTick() {
             }
         }
     
+    
+
+    if( currentPhase == moveUnits ) {
+        
+        if( activeUnit == -1 ) {
+            // user needs to pick one
+            setPlayerUnitsSelectable( true );
+            }
+        
+        }
+    
+    
+
     }
 
 
@@ -345,6 +419,13 @@ void drawTopScreen() {
         drawSprite( spriteID, drawX[i], drawY[i], drawColors[i] );
         startNewSpriteLayer();
         }
+
+    font16->drawString( translate( "status_next" ), 
+                        128, 
+                        160, white, alignCenter );
+    font16->drawString( statusMessage, 
+                        128, 
+                        175, white, alignCenter );
     }
 
 
@@ -352,6 +433,8 @@ void drawBottomScreen() {
     drawMap();
     startNewSpriteLayer();
     
+    drawUnits();
+
     if( buttonsVisible ) {
 
         drawSprite( parentSpriteID, parentButtonX, parentButtonY, white );
@@ -398,6 +481,11 @@ void drawBottomScreen() {
                                parentButtonY - 20, white, alignLeft );
             }
             
+        }
+    
+
+    if( currentPhase == moveUnits ) {
+        doneButton->draw();
         }
     
     }

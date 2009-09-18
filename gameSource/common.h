@@ -1,4 +1,5 @@
 #include "platform.h"
+#include "minorGems/util/TranslationManager.h"
 
 
 typedef struct intPair {
@@ -10,6 +11,13 @@ typedef struct intPair {
 // finds power of 2 that value fits inside
 // returns inValue if it is already power of 2
 int roundUpToPowerOfTwo( int inValue );
+
+
+// returns -1 on fail
+int loadSprite( char *inFileName, int *outW, int *outH,
+                char inCornerTransparent = false );
+
+int loadSprite( char *inFileName, char inCornerTransparent = false );
 
 
 
@@ -36,4 +44,9 @@ inline void setColor( rgbaColor *inColor,
                       
 inline void printColor( rgbaColor inC ) {
     printOut( "(%d,%d,%d,%d)", inC.r, inC.g, inC.b, inC.a );
+    }
+
+
+inline char *translate( char *inKey ) {
+    return (char*)TranslationManager::translate( inKey );
     }
