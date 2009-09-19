@@ -10,6 +10,12 @@ SUBDIRS = ..
 
 DS_SOURCE = main.cpp
 
+
+
+# NOTE:  if you see linker errors after adding files to ../makeDefs, try
+#   touch Makefile
+# To let build system know that object list has changed.
+
 # for GAME_SOURCE definition
 include ../makeDefs
 
@@ -46,6 +52,7 @@ include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
 # force rebuild of targets if romfiles change
 $(TARGETS): $(MAKEROM_ROMROOT)/$(MAKEROM_ROMFILES)
+
 
 do-build:  $(TARGETS)
 
