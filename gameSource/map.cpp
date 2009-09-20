@@ -28,6 +28,11 @@ static intPair mapRegionOffset[ numMapRegions ];
 static char mapRegionSelectable[ numMapRegions ];
 
 
+// positions of units in regions
+static intPair mapRegionUnitPosition[ numMapRegions ][ 3 ];
+
+
+
 // for checking region clicks
 static rgbaColor *mapRegionImage;
 static int mapW, mapH;
@@ -74,6 +79,12 @@ void initMap() {
     rgbaColor backgroundColor = mapRGBA[0];
     unsigned int backgroundColorInt = toInt( backgroundColor );
     
+    rgbaColor unitMarkerColor = mapRGBA[ numMapRegions + 1 ];
+    unsigned int unitMarkerColorInt = toInt( unitMarkerColor );
+    // clear it
+    mapRGBA[ numMapRegions + 1 ] = backgroundColor;
+    
+
     int i;
     for( i=0; i<numMapRegions; i++ ) {
         rgbaColor thisRegionColor = mapRGBA[ i + 1 ];
@@ -95,10 +106,15 @@ void initMap() {
         int lastX = 0;
         int lastY = 0;
         
+        int numMarkersFound = 0;
+        
+
         for( int y=0; y<mapH; y++ ) {
             for( int x=0; x<mapW; x++ ) {
                 
-                if( mapPixelInts[ y * mapW + x ] == thisRegionColorInt ) {
+                int pixIndex = y * mapW + x;
+                
+                if( mapPixelInts[ pixIndex ] == thisRegionColorInt ) {
 
                     if( y < firstY ) {
                         firstY = y;
@@ -111,6 +127,21 @@ void initMap() {
                         }
                     if( x > lastX ) {
                         lastX = x;
+                        }
+                    
+                    if( mapPixelInts[ pixIndex + 1 ] == unitMarkerColorInt ) {
+                        // marker found
+                        
+                        // clear it
+                        mapPixelInts[ pixIndex + 1 ] = thisRegionColorInt;
+                        mapRGBA[ pixIndex + 1 ] = thisRegionColor;
+                        
+                        // remember it
+                        mapRegionUnitPosition[ i ][ numMarkersFound ].x
+                            = x;
+                        mapRegionUnitPosition[ i ][ numMarkersFound ].y
+                            = y;
+                        numMarkersFound++;
                         }
                     }
                 }
@@ -360,3 +391,40 @@ int getChosenRegion( int inClickX, int inClickY ) {
     }
 
 
+
+intPair getUnitPositionInRegion( int inRegion, int inUnitNumber ) {
+    intPair badReturn = { -1, -1 };
+    
+    
+
+    // home regions
+    if( inRegion == 0 ) {
+        if( inUnitNumber < 3 ) {
+            return mapRegionUnitPosition[ inRegion ][ inUnitNumber ];
+            }
+        }
+    else if( inRegion == 1 ) {
+        if( inUnitNumber > 2 && inUnitNumber < 6 ) {
+            return mapRegionUnitPosition[ inRegion ][ inUnitNumber - 3 ];
+            }
+        }
+    
+    if( inRegion < 2 ) {
+        return badReturn;
+        }
+    
+
+    // production regions
+    if( inUnitNumber < 3 ) {
+        // player 
+        return mapRegionUnitPosition[ inRegion ][ 0 ];
+        }
+    else if( inUnitNumber < 6 ) {
+        // enemy
+        return mapRegionUnitPosition[ inRegion ][ 1 ];
+        }
+    else {
+        // inspector
+        return mapRegionUnitPosition[ inRegion ][ 2 ];
+        }
+    }

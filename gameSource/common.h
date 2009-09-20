@@ -1,3 +1,7 @@
+#ifndef COMMON_INCLUDED
+#define COMMON_INCLUDED
+
+
 #include "platform.h"
 #include "minorGems/util/TranslationManager.h"
 
@@ -59,3 +63,6 @@ inline void printColor( rgbaColor inC ) {
 inline char *translate( char *inKey ) {
     return (char*)TranslationManager::translate( inKey );
     }
+
+
+#endif

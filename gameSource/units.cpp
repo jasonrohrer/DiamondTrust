@@ -110,8 +110,11 @@ void drawUnits() {
             c = white;
             }
         
-            
-        drawSprite( gameUnit[i].mSpriteID, 100 + 20 * i, 100, c );
+        intPair pos = getUnitPositionInRegion( gameUnit[i].mRegion, i );
+        
+        drawSprite( gameUnit[i].mSpriteID, 
+                    pos.x - unitSpriteW / 2, 
+                    pos.y - unitSpriteH, c );
         }
     
     }
