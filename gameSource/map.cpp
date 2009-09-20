@@ -351,17 +351,10 @@ void drawMap() {
     startNewSpriteLayer();
     
     for( int i=0; i<numMapRegions; i++ ) {
-        if( mapRegionSelectable[ i ] ) {
-            
-            drawBlinkingSprite( mapRegionSpriteID[i], 
-                                mapRegionOffset[i].x, mapRegionOffset[i].y,
-                                white );
-            }
-        else {
-            drawSprite( mapRegionSpriteID[i], 
-                        mapRegionOffset[i].x, mapRegionOffset[i].y,
-                        white );
-            }
+        drawSprite( mapRegionSpriteID[i], 
+                    mapRegionOffset[i].x, mapRegionOffset[i].y,
+                    white,
+                    mapRegionSelectable[ i ] );
         }
     }
 
@@ -369,6 +362,14 @@ void drawMap() {
 
 void setRegionSelectable( int inRegion, char inSelectable ) {
     mapRegionSelectable[ inRegion ] = inSelectable;
+    }
+
+
+
+void setAllRegionsNotSelectable() {
+    for( int r=0; r<numMapRegions; r++ ) {
+        setRegionSelectable( r, false );
+        }
     }
 
 

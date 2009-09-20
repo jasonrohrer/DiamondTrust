@@ -12,7 +12,7 @@ font16.tga \
 testDirectColor.tga \
 test250Color.tga \
 units_simple.tga \
-
+activeUnitHalo.tga \
 
 
 

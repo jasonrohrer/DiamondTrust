@@ -14,6 +14,8 @@ void drawMap();
 
 void setRegionSelectable( int inRegion, char inSelectable );
 
+void setAllRegionsNotSelectable();
+
 
 // -1 if no region hit
 int getChosenRegion( int inClickX, int inClickY );

@@ -18,7 +18,13 @@ void setUnitSelectable( int inUnit, char inSelectable );
 void setAllUnitsNotSelectable();
 
 void setPlayerUnitsSelectable( char inSelectable );
-            
+
+
+// -1 to set none
+void setActiveUnit( int inUnit );
+
+int getActiveUnit();
+
 
 
 // -1 if no unit hit

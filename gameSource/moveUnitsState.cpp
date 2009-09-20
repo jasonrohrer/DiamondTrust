@@ -5,7 +5,7 @@
 #include "common.h"
 
 
-static int activeUnit = -1;
+//static int activeUnit = -1;
 static char stateDone = false;
 
 extern Button *doneButton;
@@ -44,20 +44,23 @@ class MoveUnitsState : public GameState {
 
 
 void MoveUnitsState::clickState( int inX, int inY ) {
+    int activeUnit = getActiveUnit();
+    
     if( activeUnit == -1 ) {
         activeUnit = getChosenUnit( inX, inY );
                         
         if( activeUnit != -1 ) {
+            setActiveUnit( activeUnit );
+            
             setAllUnitsNotSelectable();
-                    
-            //int unitRegion = getUnitRegion( activeUnit );
+
             int unitDest = getUnitDestination( activeUnit );
                     
             // unit can move to any region that's not already
             // a destination of friendly units
 
             // can always move back home
-            if( unitDest != 0 ) {
+            if( unitDest != 0 ) {                
                 setRegionSelectable( 0, true );
                 }
             else {
@@ -71,7 +74,9 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                 char alreadyDest = false;
                         
                 for( int u=0; u<numUnits-1 && !alreadyDest; u++ ) {
-                    if( getUnitDestination( u ) == r ) {
+                    int dest = getUnitDestination( u );
+                    
+                    if( dest == r ) {
                         alreadyDest = true;
                         }
                     }
@@ -94,8 +99,10 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
         if( chosenRegion != -1 ) {
             setUnitDestination( activeUnit, chosenRegion );
-            activeUnit = -1;
             setPlayerUnitsSelectable( true );
+
+            setAllRegionsNotSelectable();
+            setActiveUnit( -1 );
             }
         }
 
@@ -131,7 +138,9 @@ void MoveUnitsState::drawState() {
 
 void MoveUnitsState::enterState() {
     stateDone = false;
-    activeUnit = -1;
+    
+    setActiveUnit( -1 );
+    
     // user needs to pick one
     setPlayerUnitsSelectable( true );
 

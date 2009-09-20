@@ -101,6 +101,7 @@ char enableSlowdownKeys = false;
 //char enableSlowdownKeys = true;
 
 
+char touchWasDown = false;
 char touchDown = false;
 int touchX = 0;
 int touchY = 0;
@@ -414,6 +415,7 @@ void callbackMotion( int inX, int inY ) {
         touchX = inX;
         touchY = inY - bottomScreenYOffset;
         touchDown = true;
+        touchWasDown = true;
         }
     else {
         touchDown = false;
@@ -727,11 +729,19 @@ void startNewSpriteLayer() {
 
 // gets the current position of a pressed mouse or stylus
 // returns true if pressed
+// also consume last touch right before release, even if not currently
+// pressed, to avoid missing events between checks
 char getTouch( int *outX, int *outY ) {
-    if( touchDown ) {
+    if( touchDown || touchWasDown ) {
         *outX = touchX;
         *outY = touchY;
         
+        if( ! touchDown ) {
+            // consume it
+            touchWasDown = false;
+            }
+        
+
         return true;
         }
     

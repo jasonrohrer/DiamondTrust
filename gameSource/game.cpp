@@ -212,6 +212,12 @@ int dFade = -8;
 int x = 0;
 int dX = 1;
 
+
+// only register a click when stylus/mouse lifted
+char touchDownOnLastCheck = false;
+int lastTouchX, lastTouchY;
+
+
 void gameLoopTick() {
     stepSprites();
 
@@ -258,10 +264,24 @@ void gameLoopTick() {
             deltaY[i] = -1;
             }
         }
-    
+        
+
     int tx, ty;
     if( getTouch( &tx, &ty ) ) {
+        touchDownOnLastCheck = true;
+        lastTouchX = tx;
+        lastTouchY = ty;
+        }
+    // else not touching
+    // was it touching last time?
+    else if( touchDownOnLastCheck ) {
+        touchDownOnLastCheck = false;
         
+        tx = lastTouchX;
+        ty = lastTouchY;
+        
+        // this achieves the equivalent of a "mouse released" event
+                
         currentGameState->clickState( tx, ty );
         
         /*

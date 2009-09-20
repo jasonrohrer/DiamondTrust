@@ -3,6 +3,7 @@
 #include "platform.h"
 #include "common.h"
 #include "tga.h"
+#include "sprite.h"
 
 class Unit {
     public:
@@ -24,6 +25,11 @@ Unit::Unit()
 
 
 Unit gameUnit[ numUnits ];
+
+static int activeUnit = -1;
+
+static int activeUnitSprite;
+
 
 
 static rgbaColor playerColor = { 0, 255, 0, 255 };
@@ -87,6 +93,18 @@ void initUnits() {
     // inspector
     gameUnit[ 6 ].mRegion = getRandom( numMapRegions - 2 ) + 2;
     gameUnit[ 6 ].mSpriteID = spriteIDs[ 3 ];
+
+
+    // destinations -- nowhere
+    for( i=0; i<numUnits; i++ ) {
+        gameUnit[ i ].mDest = gameUnit[ i ].mRegion;
+        }
+    
+
+    activeUnitSprite = loadSprite( "activeUnitHalo.tga", true );
+    if( activeUnitSprite == -1 ) {
+        printOut( "Failed to load unit halo.\n" );
+        }
     }
 
 
@@ -112,18 +130,31 @@ void drawUnits() {
         
         intPair pos = getUnitPositionInRegion( gameUnit[i].mRegion, i );
         
+        // center
+        pos.x -= unitSpriteW / 2;
+        pos.y -= unitSpriteH;
+        
         drawSprite( gameUnit[i].mSpriteID, 
-                    pos.x - unitSpriteW / 2, 
-                    pos.y - unitSpriteH, c );
+                    pos.x, 
+                    pos.y, 
+                    c, gameUnit[i].mSelectable );
+        if( activeUnit == i ) {
+            drawSprite( activeUnitSprite, 
+                        pos.x, 
+                        pos.y, 
+                        c, gameUnit[i].mSelectable );
+            }
         }
     
     }
+
 
 void stepUnits() {
     }
 
 
 void setUnitSelectable( int inUnit, char inSelectable ) {
+    gameUnit[ inUnit ].mSelectable = inSelectable;
     }
 
 
@@ -132,6 +163,19 @@ void setAllUnitsNotSelectable() {
         setUnitSelectable( u, false );
         }
     }
+
+
+
+void setActiveUnit( int inUnit ) {
+    activeUnit = inUnit;
+    }
+
+
+
+int getActiveUnit() {
+    return activeUnit;
+    }
+
 
 
 
@@ -145,19 +189,38 @@ void setPlayerUnitsSelectable( char inSelectable ) {
 
 
 int getChosenUnit( int inClickX, int inClickY ) {
+    for( int i=0; i<numUnits; i++ ) {
+        if( gameUnit[i].mSelectable ) {
+
+            intPair pos = getUnitPositionInRegion( gameUnit[i].mRegion, i );
+
+            if( inClickY < pos.y &&
+                inClickY > pos.y - unitSpriteH &&
+                inClickX > pos.x - unitSpriteW / 2 &&
+                inClickX < pos.x + unitSpriteW / 2 ) {
+                
+                // hit
+                return i;
+                }
+            }
+        }
+                    
+    return -1;
     }
 
 
 int getUnitRegion( int inUnit ) {
+    return gameUnit[ inUnit ].mRegion;
     }
 
 
 void setUnitDestination( int inUnit, int inRegion ) {
+    gameUnit[ inUnit ].mDest = inRegion;
     }
 
 
 int getUnitDestination( int inUnit ) {
-
+    return gameUnit[ inUnit ].mDest;
     }
 
 
