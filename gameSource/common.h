@@ -12,6 +12,12 @@ typedef struct intPair {
     } intPair;
 
 
+unsigned long intSqrt( unsigned long x );
+
+int intDistance( intPair inA, intPair inB );
+
+
+
 // finds power of 2 that value fits inside
 // returns inValue if it is already power of 2
 int roundUpToPowerOfTwo( int inValue );

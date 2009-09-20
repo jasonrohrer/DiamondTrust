@@ -13,6 +13,7 @@ testDirectColor.tga \
 test250Color.tga \
 units_simple.tga \
 activeUnitHalo.tga \
+moveDot.tga \
 
 
 

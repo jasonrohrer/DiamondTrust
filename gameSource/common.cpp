@@ -28,6 +28,44 @@ int roundUpToPowerOfTwo( int inValue ) {
 
 
 
+
+
+// integer square root found here:
+// http://www.codecodex.com/wiki/Calculate_an_integer_square_root
+unsigned long intSqrt( unsigned long x ) {
+    unsigned long op, res, one;
+
+    op = x;
+    res = 0;
+    
+    // "one" starts at the highest power of four <= than the argument. 
+    one = 1 << 30;  // second-to-top bit set 
+    while( one > op ) one >>= 2;
+
+    while( one != 0 ) {
+        if( op >= res + one ) {
+            op = op - ( res + one );
+            res = res +  2 * one;
+            }
+        res >>= 1;
+        one >>= 2;
+        }
+    return( res );
+    }
+
+
+int intDistance( intPair inA, intPair inB ) {
+    int dx = inA.x - inB.x;
+    int dy = inA.y - inB.y;
+    
+    return intSqrt( dx * dx + dy * dy );
+    }
+
+
+
+
+
+
 int loadSprite( char *inFileName, char inCornerTransparent ) {
     int w, h;
 
