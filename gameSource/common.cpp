@@ -37,6 +37,8 @@ int loadSprite( char *inFileName, char inCornerTransparent ) {
 
 
 
+
+
 int loadSprite( char *inFileName, int *outW, int *outH, 
                 char inCornerTransparent ) {
     int returnID = -1;
@@ -49,30 +51,10 @@ int loadSprite( char *inFileName, int *outW, int *outH,
     if( spriteRGBA != NULL ) {
             
         if( inCornerTransparent ) {
-            // use corner color as transparency
-            spriteRGBA[0].a = 0;
-            unsigned char tr, tg, tb;
-            tr = spriteRGBA[0].r;
-            tg = spriteRGBA[0].g;
-            tb = spriteRGBA[0].b;
 
-            int numPixels = width * height; 
-            for( int i=0; i<numPixels; i++ ) {
-                if( spriteRGBA[i].r == tr 
-                    &&
-                    spriteRGBA[i].g == tg 
-                    &&
-                    spriteRGBA[i].b == tb ) {
-                    
-                    spriteRGBA[i].a = 0;
-                    }
-                }
+            applyCornerTransparency( spriteRGBA, width * height );
             }
             
-            
-            
-                        
-                        
         returnID = addSprite( spriteRGBA, width, height );
 
         *outW = width;
@@ -82,4 +64,28 @@ int loadSprite( char *inFileName, int *outW, int *outH,
         }
     return returnID;
     }
+
+
+
+void applyCornerTransparency( rgbaColor *inImage, int inNumPixels ) {
+    // use corner color as transparency
+    inImage[0].a = 0;
+    unsigned char tr, tg, tb;
+    tr = inImage[0].r;
+    tg = inImage[0].g;
+    tb = inImage[0].b;
+    
+    for( int i=0; i<inNumPixels; i++ ) {
+        if( inImage[i].r == tr 
+            &&
+            inImage[i].g == tg 
+            &&
+            inImage[i].b == tb ) {
+                    
+            inImage[i].a = 0;
+            }
+        }
+    
+    }
+
 

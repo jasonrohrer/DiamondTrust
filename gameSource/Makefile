@@ -11,6 +11,7 @@ font8.tga \
 font16.tga \
 testDirectColor.tga \
 test250Color.tga \
+units_simple.tga \
 
 
 

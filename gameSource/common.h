@@ -20,6 +20,10 @@ int loadSprite( char *inFileName, int *outW, int *outH,
 int loadSprite( char *inFileName, char inCornerTransparent = false );
 
 
+void applyCornerTransparency( rgbaColor *inImage, int inNumPixels );
+
+
+
 
 inline char equals( rgbaColor inA, rgbaColor inB ) {
     return 
