@@ -372,16 +372,16 @@ rgbaColor black = { 0, 0, 0, 255 };
 
 
 void drawTopScreen() {
-    
+    /*
     drawSprite( testDirectSpriteID, 100, 50, white );
     drawSprite( test250SpriteID, 100, 120, white );
-    
-
+    */
+    /*
     for( int i=0; i<1; i++ ) { //NUM_DRAWN; i++ ) {
         drawSprite( spriteID, drawX[i], drawY[i], drawColors[i] );
         startNewSpriteLayer();
         }
-
+    */
     font16->drawString( translate( "status_next" ), 
                         128, 
                         160, white, alignCenter );
@@ -401,7 +401,7 @@ void drawBottomScreen() {
         drawSprite( parentSpriteID, parentButtonX, parentButtonY, white );
         drawSprite( childSpriteID, childButtonX, childButtonY, white );
 
-        
+        /*
         font16->drawString( "Quick brown fox jumped over Lazy Dog", 
                             parentButtonX + 2, 
                             parentButtonY - 20 + 1, black, alignLeft );
@@ -413,7 +413,7 @@ void drawBottomScreen() {
         font16->drawString( "Quick brown fox jumped over Lazy Dog", 
                             parentButtonX, 
                             parentButtonY - 20, white, alignLeft );
-        
+        */
         }
     else {
         
