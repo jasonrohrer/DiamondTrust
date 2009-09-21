@@ -399,7 +399,8 @@ void freeMap() {
 
 
 static rgbaColor white = { 255, 255, 255, 255 }; 
-static rgbaColor blue = { 0, 0, 255, 255 }; 
+static rgbaColor transWhite = { 255, 255, 255, 128 }; 
+static rgbaColor purple = { 128, 0, 192, 255 }; 
 
 extern Font *font16;
 
@@ -435,7 +436,8 @@ void drawMap() {
         
         font16->drawString( countString, 
                             mapRegionDiamondPosition[i].x, 
-                            mapRegionDiamondPosition[i].y - 8, blue, 
+                            mapRegionDiamondPosition[i].y - 8,
+                            purple, 
                             alignCenter );
 
         delete [] countString;
