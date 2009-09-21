@@ -4,6 +4,9 @@
 #include "common.h"
 #include "tga.h"
 #include "sprite.h"
+#include "Font.h"
+
+#include "minorGems/util/stringUtils.h"
 
 class Unit {
     public:
@@ -14,6 +17,7 @@ class Unit {
         char mSelectable;
         int mSpriteID;
         int mDotSpriteID;
+        int mBid;
     };
 
 
@@ -30,12 +34,16 @@ static int activeUnit = -1;
 
 static int activeUnitSprite;
 
+static int bidSprite;
+static int bidW, bidH;
+extern Font *font8;
 
 
 
 static rgbaColor playerColor = { 0, 255, 0, 255 };
 static rgbaColor enemyColor = { 255, 0, 0, 255 };
 static rgbaColor white = {255, 255, 255, 255 };
+static rgbaColor black = {0, 0, 0, 255 };
 static rgbaColor inspectColor = {84, 84, 255, 255 };
 
 
@@ -125,14 +133,21 @@ void initUnits() {
 
 
     // destinations -- nowhere
+    // bids -- none
     for( i=0; i<numUnits; i++ ) {
         gameUnit[ i ].mDest = gameUnit[ i ].mRegion;
+        gameUnit[ i ].mBid = 0;
         }
     
 
     activeUnitSprite = loadSprite( "activeUnitHalo.tga", true );
     if( activeUnitSprite == -1 ) {
         printOut( "Failed to load unit halo.\n" );
+        }
+
+    bidSprite = loadSprite( "bid.tga", &bidW, &bidH, true );
+    if( bidSprite == -1 ) {
+        printOut( "Failed to load bid marker.\n" );
         }
     }
 
@@ -198,6 +213,8 @@ void drawUnits() {
             }
         }
 
+
+
     // now draw units on top
     
     for( int i=0; i<numUnits; i++ ) {
@@ -231,6 +248,47 @@ void drawUnits() {
             }
 
         }
+
+
+    // finally, draw any bids
+
+    // first markers
+    for( int i=0; i<numUnits; i++ ) {
+
+        if( gameUnit[i].mDest != gameUnit[i].mRegion ) {
+            
+
+            intPair end = 
+                getUnitPositionInRegion( gameUnit[i].mDest, i );
+
+            drawSprite( bidSprite, end.x - bidW / 2, end.y - bidH / 2,
+                        white );
+             
+            }
+        }
+    startNewSpriteLayer();
+    // then amounts
+    for( int i=0; i<numUnits; i++ ) {
+
+        if( gameUnit[i].mDest != gameUnit[i].mRegion ) {
+            
+
+            intPair end = 
+                getUnitPositionInRegion( gameUnit[i].mDest, i );
+            
+            char *bidString = autoSprintf( "$%d", gameUnit[i].mBid );
+
+            font8->drawString( bidString, 
+                               end.x, 
+                               end.y - 4,
+                               black, 
+                               alignCenter );
+
+            delete [] bidString;
+            }
+        }
+    
+    
     
     }
 
@@ -307,6 +365,11 @@ void setUnitDestination( int inUnit, int inRegion ) {
 
 int getUnitDestination( int inUnit ) {
     return gameUnit[ inUnit ].mDest;
+    }
+
+
+void setUnitBid( int inUnit, int inBid ) {
+    gameUnit[ inUnit ].mBid = inBid;
     }
 
 

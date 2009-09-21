@@ -42,7 +42,7 @@ void setUnitDestination( int inUnit, int inRegion );
 int getUnitDestination( int inUnit );
 
 
-int setUnitBid( int inUnit, int inBid );
+void setUnitBid( int inUnit, int inBid );
 
 
 

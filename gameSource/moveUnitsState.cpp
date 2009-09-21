@@ -3,6 +3,7 @@
 #include "map.h"
 #include "Button.h"
 #include "common.h"
+#include "bidPicker.h"
 
 
 //static int activeUnit = -1;
@@ -128,6 +129,9 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
         if( chosenRegion != -1 ) {
             setUnitDestination( activeUnit, chosenRegion );
+            setUnitBid( activeUnit, 0 );
+            setPickerBid( 0 );
+            
             setPlayerUnitsSelectable( true );
 
             setAllRegionsNotSelectable();
@@ -188,7 +192,7 @@ void MoveUnitsState::drawState() {
         intPair destPos = getUnitPositionInRegion( dest, activeUnit );
         
 
-        drawBidPicker( destPos.x, destPos.y );
+        drawBidPicker( destPos.x - 12, destPos.y );
         }
     
     }

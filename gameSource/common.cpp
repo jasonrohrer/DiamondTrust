@@ -32,10 +32,10 @@ int roundUpToPowerOfTwo( int inValue ) {
 
 // integer square root found here:
 // http://www.codecodex.com/wiki/Calculate_an_integer_square_root
-unsigned long intSqrt( unsigned long x ) {
+unsigned long intSqrt( unsigned long inX ) {
     unsigned long op, res, one;
 
-    op = x;
+    op = inX;
     res = 0;
     
     // "one" starts at the highest power of four <= than the argument. 
@@ -54,12 +54,23 @@ unsigned long intSqrt( unsigned long x ) {
     }
 
 
+
 int intDistance( intPair inA, intPair inB ) {
     int dx = inA.x - inB.x;
     int dy = inA.y - inB.y;
     
     return intSqrt( dx * dx + dy * dy );
     }
+
+
+
+int intAbs( int inX ) {
+    if( inX < 0 ) {
+        return -inX;
+        }
+    return inX;
+    }
+
 
 
 

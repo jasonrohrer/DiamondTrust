@@ -12,9 +12,11 @@ typedef struct intPair {
     } intPair;
 
 
-unsigned long intSqrt( unsigned long x );
+unsigned long intSqrt( unsigned long inX );
 
 int intDistance( intPair inA, intPair inB );
+
+int intAbs( int inX );
 
 
 
