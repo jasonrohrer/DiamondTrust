@@ -11,6 +11,7 @@
 #include "minorGems/util/stringUtils.h"
 #include "TranslationManager.h"
 #include "GameState.h"
+#include "bidPicker.h"
 
 
 #define NUM_DRAWN 60
@@ -182,6 +183,8 @@ void gameInit() {
 
     initMap();
     initUnits();
+    initBidPicker();
+    
     //setRegionSelectable( 2, true );
     //setRegionSelectable( 4, true );
     
@@ -203,6 +206,8 @@ void gameFree() {
 
     freeMap();
     freeUnits();
+    freeBidPicker();
+    
     }
 
 

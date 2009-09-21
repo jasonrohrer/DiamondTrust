@@ -40,11 +40,40 @@ class MoveUnitsState : public GameState {
     };
 
 
+static char pickingBid = false;
+
 
 
 
 void MoveUnitsState::clickState( int inX, int inY ) {
+
+
     int activeUnit = getActiveUnit();
+
+    if( pickingBid ) {
+        
+        if( activeUnit == -1 ) {
+            printOut( "Error: Picking bid with no active unit!\n" );
+            return;
+            }
+        
+        
+        
+
+        clickBidPicker( inX, inY );
+        
+        setUnitBid( activeUnit, getPickerBid() );
+
+        if( isBidDone() ) {
+            pickingBid = false;
+            setActiveUnit( -1 );
+            }
+    
+        return;
+        }
+    
+
+
     
     if( activeUnit == -1 ) {
         activeUnit = getChosenUnit( inX, inY );
@@ -102,14 +131,27 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             setPlayerUnitsSelectable( true );
 
             setAllRegionsNotSelectable();
-            setActiveUnit( -1 );
+            
+
+            if( chosenRegion != 0 ) {
+                
+                setPickerBid( 0 );
+                pickingBid = true;
+                }
+            else {
+                setActiveUnit( -1 );
+                }
+            
             }
         }
 
  
-    if( doneButton->getPressed( inX, inY ) ) {
-        stateDone = true;
+    if( activeUnit == -1 ) {
+        if( doneButton->getPressed( inX, inY ) ) {
+            stateDone = true;
+            }
         }
+    
     
     }
 
@@ -130,6 +172,25 @@ void MoveUnitsState::drawState() {
     
     
     doneButton->draw();
+
+    if( pickingBid ) {
+        int activeUnit = getActiveUnit();
+
+        if( activeUnit == -1 ) {
+            printOut( "Error: Picking bid with no active unit!\n" );
+            return;
+            }
+    
+        int dest = getUnitDestination( activeUnit );
+        
+        
+
+        intPair destPos = getUnitPositionInRegion( dest, activeUnit );
+        
+
+        drawBidPicker( destPos.x, destPos.y );
+        }
+    
     }
 
 

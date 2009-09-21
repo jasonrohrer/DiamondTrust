@@ -42,6 +42,9 @@ void setUnitDestination( int inUnit, int inRegion );
 int getUnitDestination( int inUnit );
 
 
+int setUnitBid( int inUnit, int inBid );
+
+
 
 // does nothing if unit not moving to a new region
 void executeMove( int inUnit );
