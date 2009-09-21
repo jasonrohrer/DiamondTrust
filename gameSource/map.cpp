@@ -4,6 +4,9 @@
 #include "platform.h"
 #include "common.h"
 #include "sprite.h"
+#include "Font.h"
+
+#include "minorGems/util/stringUtils.h"
 
 
 #include <string.h>
@@ -20,6 +23,10 @@ static int mapBackgroundBottomSpriteID;
 static int bottomHalfOffset = 128;
 
 
+static int diamondSpriteID;
+int diamondW, diamondH;
+
+
 
 static int mapRegionSpriteID[ numMapRegions ];
 
@@ -27,10 +34,16 @@ static intPair mapRegionOffset[ numMapRegions ];
 
 static char mapRegionSelectable[ numMapRegions ];
 
+static int mapRegionDiamondCount[ numMapRegions ];
+static int mapRegionDiamondRate[ numMapRegions ];
+
+
 
 // positions of units in regions
 static intPair mapRegionUnitPosition[ numMapRegions ][ 3 ];
 
+// positions of diamond marker in regions
+static intPair mapRegionDiamondPosition[ numMapRegions ];
 
 
 // for checking region clicks
@@ -79,10 +92,16 @@ void initMap() {
     rgbaColor backgroundColor = mapRGBA[0];
     unsigned int backgroundColorInt = toInt( backgroundColor );
     
+    
     rgbaColor unitMarkerColor = mapRGBA[ numMapRegions + 1 ];
     unsigned int unitMarkerColorInt = toInt( unitMarkerColor );
     // clear it
     mapRGBA[ numMapRegions + 1 ] = backgroundColor;
+
+    rgbaColor diamondMarkerColor = mapRGBA[ numMapRegions + 2 ];
+    unsigned int diamondMarkerColorInt = toInt( diamondMarkerColor );
+    // clear it
+    mapRGBA[ numMapRegions + 2 ] = backgroundColor;
     
 
     int i;
@@ -143,6 +162,20 @@ void initMap() {
                             = y;
                         numMarkersFound++;
                         }
+                    else if( mapPixelInts[ pixIndex + 1 ] == 
+                             diamondMarkerColorInt ) {
+
+                        // marker found
+                        
+                        // clear it
+                        mapPixelInts[ pixIndex + 1 ] = thisRegionColorInt;
+                        mapRGBA[ pixIndex + 1 ] = thisRegionColor;
+                        
+                        // remember it
+                        mapRegionDiamondPosition[ i ].x = x;
+                        mapRegionDiamondPosition[ i ].y = y;
+                        }
+
                     }
                 }
             }
@@ -333,6 +366,29 @@ void initMap() {
 
     delete [] mapRGBA;
     delete [] mapPixelInts;
+
+
+
+    diamondSpriteID = loadSprite( "diamond.tga", 
+                                  &diamondW, &diamondH,
+                                  true );
+
+
+    mapRegionDiamondRate[ 0 ] = 0;
+    mapRegionDiamondRate[ 1 ] = 0;
+    
+    mapRegionDiamondRate[ 2 ] = 1;
+    mapRegionDiamondRate[ 3 ] = 1;
+    mapRegionDiamondRate[ 4 ] = 1;
+    mapRegionDiamondRate[ 5 ] = 1;
+    mapRegionDiamondRate[ 6 ] = 2;
+    // last region swaps between 1 and 2 after each accumulation
+    mapRegionDiamondRate[ 7 ] = 1;
+
+    for( i=0; i<numMapRegions; i++ ) {
+        mapRegionDiamondCount[i] = 0;
+        }
+    accumulateDiamonds();
     }
 
 
@@ -343,6 +399,10 @@ void freeMap() {
 
 
 static rgbaColor white = { 255, 255, 255, 255 }; 
+static rgbaColor blue = { 0, 0, 255, 255 }; 
+
+extern Font *font16;
+
 
 void drawMap() {
     drawSprite( mapBackgroundTopSpriteID, 0, 0, white );
@@ -350,11 +410,35 @@ void drawMap() {
     
     startNewSpriteLayer();
     
-    for( int i=0; i<numMapRegions; i++ ) {
+    int i;
+    for( i=0; i<numMapRegions; i++ ) {
         drawSprite( mapRegionSpriteID[i], 
                     mapRegionOffset[i].x, mapRegionOffset[i].y,
                     white,
                     mapRegionSelectable[ i ] );
+        }
+    
+    startNewSpriteLayer();
+    // next diamonds (only producing regions)
+    for( i=2; i<numMapRegions; i++ ) {
+        drawSprite( diamondSpriteID, 
+                    mapRegionDiamondPosition[i].x - diamondW/2, 
+                    mapRegionDiamondPosition[i].y - diamondH/2, 
+                    white );
+        }
+
+    startNewSpriteLayer();
+    
+    // next diamond counters
+    for( i=2; i<numMapRegions; i++ ) {
+        char *countString = autoSprintf( "%d", mapRegionDiamondCount[i] );
+        
+        font16->drawString( countString, 
+                            mapRegionDiamondPosition[i].x, 
+                            mapRegionDiamondPosition[i].y - 8, blue, 
+                            alignCenter );
+
+        delete [] countString;
         }
     }
 
@@ -429,3 +513,16 @@ intPair getUnitPositionInRegion( int inRegion, int inUnitNumber ) {
         return mapRegionUnitPosition[ inRegion ][ 2 ];
         }
     }
+
+
+
+void accumulateDiamonds() {
+    for( int i=0; i<numMapRegions; i++ ) {
+        mapRegionDiamondCount[i] += mapRegionDiamondRate[i];
+        }
+
+    // toggle between 1 and 2
+    mapRegionDiamondRate[ 7 ] %= 2;
+    mapRegionDiamondRate[ 7 ] ++;
+    }
+

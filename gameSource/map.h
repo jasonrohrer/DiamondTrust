@@ -23,3 +23,6 @@ int getChosenRegion( int inClickX, int inClickY );
 
 // inUnitNumber is 0-5 for player units, 6 for UN inspector
 intPair getUnitPositionInRegion( int inRegion, int inUnitNumber );
+
+
+void accumulateDiamonds();
