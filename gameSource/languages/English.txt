@@ -3,3 +3,8 @@ status_next  "Next:"
 button_done "Done"
 
 phaseStatus_move  "Move your agents"
+
+phaseSubStatus_pickAgent  "Pick an agent (or hit Done)"
+phaseSubStatus_pickRegion  "Pick destination for chosen agent"
+phaseSubStatus_pickBid  "Select payment for diamonds in destination region"
+phaseSubStatus_pickInspectorBribe  "Bribe the UN Inspector?"

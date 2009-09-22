@@ -294,7 +294,7 @@ void initMap() {
             memset( tagMap, false, (unsigned int)numMapPixels );
 
             for( int y=firstY; y<=lastY; y++ ) {
-                for( int x=firstX; x<lastX; x++ ) {
+                for( int x=firstX; x<=lastX; x++ ) {
                     
                     int j = y * mapW + x;
                     tagMap[j] = false;
@@ -318,7 +318,7 @@ void initMap() {
             
             for( int j=0; j<numMapPixels; j++ ) {
                 if( tagMap[j] ) {
-                    //mapRGBA[j] = tagColor;
+                    mapRGBA[j] = tagColor;
                     mapPixelInts[j] = tagColorInt;
                     }
                 }
@@ -340,7 +340,8 @@ void initMap() {
         darkRegionColor.r /= 2;
         darkRegionColor.g /= 2;
         darkRegionColor.b /= 2;
-                
+            
+            
         for( j=0; j<numMapPixels; j++ ) {
             if( mapPixelInts[j] == tagColorInt ) {
                 mapRGBA[j] = darkRegionColor;
@@ -514,6 +515,12 @@ intPair getUnitPositionInRegion( int inRegion, int inUnitNumber ) {
         // inspector
         return mapRegionUnitPosition[ inRegion ][ 2 ];
         }
+    }
+
+
+
+intPair getDiamondPositionInRegion( int inRegion ) {
+    return mapRegionDiamondPosition[ inRegion ];
     }
 
 

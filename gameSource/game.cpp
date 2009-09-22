@@ -61,6 +61,7 @@ Font *font16;
 
 
 char *statusMessage = NULL;
+char *statusSubMessage = NULL;
 //gamePhase currentPhase;
 
 
@@ -171,7 +172,7 @@ void gameInit() {
     
     
     printOut( "Loading 8-pixel font\n" );
-    font8 = new Font( "font8.tga", 1, 6, false );
+    font8 = new Font( "font8.tga", 1, 4, false );
 
     printOut( "Loading 16-pixel font\n" );
     font16 = new Font( "font16.tga", 2, 8, false );
@@ -387,12 +388,23 @@ void drawTopScreen() {
         startNewSpriteLayer();
         }
     */
-    font16->drawString( translate( "status_next" ), 
-                        128, 
-                        160, white, alignCenter );
-    font16->drawString( statusMessage, 
-                        128, 
-                        175, white, alignCenter );
+    if( statusMessage != NULL ) {
+        
+        font16->drawString( translate( "status_next" ), 
+                            128, 
+                            145, white, alignCenter );
+        font16->drawString( statusMessage, 
+                            128, 
+                            160, white, alignCenter );
+
+        if( statusSubMessage != NULL ) {
+            font8->drawString( statusSubMessage, 
+                               128, 
+                               180, white, alignCenter );
+            }
+        
+        }
+    
     }
 
 

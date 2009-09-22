@@ -1,4 +1,8 @@
 
+#include "common.h"
+
+
+
 // first 3 are player, second 3 are enemy, last 1 is UN inspector
 #define numUnits 7
 
@@ -43,6 +47,13 @@ int getUnitDestination( int inUnit );
 
 
 void setUnitBid( int inUnit, int inBid );
+
+intPair getUnitBidPosition( int inUnit );
+
+
+void setUnitInspectorBribe( int inUnit, int inBribe );
+
+intPair getUnitInspectorBribePosition( int inUnit );
 
 
 

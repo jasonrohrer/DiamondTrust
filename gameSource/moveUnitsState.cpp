@@ -11,6 +11,7 @@ static char stateDone = false;
 
 extern Button *doneButton;
 extern char *statusMessage;
+extern char *statusSubMessage;
 
 
 
@@ -42,6 +43,7 @@ class MoveUnitsState : public GameState {
 
 
 static char pickingBid = false;
+static char pickingBribe = false;
 
 
 
@@ -67,12 +69,56 @@ void MoveUnitsState::clickState( int inX, int inY ) {
 
         if( isBidDone() ) {
             pickingBid = false;
+
+            if( getUnitDestination( activeUnit ) == 
+                getUnitRegion( numUnits - 1 ) ) {
+                // inspector there
+
+                pickingBribe = true;
+                setUnitInspectorBribe( activeUnit, 0 );
+                setPickerBid( 0 );
+
+                statusSubMessage = 
+                    translate( "phaseSubStatus_pickInspectorBribe" );
+                }
+            else {
+                
+                setPlayerUnitsSelectable( true );
+
+                statusSubMessage = translate( "phaseSubStatus_pickAgent" );
+                
+                setActiveUnit( -1 );
+                }
+            }
+    
+        return;
+        }
+
+    if( pickingBribe ) {
+        
+        if( activeUnit == -1 ) {
+            printOut( "Error: Picking bribe with no active unit!\n" );
+            return;
+            }
+        
+        
+        
+
+        clickBidPicker( inX, inY );
+        
+        setUnitInspectorBribe( activeUnit, getPickerBid() );
+
+        if( isBidDone() ) {
+            setPlayerUnitsSelectable( true );
+
+            statusSubMessage = translate( "phaseSubStatus_pickAgent" );
+
+            pickingBribe = false;
             setActiveUnit( -1 );
             }
     
         return;
         }
-    
 
 
     
@@ -82,15 +128,24 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         if( activeUnit != -1 ) {
             setActiveUnit( activeUnit );
             
+            statusSubMessage = translate( "phaseSubStatus_pickRegion" );
+
+
             setAllUnitsNotSelectable();
 
-            int unitDest = getUnitDestination( activeUnit );
-                    
+            //int unitDest = getUnitDestination( activeUnit );
+            
+            // clear any old move
+            int unitRegion = getUnitRegion( activeUnit );
+            setUnitDestination( activeUnit, unitRegion );
+            setUnitBid( activeUnit, 0 );
+            
+       
             // unit can move to any region that's not already
             // a destination of friendly units
 
-            // can always move back home
-            if( unitDest != 0 ) {                
+            // can always move back home, if not already there
+            if( unitRegion != 0 ) {                
                 setRegionSelectable( 0, true );
                 }
             else {
@@ -132,7 +187,9 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             setUnitBid( activeUnit, 0 );
             setPickerBid( 0 );
             
-            setPlayerUnitsSelectable( true );
+            statusSubMessage = translate( "phaseSubStatus_pickBid" );
+
+            
 
             setAllRegionsNotSelectable();
             
@@ -143,7 +200,10 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                 pickingBid = true;
                 }
             else {
+                setPlayerUnitsSelectable( true );
                 setActiveUnit( -1 );
+
+                statusSubMessage = translate( "phaseSubStatus_pickAgent" );
                 }
             
             }
@@ -174,8 +234,12 @@ void MoveUnitsState::drawState() {
     
     drawUnits();
     
+    int activeUnit = getActiveUnit();
+
+    if( activeUnit == -1 ) {
+        doneButton->draw();
+        }
     
-    doneButton->draw();
 
     if( pickingBid ) {
         int activeUnit = getActiveUnit();
@@ -185,14 +249,26 @@ void MoveUnitsState::drawState() {
             return;
             }
     
-        int dest = getUnitDestination( activeUnit );
-        
+
+        intPair bidPos = getUnitBidPosition( activeUnit );
         
 
-        intPair destPos = getUnitPositionInRegion( dest, activeUnit );
+        drawBidPicker( bidPos.x - 18, bidPos.y );
+        }
+
+    if( pickingBribe ) {
+        int activeUnit = getActiveUnit();
+
+        if( activeUnit == -1 ) {
+            printOut( "Error: Picking bribe with no active unit!\n" );
+            return;
+            }
+    
+
+        intPair bribePos = getUnitInspectorBribePosition( activeUnit );
         
 
-        drawBidPicker( destPos.x - 12, destPos.y );
+        drawBidPicker( bribePos.x - 18, bribePos.y );
         }
     
     }
@@ -210,6 +286,8 @@ void MoveUnitsState::enterState() {
     setPlayerUnitsSelectable( true );
 
     statusMessage = translate( "phaseStatus_move" );
+    statusSubMessage = translate( "phaseSubStatus_pickAgent" ); 
+   
     }
 
 
