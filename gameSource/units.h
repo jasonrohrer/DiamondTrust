@@ -56,6 +56,9 @@ void setUnitInspectorBribe( int inUnit, int inBribe );
 intPair getUnitInspectorBribePosition( int inUnit );
 
 
+void showInspectorBribe( int inUnit, char inShow );
+
+
 
 // does nothing if unit not moving to a new region
 void executeMove( int inUnit );

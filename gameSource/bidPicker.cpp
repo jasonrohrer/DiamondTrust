@@ -41,6 +41,12 @@ static rgbaColor white = { 255, 255, 255, 255 };
 
 
 void drawBidPicker( int inCenterX, int inCenterY ) {
+
+    if( inCenterY + 21 > 191 ) {
+        // off bottom, adjust
+        inCenterY = 191 - 21;
+        }
+    
     
     drawSprite( pickerSprite, inCenterX - pickerW/2, inCenterY - pickerH/2,
                 white );

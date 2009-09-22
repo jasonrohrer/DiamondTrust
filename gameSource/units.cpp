@@ -19,6 +19,7 @@ class Unit {
         int mDotSpriteID;
         int mBid;
         int mInspectorBribe;
+        char mShowInspectorBribe;
     };
 
 
@@ -251,7 +252,8 @@ void drawUnits() {
         }
 
 
-    // finally, draw any bids
+
+    // draw any diamond bids
 
 
     // first markers
@@ -301,9 +303,61 @@ void drawUnits() {
             }
         }
     
+
+
+    // draw inspector bribes
     
 
-    // FIXME:  draw inspector bribe amount here
+    // first markers
+    for( int i=0; i<numUnits-1; i++ ) {
+
+        if( gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
+            &&
+            gameUnit[i].mShowInspectorBribe ) {
+            
+            rgbaColor c;
+            if( i < 3 ) {
+                c = playerColor;
+                }
+            else if( i<6 ) {
+                c = enemyColor;
+                }
+
+            intPair end = getUnitInspectorBribePosition( i );
+
+            drawSprite( bidSprite, end.x - bidW / 2, end.y - bidH / 2,
+                        c );
+             
+            }
+        }
+    startNewSpriteLayer();
+    // then amounts
+    for( int i=0; i<numUnits-1; i++ ) {
+
+        if( gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
+            &&
+            gameUnit[i].mShowInspectorBribe ) {
+            
+            
+            intPair end = getUnitInspectorBribePosition( i );
+            
+            char *bidString = autoSprintf( "%d", gameUnit[i].mInspectorBribe );
+
+            font8->drawString( bidString, 
+                               end.x + 8, 
+                               end.y - 3,
+                               black, 
+                               alignRight );
+
+            font8->drawString( "$", 
+                               end.x - 9, 
+                               end.y - 4,
+                               black, 
+                               alignLeft );
+
+            delete [] bidString;
+            }
+        }
     
     }
 
@@ -393,6 +447,12 @@ void setUnitInspectorBribe( int inUnit, int inBribe ) {
     }
 
 
+void showInspectorBribe( int inUnit, char inShow ) {
+    gameUnit[ inUnit ].mShowInspectorBribe = inShow;
+    }
+
+
+
 
 
 intPair getUnitBidPosition( int inUnit ) {
@@ -425,6 +485,8 @@ intPair getUnitInspectorBribePosition( int inUnit ) {
     else {
         end.x += (10 + 5);
         }
+    end.y -= 6;
+    
     
     return end;
     }

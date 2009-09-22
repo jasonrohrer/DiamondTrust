@@ -77,6 +77,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                 pickingBribe = true;
                 setUnitInspectorBribe( activeUnit, 0 );
                 setPickerBid( 0 );
+                showInspectorBribe( activeUnit, true );
 
                 statusSubMessage = 
                     translate( "phaseSubStatus_pickInspectorBribe" );
@@ -198,6 +199,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                 
                 setPickerBid( 0 );
                 pickingBid = true;
+                showInspectorBribe( activeUnit, false );
                 }
             else {
                 setPlayerUnitsSelectable( true );
