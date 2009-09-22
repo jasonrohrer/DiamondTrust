@@ -5,7 +5,7 @@
 
 // first 3 are player, second 3 are enemy, last 1 is UN inspector
 #define numUnits 7
-
+#define numPlayerUnits 3
 
 void initUnits();
 

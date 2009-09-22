@@ -1009,6 +1009,7 @@ void stepNetwork() {
                 
                 if( nextIncomingBytesRecievedSoFar == 
                     nextIncomingMessageSize ) {
+                    //printOut( "Got message\n" );
                     
                     // got it all
 

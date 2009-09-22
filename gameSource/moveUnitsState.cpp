@@ -9,6 +9,9 @@
 
 //static int activeUnit = -1;
 static char stateDone = false;
+static char sentMove = false;
+static char gotMove = false;
+
 
 extern Button *doneButton;
 extern char *statusMessage;
@@ -255,7 +258,41 @@ void MoveUnitsState::clickState( int inX, int inY ) {
  
     if( activeUnit == -1 ) {
         if( doneButton->getPressed( inX, inY ) ) {
-            stateDone = true;
+            setAllUnitsNotSelectable();
+            
+            statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
+
+            // send our move as a message
+
+            // 3 chars per unit
+            // dest, bid, bribe
+            unsigned int messageLength = numPlayerUnits * 3;
+            unsigned char message[ messageLength ];
+
+            unsigned int i;
+            for( i=0; i<numPlayerUnits; i++ ) {
+                int index = i * 3;
+                
+                int dest = getUnitDestination( i );
+                if( dest == 0 ) {
+                    // swap home between opponents
+                    dest = 1;
+                    }
+                message[ index++ ] = (unsigned char)dest;
+                
+                
+                message[ index++ ] = (unsigned char)getUnitBid( i );
+                message[ index++ ] = (unsigned char)getUnitInspectorBribe( i );
+                }
+            
+            printOut( "Sending message: " );
+            for( i=0; i<messageLength; i++ ) {
+                printOut( "%d,", message[i] );
+                }
+            printOut( "\n" );
+            
+            sendMessage( message, messageLength );
+            sentMove = true;
             }
         }
     
@@ -267,6 +304,65 @@ void MoveUnitsState::clickState( int inX, int inY ) {
 void MoveUnitsState::stepState() {
     
     stepUnits();
+
+    if( sentMove && !gotMove ) {
+        
+        if( checkConnectionStatus() == -1 ) {
+            statusSubMessage = 
+                translate( "phaseSubStatus_connectFailed" );
+            stateDone = true;
+            return;
+            }
+
+        
+        unsigned int messageLength;
+        unsigned char *message = getMessage( &messageLength );
+        //printOut( "trying to receive message\n" );
+        
+        if( message != NULL ) {
+            // got move!
+
+            gotMove = true;
+            
+
+            // unpack it
+            if( messageLength != numPlayerUnits * 3 ) {
+                printOut( "Bad message length from opponent\n" );
+                stateDone = true;
+
+                delete [] message;
+                return;
+                }
+            
+            int i;
+            for( i=0; i<numPlayerUnits; i++ ) {
+                int index = i * 3;
+                
+                int oppUnit = i + numPlayerUnits;
+                
+                setUnitDestination( oppUnit,
+                                    message[ index++ ] );
+                setUnitBid( oppUnit,
+                            message[ index++ ] );
+                setUnitInspectorBribe( oppUnit,
+                                       message[ index++ ] );
+                
+                if( getUnitDestination( oppUnit ) ==
+                    getUnitRegion( numUnits - 1 ) ) {
+                    
+                    // moving in with inspector, show bribe
+                    showInspectorBribe( oppUnit, true );
+                    }
+                
+                }
+
+            statusSubMessage = 
+                translate( "phaseSubStatus_moveExecute" );
+
+            delete [] message;
+            }        
+        }
+    
     }
 
 
@@ -279,7 +375,7 @@ void MoveUnitsState::drawState() {
     
     int activeUnit = getActiveUnit();
 
-    if( activeUnit == -1 ) {
+    if( activeUnit == -1 && !sentMove ) {
         doneButton->draw();
         }
     
