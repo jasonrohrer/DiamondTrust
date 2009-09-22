@@ -111,6 +111,12 @@ int loadSprite( char *inFileName, int *outW, int *outH,
             
         delete [] spriteRGBA;
         }
+
+    if( returnID == -1 ) {
+        printOut( "ERROR:  Failed to load sprite from file %s\n", inFileName );
+        }
+    
+
     return returnID;
     }
 

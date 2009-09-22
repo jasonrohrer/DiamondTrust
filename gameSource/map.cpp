@@ -5,6 +5,8 @@
 #include "common.h"
 #include "sprite.h"
 #include "Font.h"
+#include "colors.h"
+
 
 #include "minorGems/util/stringUtils.h"
 
@@ -23,8 +25,8 @@ static int mapBackgroundBottomSpriteID;
 static int bottomHalfOffset = 128;
 
 
-static int diamondSpriteID;
-int diamondW, diamondH;
+int diamondSpriteID;
+int diamondSpriteW, diamondSpriteH;
 
 
 
@@ -371,7 +373,7 @@ void initMap() {
 
 
     diamondSpriteID = loadSprite( "diamond.tga", 
-                                  &diamondW, &diamondH,
+                                  &diamondSpriteW, &diamondSpriteH,
                                   true );
 
 
@@ -399,9 +401,6 @@ void freeMap() {
     }
 
 
-static rgbaColor white = { 255, 255, 255, 255 }; 
-static rgbaColor transWhite = { 255, 255, 255, 128 }; 
-static rgbaColor purple = { 128, 0, 192, 255 }; 
 
 extern Font *font16;
 
@@ -424,8 +423,8 @@ void drawMap() {
     // next diamonds (only producing regions)
     for( i=2; i<numMapRegions; i++ ) {
         drawSprite( diamondSpriteID, 
-                    mapRegionDiamondPosition[i].x - diamondW/2, 
-                    mapRegionDiamondPosition[i].y - diamondH/2, 
+                    mapRegionDiamondPosition[i].x - diamondSpriteW/2, 
+                    mapRegionDiamondPosition[i].y - diamondSpriteH/2, 
                     white );
         }
 
@@ -438,7 +437,7 @@ void drawMap() {
         font16->drawString( countString, 
                             mapRegionDiamondPosition[i].x, 
                             mapRegionDiamondPosition[i].y - 8,
-                            purple, 
+                            diamondPurple, 
                             alignCenter );
 
         delete [] countString;

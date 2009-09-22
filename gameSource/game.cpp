@@ -12,6 +12,8 @@
 #include "TranslationManager.h"
 #include "GameState.h"
 #include "bidPicker.h"
+#include "gameStats.h"
+#include "colors.h"
 
 
 #define NUM_DRAWN 60
@@ -185,6 +187,7 @@ void gameInit() {
     initMap();
     initUnits();
     initBidPicker();
+    initStats();
     
     //setRegionSelectable( 2, true );
     //setRegionSelectable( 4, true );
@@ -208,7 +211,7 @@ void gameFree() {
     freeMap();
     freeUnits();
     freeBidPicker();
-    
+    freeStats();
     }
 
 
@@ -370,9 +373,6 @@ void gameLoopTick() {
     }
 
 
-rgbaColor white = { 255, 255, 255, 255 };
-rgbaColor transBlack = { 0, 0, 0, 128 };
-rgbaColor black = { 0, 0, 0, 255 };
 
 
 
@@ -388,6 +388,10 @@ void drawTopScreen() {
         startNewSpriteLayer();
         }
     */
+    
+    drawStats();
+    
+
     if( statusMessage != NULL ) {
         
         font16->drawString( translate( "status_next" ), 

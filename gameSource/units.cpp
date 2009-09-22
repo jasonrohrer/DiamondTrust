@@ -5,6 +5,8 @@
 #include "tga.h"
 #include "sprite.h"
 #include "Font.h"
+#include "colors.h"
+
 
 #include "minorGems/util/stringUtils.h"
 
@@ -42,11 +44,7 @@ extern Font *font8;
 
 
 
-static rgbaColor playerColor = { 0, 255, 0, 255 };
-static rgbaColor enemyColor = { 255, 0, 0, 255 };
-static rgbaColor white = {255, 255, 255, 255 };
-static rgbaColor black = {0, 0, 0, 255 };
-static rgbaColor inspectColor = {84, 84, 255, 255 };
+//static rgbaColor inspectorColor = {84, 84, 255, 255 };
 
 
 
