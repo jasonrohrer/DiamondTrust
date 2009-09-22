@@ -4,6 +4,7 @@
 #include "Button.h"
 #include "common.h"
 #include "bidPicker.h"
+#include "gameStats.h"
 
 
 //static int activeUnit = -1;
@@ -61,11 +62,27 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             }
         
         
+        int oldBid = getPickerBid();
         
 
         clickBidPicker( inX, inY );
         
-        setUnitBid( activeUnit, getPickerBid() );
+
+        int newBid = getPickerBid();
+        
+
+        if( newBid > oldBid &&
+            getPlayerMoney( 0 ) == 0 ) {
+            
+            // out of money, stop bid increase
+            newBid = oldBid;
+            setPickerBid( newBid );
+            }
+        
+        // update money
+        addPlayerMoney( 0, - (newBid - oldBid) );
+        
+        setUnitBid( activeUnit, newBid );
 
         if( isBidDone() ) {
             pickingBid = false;
@@ -104,10 +121,25 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         
         
         
+        int oldBid = getPickerBid();
 
         clickBidPicker( inX, inY );
         
-        setUnitInspectorBribe( activeUnit, getPickerBid() );
+        int newBid = getPickerBid();
+        
+
+        if( newBid > oldBid &&
+            getPlayerMoney( 0 ) == 0 ) {
+            
+            // out of money, stop bid increase
+            newBid = oldBid;
+            setPickerBid( newBid );
+            }
+        
+        // update money
+        addPlayerMoney( 0, - (newBid - oldBid) );
+
+        setUnitInspectorBribe( activeUnit, newBid );
 
         if( isBidDone() ) {
             setPlayerUnitsSelectable( true );
@@ -139,8 +171,17 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             // clear any old move
             int unitRegion = getUnitRegion( activeUnit );
             setUnitDestination( activeUnit, unitRegion );
-            setUnitBid( activeUnit, 0 );
             
+            int oldBid = getUnitBid( activeUnit );
+            
+            addPlayerMoney( 0, oldBid );
+            setUnitBid( activeUnit, 0 );
+
+            int oldBribe = getUnitInspectorBribe( activeUnit );
+            
+            addPlayerMoney( 0, oldBribe );
+            setUnitInspectorBribe( activeUnit, 0 );
+
        
             // unit can move to any region that's not already
             // a destination of friendly units
@@ -185,8 +226,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
         if( chosenRegion != -1 ) {
             setUnitDestination( activeUnit, chosenRegion );
-            setUnitBid( activeUnit, 0 );
-            setPickerBid( 0 );
+            //setUnitBid( activeUnit, 0 );
+            //setPickerBid( 0 );
             
             statusSubMessage = translate( "phaseSubStatus_pickBid" );
 

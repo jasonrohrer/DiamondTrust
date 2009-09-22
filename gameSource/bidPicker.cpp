@@ -77,16 +77,16 @@ void clickBidPicker( int inX, int inY ) {
     
     intPair click = { inX, inY };
     
-    if( intDistance( click, upCenter ) < 5 ) {
+    if( intDistance( click, upCenter ) < 6 ) {
         bid ++;
         }
-    else if( intDistance( click, downCenter ) < 5 ) {
+    else if( intDistance( click, downCenter ) < 6 ) {
         bid --;
         if( bid < 0 ) {
             bid = 0;
             }
         }
-    else if( intDistance( click, doneCenter ) < 5 ) {    
+    else if( intDistance( click, doneCenter ) < 6 ) {    
         done = true;
         }
     }

@@ -47,11 +47,13 @@ int getUnitDestination( int inUnit );
 
 
 void setUnitBid( int inUnit, int inBid );
+int getUnitBid( int inUnit );
 
 intPair getUnitBidPosition( int inUnit );
 
 
 void setUnitInspectorBribe( int inUnit, int inBribe );
+int getUnitInspectorBribe( int inUnit );
 
 intPair getUnitInspectorBribePosition( int inUnit );
 

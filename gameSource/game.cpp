@@ -189,6 +189,10 @@ void gameInit() {
     initBidPicker();
     initStats();
     
+    setPlayerMoney( 0, 18 );
+    setPlayerMoney( 1, 18 );
+    
+
     //setRegionSelectable( 2, true );
     //setRegionSelectable( 4, true );
     

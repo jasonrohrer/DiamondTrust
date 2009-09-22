@@ -261,10 +261,10 @@ void drawUnits() {
             
             rgbaColor c;
             if( i < 3 ) {
-                c = playerColor;
+                c = playerRegionColor;
                 }
             else if( i<6 ) {
-                c = enemyColor;
+                c = enemyRegionColor;
                 }
 
             intPair end = getUnitBidPosition( i );
@@ -315,10 +315,10 @@ void drawUnits() {
             
             rgbaColor c;
             if( i < 3 ) {
-                c = playerColor;
+                c = playerRegionColor;
                 }
             else if( i<6 ) {
-                c = enemyColor;
+                c = enemyRegionColor;
                 }
 
             intPair end = getUnitInspectorBribePosition( i );
@@ -439,9 +439,17 @@ void setUnitBid( int inUnit, int inBid ) {
     gameUnit[ inUnit ].mBid = inBid;
     }
 
+int getUnitBid( int inUnit ) {
+    return gameUnit[ inUnit ].mBid;
+    }
+
 
 void setUnitInspectorBribe( int inUnit, int inBribe ) {
     gameUnit[ inUnit ].mInspectorBribe = inBribe;
+    }
+
+int getUnitInspectorBribe( int inUnit ) {
+    return gameUnit[ inUnit ].mInspectorBribe;
     }
 
 

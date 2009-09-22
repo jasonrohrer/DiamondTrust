@@ -31,6 +31,15 @@ void setPlayerDiamonds( int inPlayer, int inDiamonds ) {
     diamonds[inPlayer] = inDiamonds;
     }
 
+void addPlayerMoney( int inPlayer, int inMoney ) {
+    money[inPlayer] += inMoney;
+    }
+
+
+void addPlayerDiamonds( int inPlayer, int inDiamonds ) {
+    diamonds[inPlayer] += inDiamonds;
+    }
+
 
 static int statusPanelSprite;
 static int panelW, panelH;
