@@ -1,6 +1,20 @@
 status_next  "Next:"
 
 button_done "Done"
+button_parent "Parent"
+button_child "Child"
+
+
+
+phaseStatus_connect  "Connect to opponent"
+phaseSubStatus_parentOrChild  "Start as parent or as child"
+phaseSubStatus_waitingConnect  "Waiting for a connection"
+phaseSubStatus_waitingConnectOn  "Waiting for a connection on "
+phaseSubStatus_connectingToParent  "Connecting to parent... "
+phaseSubStatus_connectFailed  "Connection failed"
+
+
+
 
 phaseStatus_move  "Move your agents"
 

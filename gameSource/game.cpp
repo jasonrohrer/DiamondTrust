@@ -69,10 +69,13 @@ char *statusSubMessage = NULL;
 
 GameState *currentGameState;
 
+extern GameState *connectState;
 extern GameState *moveUnitsState;
 
 
 Button *doneButton;
+Button *parentButton;
+Button *childButton;
 
 
 
@@ -183,6 +186,12 @@ void gameInit() {
 
     doneButton = new Button( font16, translate( "button_done" ), 7, 84 );
     
+    parentButton = new Button( font16, translate( "button_parent" ),
+                                                  128 - 32,
+                                                  76 - 8 );
+    childButton = new Button( font16, translate( "button_child" ),
+                                                 128 - 32,
+                                                 116 - 8 );
 
     initMap();
     initUnits();
@@ -197,7 +206,7 @@ void gameInit() {
     //setRegionSelectable( 4, true );
     
 
-    currentGameState = moveUnitsState;
+    currentGameState = connectState;
     currentGameState->enterState();
     }
 
@@ -236,6 +245,16 @@ void gameLoopTick() {
 
     currentGameState->stepState();
     
+    if( currentGameState->isStateDone() ) {
+        
+        if( currentGameState == connectState ) {
+            currentGameState = moveUnitsState;
+            }
+        
+        currentGameState->enterState();
+        }
+    
+
 
     for( int i=0; i<NUM_DRAWN; i++ ) {
         int f = drawColors[i].a;
