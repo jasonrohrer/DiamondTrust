@@ -266,10 +266,10 @@ void MoveUnitsState::clickState( int inX, int inY ) {
 
             // 3 chars per unit
             // dest, bid, bribe
-            unsigned int messageLength = numPlayerUnits * 3;
-            unsigned char message[ messageLength ];
+            int messageLength = numPlayerUnits * 3;
+            unsigned char message[ numPlayerUnits * 3 ];
 
-            unsigned int i;
+            int i;
             for( i=0; i<numPlayerUnits; i++ ) {
                 int index = i * 3;
                 
@@ -291,7 +291,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                 }
             printOut( "\n" );
             
-            sendMessage( message, messageLength );
+            sendMessage( message, (unsigned int)messageLength );
             sentMove = true;
             }
         }

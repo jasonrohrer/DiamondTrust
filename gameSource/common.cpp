@@ -59,7 +59,7 @@ int intDistance( intPair inA, intPair inB ) {
     int dx = inA.x - inB.x;
     int dy = inA.y - inB.y;
     
-    return intSqrt( dx * dx + dy * dy );
+    return (int)intSqrt( (unsigned int)( dx * dx + dy * dy ) );
     }
 
 
