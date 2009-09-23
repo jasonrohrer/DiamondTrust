@@ -18,6 +18,7 @@ diamond.tga \
 bidPicker.tga \
 bid.tga \
 statsPanel.tga \
+bribedMarker.tga \
 
 
 

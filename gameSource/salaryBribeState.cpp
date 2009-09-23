@@ -178,14 +178,43 @@ void SalaryBribeState::clickState( int inX, int inY ) {
         if( doneButton->getPressed( inX, inY ) ) {
             setAllUnitsNotSelectable();
             
+            
+            
+            statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
+
+            // send our move as a message
+
+            // 2 chars per unit (both player and opponent)
+            // salary or bribe, last bribing unit
+            int messageLength = numPlayerUnits * 2 * 2;
+            unsigned char message[ numPlayerUnits * 2 * 2 ];
+
             int i;
-            for( i=0; i<numPlayerUnits; i++ ) {
-                getUnit(i)->mShowSalaryPayment = false;
-                getUnit( i + numPlayerUnits )->mShowBribePayment = false;
+            for( i=0; i<numPlayerUnits*2; i++ ) {
+                int index = i*2;
+                
+                Unit *u = getUnit( i );
+                if( i < numPlayerUnits ) {
+                    message[ index++ ] = 
+                        (unsigned char)(u->mLastSalaryPayment);
+                    }
+                else {
+                    message[ index++ ] = 
+                        (unsigned char)(u->mLastBribePayment);
+                    }
+                message[ index++ ] =  (unsigned char)(u->mLastBribingUnit);
                 }
             
-            stateDone = true;
+            printOut( "Sending message: " );
+            for( i=0; i<messageLength; i++ ) {
+                printOut( "%d,", message[i] );
+                }
+            printOut( "\n" );
+            
+            sendMessage( message, (unsigned int)messageLength );
+            sentMove = true;
             }
+        
         }
     
     
@@ -219,7 +248,7 @@ void SalaryBribeState::stepState() {
             
 
             // unpack it
-            if( messageLength != numPlayerUnits * 3 ) {
+            if( messageLength != numPlayerUnits * 2 * 2 ) {
                 printOut( "Bad message length from opponent\n" );
                 stateDone = true;
 
@@ -228,45 +257,61 @@ void SalaryBribeState::stepState() {
                 }
             
 
-            int totalBidsAndBribes = 0;
+            int totalSalaryAndBribes = 0;
             
             int i;
-            for( i=0; i<numPlayerUnits; i++ ) {
-                int index = i * 3;
-                
-                int oppUnit = i + numPlayerUnits;
-                
-                setUnitDestination( oppUnit,
-                                    message[ index++ ] );
-            
-                int bid = message[ index++ ];
-                
-                setUnitBid( oppUnit, bid );
-                
-                totalBidsAndBribes += bid;
-                
-                int bribe = message[ index++ ];
-                
-                setUnitInspectorBribe( oppUnit, bribe );
+            for( i=0; i<numPlayerUnits*2; i++ ) {
+                Unit *u = getUnit( i );
 
-                totalBidsAndBribes += bribe;
+                int index = i * 2;
+                // units described in opposite order
+
+                // opp units first (opposite)
                 
-                
-                if( getUnitDestination( oppUnit ) ==
-                    getUnitRegion( numUnits - 1 ) ) {
+                if( i < 3 ) {
+                    // these are opp units
                     
-                    // moving in with inspector, show bribe
-                    showInspectorBribe( oppUnit, true );
+                    // salary
+                    u->mLastSalaryPayment = message[ index++ ];
+                    totalSalaryAndBribes += u->mLastSalaryPayment;
+                    
+                    // ignore last bribing unit
                     }
-                
+                else {
+                    // these bytes describe our units (from opponent's 
+                    // point of view)
+                    u->mLastBribePayment = message[ index++ ];
+                    totalSalaryAndBribes += u->mLastBribePayment;
+                    
+                    u->mLastBribingUnit = message[ index++ ];
+                    }
                 }
 
-            addPlayerMoney( 1, -totalBidsAndBribes );
+            addPlayerMoney( 1, -totalSalaryAndBribes );
             
 
-            statusSubMessage = 
-                translate( "phaseSubStatus_moveExecute" );
+            
+            for( i=0; i<numPlayerUnits * 2; i++ ) {
+                getUnit(i)->mShowSalaryPayment = false;
+                getUnit(i)->mShowBribePayment = false;
+                }
 
+            // now we have bids and bribes for both sides
+
+            // apply them
+            for( i=0; i<numPlayerUnits*2; i++ ) {
+                Unit *u = getUnit(i);
+                u->mTotalSalary += u->mLastSalaryPayment;
+                u->mLastSalaryPayment = 0;
+
+                u->mTotalBribe += u->mLastBribePayment;
+                u->mLastBribePayment = 0;
+                }
+            
+                
+
+            stateDone = true;
+            
             delete [] message;
             }        
         }

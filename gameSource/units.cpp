@@ -30,6 +30,8 @@ static int bidSprite;
 static int bidW, bidH;
 extern Font *font8;
 
+static int bribedMarkerSprite;
+
 
 
 //static rgbaColor inspectorColor = {84, 84, 255, 255 };
@@ -144,14 +146,11 @@ void initUnits() {
     
 
     activeUnitSprite = loadSprite( "activeUnitHalo.tga", true );
-    if( activeUnitSprite == -1 ) {
-        printOut( "Failed to load unit halo.\n" );
-        }
-
+    
     bidSprite = loadSprite( "bid.tga", &bidW, &bidH, true );
-    if( bidSprite == -1 ) {
-        printOut( "Failed to load bid marker.\n" );
-        }
+    
+    bribedMarkerSprite = loadSprite( "bribedMarker.tga", true );
+
     }
 
 
@@ -257,6 +256,61 @@ void drawUnits() {
 
         }
 
+
+    startNewSpriteLayer();
+
+    // mark any bribed units
+    for( int i=0; i<numUnits; i++ ) {
+        if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe ) {
+            
+            char drawMarker = true;
+            
+            if( i < 3 ) {
+                // one of our units!  Should we let the player know about this?
+
+                // only if bribing unit has been compromised by us
+
+                int bribingUnit = gameUnit[i].mLastBribingUnit;
+                
+                if( gameUnit[bribingUnit].mTotalSalary < 
+                    gameUnit[bribingUnit].mTotalBribe ) {
+                    
+                    // bribing unit has been bribed!
+
+                    drawMarker = true;
+                    }
+                else {
+                    drawMarker = false;
+                    }
+                }
+            
+                
+            if( drawMarker ) {
+                
+                // color of marker (opposite)
+                rgbaColor c;
+                if( i < 3 ) {
+                    c = enemyColor;
+                    }
+                else if( i<6 ) {
+                    c = playerColor;
+                    }
+                
+                intPair pos = 
+                    getUnitPositionInRegion( gameUnit[i].mRegion, i );
+        
+                // center
+                pos.x -= unitSpriteW / 2;
+                pos.y -= unitSpriteH;
+
+                drawSprite( bribedMarkerSprite, 
+                            pos.x, 
+                            pos.y, 
+                            c, gameUnit[i].mSelectable );
+                }
+            }
+        }
+    
 
 
     // draw any diamond bids
