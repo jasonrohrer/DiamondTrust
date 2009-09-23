@@ -334,6 +334,9 @@ void MoveUnitsState::stepState() {
                 return;
                 }
             
+
+            int totalBidsAndBribes = 0;
+            
             int i;
             for( i=0; i<numPlayerUnits; i++ ) {
                 int index = i * 3;
@@ -342,10 +345,19 @@ void MoveUnitsState::stepState() {
                 
                 setUnitDestination( oppUnit,
                                     message[ index++ ] );
-                setUnitBid( oppUnit,
-                            message[ index++ ] );
-                setUnitInspectorBribe( oppUnit,
-                                       message[ index++ ] );
+            
+                int bid = message[ index++ ];
+                
+                setUnitBid( oppUnit, bid );
+                
+                totalBidsAndBribes += bid;
+                
+                int bribe = message[ index++ ];
+                
+                setUnitInspectorBribe( oppUnit, bribe );
+
+                totalBidsAndBribes += bribe;
+                
                 
                 if( getUnitDestination( oppUnit ) ==
                     getUnitRegion( numUnits - 1 ) ) {
@@ -355,6 +367,9 @@ void MoveUnitsState::stepState() {
                     }
                 
                 }
+
+            addPlayerMoney( 1, -totalBidsAndBribes );
+            
 
             statusSubMessage = 
                 translate( "phaseSubStatus_moveExecute" );

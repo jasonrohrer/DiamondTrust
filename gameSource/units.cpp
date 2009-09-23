@@ -126,8 +126,9 @@ void initUnits() {
         gameUnit[ i + 3 ].mDotSpriteID = moveDotSpriteIDs[ i ];
         }
     
-    // inspector
-    gameUnit[ 6 ].mRegion = getRandom( numMapRegions - 2 ) + 2;
+    // inspector 
+    // always starts in last region
+    gameUnit[ 6 ].mRegion = numMapRegions - 1;
     gameUnit[ 6 ].mSpriteID = spriteIDs[ 3 ];
     gameUnit[ 6 ].mDotSpriteID = moveDotSpriteIDs[ 3 ];
 
