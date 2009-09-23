@@ -10,19 +10,7 @@
 
 #include "minorGems/util/stringUtils.h"
 
-class Unit {
-    public:
-        Unit();
-        
-        int mRegion;
-        int mDest;
-        char mSelectable;
-        int mSpriteID;
-        int mDotSpriteID;
-        int mBid;
-        int mInspectorBribe;
-        char mShowInspectorBribe;
-    };
+
 
 
 Unit::Unit() 
@@ -109,12 +97,12 @@ void initUnits() {
     
 
     // player
-    gameUnit[ 0 ].mRegion = 0;
+    gameUnit[ 0 ].mRegion = 2;
     gameUnit[ 1 ].mRegion = 0;
     gameUnit[ 2 ].mRegion = 0;
 
     // enemy
-    gameUnit[ 3 ].mRegion = 1;
+    gameUnit[ 3 ].mRegion = 2;
     gameUnit[ 4 ].mRegion = 1;
     gameUnit[ 5 ].mRegion = 1;
 
@@ -124,6 +112,20 @@ void initUnits() {
         
         gameUnit[ i ].mDotSpriteID = moveDotSpriteIDs[ i ];
         gameUnit[ i + 3 ].mDotSpriteID = moveDotSpriteIDs[ i ];
+
+
+        gameUnit[ i ].mTotalSalary = 0;
+        gameUnit[ i + 3].mTotalSalary = 0;
+        gameUnit[ i ].mLastSalaryPayment = 0;
+        gameUnit[ i + 3].mLastSalaryPayment = 0;
+
+
+        gameUnit[ i ].mTotalBribe = 0;
+        gameUnit[ i + 3].mTotalBribe = 0;
+        gameUnit[ i ].mLastBribePayment = 0;
+        gameUnit[ i + 3].mLastBribePayment = 0;
+        gameUnit[ i ].mLastBribingUnit = -1;
+        gameUnit[ i + 3].mLastBribingUnit = -1;
         }
     
     // inspector 
@@ -155,6 +157,11 @@ void initUnits() {
 
 
 void freeUnits() {
+    }
+
+
+Unit *getUnit( int inUnit ) {
+    return &( gameUnit[ inUnit ] );
     }
 
 
@@ -357,6 +364,103 @@ void drawUnits() {
             delete [] bidString;
             }
         }
+
+
+
+    // draw salaries
+
+    // first markers
+    for( int i=0; i<numUnits-1; i++ ) {
+
+        if( gameUnit[i].mShowSalaryPayment ) {
+            
+            // always being paid by player
+            rgbaColor c = playerRegionColor;
+
+            intPair end = getUnitSalaryPosition( i );
+
+            drawSprite( bidSprite, end.x - bidW / 2, end.y - bidH / 2,
+                        c );
+             
+            }
+        }
+    startNewSpriteLayer();
+    // then amounts
+    for( int i=0; i<numUnits-1; i++ ) {
+
+        if( gameUnit[i].mShowSalaryPayment ) {
+            
+            
+            intPair end = getUnitSalaryPosition( i );
+            
+            char *bidString = autoSprintf( "%d", 
+                                           gameUnit[i].mLastSalaryPayment );
+
+            font8->drawString( bidString, 
+                               end.x + 8, 
+                               end.y - 3,
+                               black, 
+                               alignRight );
+
+            font8->drawString( "$", 
+                               end.x - 9, 
+                               end.y - 4,
+                               black, 
+                               alignLeft );
+
+            delete [] bidString;
+            }
+        }
+
+
+
+
+    // draw bribes
+
+    // first markers
+    for( int i=0; i<numUnits-1; i++ ) {
+
+        if( gameUnit[i].mShowBribePayment ) {
+            
+            // always being paid by player
+            rgbaColor c = playerRegionColor;
+
+            intPair end = getUnitBribePosition( i );
+
+            drawSprite( bidSprite, end.x - bidW / 2, end.y - bidH / 2,
+                        c );
+             
+            }
+        }
+    startNewSpriteLayer();
+    // then amounts
+    for( int i=0; i<numUnits-1; i++ ) {
+
+        if( gameUnit[i].mShowBribePayment ) {
+            
+            
+            intPair end = getUnitBribePosition( i );
+            
+            char *bidString = autoSprintf( "%d", 
+                                           gameUnit[i].mLastBribePayment );
+
+            font8->drawString( bidString, 
+                               end.x + 8, 
+                               end.y - 3,
+                               black, 
+                               alignRight );
+
+            font8->drawString( "$", 
+                               end.x - 9, 
+                               end.y - 4,
+                               black, 
+                               alignLeft );
+
+            delete [] bidString;
+            }
+        }
+
+
     
     }
 
@@ -497,6 +601,27 @@ intPair getUnitInspectorBribePosition( int inUnit ) {
     
     return end;
     }
+
+
+
+intPair getUnitSalaryPosition( int inUnit ) {
+    // to right of unit
+    intPair end = 
+        getUnitPositionInRegion( gameUnit[inUnit].mRegion, inUnit );
+
+    end.x += (10 + 5);
+    end.y -= 6;
+    return end;
+    }
+
+            
+
+intPair getUnitBribePosition( int inUnit ) {
+    // same as for salary
+    return getUnitSalaryPosition( inUnit );
+    }
+
+
 
 
 

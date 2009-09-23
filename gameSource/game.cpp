@@ -34,6 +34,7 @@ char *statusSubMessage = NULL;
 GameState *currentGameState;
 
 extern GameState *connectState;
+extern GameState *salaryBribeState;
 extern GameState *moveUnitsState;
 
 
@@ -132,9 +133,14 @@ void gameLoopTick() {
     
     if( currentGameState->isStateDone() ) {
         
+        // state transition
         if( currentGameState == connectState ) {
+            currentGameState = salaryBribeState;
+            }
+        else if( currentGameState == salaryBribeState ) {
             currentGameState = moveUnitsState;
             }
+        
         
         currentGameState->enterState();
         }

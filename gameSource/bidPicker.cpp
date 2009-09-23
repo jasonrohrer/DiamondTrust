@@ -46,6 +46,10 @@ void drawBidPicker( int inCenterX, int inCenterY ) {
         // off bottom, adjust
         inCenterY = 191 - 21;
         }
+    else if( inCenterY - 21 < 0 ) {
+        // off top, adjust
+        inCenterY = 21;
+        }
     
     
     drawSprite( pickerSprite, inCenterX - pickerW/2, inCenterY - pickerH/2,

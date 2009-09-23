@@ -57,8 +57,41 @@ int getUnitInspectorBribe( int inUnit );
 
 intPair getUnitInspectorBribePosition( int inUnit );
 
-
 void showInspectorBribe( int inUnit, char inShow );
+
+
+intPair getUnitSalaryPosition( int inUnit );
+intPair getUnitBribePosition( int inUnit );
+
+
+// getting tired of writing so many access functions...
+// give access to the unit class directly
+class Unit {
+    public:
+        Unit();
+        
+        int mRegion;
+        int mDest;
+        char mSelectable;
+        int mSpriteID;
+        int mDotSpriteID;
+        int mBid;
+        int mInspectorBribe;
+        char mShowInspectorBribe;
+
+        int mTotalSalary;
+        int mLastSalaryPayment;
+        char mShowSalaryPayment;
+        
+        int mTotalBribe;
+        int mLastBribePayment;
+        char mShowBribePayment;
+        
+        int mLastBribingUnit;
+    };
+
+
+Unit *getUnit( int inUnit );
 
 
 

@@ -11,8 +11,9 @@ sprite.cpp \
 common.cpp \
 DataFifo.cpp \
 TranslationManager.cpp \
-moveUnitsState.cpp \
 connectState.cpp \
+salaryBribeState.cpp \
+moveUnitsState.cpp \
 bidPicker.cpp \
 gameStats.cpp \
 colors.cpp \
@@ -37,8 +38,9 @@ s/^sprite\.o/\.\.\/sprite\.o/; \
 s/^common\.o/\.\.\/common\.o/; \
 s/^DataFifo\.o/\.\.\/DataFifo\.o/; \
 s/^TranslationManager\.o/\.\.\/TranslationManager\.o/; \
-s/^moveUnitsState\.o/\.\.\/moveUnitsState\.o/; \
 s/^connectState\.o/\.\.\/connectState\.o/; \
+s/^salaryBribeState\.o/\.\.\/salaryBribeState\.o/; \
+s/^moveUnitsState\.o/\.\.\/moveUnitsState\.o/; \
 s/^bidPicker\.o/\.\.\/bidPicker\.o/; \
 s/^gameStats\.o/\.\.\/gameStats\.o/; \
 s/^colors\.o/\.\.\/colors\.o/; \
