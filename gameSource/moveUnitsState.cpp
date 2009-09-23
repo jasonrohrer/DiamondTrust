@@ -9,6 +9,8 @@
 
 //static int activeUnit = -1;
 static char stateDone = false;
+static char sentInitialMove = false;
+static char gotInitialMove = false;
 static char sentMove = false;
 static char gotMove = false;
 
@@ -46,7 +48,106 @@ class MoveUnitsState : public GameState {
     };
 
 
-static char pickingBid = false;
+
+
+static void sendMoveMessage() {
+    // send our move as a message
+
+    // 3 chars per unit
+    // dest, bid, bribe
+    int messageLength = numPlayerUnits * 3;
+    unsigned char message[ numPlayerUnits * 3 ];
+
+    int i;
+    for( i=0; i<numPlayerUnits; i++ ) {
+        int index = i * 3;
+                
+        int dest = getUnitDestination( i );
+        if( dest == 0 ) {
+            // swap home between opponents
+            dest = 1;
+            }
+        message[ index++ ] = (unsigned char)dest;
+                
+                
+        message[ index++ ] = (unsigned char)getUnitBid( i );
+        message[ index++ ] = (unsigned char)getUnitInspectorBribe( i );
+        }
+            
+    printOut( "Sending message: " );
+    for( i=0; i<messageLength; i++ ) {
+        printOut( "%d,", message[i] );
+        }
+    printOut( "\n" );
+            
+    sendMessage( message, (unsigned int)messageLength );
+    }
+
+
+// returns total spent by opponent, or -1 if message not received
+static int getMoveMessage() {
+    unsigned int messageLength;
+    unsigned char *message = getMessage( &messageLength );
+    //printOut( "trying to receive message\n" );
+        
+    if( message != NULL ) {
+        // got move!            
+
+        // unpack it
+        if( messageLength != numPlayerUnits * 3 ) {
+            printOut( "Bad message length from opponent\n" );
+            stateDone = true;
+
+            delete [] message;
+            return -1;
+            }
+            
+
+        int totalBidsAndBribes = 0;
+            
+        int i;
+        for( i=0; i<numPlayerUnits; i++ ) {
+            int index = i * 3;
+                
+            int oppUnit = i + numPlayerUnits;
+                
+            setUnitDestination( oppUnit,
+                                message[ index++ ] );
+            
+            int bid = message[ index++ ];
+                
+            setUnitBid( oppUnit, bid );
+                
+            totalBidsAndBribes += bid;
+                
+            int bribe = message[ index++ ];
+                
+            setUnitInspectorBribe( oppUnit, bribe );
+
+            totalBidsAndBribes += bribe;
+                
+                
+            if( getUnitDestination( oppUnit ) ==
+                getUnitRegion( numUnits - 1 ) ) {
+                    
+                // moving in with inspector, show bribe
+                showInspectorBribe( oppUnit, true );
+                }
+                
+            }
+        
+        delete [] message;
+        
+        return totalBidsAndBribes;
+        }
+
+    return -1;
+    }
+
+        
+
+
+    static char pickingBid = false;
 static char pickingBribe = false;
 
 
@@ -256,43 +357,15 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         }
 
  
-    if( activeUnit == -1 ) {
+    if( activeUnit == -1 && !sentInitialMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
             setAllUnitsNotSelectable();
             
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
 
-            // send our move as a message
-
-            // 3 chars per unit
-            // dest, bid, bribe
-            int messageLength = numPlayerUnits * 3;
-            unsigned char message[ numPlayerUnits * 3 ];
-
-            int i;
-            for( i=0; i<numPlayerUnits; i++ ) {
-                int index = i * 3;
-                
-                int dest = getUnitDestination( i );
-                if( dest == 0 ) {
-                    // swap home between opponents
-                    dest = 1;
-                    }
-                message[ index++ ] = (unsigned char)dest;
-                
-                
-                message[ index++ ] = (unsigned char)getUnitBid( i );
-                message[ index++ ] = (unsigned char)getUnitInspectorBribe( i );
-                }
+            sendMoveMessage();
             
-            printOut( "Sending message: " );
-            for( i=0; i<messageLength; i++ ) {
-                printOut( "%d,", message[i] );
-                }
-            printOut( "\n" );
-            
-            sendMessage( message, (unsigned int)messageLength );
-            sentMove = true;
+            sentInitialMove = true;
             }
         }
     
@@ -305,6 +378,30 @@ void MoveUnitsState::stepState() {
     
     stepUnits();
 
+    if( sentInitialMove && !gotMove ) {
+        if( checkConnectionStatus() == -1 ) {
+            statusSubMessage = 
+                translate( "phaseSubStatus_connectFailed" );
+            stateDone = true;
+            return;
+            }
+
+        
+        int totalBidsAndBribes = getMoveMessage();
+        
+        if( totalBidsAndBribes == -1 ) {
+            // still waiting
+            return;
+            }
+        else {
+            
+            statusMessage = translate( "phaseStatus_movePeek" );
+            setMovePeeking( true );
+            }        
+
+        }
+    
+
     if( sentMove && !gotMove ) {
         
         if( checkConnectionStatus() == -1 ) {
@@ -315,66 +412,19 @@ void MoveUnitsState::stepState() {
             }
 
         
-        unsigned int messageLength;
-        unsigned char *message = getMessage( &messageLength );
-        //printOut( "trying to receive message\n" );
+        int totalBidsAndBribes = getMoveMessage();
         
-        if( message != NULL ) {
-            // got move!
-
-            gotMove = true;
+        if( totalBidsAndBribes == -1 ) {
+            // still waiting
+            return;
+            }
+        else {
             
-
-            // unpack it
-            if( messageLength != numPlayerUnits * 3 ) {
-                printOut( "Bad message length from opponent\n" );
-                stateDone = true;
-
-                delete [] message;
-                return;
-                }
-            
-
-            int totalBidsAndBribes = 0;
-            
-            int i;
-            for( i=0; i<numPlayerUnits; i++ ) {
-                int index = i * 3;
-                
-                int oppUnit = i + numPlayerUnits;
-                
-                setUnitDestination( oppUnit,
-                                    message[ index++ ] );
-            
-                int bid = message[ index++ ];
-                
-                setUnitBid( oppUnit, bid );
-                
-                totalBidsAndBribes += bid;
-                
-                int bribe = message[ index++ ];
-                
-                setUnitInspectorBribe( oppUnit, bribe );
-
-                totalBidsAndBribes += bribe;
-                
-                
-                if( getUnitDestination( oppUnit ) ==
-                    getUnitRegion( numUnits - 1 ) ) {
-                    
-                    // moving in with inspector, show bribe
-                    showInspectorBribe( oppUnit, true );
-                    }
-                
-                }
-
             addPlayerMoney( 1, -totalBidsAndBribes );
             
 
             statusSubMessage = 
                 translate( "phaseSubStatus_moveExecute" );
-
-            delete [] message;
             }        
         }
     

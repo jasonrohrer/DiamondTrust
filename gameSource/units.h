@@ -64,6 +64,10 @@ intPair getUnitSalaryPosition( int inUnit );
 intPair getUnitBribePosition( int inUnit );
 
 
+void setMovePeeking( char inPeeking );
+
+
+
 // getting tired of writing so many access functions...
 // give access to the unit class directly
 class Unit {

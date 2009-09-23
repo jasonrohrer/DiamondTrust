@@ -21,6 +21,7 @@ phaseSubStatus_pickOpponentBribe  "Select bribe payment for this opponent agent"
 
 
 phaseStatus_move  "Move your agents"
+phaseStatus_movePeek  "Bribed units reveal"
 
 phaseSubStatus_pickAgent  "Pick an agent (or hit Done)"
 phaseSubStatus_pickRegion  "Pick destination for chosen agent"

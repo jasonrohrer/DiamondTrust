@@ -23,6 +23,7 @@ Unit::Unit()
 Unit gameUnit[ numUnits ];
 
 static int activeUnit = -1;
+static char peeking = false;
 
 static int activeUnitSprite;
 
@@ -166,6 +167,8 @@ Unit *getUnit( int inUnit ) {
 
 
 void drawUnits() {
+
+    // FIXME:  take peeking into account
 
     // draw paths first, under units
     for( int i=0; i<numUnits; i++ ) {
@@ -675,6 +678,10 @@ intPair getUnitBribePosition( int inUnit ) {
     return getUnitSalaryPosition( inUnit );
     }
 
+
+void setMovePeeking( char inPeeking ) {
+    peeking = inPeeking;
+    }
 
 
 
