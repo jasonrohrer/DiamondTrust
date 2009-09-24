@@ -511,6 +511,8 @@ void MoveUnitsState::stepState() {
 
             statusSubMessage = 
                 translate( "phaseSubStatus_moveExecute" );
+            
+            showAllUnitMoves( true );
             executeUnitMoves();
             }        
         }

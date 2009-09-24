@@ -26,6 +26,7 @@ static int activeUnit = -1;
 static char peeking = false;
 static char executing = true;
 static char showMoves = false;
+static char showAllMoves = false;
 
 static int activeUnitSprite;
 
@@ -179,7 +180,7 @@ char getUnitMoveVisible( int inUnit ) {
             return true;
             }
         }
-    else if( executing ) {
+    else if( showAllMoves ) {
         return true;
         }
     
@@ -762,6 +763,10 @@ char isAnyOpponentBribed() {
 
 void showUnitMoves( char inShow ) {
     showMoves = inShow;
+    }
+
+void showAllUnitMoves( char inShow ) {
+    showAllMoves = inShow;
     }
 
 

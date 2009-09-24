@@ -69,7 +69,11 @@ void setMovePeeking( char inPeeking );
 
 char isAnyOpponentBribed();
 
+// shows only moves that are known to player
 void showUnitMoves( char inShow );
+
+// shows all moves
+void showAllUnitMoves( char inShow );
 
 
 
