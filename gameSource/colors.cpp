@@ -4,6 +4,9 @@
 rgbaColor black = {0, 0, 0, 255 };
 rgbaColor white = {255, 255, 255, 255 };
 
+rgbaColor trans75white = {255, 255, 255, 192 };
+
+
 
 rgbaColor playerColor = { 0, 255, 0, 255 };
 rgbaColor enemyColor = { 255, 0, 0, 255 };

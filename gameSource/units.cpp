@@ -147,6 +147,8 @@ void initUnits() {
         gameUnit[ i ].mDest = gameUnit[ i ].mRegion;
         gameUnit[ i ].mBid = 0;
         gameUnit[ i ].mExecutionStep = 0;
+
+        gameUnit[ i ].mNumDiamondsHeld = 0;
         }
     
 

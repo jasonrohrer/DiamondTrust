@@ -104,6 +104,8 @@ class Unit {
 
         int mExecutionStep;
         int mNumExecutionSteps;
+
+        int mNumDiamondsHeld;
     };
 
 

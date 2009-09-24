@@ -534,3 +534,13 @@ void accumulateDiamonds() {
     mapRegionDiamondRate[ 7 ] ++;
     }
 
+
+int getDiamondsInRegion( int inRegion ) {
+    return mapRegionDiamondCount[ inRegion ];
+    }
+
+
+void decrementDiamonds( int inRegion ) {
+    mapRegionDiamondCount[ inRegion ]--;
+    }
+

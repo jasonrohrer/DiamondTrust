@@ -4,6 +4,8 @@
 extern rgbaColor black;
 extern rgbaColor white;
 
+extern rgbaColor trans75white;
+
 
 extern rgbaColor playerColor;
 extern rgbaColor enemyColor;

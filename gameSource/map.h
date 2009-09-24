@@ -28,3 +28,7 @@ intPair getDiamondPositionInRegion( int inRegion );
 
 
 void accumulateDiamonds();
+
+
+int getDiamondsInRegion( int inRegion );
+void decrementDiamonds( int inRegion );

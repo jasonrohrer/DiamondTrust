@@ -14,6 +14,7 @@
 #include "bidPicker.h"
 #include "gameStats.h"
 #include "colors.h"
+#include "flyingDiamonds.h"
 
 
 
@@ -37,6 +38,7 @@ extern GameState *connectState;
 extern GameState *salaryBribeState;
 extern GameState *moveUnitsState;
 extern GameState *moveInspectorState;
+extern GameState *buyDiamondsState;
 
 
 Button *doneButton;
@@ -95,6 +97,7 @@ void gameInit() {
     initUnits();
     initBidPicker();
     initStats();
+    initFlyingDiamonds();
     
     setPlayerMoney( 0, 18 );
     setPlayerMoney( 1, 18 );    
@@ -116,6 +119,7 @@ void gameFree() {
     freeUnits();
     freeBidPicker();
     freeStats();
+    freeFlyingDiamonds();
     }
 
 
@@ -146,13 +150,16 @@ void gameLoopTick() {
             
             switch( briber ) {
                 case -1:
-                    currentGameState = moveUnitsState;
+                    currentGameState = buyDiamondsState;
                     break;
                 case 0:
                 case 1:
                     currentGameState = moveInspectorState;
                     break;
                 }
+            }
+        else if( currentGameState == moveInspectorState ) {
+            currentGameState = buyDiamondsState;
             }
         
         
