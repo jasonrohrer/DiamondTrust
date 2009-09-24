@@ -207,8 +207,14 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                 
                 setPlayerUnitsSelectable( true );
 
-                statusSubMessage = translate( "phaseSubStatus_pickAgent" );
-                
+                if( !sentInitialMove ) {
+                    statusSubMessage = translate( "phaseSubStatus_pickAgent" );
+                    }
+                else {
+                    statusSubMessage = 
+                        translate( "phaseSubStatus_pickAgentAdjust" );
+                    }
+                    
                 setActiveUnit( -1 );
                 }
             }
@@ -248,7 +254,14 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         if( isBidDone() ) {
             setPlayerUnitsSelectable( true );
 
-            statusSubMessage = translate( "phaseSubStatus_pickAgent" );
+
+            if( !sentInitialMove ) {
+                statusSubMessage = translate( "phaseSubStatus_pickAgent" );
+                }
+            else {
+                statusSubMessage = 
+                    translate( "phaseSubStatus_pickAgentAdjust" );
+                }
 
             pickingBribe = false;
             setActiveUnit( -1 );
@@ -304,7 +317,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             for( int r=2; r<numMapRegions; r++ ) {
                 char alreadyDest = false;
                         
-                for( int u=0; u<numUnits-1 && !alreadyDest; u++ ) {
+                for( int u=0; u<numPlayerUnits && !alreadyDest; u++ ) {
                     int dest = getUnitDestination( u );
                     
                     if( dest == r ) {
@@ -349,8 +362,15 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             else {
                 setPlayerUnitsSelectable( true );
                 setActiveUnit( -1 );
-
-                statusSubMessage = translate( "phaseSubStatus_pickAgent" );
+                
+                if( !sentInitialMove ) {
+                    statusSubMessage = translate( "phaseSubStatus_pickAgent" );
+                    }
+                else {
+                    statusSubMessage = 
+                        translate( "phaseSubStatus_pickAgentAdjust" );
+                    }
+                
                 }
             
             }
@@ -360,7 +380,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
     if( activeUnit == -1 && !sentInitialMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
             setAllUnitsNotSelectable();
-            
+
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
 
             sendMoveMessage();
@@ -368,6 +388,18 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             sentInitialMove = true;
             }
         }
+    else if( activeUnit == -1 && !sentMove ) {
+        if( doneButton->getPressed( inX, inY ) ) {
+            setAllUnitsNotSelectable();
+            
+            statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
+            
+            sendMoveMessage();
+            
+            sentMove = true;
+            }
+        }
+    
     
     
     }
@@ -378,7 +410,7 @@ void MoveUnitsState::stepState() {
     
     stepUnits();
 
-    if( sentInitialMove && !gotMove ) {
+    if( sentInitialMove && !gotInitialMove ) {
         if( checkConnectionStatus() == -1 ) {
             statusSubMessage = 
                 translate( "phaseSubStatus_connectFailed" );
@@ -394,9 +426,31 @@ void MoveUnitsState::stepState() {
             return;
             }
         else {
+            gotInitialMove = true;
             
-            statusMessage = translate( "phaseStatus_movePeek" );
-            setMovePeeking( true );
+            if( isAnyOpponentBribed() ) {
+                // show opponent moves to player and let player adjust
+
+                statusMessage = translate( "phaseStatus_movePeek" );
+                statusSubMessage = 
+                    translate( "phaseSubStatus_pickAgentAdjust" );
+                setMovePeeking( true );
+                
+                setPlayerUnitsSelectable( true );
+                }
+            else {
+                // no new info, no need to adjust!
+
+                // send final move to opponent right away
+                setAllUnitsNotSelectable();
+                
+                statusSubMessage = 
+                    translate( "phaseSubStatus_waitingOpponent" );
+            
+                sendMoveMessage();
+                
+                sentMove = true;
+                }                
             }        
 
         }
@@ -419,6 +473,7 @@ void MoveUnitsState::stepState() {
             return;
             }
         else {
+            gotMove = true;
             
             addPlayerMoney( 1, -totalBidsAndBribes );
             
@@ -440,7 +495,9 @@ void MoveUnitsState::drawState() {
     
     int activeUnit = getActiveUnit();
 
-    if( activeUnit == -1 && !sentMove ) {
+    if( activeUnit == -1 && !sentMove
+        &&
+        !( sentInitialMove && !gotInitialMove ) ) {
         doneButton->draw();
         }
     

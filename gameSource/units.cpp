@@ -166,9 +166,22 @@ Unit *getUnit( int inUnit ) {
 
 
 
+char getUnitMoveVisible( int inUnit ) {
+    if( inUnit < numPlayerUnits ) {
+        return true;
+        }
+    
+    else if( peeking &&
+             gameUnit[inUnit].mTotalSalary < gameUnit[inUnit].mTotalBribe ) {
+        return true;
+        }
+    return false;
+    }
+ 
+
+
 void drawUnits() {
 
-    // FIXME:  take peeking into account
 
     // draw paths first, under units
     for( int i=0; i<numUnits; i++ ) {
@@ -188,7 +201,8 @@ void drawUnits() {
         c.a = 160;
         
 
-        if( gameUnit[i].mDest != gameUnit[i].mRegion ) {
+        if( getUnitMoveVisible( i ) &&
+            gameUnit[i].mDest != gameUnit[i].mRegion ) {
             // move chosen
             
             // draw line
@@ -322,7 +336,8 @@ void drawUnits() {
     // first markers
     for( int i=0; i<numUnits-1; i++ ) {
 
-        if( gameUnit[i].mDest != gameUnit[i].mRegion ) {
+        if( getUnitMoveVisible( i ) &&
+            gameUnit[i].mDest != gameUnit[i].mRegion ) {
             
             rgbaColor c;
             if( i < 3 ) {
@@ -343,7 +358,8 @@ void drawUnits() {
     // then amounts
     for( int i=0; i<numUnits-1; i++ ) {
 
-        if( gameUnit[i].mDest != gameUnit[i].mRegion ) {
+        if( getUnitMoveVisible( i ) &&
+            gameUnit[i].mDest != gameUnit[i].mRegion ) {
             
             
             intPair end = getUnitBidPosition( i );
@@ -374,7 +390,8 @@ void drawUnits() {
     // first markers
     for( int i=0; i<numUnits-1; i++ ) {
 
-        if( gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
+        if( getUnitMoveVisible( i ) &&
+            gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
             &&
             gameUnit[i].mShowInspectorBribe ) {
             
@@ -397,7 +414,8 @@ void drawUnits() {
     // then amounts
     for( int i=0; i<numUnits-1; i++ ) {
 
-        if( gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
+        if( getUnitMoveVisible( i ) &&
+            gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
             &&
             gameUnit[i].mShowInspectorBribe ) {
             
@@ -682,6 +700,18 @@ intPair getUnitBribePosition( int inUnit ) {
 void setMovePeeking( char inPeeking ) {
     peeking = inPeeking;
     }
+
+
+
+char isAnyOpponentBribed() {
+    for( int i=numPlayerUnits; i<numPlayerUnits*2; i++ ) {
+        if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe ) {
+            return true;
+            }
+        }
+    return false;
+    }
+
 
 
 

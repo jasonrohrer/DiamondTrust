@@ -67,6 +67,8 @@ intPair getUnitBribePosition( int inUnit );
 void setMovePeeking( char inPeeking );
 
 
+char isAnyOpponentBribed();
+
 
 // getting tired of writing so many access functions...
 // give access to the unit class directly

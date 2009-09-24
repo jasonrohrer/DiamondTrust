@@ -261,29 +261,35 @@ void SalaryBribeState::stepState() {
             
             int i;
             for( i=0; i<numPlayerUnits*2; i++ ) {
-                Unit *u = getUnit( i );
+                
 
                 int index = i * 2;
                 // units described in opposite order
 
                 // opp units first (opposite)
                 
-                if( i < 3 ) {
+                if( i < numPlayerUnits ) {
                     // these are opp units
-                    
+                    Unit *u = getUnit( i + numPlayerUnits );
+
                     // salary
                     u->mLastSalaryPayment = message[ index++ ];
                     totalSalaryAndBribes += u->mLastSalaryPayment;
                     
-                    // ignore last bribing unit
+                    // ignore last bribing unit, since we already know it
                     }
                 else {
                     // these bytes describe our units (from opponent's 
                     // point of view)
+                    Unit *u = getUnit( i - numPlayerUnits );
+
                     u->mLastBribePayment = message[ index++ ];
                     totalSalaryAndBribes += u->mLastBribePayment;
                     
                     u->mLastBribingUnit = message[ index++ ];
+                    
+                    // adjust to describe opponent unit that is bribing us
+                    u->mLastBribingUnit += numPlayerUnits;
                     }
                 }
 
@@ -328,7 +334,7 @@ void SalaryBribeState::drawState() {
     
     int activeUnit = getActiveUnit();
 
-    if( activeUnit == -1 ) {
+    if( activeUnit == -1 && ! sentMove ) {
         doneButton->draw();
         }
     
