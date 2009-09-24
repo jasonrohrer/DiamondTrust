@@ -30,3 +30,9 @@ phaseSubStatus_pickBid  "Select payment for diamonds in destination region"
 phaseSubStatus_pickInspectorBribe  "Bribe the UN Inspector?"
 phaseSubStatus_waitingOpponent  "Waiting for opponent to move..."
 phaseSubStatus_moveExecute  "Executing moves..."
+
+
+
+phaseStatus_moveInspector  "Move the UN Inspector "
+
+phaseSubStatus_pickInspectorRegion  "Pick destination (or hit Done)"

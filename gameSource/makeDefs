@@ -14,6 +14,7 @@ TranslationManager.cpp \
 connectState.cpp \
 salaryBribeState.cpp \
 moveUnitsState.cpp \
+moveInspectorState.cpp \
 bidPicker.cpp \
 gameStats.cpp \
 colors.cpp \
@@ -41,6 +42,7 @@ s/^TranslationManager\.o/\.\.\/TranslationManager\.o/; \
 s/^connectState\.o/\.\.\/connectState\.o/; \
 s/^salaryBribeState\.o/\.\.\/salaryBribeState\.o/; \
 s/^moveUnitsState\.o/\.\.\/moveUnitsState\.o/; \
+s/^moveInspectorState\.o/\.\.\/moveInspectorState\.o/; \
 s/^bidPicker\.o/\.\.\/bidPicker\.o/; \
 s/^gameStats\.o/\.\.\/gameStats\.o/; \
 s/^colors\.o/\.\.\/colors\.o/; \

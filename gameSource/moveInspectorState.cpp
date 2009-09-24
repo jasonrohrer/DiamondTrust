@@ -1,0 +1,219 @@
+#include "GameState.h"
+#include "units.h"
+#include "map.h"
+#include "Button.h"
+#include "common.h"
+#include "bidPicker.h"
+#include "gameStats.h"
+
+
+//static int activeUnit = -1;
+static char stateDone = false;
+static char moving = false;
+static char waiting = false;
+static char sentMove = false;
+static char gotMove = false;
+
+
+extern Button *doneButton;
+extern char *statusMessage;
+extern char *statusSubMessage;
+
+
+
+class MoveInspectorState : public GameState {
+    public:
+        
+        virtual void clickState( int inX, int inY );
+        
+
+        virtual void stepState();
+        
+        
+
+        // draws into bottom screen
+        virtual void drawState();
+
+
+        virtual void enterState();        
+        virtual char isStateDone() {
+            return stateDone;
+            }
+        
+        
+
+        // destructor?
+        //virtual ~GameState();
+        
+    };
+
+
+
+
+static void sendMoveMessage() {
+    // send our move as a message
+
+    // 1 char
+    // inspector dest
+    int messageLength = 1;
+    unsigned char message[ 1 ];
+
+    message[0] = (unsigned char)getUnitDestination( numUnits - 1 );
+                
+    printOut( "Sending message: " );
+    for( int i=0; i<messageLength; i++ ) {
+        printOut( "%d,", message[i] );
+        }
+    printOut( "\n" );
+            
+    sendMessage( message, (unsigned int)messageLength );
+    }
+
+
+
+
+void MoveInspectorState::clickState( int inX, int inY ) {
+
+
+    // region picked?
+    int chosenRegion = getChosenRegion( inX, inY );
+            
+    if( chosenRegion != -1 ) {
+        setUnitDestination( numUnits-1, chosenRegion );
+        }
+
+    
+    if( moving && !sentMove ) {
+        if( doneButton->getPressed( inX, inY ) ) {
+            
+            setAllRegionsNotSelectable();
+            
+            
+            sendMoveMessage();
+
+            statusSubMessage = translate( "phaseSubStatus_moveExecute" );
+            
+            
+            sentMove = true;
+
+            showAllUnitMoves( true );
+            executeUnitMoves();
+            }
+        }
+    
+    
+    
+    }
+
+
+
+void MoveInspectorState::stepState() {
+    
+    stepUnits();
+
+    if( waiting && !gotMove ) {
+        
+        if( checkConnectionStatus() == -1 ) {
+            statusSubMessage = 
+                translate( "phaseSubStatus_connectFailed" );
+            stateDone = true;
+            return;
+            }
+
+        
+
+        unsigned int messageLength;
+        unsigned char *message = getMessage( &messageLength );
+        //printOut( "trying to receive message\n" );
+        
+        if( message != NULL ) {
+            // got move!            
+            gotMove = true;
+            
+            // unpack it
+            if( messageLength != 1 ) {
+                printOut( "Bad message length from opponent\n" );
+                stateDone = true;
+                
+                delete [] message;
+                return;
+                }
+            
+            
+            setUnitDestination( numUnits-1, (int)message[0] );
+            
+            delete [] message;
+                     
+
+            statusSubMessage = 
+                translate( "phaseSubStatus_moveExecute" );
+            
+            showAllUnitMoves( true );
+            executeUnitMoves();
+            }        
+        }
+
+
+    if( sentMove || gotMove ) {
+        if( unitAnimationsDone() ) {
+            stateDone = true;
+            }
+        }
+    
+    
+    }
+
+
+
+void MoveInspectorState::drawState() {
+    drawMap();
+    startNewSpriteLayer();
+    
+    drawUnits();
+    
+    if( moving && !sentMove ) {
+        doneButton->draw();
+        }    
+    }
+
+
+
+
+
+void MoveInspectorState::enterState() {
+    stateDone = false;
+
+    statusMessage = translate( "phaseStatus_moveInspector" );
+            
+    if( getPlayerBribedInspector() == 0 ) {
+        moving = true;
+        setActiveUnit( numUnits - 1 );
+
+        statusSubMessage = translate( "phaseSubStatus_pickInspectorRegion" ); 
+
+        for( int r=2; r<numMapRegions; r++ ) {
+            setRegionSelectable( r, true );
+            }
+        }
+    else {
+        waiting = true;
+        statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
+        }
+    
+    sentMove = false;
+    gotMove = false;
+    
+    
+    showUnitMoves( true );
+    }
+
+
+
+
+
+
+// singleton
+static MoveInspectorState state;
+
+
+GameState *moveInspectorState = &state;

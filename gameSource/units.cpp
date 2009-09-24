@@ -776,7 +776,7 @@ void showAllUnitMoves( char inShow ) {
 
 void executeUnitMoves() {
     executing = true;
-    for( int i=0; i<numPlayerUnits*2; i++ ) {
+    for( int i=0; i<numUnits; i++ ) {
         gameUnit[i].mExecutionStep = 0;
         
         // steps based on distance
@@ -798,7 +798,7 @@ void stepUnits() {
         
         char foundNext = false;
     
-        for( int i=0; i<numPlayerUnits*2 && !foundNext; i++ ) {
+        for( int i=0; i<numUnits && !foundNext; i++ ) {
             if( gameUnit[i].mExecutionStep < gameUnit[i].mNumExecutionSteps ) {
                 foundNext = true;
                 gameUnit[i].mExecutionStep++;
@@ -814,7 +814,7 @@ void stepUnits() {
             }
         if( !foundNext ) {
             // done moving them all 
-            for( int i=0; i<numPlayerUnits*2; i++ ) {                
+            for( int i=0; i<numUnits; i++ ) {                
                 gameUnit[i].mExecutionStep = 0;
                 }
             
@@ -827,6 +827,37 @@ void stepUnits() {
 
 char unitAnimationsDone() {
     return !executing;
+    }
+
+
+
+
+
+int getPlayerBribedInspector() {
+    int highBribingUnit = -1;
+    int highBribe = 0;
+    
+    for( int i=0; i<numPlayerUnits*2; i++ ) { 
+        if( gameUnit[i].mRegion == gameUnit[numUnits - 1].mRegion
+            &&
+            gameUnit[i].mInspectorBribe > highBribe ) {
+            
+            highBribe = gameUnit[i].mInspectorBribe;
+            
+            highBribingUnit = i;
+            }
+        }
+    
+    if( highBribingUnit == -1 ) {
+        return -1;
+        }
+    
+    if( highBribingUnit < numPlayerUnits ) {
+        return 0;
+        }
+    else {
+        return 1;
+        }
     }
 
 

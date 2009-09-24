@@ -36,6 +36,7 @@ GameState *currentGameState;
 extern GameState *connectState;
 extern GameState *salaryBribeState;
 extern GameState *moveUnitsState;
+extern GameState *moveInspectorState;
 
 
 Button *doneButton;
@@ -140,6 +141,20 @@ void gameLoopTick() {
         else if( currentGameState == salaryBribeState ) {
             currentGameState = moveUnitsState;
             }
+        else if( currentGameState == moveUnitsState ) {
+            int briber = getPlayerBribedInspector();
+            
+            switch( briber ) {
+                case -1:
+                    currentGameState = moveUnitsState;
+                    break;
+                case 0:
+                case 1:
+                    currentGameState = moveInspectorState;
+                    break;
+                }
+            }
+        
         
         
         currentGameState->enterState();
