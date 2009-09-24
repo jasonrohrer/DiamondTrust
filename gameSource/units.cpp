@@ -35,8 +35,6 @@ extern Font *font8;
 
 static int bribedMarkerSprite;
 
-static int numExecutionSteps = 30;
-
 
 
 //static rgbaColor inspectorColor = {84, 84, 255, 255 };
@@ -197,11 +195,12 @@ intPair getUnitCurrentPosition( int inUnit ) {
     intPair end = getUnitPositionInRegion( gameUnit[i].mDest, i );
 
     int progress = gameUnit[i].mExecutionStep;
-    
     if( progress == 0 ) {
         return start;
         }
-    if( progress == numExecutionSteps ) {
+
+    int numSteps = gameUnit[i].mNumExecutionSteps;
+    if( progress == numSteps ) {
         return end;
         }
     
@@ -210,11 +209,11 @@ intPair getUnitCurrentPosition( int inUnit ) {
     result.x *= progress;
     result.y *= progress;
     
-    result.x += (numExecutionSteps - progress) * start.x;
-    result.y += (numExecutionSteps - progress) * start.y;
+    result.x += (numSteps - progress) * start.x;
+    result.y += (numSteps - progress) * start.y;
     
-    result.x /= numExecutionSteps;
-    result.y /= numExecutionSteps;
+    result.x /= numSteps;
+    result.y /= numSteps;
         
     return result;
     }
@@ -772,6 +771,20 @@ void showUnitMoves( char inShow ) {
 
 void executeUnitMoves() {
     executing = true;
+    for( int i=0; i<numPlayerUnits*2; i++ ) {
+        gameUnit[i].mExecutionStep = 0;
+        
+        // steps based on distance
+        intPair start = 
+            getUnitPositionInRegion( gameUnit[i].mRegion, i );
+            
+        intPair end = 
+            getUnitPositionInRegion( gameUnit[i].mDest, i );
+        
+        int distance = intDistance( start, end );
+        
+        gameUnit[i].mNumExecutionSteps = distance / 2;
+        }
     }
 
 
@@ -781,16 +794,22 @@ void stepUnits() {
         char foundNext = false;
     
         for( int i=0; i<numPlayerUnits*2 && !foundNext; i++ ) {
-            if( gameUnit[i].mExecutionStep < numExecutionSteps ) {
+            if( gameUnit[i].mExecutionStep < gameUnit[i].mNumExecutionSteps ) {
                 foundNext = true;
                 gameUnit[i].mExecutionStep++;
+
+                if( gameUnit[i].mExecutionStep == 
+                    gameUnit[i].mNumExecutionSteps ) {
+                    
+                    // unit done moving, clear destination
+                    gameUnit[i].mRegion = gameUnit[i].mDest;
+                    }
+                
                 }
             }
         if( !foundNext ) {
-            // done moving them
-            for( int i=0; i<numPlayerUnits*2; i++ ) {
-                // clear their destinations
-                gameUnit[i].mRegion = gameUnit[i].mDest;
+            // done moving them all 
+            for( int i=0; i<numPlayerUnits*2; i++ ) {                
                 gameUnit[i].mExecutionStep = 0;
                 }
             

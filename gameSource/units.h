@@ -99,6 +99,7 @@ class Unit {
         int mLastBribingUnit;
 
         int mExecutionStep;
+        int mNumExecutionSteps;
     };
 
 
