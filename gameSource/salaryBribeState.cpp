@@ -12,6 +12,11 @@ static char stateDone = false;
 static char sentMove = false;
 static char gotMove = false;
 
+// wait at least 2 seconds between wait and display
+static char stepsSinceSentMove = 0;
+static char minSteps = 30;
+
+
 static char pickingSalary = false;
 static char pickingBribe = false;
 
@@ -213,6 +218,7 @@ void SalaryBribeState::clickState( int inX, int inY ) {
             
             sendMessage( message, (unsigned int)messageLength );
             sentMove = true;
+            stepsSinceSentMove = 0;
             }
         
         }
@@ -227,7 +233,9 @@ void SalaryBribeState::stepState() {
     
     stepUnits();
 
-    if( sentMove && !gotMove ) {
+    stepsSinceSentMove++;
+    
+    if( sentMove && !gotMove && stepsSinceSentMove > minSteps ) {
         
         if( checkConnectionStatus() == -1 ) {
             statusSubMessage = 

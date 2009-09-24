@@ -14,6 +14,8 @@ static char waiting = false;
 static char sentMove = false;
 static char gotMove = false;
 
+static char stepsWaiting = 0;
+static char minSteps = 30;
 
 extern Button *doneButton;
 extern char *statusMessage;
@@ -90,7 +92,7 @@ void MoveInspectorState::clickState( int inX, int inY ) {
             
             
             sendMoveMessage();
-
+                        
             statusSubMessage = translate( "phaseSubStatus_moveExecute" );
             
             
@@ -110,8 +112,9 @@ void MoveInspectorState::clickState( int inX, int inY ) {
 void MoveInspectorState::stepState() {
     
     stepUnits();
-
-    if( waiting && !gotMove ) {
+    stepsWaiting++;
+    
+    if( waiting && !gotMove && stepsWaiting > minSteps ) {
         
         if( checkConnectionStatus() == -1 ) {
             statusSubMessage = 
@@ -198,6 +201,7 @@ void MoveInspectorState::enterState() {
     else {
         waiting = true;
         statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
+        stepsWaiting = 0;
         }
     
     sentMove = false;

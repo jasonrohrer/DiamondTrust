@@ -174,14 +174,13 @@ char getUnitMoveVisible( int inUnit ) {
     if( inUnit < numPlayerUnits ) {
         return true;
         }
-    
+    else if( showAllMoves ) {
+        return true;
+        }
     else if( peeking ) {
         if( gameUnit[inUnit].mTotalSalary < gameUnit[inUnit].mTotalBribe ) {
             return true;
             }
-        }
-    else if( showAllMoves ) {
-        return true;
         }
     
     return false;

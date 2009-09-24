@@ -14,6 +14,9 @@ static char gotInitialMove = false;
 static char sentMove = false;
 static char gotMove = false;
 
+static char stepsSinceSentMove = 0;
+static char minSteps = 30;
+
 
 extern Button *doneButton;
 extern char *statusMessage;
@@ -415,6 +418,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
 
             sendMoveMessage();
+            stepsSinceSentMove = 0;
             
             sentInitialMove = true;
             }
@@ -426,7 +430,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
             
             sendMoveMessage();
-            
+            stepsSinceSentMove = 0;
+
             sentMove = true;
             }
         }
@@ -440,8 +445,9 @@ void MoveUnitsState::clickState( int inX, int inY ) {
 void MoveUnitsState::stepState() {
     
     stepUnits();
-
-    if( sentInitialMove && !gotInitialMove ) {
+    stepsSinceSentMove ++;
+    
+    if( sentInitialMove && !gotInitialMove && stepsSinceSentMove > minSteps ) {
         if( checkConnectionStatus() == -1 ) {
             statusSubMessage = 
                 translate( "phaseSubStatus_connectFailed" );
@@ -487,7 +493,7 @@ void MoveUnitsState::stepState() {
         }
     
 
-    if( sentMove && !gotMove ) {
+    if( sentMove && !gotMove && stepsSinceSentMove > minSteps ) {
         
         if( checkConnectionStatus() == -1 ) {
             statusSubMessage = 

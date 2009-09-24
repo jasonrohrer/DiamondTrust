@@ -14,6 +14,11 @@ extern char *statusMessage;
 extern char *statusSubMessage;
 
 
+// wait at least 2 seconds between wait and display
+static char stepsSinceConnectTry = 0;
+static char minSteps = 30;
+
+
 
 class ConnectState : public GameState {
     public:
@@ -91,6 +96,7 @@ void ConnectState::clickState( int inX, int inY ) {
             
             statusSubMessage = mMessage;
             connecting = true;
+            stepsSinceConnectTry = 0;
             }
         else if( childButton->getPressed( inX, inY ) ) {
 
@@ -100,6 +106,7 @@ void ConnectState::clickState( int inX, int inY ) {
             statusSubMessage = 
                 translate( "phaseSubStatus_connectingToParent" );
             connecting = true;
+            stepsSinceConnectTry = 0;
             }
         }
     
@@ -109,8 +116,9 @@ void ConnectState::clickState( int inX, int inY ) {
 
 
 void ConnectState::stepState() {
-
-    if( connecting ) {
+    stepsSinceConnectTry ++;
+    
+    if( connecting && stepsSinceConnectTry > minSteps ) {
         
 
         if( checkConnectionStatus() == -1 ) {
