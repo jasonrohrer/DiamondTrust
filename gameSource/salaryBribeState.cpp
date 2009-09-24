@@ -378,6 +378,7 @@ void SalaryBribeState::enterState() {
     stateDone = false;
     
     setActiveUnit( -1 );
+    showUnitMoves( false );
     
     // user needs to pick one
     setPayableUnitsSelectable();

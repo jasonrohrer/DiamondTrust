@@ -24,6 +24,8 @@ Unit gameUnit[ numUnits ];
 
 static int activeUnit = -1;
 static char peeking = false;
+static char executing = true;
+static char showMoves = false;
 
 static int activeUnitSprite;
 
@@ -32,6 +34,8 @@ static int bidW, bidH;
 extern Font *font8;
 
 static int bribedMarkerSprite;
+
+static int numExecutionSteps = 30;
 
 
 
@@ -143,6 +147,7 @@ void initUnits() {
     for( i=0; i<numUnits; i++ ) {
         gameUnit[ i ].mDest = gameUnit[ i ].mRegion;
         gameUnit[ i ].mBid = 0;
+        gameUnit[ i ].mExecutionStep = 0;
         }
     
 
@@ -171,20 +176,65 @@ char getUnitMoveVisible( int inUnit ) {
         return true;
         }
     
-    else if( peeking &&
-             gameUnit[inUnit].mTotalSalary < gameUnit[inUnit].mTotalBribe ) {
+    else if( peeking ) {
+        if( gameUnit[inUnit].mTotalSalary < gameUnit[inUnit].mTotalBribe ) {
+            return true;
+            }
+        }
+    else if( executing ) {
         return true;
         }
+    
     return false;
     }
- 
+
+
+
+intPair getUnitCurrentPosition( int inUnit ) {
+    int i=inUnit;
+    
+    intPair start = getUnitPositionInRegion( gameUnit[i].mRegion, i );
+    intPair end = getUnitPositionInRegion( gameUnit[i].mDest, i );
+
+    int progress = gameUnit[i].mExecutionStep;
+    
+    if( progress == 0 ) {
+        return start;
+        }
+    if( progress == numExecutionSteps ) {
+        return end;
+        }
+    
+    // else blend
+    intPair result = end;
+    result.x *= progress;
+    result.y *= progress;
+    
+    result.x += (numExecutionSteps - progress) * start.x;
+    result.y += (numExecutionSteps - progress) * start.y;
+    
+    result.x /= numExecutionSteps;
+    result.y /= numExecutionSteps;
+        
+    return result;
+    }
+
+
+int getHomeRegion( int inUnit ) {
+    if( inUnit < numPlayerUnits ) {
+        return 0;
+        }
+    else {
+        return 1;
+        }
+    }
 
 
 void drawUnits() {
 
 
     // draw paths first, under units
-    for( int i=0; i<numUnits; i++ ) {
+    for( int i=0; i<numUnits && showMoves; i++ ) {
         rgbaColor c;
         if( i < 3 ) {
             c = playerColor;
@@ -254,7 +304,7 @@ void drawUnits() {
             c = white;
             }
         
-        intPair pos = getUnitPositionInRegion( gameUnit[i].mRegion, i );
+        intPair pos = getUnitCurrentPosition( i );
         
         // center
         pos.x -= unitSpriteW / 2;
@@ -313,8 +363,7 @@ void drawUnits() {
                     c = playerColor;
                     }
                 
-                intPair pos = 
-                    getUnitPositionInRegion( gameUnit[i].mRegion, i );
+                intPair pos = getUnitCurrentPosition( i );
         
                 // center
                 pos.x -= unitSpriteW / 2;
@@ -334,10 +383,10 @@ void drawUnits() {
 
 
     // first markers
-    for( int i=0; i<numUnits-1; i++ ) {
+    for( int i=0; i<numUnits-1 && showMoves; i++ ) {
 
         if( getUnitMoveVisible( i ) &&
-            gameUnit[i].mDest != gameUnit[i].mRegion ) {
+            gameUnit[i].mDest != getHomeRegion( i ) ) {
             
             rgbaColor c;
             if( i < 3 ) {
@@ -356,10 +405,10 @@ void drawUnits() {
         }
     startNewSpriteLayer();
     // then amounts
-    for( int i=0; i<numUnits-1; i++ ) {
+    for( int i=0; i<numUnits-1 && showMoves; i++ ) {
 
         if( getUnitMoveVisible( i ) &&
-            gameUnit[i].mDest != gameUnit[i].mRegion ) {
+            gameUnit[i].mDest != getHomeRegion( i ) ) {
             
             
             intPair end = getUnitBidPosition( i );
@@ -388,7 +437,7 @@ void drawUnits() {
     
 
     // first markers
-    for( int i=0; i<numUnits-1; i++ ) {
+    for( int i=0; i<numUnits-1 && showMoves; i++ ) {
 
         if( getUnitMoveVisible( i ) &&
             gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
@@ -412,7 +461,7 @@ void drawUnits() {
         }
     startNewSpriteLayer();
     // then amounts
-    for( int i=0; i<numUnits-1; i++ ) {
+    for( int i=0; i<numUnits-1 && showMoves; i++ ) {
 
         if( getUnitMoveVisible( i ) &&
             gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
@@ -540,8 +589,6 @@ void drawUnits() {
     }
 
 
-void stepUnits() {
-    }
 
 
 void setUnitSelectable( int inUnit, char inSelectable ) {
@@ -714,14 +761,48 @@ char isAnyOpponentBribed() {
 
 
 
-
-
-
-void executeMove( int inUnit ) {
+void showUnitMoves( char inShow ) {
+    showMoves = inShow;
     }
 
 
-char animationsDone() {
+
+
+
+
+void executeUnitMoves() {
+    executing = true;
+    }
+
+
+void stepUnits() {
+    if( executing ) {
+        
+        char foundNext = false;
+    
+        for( int i=0; i<numPlayerUnits*2 && !foundNext; i++ ) {
+            if( gameUnit[i].mExecutionStep < numExecutionSteps ) {
+                foundNext = true;
+                gameUnit[i].mExecutionStep++;
+                }
+            }
+        if( !foundNext ) {
+            // done moving them
+            for( int i=0; i<numPlayerUnits*2; i++ ) {
+                // clear their destinations
+                gameUnit[i].mRegion = gameUnit[i].mDest;
+                gameUnit[i].mExecutionStep = 0;
+                }
+            
+            executing = false;
+            }
+        }
+    
+    }
+
+
+char unitAnimationsDone() {
+    return !executing;
     }
 
 

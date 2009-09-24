@@ -147,7 +147,7 @@ static int getMoveMessage() {
         
 
 
-    static char pickingBid = false;
+static char pickingBid = false;
 static char pickingBribe = false;
 
 
@@ -196,8 +196,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                 // inspector there
 
                 pickingBribe = true;
-                setUnitInspectorBribe( activeUnit, 0 );
-                setPickerBid( 0 );
+                //setUnitInspectorBribe( activeUnit, 0 );
+                setPickerBid( getUnitInspectorBribe( activeUnit ) );
                 showInspectorBribe( activeUnit, true );
 
                 statusSubMessage = 
@@ -287,6 +287,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
             // clear any old move
             int unitRegion = getUnitRegion( activeUnit );
+            /*
             setUnitDestination( activeUnit, unitRegion );
             
             int oldBid = getUnitBid( activeUnit );
@@ -298,7 +299,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
             addPlayerMoney( 0, oldBribe );
             setUnitInspectorBribe( activeUnit, 0 );
-
+            */
        
             // unit can move to any region that's not already
             // a destination of friendly units
@@ -313,15 +314,20 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                     
                     
             // never move into region 1 (enemy home)
-
+            
             for( int r=2; r<numMapRegions; r++ ) {
                 char alreadyDest = false;
                         
                 for( int u=0; u<numPlayerUnits && !alreadyDest; u++ ) {
                     int dest = getUnitDestination( u );
                     
-                    if( dest == r ) {
-                        alreadyDest = true;
+                    // allow unit to "move into" its current non-home
+                    // region to re-specify its bid there
+                    if( u != activeUnit ) {
+                        
+                        if( dest == r ) {
+                            alreadyDest = true;
+                            }
                         }
                     }
 
@@ -342,7 +348,34 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         int chosenRegion = getChosenRegion( inX, inY );
             
         if( chosenRegion != -1 ) {
-            setUnitDestination( activeUnit, chosenRegion );
+            
+            // different dest chose?
+            int oldDest = getUnitDestination( activeUnit );
+            
+            if( oldDest != chosenRegion ) {
+                // clear old bid info
+                int oldBid = getUnitBid( activeUnit );
+            
+                addPlayerMoney( 0, oldBid );
+                setUnitBid( activeUnit, 0 );
+
+                int oldBribe = getUnitInspectorBribe( activeUnit );
+            
+                addPlayerMoney( 0, oldBribe );
+                setUnitInspectorBribe( activeUnit, 0 );
+            
+                setUnitDestination( activeUnit, chosenRegion );
+                setPickerBid( 0 );
+                }
+            else {
+                // same region
+                
+                // keep old bid for adjustment
+                int oldBid = getUnitBid( activeUnit );
+                setPickerBid( oldBid );
+                }
+            
+            
             //setUnitBid( activeUnit, 0 );
             //setPickerBid( 0 );
             
@@ -354,8 +387,6 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
 
             if( chosenRegion != 0 ) {
-                
-                setPickerBid( 0 );
                 pickingBid = true;
                 showInspectorBribe( activeUnit, false );
                 }
@@ -480,8 +511,16 @@ void MoveUnitsState::stepState() {
 
             statusSubMessage = 
                 translate( "phaseSubStatus_moveExecute" );
+            executeUnitMoves();
             }        
         }
+
+    if( sentMove && gotMove ) {
+        if( unitAnimationsDone() ) {
+            stateDone = true;
+            }
+        }
+    
     
     }
 
@@ -540,8 +579,13 @@ void MoveUnitsState::drawState() {
 
 void MoveUnitsState::enterState() {
     stateDone = false;
+    sentInitialMove = false;
+    gotInitialMove = false;
+    sentMove = false;
+    gotMove = false;
     
     setActiveUnit( -1 );
+    showUnitMoves( true );
     
     // user needs to pick one
     setPlayerUnitsSelectable( true );

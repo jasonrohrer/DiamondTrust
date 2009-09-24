@@ -69,6 +69,9 @@ void setMovePeeking( char inPeeking );
 
 char isAnyOpponentBribed();
 
+void showUnitMoves( char inShow );
+
+
 
 // getting tired of writing so many access functions...
 // give access to the unit class directly
@@ -94,6 +97,8 @@ class Unit {
         char mShowBribePayment;
         
         int mLastBribingUnit;
+
+        int mExecutionStep;
     };
 
 
@@ -101,10 +106,9 @@ Unit *getUnit( int inUnit );
 
 
 
-// does nothing if unit not moving to a new region
-void executeMove( int inUnit );
+void executeUnitMoves();
 
 
-// true if latest execution done
-char animationsDone();
+// true if last execution done
+char unitAnimationsDone();
 
