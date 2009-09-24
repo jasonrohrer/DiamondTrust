@@ -33,6 +33,9 @@ phaseSubStatus_moveExecute  "Executing moves..."
 
 
 
-phaseStatus_moveInspector  "Move the UN Inspector "
+phaseStatus_moveInspector  "Move the UN Inspector"
 
 phaseSubStatus_pickInspectorRegion  "Pick destination (or hit Done)"
+
+
+phaseStatus_buyDiamonds  "Buying diamonds"
