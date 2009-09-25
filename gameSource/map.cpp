@@ -28,6 +28,8 @@ static int bottomHalfOffset = 128;
 int diamondSpriteID;
 int diamondSpriteW, diamondSpriteH;
 
+int vaultSpriteID;
+
 
 
 static int mapRegionSpriteID[ numMapRegions ];
@@ -46,6 +48,9 @@ static intPair mapRegionUnitPosition[ numMapRegions ][ 3 ];
 
 // positions of diamond marker in regions
 static intPair mapRegionDiamondPosition[ numMapRegions ];
+
+// positions of vault marker in regions
+static intPair mapRegionVaultPosition[ numMapRegions ];
 
 
 // for checking region clicks
@@ -104,7 +109,12 @@ void initMap() {
     unsigned int diamondMarkerColorInt = toInt( diamondMarkerColor );
     // clear it
     mapRGBA[ numMapRegions + 2 ] = backgroundColor;
-    
+
+    rgbaColor vaultMarkerColor = mapRGBA[ numMapRegions + 3 ];
+    unsigned int vaultMarkerColorInt = toInt( vaultMarkerColor );
+    // clear it
+    mapRGBA[ numMapRegions + 3 ] = backgroundColor;
+
 
     int i;
     for( i=0; i<numMapRegions; i++ ) {
@@ -159,7 +169,7 @@ void initMap() {
                         
                         // remember it
                         mapRegionUnitPosition[ i ][ numMarkersFound ].x
-                            = x;
+                            = x + 1;
                         mapRegionUnitPosition[ i ][ numMarkersFound ].y
                             = y;
                         numMarkersFound++;
@@ -174,8 +184,21 @@ void initMap() {
                         mapRGBA[ pixIndex + 1 ] = thisRegionColor;
                         
                         // remember it
-                        mapRegionDiamondPosition[ i ].x = x;
+                        mapRegionDiamondPosition[ i ].x = x + 1;
                         mapRegionDiamondPosition[ i ].y = y;
+                        }
+                    else if( mapPixelInts[ pixIndex + 1 ] == 
+                             vaultMarkerColorInt ) {
+
+                        // marker found
+                        
+                        // clear it
+                        mapPixelInts[ pixIndex + 1 ] = thisRegionColorInt;
+                        mapRGBA[ pixIndex + 1 ] = thisRegionColor;
+                        
+                        // remember it
+                        mapRegionVaultPosition[ i ].x = x + 1;
+                        mapRegionVaultPosition[ i ].y = y;
                         }
 
                     }
@@ -376,6 +399,8 @@ void initMap() {
                                   &diamondSpriteW, &diamondSpriteH,
                                   true );
 
+    vaultSpriteID = loadSprite( "vault.tga", true );
+
 
     mapRegionDiamondRate[ 0 ] = 0;
     mapRegionDiamondRate[ 1 ] = 0;
@@ -420,6 +445,15 @@ void drawMap() {
         }
     
     startNewSpriteLayer();
+
+    // next vaults (only in home regions
+    for( i=0; i<2; i++ ) {
+        drawSprite( vaultSpriteID, 
+                    mapRegionVaultPosition[i].x, 
+                    mapRegionVaultPosition[i].y, 
+                    white );
+        }
+
     // next diamonds (only producing regions)
     for( i=2; i<numMapRegions; i++ ) {
         drawSprite( diamondSpriteID, 

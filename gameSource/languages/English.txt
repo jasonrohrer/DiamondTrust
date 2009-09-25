@@ -26,11 +26,14 @@ phaseStatus_movePeek  "Bribed units reveal moves"
 phaseSubStatus_pickAgent  "Pick an agent (or hit Done)"
 phaseSubStatus_pickAgentAdjust  "Adjust move?  Pick an agent (or hit Done)"
 phaseSubStatus_pickRegion  "Pick destination for chosen agent"
-phaseSubStatus_pickBid  "Select payment for diamonds in destination region"
+phaseSubStatus_pickBid  "How much to pay diamond guide in this region?"
 phaseSubStatus_pickInspectorBribe  "Bribe the UN Inspector?"
 phaseSubStatus_waitingOpponent  "Waiting for opponent to move..."
 phaseSubStatus_moveExecute  "Executing moves..."
 
+
+phaseStatus_depositDiamonds  "Depositing diamonds"
+phaseSubStatus_depositDiamonds "Agents returning home unload their diamonds"
 
 
 phaseStatus_moveInspector  "Move the UN Inspector"
@@ -38,4 +41,5 @@ phaseStatus_moveInspector  "Move the UN Inspector"
 phaseSubStatus_pickInspectorRegion  "Pick destination (or hit Done)"
 
 
-phaseStatus_buyDiamonds  "Buying diamonds"
+phaseStatus_buyDiamonds  "Collecting diamonds"
+phaseSubStatus_buyDiamonds  "Guides help highest payer get diamonds"

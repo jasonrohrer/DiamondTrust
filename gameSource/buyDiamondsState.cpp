@@ -133,6 +133,7 @@ void BuyDiamondsState::enterState() {
     stateDone = false;
 
     statusMessage = translate( "phaseStatus_buyDiamonds" );    
+    statusMessage = translate( "phaseSubStatus_buyDiamonds" );    
     
     showUnitMoves( true );
     
