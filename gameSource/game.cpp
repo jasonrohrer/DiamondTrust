@@ -37,6 +37,7 @@ GameState *currentGameState;
 extern GameState *connectState;
 extern GameState *salaryBribeState;
 extern GameState *moveUnitsState;
+extern GameState *depositDiamondsState;
 extern GameState *moveInspectorState;
 extern GameState *buyDiamondsState;
 
@@ -146,6 +147,30 @@ void gameLoopTick() {
             currentGameState = moveUnitsState;
             }
         else if( currentGameState == moveUnitsState ) {
+
+            if( isAnyUnitDepositingDiamonds() ) {
+                currentGameState = depositDiamondsState;
+                }
+            else {
+                int briber = getPlayerBribedInspector();
+            
+                switch( briber ) {
+                    case -1:
+                        if( isAnyUnitBuyingDiamonds() ) {
+                            currentGameState = buyDiamondsState;
+                            }
+                        else {
+                            currentGameState = salaryBribeState;
+                            }
+                        break;
+                    case 0:
+                    case 1:
+                        currentGameState = moveInspectorState;
+                        break;
+                    }
+                }
+            }
+        else if( currentGameState == depositDiamondsState ) {
             int briber = getPlayerBribedInspector();
             
             switch( briber ) {

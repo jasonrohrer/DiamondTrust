@@ -898,3 +898,28 @@ char isAnyUnitBuyingDiamonds() {
 
 
 
+char isAnyUnitDepositingDiamonds() {
+
+    char found = false;
+    
+    
+    for( int i=0; i<numPlayerUnits*2 && !found; i++ ) {
+            
+        Unit *u = getUnit( i );
+        
+        int unitRegion = getUnitRegion( i );
+        int unitDiamonds = u->mNumDiamondsHeld;
+
+        if( ( unitRegion == 0 || unitRegion == 1 ) 
+            &&
+            unitDiamonds > 0 ) {
+                
+            found = true;
+            }
+        }
+        
+    return found;
+    }
+
+
+

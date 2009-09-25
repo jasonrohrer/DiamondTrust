@@ -14,6 +14,7 @@ TranslationManager.cpp \
 connectState.cpp \
 salaryBribeState.cpp \
 moveUnitsState.cpp \
+depositDiamondsState.cpp \
 moveInspectorState.cpp \
 buyDiamondsState.cpp \
 bidPicker.cpp \
@@ -44,6 +45,7 @@ s/^TranslationManager\.o/\.\.\/TranslationManager\.o/; \
 s/^connectState\.o/\.\.\/connectState\.o/; \
 s/^salaryBribeState\.o/\.\.\/salaryBribeState\.o/; \
 s/^moveUnitsState\.o/\.\.\/moveUnitsState\.o/; \
+s/^depositDiamondsState\.o/\.\.\/depositDiamondsState\.o/; \
 s/^moveInspectorState\.o/\.\.\/moveInspectorState\.o/; \
 s/^buyDiamondsState\.o/\.\.\/buyDiamondsState\.o/; \
 s/^bidPicker\.o/\.\.\/bidPicker\.o/; \

@@ -125,3 +125,5 @@ char unitAnimationsDone();
 int getPlayerBribedInspector();
 
 char isAnyUnitBuyingDiamonds();
+
+char isAnyUnitDepositingDiamonds();

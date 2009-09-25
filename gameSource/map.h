@@ -26,6 +26,8 @@ intPair getUnitPositionInRegion( int inRegion, int inUnitNumber );
 
 intPair getDiamondPositionInRegion( int inRegion );
 
+intPair getVaultPositionInRegion( int inRegion );
+
 
 void accumulateDiamonds();
 

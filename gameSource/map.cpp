@@ -29,6 +29,7 @@ int diamondSpriteID;
 int diamondSpriteW, diamondSpriteH;
 
 int vaultSpriteID;
+int vaultSpriteW, vaultSpriteH;
 
 
 
@@ -399,7 +400,9 @@ void initMap() {
                                   &diamondSpriteW, &diamondSpriteH,
                                   true );
 
-    vaultSpriteID = loadSprite( "vault.tga", true );
+    vaultSpriteID = loadSprite( "vault.tga", 
+                                &vaultSpriteW, &vaultSpriteH,
+                                true );
 
 
     mapRegionDiamondRate[ 0 ] = 0;
@@ -449,8 +452,8 @@ void drawMap() {
     // next vaults (only in home regions
     for( i=0; i<2; i++ ) {
         drawSprite( vaultSpriteID, 
-                    mapRegionVaultPosition[i].x, 
-                    mapRegionVaultPosition[i].y, 
+                    mapRegionVaultPosition[i].x - vaultSpriteW/2, 
+                    mapRegionVaultPosition[i].y - vaultSpriteH/2, 
                     white );
         }
 
@@ -554,6 +557,11 @@ intPair getUnitPositionInRegion( int inRegion, int inUnitNumber ) {
 
 intPair getDiamondPositionInRegion( int inRegion ) {
     return mapRegionDiamondPosition[ inRegion ];
+    }
+
+
+intPair getVaultPositionInRegion( int inRegion ) {
+    return mapRegionVaultPosition[ inRegion ];
     }
 
 
