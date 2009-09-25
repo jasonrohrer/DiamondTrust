@@ -21,6 +21,8 @@ statsPanel.tga \
 bribedMarker.tga \
 miniDiamond.tga \
 vault.tga \
+salePicker.tga \
+
 
 
 

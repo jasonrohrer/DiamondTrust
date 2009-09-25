@@ -761,6 +761,20 @@ char isAnyOpponentBribed() {
     }
 
 
+char isOpponentHomeBribed() {
+    for( int i=numPlayerUnits; i<numPlayerUnits*2; i++ ) {
+        if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe 
+            &&
+            gameUnit[i].mRegion == 1 ) {
+
+            return true;
+            }
+        }
+    return false;
+    }
+
+
+
 
 void showUnitMoves( char inShow ) {
     showMoves = inShow;
@@ -859,6 +873,36 @@ int getPlayerBribedInspector() {
     else {
         return 1;
         }
+    }
+
+
+
+char isAnyUnitPayable() {
+    
+    // home units
+    int i;
+    for( i=0; i<numPlayerUnits*2; i++ ) {
+        if( getUnitRegion( i ) == 0 ) {
+            return true;
+            }
+        }
+    // opponent units in shared regions with opponent
+    for( i=0; i<numPlayerUnits*2; i++ ) {
+        int unitRegion = getUnitRegion( i );
+        
+        if( unitRegion > 1 ) {
+            
+            for( int j=0; j<numPlayerUnits*2; j++ ) {
+                if( j!=i && 
+                    getUnitRegion( j ) == unitRegion ) {
+                    
+                    return true;
+                    }
+                }
+            }
+        }
+
+    return false;
     }
 
 

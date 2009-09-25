@@ -1,46 +1,45 @@
-
-#include "bidPicker.h"
+#include "salePicker.h"
 #include "common.h"
 #include "platform.h"
+#include "sprite.h"
 
 
 static int pickerSprite;
 static int pickerW, pickerH;
 
-static int bid;
+static int sale;
 
-static char done;
 
 static intPair lastCenter;
 
 
-void initBidPicker() {
-    pickerSprite = loadSprite( "bidPicker.tga", &pickerW, &pickerH, true );    
+void initSalePicker() {
+    pickerSprite = loadSprite( "salePicker.tga", &pickerW, &pickerH, true );
+    
     }
 
 
-void freeBidPicker() {
+void freeSalePicker() {
     //
     }
 
 
 
-void setPickerBid( int inBid ) {
-    bid = inBid;
-    done = false;
+void setPickerSale( int inSale ) {
+    sale = inSale;
     }
 
 
 
-int getPickerBid() {
-    return bid;
+int getPickerSale() {
+    return sale;
     }
 
 
 static rgbaColor white = { 255, 255, 255, 255 };
 
 
-void drawBidPicker( int inCenterX, int inCenterY ) {
+void drawSalePicker( int inCenterX, int inCenterY ) {
 
     if( inCenterY + 21 > 191 ) {
         // off bottom, adjust
@@ -52,8 +51,9 @@ void drawBidPicker( int inCenterX, int inCenterY ) {
         }
     
     
-    drawSprite( pickerSprite, inCenterX - pickerW/2, inCenterY - pickerH/2,
-                white );
+    drawBlinkingSprite( pickerSprite, 
+                        inCenterX - pickerW/2, inCenterY - pickerH/2,
+                        white );
 
     lastCenter.x = inCenterX;
     lastCenter.y = inCenterY;
@@ -61,7 +61,7 @@ void drawBidPicker( int inCenterX, int inCenterY ) {
 
 
 
-void clickBidPicker( int inX, int inY ) {
+void clickSalePicker( int inX, int inY ) {
     
     if( intAbs( inY - lastCenter.y ) > 22 ) {
         // off top or bottom
@@ -73,7 +73,6 @@ void clickBidPicker( int inX, int inY ) {
         }
     
     intPair upCenter = lastCenter;
-    intPair doneCenter = lastCenter;
     intPair downCenter = lastCenter;
     
     upCenter.y -= 14;
@@ -82,21 +81,13 @@ void clickBidPicker( int inX, int inY ) {
     intPair click = { inX, inY };
     
     if( intDistance( click, upCenter ) < 6 ) {
-        bid ++;
+        sale ++;
         }
     else if( intDistance( click, downCenter ) < 6 ) {
-        bid --;
-        if( bid < 0 ) {
-            bid = 0;
+        sale --;
+        if( sale < 0 ) {
+            sale = 0;
             }
         }
-    else if( intDistance( click, doneCenter ) < 6 ) {    
-        done = true;
-        }
-    }
-
-
-char isBidDone() {
-    return done;
     }
 

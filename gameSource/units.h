@@ -69,6 +69,10 @@ void setMovePeeking( char inPeeking );
 
 char isAnyOpponentBribed();
 
+// bribed unit in opponent's home region?
+char isOpponentHomeBribed();
+
+
 // shows only moves that are known to player
 void showUnitMoves( char inShow );
 
@@ -123,6 +127,8 @@ char unitAnimationsDone();
 
 // 0 for this player, 1 for opponent, -1 for neither
 int getPlayerBribedInspector();
+
+char isAnyUnitPayable();
 
 char isAnyUnitBuyingDiamonds();
 

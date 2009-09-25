@@ -15,6 +15,7 @@
 #include "gameStats.h"
 #include "colors.h"
 #include "flyingDiamonds.h"
+#include "salePicker.h"
 
 
 
@@ -40,6 +41,7 @@ extern GameState *moveUnitsState;
 extern GameState *depositDiamondsState;
 extern GameState *moveInspectorState;
 extern GameState *buyDiamondsState;
+extern GameState *sellDiamondsState;
 
 
 Button *doneButton;
@@ -99,6 +101,7 @@ void gameInit() {
     initBidPicker();
     initStats();
     initFlyingDiamonds();
+    initSalePicker();
     
     setPlayerMoney( 0, 18 );
     setPlayerMoney( 1, 18 );    
@@ -121,9 +124,77 @@ void gameFree() {
     freeBidPicker();
     freeStats();
     freeFlyingDiamonds();
+    freeSalePicker();
     }
 
 
+static void postSellTransition() {
+    if( isAnyUnitPayable() ) {
+        currentGameState = salaryBribeState;
+        }
+    else {
+        // skip salary
+        currentGameState = moveUnitsState;
+        }
+    }
+
+
+
+    
+
+static void postBuyTransition() {
+    printOut( "Transition after buy\n" );
+    
+    if( getPlayerDiamonds(0) > 0 || getPlayerDiamonds(1) > 0 ) {
+        currentGameState = sellDiamondsState;
+        }
+    else {
+        // skip selling
+        postSellTransition();
+        }
+    }
+
+        
+
+static void postMoveInspectorTransition() {
+    if( isAnyUnitBuyingDiamonds() ) {
+        currentGameState = buyDiamondsState;
+        }
+    else {
+        // skip buying
+        postBuyTransition();
+        }
+    }
+
+
+
+static void postDepositeTransition() {
+    int briber = getPlayerBribedInspector();
+            
+    switch( briber ) {
+        case -1:
+            // skip moving inspector
+            postMoveInspectorTransition();
+            break;
+        case 0:
+        case 1:
+            currentGameState = moveInspectorState;
+            break;
+        }
+    }
+
+
+static void postMoveUnitsTransition() {
+    if( isAnyUnitDepositingDiamonds() ) {
+        currentGameState = depositDiamondsState;
+        }
+    else {
+        // skip deposit
+        postDepositeTransition();
+        }
+    }
+
+    
 
 
 
@@ -147,62 +218,22 @@ void gameLoopTick() {
             currentGameState = moveUnitsState;
             }
         else if( currentGameState == moveUnitsState ) {
-
-            if( isAnyUnitDepositingDiamonds() ) {
-                currentGameState = depositDiamondsState;
-                }
-            else {
-                int briber = getPlayerBribedInspector();
-            
-                switch( briber ) {
-                    case -1:
-                        if( isAnyUnitBuyingDiamonds() ) {
-                            currentGameState = buyDiamondsState;
-                            }
-                        else {
-                            currentGameState = salaryBribeState;
-                            }
-                        break;
-                    case 0:
-                    case 1:
-                        currentGameState = moveInspectorState;
-                        break;
-                    }
-                }
+            postMoveUnitsTransition();
             }
         else if( currentGameState == depositDiamondsState ) {
-            int briber = getPlayerBribedInspector();
-            
-            switch( briber ) {
-                case -1:
-                    if( isAnyUnitBuyingDiamonds() ) {
-                        currentGameState = buyDiamondsState;
-                        }
-                    else {
-                        currentGameState = salaryBribeState;
-                        }
-                    break;
-                case 0:
-                case 1:
-                    currentGameState = moveInspectorState;
-                    break;
-                }
+            postDepositeTransition();
             }
         else if( currentGameState == moveInspectorState ) {
-            if( isAnyUnitBuyingDiamonds() ) {
-                currentGameState = buyDiamondsState;
-                }
-            else {
-                currentGameState = salaryBribeState;
-                }
+            postMoveInspectorTransition();
             }
         else if( currentGameState == buyDiamondsState ) {
-            currentGameState = salaryBribeState;
+            postBuyTransition();
             }
-        
-        
-        
-        
+        else if( currentGameState == sellDiamondsState ) {
+            // beginning of next round
+            postSellTransition();
+            }
+                
         currentGameState->enterState();
         }
         

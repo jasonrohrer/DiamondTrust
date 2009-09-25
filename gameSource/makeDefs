@@ -17,7 +17,9 @@ moveUnitsState.cpp \
 depositDiamondsState.cpp \
 moveInspectorState.cpp \
 buyDiamondsState.cpp \
+sellDiamondsState.cpp \
 bidPicker.cpp \
+salePicker.cpp \
 gameStats.cpp \
 colors.cpp \
 flyingDiamonds.cpp \
@@ -48,7 +50,9 @@ s/^moveUnitsState\.o/\.\.\/moveUnitsState\.o/; \
 s/^depositDiamondsState\.o/\.\.\/depositDiamondsState\.o/; \
 s/^moveInspectorState\.o/\.\.\/moveInspectorState\.o/; \
 s/^buyDiamondsState\.o/\.\.\/buyDiamondsState\.o/; \
+s/^sellDiamondsState\.o/\.\.\/sellDiamondsState\.o/; \
 s/^bidPicker\.o/\.\.\/bidPicker\.o/; \
+s/^salePicker\.o/\.\.\/salePicker\.o/; \
 s/^gameStats\.o/\.\.\/gameStats\.o/; \
 s/^colors\.o/\.\.\/colors\.o/; \
 s/^flyingDiamonds\.o/\.\.\/flyingDiamonds\.o/; \

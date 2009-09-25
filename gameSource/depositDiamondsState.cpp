@@ -124,7 +124,7 @@ void DepositDiamondsState::enterState() {
     stateDone = false;
 
     statusMessage = translate( "phaseStatus_depositDiamonds" );    
-    statusMessage = translate( "phaseSubStatus_depositDiamonds" );    
+    statusSubMessage = translate( "phaseSubStatus_depositDiamonds" );    
         
     showUnitMoves( true );
     
