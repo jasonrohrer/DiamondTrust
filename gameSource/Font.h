@@ -29,13 +29,13 @@ class Font {
                          TextAlignment inAlign = alignCenter );
 
 
-        
+        int measureString( char *inString );
+
     private:
         
         // returns x coordinate to right of drawn character
         int drawCharacter( char inC, int inX, int inY, rgbaColor inColor );
         
-        int measureString( char *inString );
         
         
         int mCharSpacing;

@@ -5,6 +5,13 @@ button_parent "Parent"
 button_child "Child"
 
 
+stats_selling "Selling:"
+stats_earning  "Earning:"
+
+stats_sellZeroNote "Trust pays you $%d to keep diamonds off the market"
+stats_sellSomeNote "You get share of $%d based on total diamonds sold"
+
+
 
 phaseStatus_connect  "Connect to opponent"
 phaseSubStatus_parentOrChild  "Start as parent or as child"

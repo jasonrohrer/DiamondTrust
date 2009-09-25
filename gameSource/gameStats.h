@@ -16,5 +16,29 @@ void addPlayerDiamonds( int inPlayer, int inDiamonds );
 
 
 
+
+#define noSaleFlatRate 18
+#define saleNet 24
+
+
+// enables sale display
+void showSale( char inShow );
+
+void setPlayerNumToSell( int inPlayer, int inNumToSell );
+
+// show's opponent's num to sell
+void peekSale();
+
+// reveal sale results
+void finishSale();
+
+int getPlayerEarnings( int inPlayer );
+int getNumSold( int inPlayer );
+
+// final step:  showSale( false )
+
+
+
+
 // draws stats onto upper screen
 void drawStats();

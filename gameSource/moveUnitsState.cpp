@@ -595,6 +595,13 @@ void MoveUnitsState::enterState() {
     setActiveUnit( -1 );
     showUnitMoves( true );
     
+    for( int i=0; i<numPlayerUnits * 2; i++ ) {
+        setUnitBid( i, 0 );
+        setUnitInspectorBribe( i, 0 );
+        }
+    
+
+
     // user needs to pick one
     setPlayerUnitsSelectable( true );
 

@@ -93,7 +93,8 @@ static int getMoveMessage() {
             
         int returnVal = (int)message[0];
         
-        // FIXME:  save num sold by opponent
+        setPlayerNumToSell( 1, returnVal );
+        
 
         delete [] message;
         
@@ -123,6 +124,15 @@ void SellDiamondsState::clickState( int inX, int inY ) {
         
 
         int newSale = getPickerSale();
+        
+        if( newSale > getPlayerDiamonds( 0 ) ) {
+            // too many!  stop
+            newSale = oldSale;
+            setPickerSale( oldSale );
+            }
+        
+
+        setPlayerNumToSell( 0, newSale );
         }
 
  
@@ -157,6 +167,13 @@ void SellDiamondsState::clickState( int inX, int inY ) {
 
 
 
+static int playerEarnings[2] = {0,0};
+static int numSold[2] = {0,0};
+
+static int stepsSinceEarningTick = 0;
+static int minEarningsSteps = 10;
+
+
 void SellDiamondsState::stepState() {
     
     stepUnits();
@@ -180,7 +197,6 @@ void SellDiamondsState::stepState() {
         else {
             gotInitialMove = true;
             
-            // FIXME:  
 
             if( isOpponentHomeBribed() ) {
                 // show opponent sale to player and let player adjust
@@ -189,8 +205,7 @@ void SellDiamondsState::stepState() {
                 statusSubMessage = 
                     translate( "phaseSubStatus_sellDiamondsAdjust" );
                 
-                // FIXME:  show it here
-                //setMovePeeking( true );
+                peekSale();
                 
                 pickingSale = true;
                 }
@@ -234,15 +249,62 @@ void SellDiamondsState::stepState() {
             statusSubMessage = 
                 translate( "phaseSubStatus_moveExecute" );
             
-            // FIXME:  execute sales
+            finishSale();
+            
+            // tally earnings
+            for( int i=0; i<2; i++ ) {
+                playerEarnings[i] = getPlayerEarnings(i);
+                numSold[i] = getNumSold(i);
+                }
+            
+            stepsSinceEarningTick = 0;
             }        
         }
 
     if( sentMove && gotMove ) {
-        // FIXME:  detect if execution done
-        if( false && unitAnimationsDone() ) {
-            stateDone = true;
+        
+        stepsSinceEarningTick++;
+        
+        if( stepsSinceEarningTick > minEarningsSteps ) {
+            
+            char changedSome = false;
+            
+            // first tick diamonds
+        
+            for( int i=0; i<2; i++ ) {
+                if( numSold[i] > 0 ) {
+                    // more left to tally
+                    addPlayerDiamonds( i, -1 );
+                    numSold[i]--;
+                    
+                    changedSome = true;
+                    stepsSinceEarningTick = 0;
+                    }
+                }
+
+
+            if( !changedSome ) {
+                for( int i=0; i<2; i++ ) {
+                    if( playerEarnings[i] > 0 ) {
+                        // more left to tally
+                        addPlayerMoney( i, 1 );
+                        playerEarnings[i]--;
+                        
+                        changedSome = true;
+                        stepsSinceEarningTick = 0;
+                        }
+                    }
+                }
+            
+        
+
+            if( !changedSome ) {
+                showSale( false );
+
+                stateDone = true;
+                }
             }
+        
         }
     
     
@@ -281,6 +343,8 @@ void SellDiamondsState::enterState() {
 
     pickingSale = true;
     setPickerSale( 0 );
+    
+    showSale( true );
     
     setActiveUnit( -1 );
     showUnitMoves( false );
