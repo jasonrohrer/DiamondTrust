@@ -123,3 +123,5 @@ char unitAnimationsDone();
 
 // 0 for this player, 1 for opponent, -1 for neither
 int getPlayerBribedInspector();
+
+char isAnyUnitBuyingDiamonds();

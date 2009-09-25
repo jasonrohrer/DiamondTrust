@@ -384,6 +384,8 @@ void SalaryBribeState::drawState() {
 
 void SalaryBribeState::enterState() {
     stateDone = false;
+    sentMove = false;
+    gotMove = false;
     
     setActiveUnit( -1 );
     showUnitMoves( false );

@@ -150,7 +150,12 @@ void gameLoopTick() {
             
             switch( briber ) {
                 case -1:
-                    currentGameState = buyDiamondsState;
+                    if( isAnyUnitBuyingDiamonds() ) {
+                        currentGameState = buyDiamondsState;
+                        }
+                    else {
+                        currentGameState = salaryBribeState;
+                        }
                     break;
                 case 0:
                 case 1:
@@ -159,8 +164,17 @@ void gameLoopTick() {
                 }
             }
         else if( currentGameState == moveInspectorState ) {
-            currentGameState = buyDiamondsState;
+            if( isAnyUnitBuyingDiamonds() ) {
+                currentGameState = buyDiamondsState;
+                }
+            else {
+                currentGameState = salaryBribeState;
+                }
             }
+        else if( currentGameState == buyDiamondsState ) {
+            currentGameState = salaryBribeState;
+            }
+        
         
         
         

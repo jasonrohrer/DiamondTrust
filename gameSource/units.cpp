@@ -862,3 +862,39 @@ int getPlayerBribedInspector() {
     }
 
 
+
+char isAnyUnitBuyingDiamonds() {
+
+    char found = false;
+    
+    
+    for( int i=0; i<numPlayerUnits*2 && !found; i++ ) {
+        
+        int unitRegion = getUnitRegion( i );
+        int unitBid = getUnitBid( i );
+        char highest = true;
+        
+        if( unitBid > 0 && getDiamondsInRegion( unitRegion ) ) {
+            
+            // look for other unit in this region
+            for( int j=0; j<numPlayerUnits*2; j++ ) {
+                if( j != i ) {
+                    if( getUnitRegion( j ) == unitRegion ) {
+                        if( getUnitBid( j ) >= unitBid ) {
+                            highest = false;
+                            }
+                        }
+                    }
+                }
+            
+            if( highest ) {
+                found = true;
+                }
+            }
+        }
+    
+    return found;
+    }
+
+
+
