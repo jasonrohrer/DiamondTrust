@@ -73,7 +73,10 @@ void BuyDiamondsState::stepState() {
             int unitBid = getUnitBid( i );
             char highest = true;
             
-            if( unitBid > 0 && getDiamondsInRegion( unitRegion ) ) {
+            if( unitBid > 0 && getDiamondsInRegion( unitRegion ) 
+                // inspector blocks sale
+                &&
+                getUnitRegion( numUnits - 1 ) != unitRegion ) {
                 
                 // look for other unit in this region
                 for( int j=0; j<numPlayerUnits*2; j++ ) {
