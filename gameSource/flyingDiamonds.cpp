@@ -80,9 +80,13 @@ void addFlyingDiamond( intPair inStart, intPair inEnd ) {
     currentDiamond->mStep = 0;
     
     // steps based on distance
-    int distance = intDistance( inStart, inEnd );
+    //int distance = intDistance( inStart, inEnd );
     
-    currentDiamond->mNumSteps = distance * 2;
+    //currentDiamond->mNumSteps = distance * 2;
+    
+    // same number of steps regardless of distance
+    // (thus, for farther trips, diamonds move faster)
+    currentDiamond->mNumSteps = 22;
     }
 
 
