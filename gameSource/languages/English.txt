@@ -11,6 +11,10 @@ stats_earning  "Earning:"
 stats_sellZeroNote "Trust pays you $%d to keep diamonds off the market"
 stats_sellSomeNote "You get share of $%d based on total diamonds sold"
 
+stats_salary "Salary:"
+stats_bribes "Bribes:"
+
+stats_bribing "Bribing:"
 
 
 phaseStatus_connect  "Connect to opponent"
