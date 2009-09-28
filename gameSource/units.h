@@ -140,3 +140,6 @@ char isAnyUnitPayable();
 char isAnyUnitBuyingDiamonds();
 
 char isAnyUnitDepositingDiamonds();
+
+
+char isAnyConfiscationNeeded();

@@ -40,6 +40,7 @@ extern GameState *accumulateDiamondsState;
 extern GameState *salaryBribeState;
 extern GameState *moveUnitsState;
 extern GameState *depositDiamondsState;
+extern GameState *confiscateState;
 extern GameState *moveInspectorState;
 extern GameState *buyDiamondsState;
 extern GameState *sellDiamondsState;
@@ -157,19 +158,32 @@ static void postBuyTransition() {
         }
     else {
         // skip selling
+
         postSellTransition();
         }
     }
 
-        
 
-static void postMoveInspectorTransition() {
+
+static void postConfiscateTransition() {
     if( isAnyUnitBuyingDiamonds() ) {
         currentGameState = buyDiamondsState;
         }
     else {
         // skip buying
         postBuyTransition();
+        }
+    }
+
+        
+
+static void postMoveInspectorTransition() {
+    if( isAnyConfiscationNeeded() ) {
+        currentGameState = confiscateState;
+        }
+    else {
+        // skip confiscation
+        postConfiscateTransition();
         }
     }
 
@@ -235,6 +249,9 @@ void gameLoopTick() {
             }
         else if( currentGameState == moveInspectorState ) {
             postMoveInspectorTransition();
+            }
+        else if( currentGameState == confiscateState ) {
+            postConfiscateTransition();
             }
         else if( currentGameState == buyDiamondsState ) {
             postBuyTransition();

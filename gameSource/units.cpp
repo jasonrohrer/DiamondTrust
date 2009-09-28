@@ -1014,3 +1014,24 @@ char isAnyUnitDepositingDiamonds() {
 
 
 
+char isAnyConfiscationNeeded() {
+    
+    int inspectorRegion = getUnitRegion( numUnits - 1 );
+    
+    for( int i=0; i<numPlayerUnits*2; i++ ) {
+            
+        Unit *u = getUnit( i );
+
+        if( getUnitRegion( i ) == inspectorRegion 
+            &&
+            u->mNumDiamondsHeld > 0 ) {
+            
+            return true;
+            }
+        }
+        
+    return false;
+    }
+
+
+

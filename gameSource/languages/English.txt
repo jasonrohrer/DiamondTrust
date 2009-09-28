@@ -48,8 +48,11 @@ phaseSubStatus_depositDiamonds "Agents returning home unload their diamonds"
 
 
 phaseStatus_moveInspector  "Move the UN Inspector"
-
 phaseSubStatus_pickInspectorRegion  "Pick destination (or hit Done)"
+
+
+phaseStatus_confiscate  "UN inspection"
+phaseSubStatus_confiscate  "Inspector confiscates diamonds"
 
 
 phaseStatus_buyDiamonds  "Collecting diamonds"
