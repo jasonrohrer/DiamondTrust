@@ -761,6 +761,37 @@ char isAnyOpponentBribed() {
     }
 
 
+
+static char isPlayerUnitKnownBribed( int inUnit ) {
+    int i = inUnit;
+    
+    if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe ) {
+        int bribingUnit = gameUnit[i].mLastBribingUnit;
+        
+        if( gameUnit[bribingUnit].mTotalSalary < 
+            gameUnit[bribingUnit].mTotalBribe ) {
+            
+            // bribing unit has been bribed!
+            return true;
+            }
+        }
+
+    return false;
+    }
+
+
+
+char isAnyPlayerUnitKnownBribed() {
+    for( int i=0; i<numPlayerUnits; i++ ) {
+        if( isPlayerUnitKnownBribed( i ) ) {
+            return true;
+            }
+        }
+    return false;
+    }
+
+
+
 char isOpponentHomeBribed() {
     for( int i=numPlayerUnits; i<numPlayerUnits*2; i++ ) {
         if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe 
@@ -773,6 +804,20 @@ char isOpponentHomeBribed() {
     return false;
     }
 
+
+
+char isPlayerHomeKnownBribed() {
+    for( int i=0; i<numPlayerUnits; i++ ) {
+        if( isPlayerUnitKnownBribed( i )
+            && 
+            gameUnit[i].mRegion == 0 ) {
+
+            // at home and we know it's bribed
+            return true;
+            }
+        }
+    return false;
+    }
 
 
 

@@ -198,7 +198,7 @@ void SellDiamondsState::stepState() {
             gotInitialMove = true;
             
 
-            if( isOpponentHomeBribed() ) {
+            if( isOpponentHomeBribed() || isPlayerHomeKnownBribed() ) {
                 // show opponent sale to player and let player adjust
 
                 statusMessage = translate( "phaseStatus_sellPeek" );

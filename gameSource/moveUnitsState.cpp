@@ -465,7 +465,7 @@ void MoveUnitsState::stepState() {
         else {
             gotInitialMove = true;
             
-            if( isAnyOpponentBribed() ) {
+            if( isAnyOpponentBribed() || isAnyPlayerUnitKnownBribed() ) {
                 // show opponent moves to player and let player adjust
 
                 statusMessage = translate( "phaseStatus_movePeek" );

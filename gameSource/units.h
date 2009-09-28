@@ -69,8 +69,15 @@ void setMovePeeking( char inPeeking );
 
 char isAnyOpponentBribed();
 
+// true if we know that one of our units is bribed
+char isAnyPlayerUnitKnownBribed();
+
+
 // bribed unit in opponent's home region?
 char isOpponentHomeBribed();
+
+// true if we have a known-bribed unit at home
+char isPlayerHomeKnownBribed();
 
 
 // shows only moves that are known to player
