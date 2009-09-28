@@ -29,7 +29,10 @@ intPair getDiamondPositionInRegion( int inRegion );
 intPair getVaultPositionInRegion( int inRegion );
 
 
-void accumulateDiamonds();
+
+void accumulateDiamondsStart();
+// returns true when done
+char accumulateDiamondsStep();
 
 
 int getDiamondsInRegion( int inRegion );

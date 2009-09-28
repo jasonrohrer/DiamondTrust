@@ -419,7 +419,6 @@ void initMap() {
     for( i=0; i<numMapRegions; i++ ) {
         mapRegionDiamondCount[i] = 0;
         }
-    accumulateDiamonds();
     }
 
 
@@ -566,15 +565,38 @@ intPair getVaultPositionInRegion( int inRegion ) {
 
 
 
-void accumulateDiamonds() {
+
+static int numToAccumulate[numMapRegions];
+static int numAccumulated[numMapRegions];
+
+
+void accumulateDiamondsStart() {
     for( int i=0; i<numMapRegions; i++ ) {
-        mapRegionDiamondCount[i] += mapRegionDiamondRate[i];
+        numToAccumulate[i] = mapRegionDiamondRate[i];
+        numAccumulated[i] = 0;
         }
 
-    // toggle between 1 and 2
+    // toggle between 1 and 2 (used for next Start)
     mapRegionDiamondRate[ 7 ] %= 2;
     mapRegionDiamondRate[ 7 ] ++;
     }
+
+
+char accumulateDiamondsStep() {
+    for( int i=0; i<numMapRegions; i++ ) {
+        if( numToAccumulate[i] > numAccumulated[i] ) {
+            numAccumulated[i]++;
+            mapRegionDiamondCount[i]++;
+            
+            // not done
+            return false;
+            }
+        }
+    
+    // get here, done
+    return true;
+    }
+
 
 
 int getDiamondsInRegion( int inRegion ) {

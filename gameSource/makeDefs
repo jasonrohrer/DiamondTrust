@@ -12,6 +12,7 @@ common.cpp \
 DataFifo.cpp \
 TranslationManager.cpp \
 connectState.cpp \
+accumulateDiamondsState.cpp \
 salaryBribeState.cpp \
 moveUnitsState.cpp \
 depositDiamondsState.cpp \
@@ -45,6 +46,7 @@ s/^common\.o/\.\.\/common\.o/; \
 s/^DataFifo\.o/\.\.\/DataFifo\.o/; \
 s/^TranslationManager\.o/\.\.\/TranslationManager\.o/; \
 s/^connectState\.o/\.\.\/connectState\.o/; \
+s/^accumulateDiamondsState\.o/\.\.\/accumulateDiamondsState\.o/; \
 s/^salaryBribeState\.o/\.\.\/salaryBribeState\.o/; \
 s/^moveUnitsState\.o/\.\.\/moveUnitsState\.o/; \
 s/^depositDiamondsState\.o/\.\.\/depositDiamondsState\.o/; \

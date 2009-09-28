@@ -36,6 +36,7 @@ char *statusSubMessage = NULL;
 GameState *currentGameState;
 
 extern GameState *connectState;
+extern GameState *accumulateDiamondsState;
 extern GameState *salaryBribeState;
 extern GameState *moveUnitsState;
 extern GameState *depositDiamondsState;
@@ -128,7 +129,7 @@ void gameFree() {
     }
 
 
-static void postSellTransition() {
+static void postAccumulateTransition() {
     if( isAnyUnitPayable() ) {
         currentGameState = salaryBribeState;
         }
@@ -136,6 +137,12 @@ static void postSellTransition() {
         // skip salary
         currentGameState = moveUnitsState;
         }
+    }
+
+
+
+static void postSellTransition() {
+    currentGameState = accumulateDiamondsState;
     }
 
 
@@ -212,7 +219,10 @@ void gameLoopTick() {
         
         // state transition
         if( currentGameState == connectState ) {
-            currentGameState = salaryBribeState;
+            currentGameState = accumulateDiamondsState;
+            }
+        else if( currentGameState == accumulateDiamondsState ) {
+            postAccumulateTransition();
             }
         else if( currentGameState == salaryBribeState ) {
             currentGameState = moveUnitsState;

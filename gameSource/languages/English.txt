@@ -21,6 +21,10 @@ phaseSubStatus_connectingToParent  "Connecting to parent... "
 phaseSubStatus_connectFailed  "Connection failed"
 
 
+phaseStatus_accumulate  "Diamonds accumulate"
+phaseSubStatus_accumulate  "Regions produce more diamonds"
+
+
 phaseStatus_payAgents  "Pay agents"
 phaseSubStatus_pickSalary  "Select salary payment for this agent"
 phaseSubStatus_pickOpponentBribe  "Select bribe payment for this opponent agent"
