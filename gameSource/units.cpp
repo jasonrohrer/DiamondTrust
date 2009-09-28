@@ -100,6 +100,8 @@ void initUnits() {
         moveDotSpriteIDs[i] = 
             addSprite( subImage, unitSpriteW, unitSpriteH );
         }
+    delete [] moveDotRGBA;
+    delete [] unitRGBA;
     
 
     // player
