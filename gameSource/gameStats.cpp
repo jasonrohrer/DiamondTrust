@@ -3,6 +3,7 @@
 #include "common.h"
 #include "Font.h"
 #include "colors.h"
+#include "units.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -53,9 +54,14 @@ void addPlayerDiamonds( int inPlayer, int inDiamonds ) {
 static int statusPanelSprite;
 static int panelW, panelH;
 
+static int unitInfoPanelSprite;
+static int unitPanelW, unitPanelH;
+
 void initStats() {
     statusPanelSprite = loadSprite( "statsPanel.tga", 
-                                    &panelW, &panelH, false );
+                                    &panelW, &panelH, true );
+    unitInfoPanelSprite = loadSprite( "unitInfoPanel.tga", 
+                                      &unitPanelW, &unitPanelH, true );
 
     sellZeroNote = autoSprintf( translate( "stats_sellZeroNote" ),
                                 noSaleFlatRate );
@@ -182,6 +188,33 @@ static void drawPanelContents( int inX, int inPlayer ) {
 
 
 
+
+static void drawMoneyValue( int inX, int inY, int inValue, 
+                            rgbaColor inColor, char inValueHidden ) {
+
+    font16->drawString( "$", inX, inY - 2, inColor, alignLeft );
+    
+    char *moneyString;
+        
+    if( inValueHidden ) {
+        moneyString = autoSprintf( "?" );
+        }
+    else {
+        moneyString = autoSprintf( "%d", inValue );
+        }
+    
+    
+    font16->drawString( moneyString, 
+                        inX + 30, 
+                        inY,
+                        inColor, 
+                        alignRight );
+
+    delete [] moneyString;
+    }
+
+
+
 static void drawSellStats( int inX, int inPlayer ) {
     int y = 50;
     
@@ -210,31 +243,17 @@ static void drawSellStats( int inX, int inPlayer ) {
                         white, 
                         alignLeft );
     
-        
-    font16->drawString( "$", inX + xOffset - 8, y-2, white, alignLeft );
     
-    char *moneyString;
     
     if( selling[inPlayer] == 0 ) {
-        moneyString = autoSprintf( "%d", noSaleFlatRate );
+        drawMoneyValue( inX + xOffset - 8, y, noSaleFlatRate, white, false );
         }
     else {
 
-        if( !revealSaleFlag ) {
-            moneyString = autoSprintf( "?" );
-            }
-        else {
-            moneyString = autoSprintf( "%d", getPlayerEarnings( inPlayer ) );
-            }
+        drawMoneyValue( inX + xOffset - 8, y, 
+                        getPlayerEarnings( inPlayer ), white, 
+                        !revealSaleFlag );
         }
-    
-    font16->drawString( moneyString, 
-                        inX + xOffset - 8 + 30, 
-                        y,
-                        white, 
-                        alignRight );
-
-    delete [] moneyString;
     }
 
 
@@ -272,5 +291,70 @@ void drawStats() {
             }
         
         }
+
+
+
+    int activeUnit = getActiveUnit();
+    
+    // don't show panel for inspector
+    if( activeUnit >= 0 && activeUnit < numUnits - 1 ) {
+        
+        Unit *u = getUnit( activeUnit );
+        
+        rgbaColor c;
+        if( activeUnit < numPlayerUnits ) {
+            c = panelColors[0];
+            }
+        else {
+            c = panelColors[1];
+            }
+        
+        drawSprite( unitInfoPanelSprite, 64, 64, c );
+
+        startNewSpriteLayer();
+        
+
+        // show stats for active unit
+
+        drawUnit( activeUnit, 74, 84 );
+
+        drawDiamondCounter( 79, 94, u->mNumDiamondsHeld );
+        
+
+        int xOffset = font16->measureString( translate( "stats_salary" ) );
+        int otherOffset = 
+            font16->measureString( translate( "stats_bribes" ) );
+        if( otherOffset > xOffset ) {
+            xOffset = otherOffset;
+            }
+    
+        xOffset += 20;
+        
+        int x = 84;
+        int y = 94;
+        
+        font16->drawString( translate( "stats_salary" ), 
+                            x, 
+                            y,
+                            black, 
+                            alignLeft );
+
+        char hideSalary = false;
+        if( activeUnit >= numPlayerUnits ) {
+            // hide if not bribed
+            if( u->mTotalBribe <= u->mTotalSalary ) {
+                hideSalary = true;
+                }
+            }
+        
+        font16->drawString( translate( "stats_salary" ), 
+                            x, 
+                            y,
+                            black, 
+                            alignLeft );
+        drawMoneyValue( x + xOffset, y, u->mTotalSalary, black, hideSalary );
+        
+        }
+    
     }
 

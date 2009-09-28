@@ -17,6 +17,12 @@ void drawUnits();
 void stepUnits();
 
 
+// draw a unit onto the current screen at the given (center of foot)
+// position
+void drawUnit( int inUnit, int inX, int inY );
+
+
+
 void setUnitSelectable( int inUnit, char inSelectable );
 
 void setAllUnitsNotSelectable();

@@ -233,6 +233,92 @@ int getHomeRegion( int inUnit ) {
     }
 
 
+
+static char isBribeStatusVisible( int inUnit ) {
+    int i = inUnit;
+    char visible = false;
+    
+    if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe ) {
+            
+        char visible = true;
+        
+        if( i < 3 ) {
+            // one of our units!  Should we let the player know about this?
+            
+            // only if bribing unit has been compromised by us
+            
+            int bribingUnit = gameUnit[i].mLastBribingUnit;
+            
+            if( gameUnit[bribingUnit].mTotalSalary < 
+                gameUnit[bribingUnit].mTotalBribe ) {
+                
+                // bribing unit has been bribed!
+                
+                visible = true;
+                }
+            else {
+                visible = false;
+                }
+            }
+        }
+
+    return visible;
+    }
+
+
+
+static void drawUnitSprite( int inUnit, intPair inPos ) {
+    int i = inUnit;
+    
+    rgbaColor c;
+    if( i < 3 ) {
+        c = playerColor;
+        }
+    else if( i<6 ) {
+        c = enemyColor;
+        }
+    else {
+        // inspector sprite already contains color
+        c = white;
+        }
+    
+        
+    // center
+    inPos.x -= unitSpriteW / 2;
+    inPos.y -= unitSpriteH;
+    
+    drawSprite( gameUnit[i].mSpriteID, 
+                inPos.x, 
+                inPos.y, 
+                c, gameUnit[i].mSelectable );    
+    }
+
+
+
+static void drawUnitBribedMarker( int inUnit, intPair inPos ) {
+    int i = inUnit;
+
+    // color of marker (opposite)
+    rgbaColor c;
+    if( i < 3 ) {
+        c = enemyColor;
+        }
+    else if( i<6 ) {
+        c = playerColor;
+        }
+            
+    // center
+    inPos.x -= unitSpriteW / 2;
+    inPos.y -= unitSpriteH;
+            
+    drawSprite( bribedMarkerSprite, 
+                inPos.x, 
+                inPos.y, 
+                c, gameUnit[i].mSelectable );
+    }
+
+
+
 void drawUnits() {
 
 
@@ -295,29 +381,26 @@ void drawUnits() {
     // now draw units on top
     
     for( int i=0; i<numUnits; i++ ) {
-        rgbaColor c;
-        if( i < 3 ) {
-            c = playerColor;
-            }
-        else if( i<6 ) {
-            c = enemyColor;
-            }
-        else {
-            // inspector sprite already contains color
-            c = white;
-            }
-        
         intPair pos = getUnitCurrentPosition( i );
         
-        // center
-        pos.x -= unitSpriteW / 2;
-        pos.y -= unitSpriteH;
-        
-        drawSprite( gameUnit[i].mSpriteID, 
-                    pos.x, 
-                    pos.y, 
-                    c, gameUnit[i].mSelectable );
+        drawUnitSprite( i, pos );
         if( activeUnit == i ) {
+            rgbaColor c;
+            if( i < 3 ) {
+                c = playerColor;
+                }
+            else if( i<6 ) {
+                c = enemyColor;
+                }
+            else {
+                // inspector sprite already contains color
+                c = white;
+                }            
+
+            // center
+            pos.x -= unitSpriteW / 2;
+            pos.y -= unitSpriteH;
+
             drawSprite( activeUnitSprite, 
                         pos.x, 
                         pos.y, 
@@ -331,52 +414,8 @@ void drawUnits() {
 
     // mark any bribed units
     for( int i=0; i<numUnits; i++ ) {
-        if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe ) {
-            
-            char drawMarker = true;
-            
-            if( i < 3 ) {
-                // one of our units!  Should we let the player know about this?
-
-                // only if bribing unit has been compromised by us
-
-                int bribingUnit = gameUnit[i].mLastBribingUnit;
-                
-                if( gameUnit[bribingUnit].mTotalSalary < 
-                    gameUnit[bribingUnit].mTotalBribe ) {
-                    
-                    // bribing unit has been bribed!
-
-                    drawMarker = true;
-                    }
-                else {
-                    drawMarker = false;
-                    }
-                }
-            
-                
-            if( drawMarker ) {
-                
-                // color of marker (opposite)
-                rgbaColor c;
-                if( i < 3 ) {
-                    c = enemyColor;
-                    }
-                else if( i<6 ) {
-                    c = playerColor;
-                    }
-                
-                intPair pos = getUnitCurrentPosition( i );
-        
-                // center
-                pos.x -= unitSpriteW / 2;
-                pos.y -= unitSpriteH;
-
-                drawSprite( bribedMarkerSprite, 
-                            pos.x, 
-                            pos.y, 
-                            c, gameUnit[i].mSelectable );
-                }
+        if( isBribeStatusVisible( i ) ) {
+            drawUnitBribedMarker( i, getUnitCurrentPosition( i ) );
             }
         }
     
@@ -590,6 +629,20 @@ void drawUnits() {
 
     
     }
+
+
+
+void drawUnit( int inUnit, int inX, int inY ) {
+    intPair pos = { inX, inY };
+    drawUnitSprite( inUnit, pos );
+    
+    startNewSpriteLayer();
+    
+    if( isBribeStatusVisible( inUnit ) ) {
+        drawUnitBribedMarker( inUnit, pos );
+        }
+    }
+
 
 
 
