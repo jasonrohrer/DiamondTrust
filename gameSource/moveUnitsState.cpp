@@ -307,13 +307,14 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             // unit can move to any region that's not already
             // a destination of friendly units
 
-            // can always move back home, if not already there
-            if( unitRegion != 0 ) {                
+            // can always move back home
+            //, if not already there
+            //if( unitRegion != 0 ) {                
                 setRegionSelectable( 0, true );
-                }
-            else {
-                setRegionSelectable( 0, false );
-                }
+                //    }
+                //else {
+                //setRegionSelectable( 0, false );
+                //}
                     
                     
             // never move into region 1 (enemy home)
