@@ -28,6 +28,7 @@ class Button {
         int mX, mY;
         
         int mTextX, mTextY;
+        char mLong;
         
     };
 
