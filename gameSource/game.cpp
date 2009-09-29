@@ -108,6 +108,10 @@ void gameInit() {
     setPlayerMoney( 0, 18 );
     setPlayerMoney( 1, 18 );    
 
+    // show opponent's money at start of game
+    setOpponentMoneyUnknown( false );
+    
+
     currentGameState = connectState;
     currentGameState->enterState();
     }

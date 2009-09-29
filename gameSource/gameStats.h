@@ -15,6 +15,9 @@ void addPlayerMoney( int inPlayer, int inMoney );
 void addPlayerDiamonds( int inPlayer, int inDiamonds );
 
 
+// if true, opponent money is only shown if bribed unit in opponent home
+void setOpponentMoneyUnknown( char inUnknown );
+
 
 
 #define noSaleFlatRate 18

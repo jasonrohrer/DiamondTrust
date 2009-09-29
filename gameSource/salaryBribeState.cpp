@@ -372,7 +372,11 @@ void SalaryBribeState::stepState() {
 
                 }
             
-                
+            
+            // opponent has had opportunity to spend money, so treat
+            // it as an unknown from here on out
+            setOpponentMoneyUnknown( true );
+            
 
             stateDone = true;
             

@@ -12,6 +12,8 @@ static int money[2] = {0,0};
 static int diamonds[2] = {0,0};
 static int selling[2] = {0,0};
 
+static char opponentMoneyUnknown = false;
+
 
 
 static char showSaleFlag = false;
@@ -49,6 +51,13 @@ void addPlayerMoney( int inPlayer, int inMoney ) {
 void addPlayerDiamonds( int inPlayer, int inDiamonds ) {
     diamonds[inPlayer] += inDiamonds;
     }
+
+
+void setOpponentMoneyUnknown( char inUnknown ) {
+    opponentMoneyUnknown = inUnknown;
+    }
+
+
 
 
 static int statusPanelSprite;
@@ -239,8 +248,31 @@ static void drawPanelContents( int inX, int inPlayer ) {
     int baseY = 0;
     
     inX += 10;
+
+
+    int showMoney = true;
     
-    drawMoneyValue16( inX, baseY + 6, money[ inPlayer ], black, false );
+    if( inPlayer == 1 && opponentMoneyUnknown ) {
+        // other player
+        
+        showMoney = false;
+        
+        // show their money only if a bribed unit is at home
+        for( int i=numPlayerUnits; i<numPlayerUnits*2; i++ ) {
+            Unit *u = getUnit( i );
+            if( getUnitRegion( i ) == 1 ) {
+                // home
+                
+                if( u->mTotalBribe > u->mTotalSalary ) {
+                    showMoney = true;
+                    }
+                }
+            }
+        }
+    
+            
+    
+    drawMoneyValue16( inX, baseY + 6, money[ inPlayer ], black, !showMoney );
 
     inX += 90;
     drawDiamondCounter( inX, baseY + panelH / 2, diamonds[ inPlayer ] );
