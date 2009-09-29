@@ -21,6 +21,10 @@ void stepUnits();
 // position
 void drawUnit( int inUnit, int inX, int inY );
 
+// draw a total bribe marker onto the current screen at give (center of marker)
+// position
+void drawUnitBribe( int inUnit, int inX, int inY );
+
 
 
 void setUnitSelectable( int inUnit, char inSelectable );

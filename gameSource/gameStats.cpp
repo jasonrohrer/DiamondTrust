@@ -164,7 +164,7 @@ static void drawDiamondCounter( int inX, int inY, int inCount ) {
 
 
 
-static void drawMoneyValue( int inX, int inY, int inValue, 
+static void drawMoneyValue16( int inX, int inY, int inValue, 
                             rgbaColor inColor, char inValueHidden ) {
 
     font16->drawString( "$", inX, inY - 2, inColor, alignLeft );
@@ -199,13 +199,48 @@ static void drawMoneyValue( int inX, int inY, int inValue,
 
 
 
+static void drawMoneyValue8( int inX, int inY, int inValue, 
+                             rgbaColor inColor, char inValueHidden ) {
+    
+    font8->drawString( "$", inX, inY - 1, inColor, alignLeft );
+    
+    char *moneyString;
+        
+    if( inValueHidden ) {
+        moneyString = autoSprintf( "?" );
+        }
+    else {
+        moneyString = autoSprintf( "%d", inValue );
+        }
+    
+    // assume two digits wide, max, with right-aligned digits and fixed
+    // "$" position
+
+    // hackish fix if 3+ digits are required (violate right-alignment)
+    int numDigits = strlen( moneyString );
+    if( numDigits > 2 ) {
+        inX += 5 * (numDigits - 2) + 1 * (numDigits - 2);
+        }
+    
+    
+    font8->drawString( moneyString, 
+                       inX + 17, 
+                       inY,
+                       inColor, 
+                       alignRight );
+
+    delete [] moneyString;
+    }
+
+
+
 static void drawPanelContents( int inX, int inPlayer ) {
     
     int baseY = 0;
     
     inX += 10;
     
-    drawMoneyValue( inX, baseY + 6, money[ inPlayer ], black, false );
+    drawMoneyValue16( inX, baseY + 6, money[ inPlayer ], black, false );
 
     inX += 90;
     drawDiamondCounter( inX, baseY + panelH / 2, diamonds[ inPlayer ] );
@@ -245,13 +280,13 @@ static void drawSellStats( int inX, int inPlayer ) {
     
     
     if( selling[inPlayer] == 0 ) {
-        drawMoneyValue( inX + xOffset - 8, y, noSaleFlatRate, white, false );
+        drawMoneyValue16( inX + xOffset - 8, y, noSaleFlatRate, white, false );
         }
     else {
 
-        drawMoneyValue( inX + xOffset - 8, y, 
-                        getPlayerEarnings( inPlayer ), white, 
-                        !revealSaleFlag );
+        drawMoneyValue16( inX + xOffset - 8, y, 
+                          getPlayerEarnings( inPlayer ), white, 
+                          !revealSaleFlag );
         }
     }
 
@@ -346,9 +381,9 @@ void drawStats() {
                 }
             }
         
-        drawMoneyValue( x + xOffset, y, 
-                        u->mTotalSalary + u->mLastSalaryPayment, 
-                        black, hideSalary );
+        drawMoneyValue16( x + xOffset, y, 
+                          u->mTotalSalary + u->mLastSalaryPayment, 
+                          black, hideSalary );
         
 
 
@@ -377,26 +412,77 @@ void drawStats() {
             }
         
         
-        drawMoneyValue( x + xOffset, y, 
-                        u->mTotalBribe + u->mLastBribePayment, 
-                        black, hideBribe );
+        drawMoneyValue16( x + xOffset, y, 
+                          u->mTotalBribe + u->mLastBribePayment, 
+                          black, hideBribe );
 
         if( ! hideBribe && u->mLastBribingUnit >= 0 ) {
-            x = 55;
-            y = 72;
+            x = 241;
+            y = 109;
+            
+            drawUnit( u->mLastBribingUnit, x, y + 12 );
+            
+            x -= 10;
             
             font16->drawString( translate( "stats_bribedBy" ), 
                                 x, 
                                 y,
                                 black, 
-                                alignLeft );
-
-            int xOffset = 
-                font16->measureString( translate( "stats_bribedBy" ) );
-
-            drawUnit( u->mLastBribingUnit, x + xOffset + 10, y + 12 );
+                                alignRight );
             }
         
+
+        char showBribedUnits = true;
+        if( activeUnit >= numPlayerUnits ) {
+            // enemy
+            // hide if not bribed
+            if( u->mTotalSalary >= u->mTotalBribe ) {
+                showBribedUnits = false;
+                }
+            }
+        
+        
+        if( showBribedUnits ) {
+
+
+            int bribedCount = 0;
+            
+            for( int i=0; i<numPlayerUnits*2; i++ ) {
+                if( getUnit(i)->mLastBribingUnit == activeUnit ) {
+                    bribedCount ++;
+                    }
+                }
+
+            if( bribedCount > 0 ) {
+                
+            
+                font16->drawString( translate( "stats_bribing" ), 
+                                    150, 
+                                    72,
+                                    black, 
+                                    alignLeft );
+                x = 155;
+                y = 102;
+                
+                for( int i=0; i<numPlayerUnits*2; i++ ) {
+                    Unit *other = getUnit(i);
+                    
+                    if( other->mLastBribingUnit == activeUnit ) {
+                        
+                        drawUnit( i, x, y );
+                        
+                        drawUnitBribe( i, x + 15, y - 6 );
+                        
+                        x += 33;
+                        }
+                    }
+
+                }
+            
+            
+            }
+        
+            
         }
     
     }

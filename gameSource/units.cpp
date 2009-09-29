@@ -319,6 +319,27 @@ static void drawUnitBribedMarker( int inUnit, intPair inPos ) {
 
 
 
+static void drawUnitPaymentNumber( intPair inPos, int inValue ) {
+    char *bidString = autoSprintf( "%d", inValue );
+
+    font8->drawString( bidString, 
+                       inPos.x + 8, 
+                       inPos.y - 3,
+                       black, 
+                       alignRight );
+    
+    font8->drawString( "$", 
+                       inPos.x - 9, 
+                       inPos.y - 4,
+                       black, 
+                       alignLeft );
+    
+    delete [] bidString;
+    }
+
+
+
+
 void drawUnits() {
 
 
@@ -455,21 +476,7 @@ void drawUnits() {
             
             intPair end = getUnitBidPosition( i );
             
-            char *bidString = autoSprintf( "%d", gameUnit[i].mBid );
-
-            font8->drawString( bidString, 
-                               end.x + 8, 
-                               end.y - 3,
-                               black, 
-                               alignRight );
-
-            font8->drawString( "$", 
-                               end.x - 9, 
-                               end.y - 4,
-                               black, 
-                               alignLeft );
-
-            delete [] bidString;
+            drawUnitPaymentNumber( end, gameUnit[i].mBid );
             }
         }
     
@@ -513,21 +520,7 @@ void drawUnits() {
             
             intPair end = getUnitInspectorBribePosition( i );
             
-            char *bidString = autoSprintf( "%d", gameUnit[i].mInspectorBribe );
-
-            font8->drawString( bidString, 
-                               end.x + 8, 
-                               end.y - 3,
-                               black, 
-                               alignRight );
-
-            font8->drawString( "$", 
-                               end.x - 9, 
-                               end.y - 4,
-                               black, 
-                               alignLeft );
-
-            delete [] bidString;
+            drawUnitPaymentNumber( end, gameUnit[i].mInspectorBribe );
             }
         }
 
@@ -558,23 +551,7 @@ void drawUnits() {
             
             
             intPair end = getUnitSalaryPosition( i );
-            
-            char *bidString = autoSprintf( "%d", 
-                                           gameUnit[i].mLastSalaryPayment );
-
-            font8->drawString( bidString, 
-                               end.x + 8, 
-                               end.y - 3,
-                               black, 
-                               alignRight );
-
-            font8->drawString( "$", 
-                               end.x - 9, 
-                               end.y - 4,
-                               black, 
-                               alignLeft );
-
-            delete [] bidString;
+            drawUnitPaymentNumber( end, gameUnit[i].mLastSalaryPayment );
             }
         }
 
@@ -606,23 +583,7 @@ void drawUnits() {
             
             
             intPair end = getUnitBribePosition( i );
-            
-            char *bidString = autoSprintf( "%d", 
-                                           gameUnit[i].mLastBribePayment );
-
-            font8->drawString( bidString, 
-                               end.x + 8, 
-                               end.y - 3,
-                               black, 
-                               alignRight );
-
-            font8->drawString( "$", 
-                               end.x - 9, 
-                               end.y - 4,
-                               black, 
-                               alignLeft );
-
-            delete [] bidString;
+            drawUnitPaymentNumber( end, gameUnit[i].mLastBribePayment );
             }
         }
 
@@ -644,6 +605,26 @@ void drawUnit( int inUnit, int inX, int inY ) {
     }
 
 
+void drawUnitBribe( int inUnit, int inX, int inY ) {
+    int i = inUnit;
+    
+    intPair end = { inX, inY };
+    
+    // color of marker (opposite)
+    rgbaColor c;
+    if( i < 3 ) {
+        c = enemyColor;
+        }
+    else if( i<6 ) {
+        c = playerColor;
+        }
+
+    drawSprite( bidSprite, end.x - bidW / 2, end.y - bidH / 2, c );
+
+    startNewSpriteLayer();
+
+    drawUnitPaymentNumber( end, gameUnit[i].mTotalBribe );
+    }
 
 
 
