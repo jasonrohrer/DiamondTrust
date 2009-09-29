@@ -196,7 +196,8 @@ void SellDiamondsState::stepState() {
             gotInitialMove = true;
             
 
-            if( isOpponentHomeBribed() || isPlayerHomeKnownBribed() ) {
+            if( getPlayerDiamonds( 0 ) > 0 &&
+                ( isOpponentHomeBribed() || isPlayerHomeKnownBribed() ) ) {
                 // show opponent sale to player and let player adjust
 
                 statusMessage = translate( "phaseStatus_sellPeek" );
@@ -208,7 +209,10 @@ void SellDiamondsState::stepState() {
                 pickingSale = true;
                 }
             else {
-                // no new info, no need to adjust!
+                // no new info, 
+                // OR
+                // no room to adjust (we have 0 diamonds),
+                // no need to adjust!
 
                 // send final move to opponent right away
                 statusSubMessage = 
