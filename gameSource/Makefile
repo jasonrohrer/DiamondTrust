@@ -17,6 +17,7 @@ activeUnitHalo.tga \
 moveDot.tga \
 diamond.tga \
 bidPicker.tga \
+pickerBorder.tga \
 bid.tga \
 statsPanel.tga \
 unitInfoPanel.tga \

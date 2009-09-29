@@ -422,9 +422,7 @@ void drawStats() {
                           u->mTotalBribe + u->mLastBribePayment, 
                           black, hideBribe );
 
-        if( ! hideBribe && u->mLastBribingUnit >= 0 ) {
-            printOut( "mLastBribingUnit = %d\n", u->mLastBribingUnit );
-            
+        if( ! hideBribe && u->mLastBribingUnit >= 0 ) {            
             x = 241;
             y = 109;
             

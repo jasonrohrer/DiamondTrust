@@ -2,10 +2,14 @@
 #include "bidPicker.h"
 #include "common.h"
 #include "platform.h"
+#include "sprite.h"
 
 
 static int pickerSprite;
 static int pickerW, pickerH;
+
+int pickerBorderSprite;
+
 
 static int bid;
 
@@ -16,6 +20,7 @@ static intPair lastCenter;
 
 void initBidPicker() {
     pickerSprite = loadSprite( "bidPicker.tga", &pickerW, &pickerH, true );    
+    pickerBorderSprite = loadSprite( "pickerBorder.tga", true );    
     }
 
 
@@ -52,8 +57,15 @@ void drawBidPicker( int inCenterX, int inCenterY ) {
         }
     
     
-    drawSprite( pickerSprite, inCenterX - pickerW/2, inCenterY - pickerH/2,
+    drawSprite( pickerSprite, 
+                inCenterX - pickerW/2, inCenterY - pickerH/2,
                 white );
+
+    startNewSpriteLayer();
+
+    drawBlinkingSprite( pickerBorderSprite, 
+                        inCenterX - pickerW/2, inCenterY - pickerH/2,
+                        white );
 
     lastCenter.x = inCenterX;
     lastCenter.y = inCenterY;

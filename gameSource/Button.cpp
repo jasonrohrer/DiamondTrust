@@ -33,6 +33,10 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     if( textWidth > buttonW ) {
         mLong = true;
         }
+    else {
+        mLong = false;
+        }
+    
     if( !mLong ) {
         mTextX = mX + buttonW / 2;
         }

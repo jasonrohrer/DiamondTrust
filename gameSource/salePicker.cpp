@@ -7,6 +7,10 @@
 static int pickerSprite;
 static int pickerW, pickerH;
 
+// defined in bidPicker.cpp
+extern int pickerBorderSprite;
+
+
 static int sale;
 
 
@@ -51,7 +55,13 @@ void drawSalePicker( int inCenterX, int inCenterY ) {
         }
     
     
-    drawBlinkingSprite( pickerSprite, 
+    drawSprite( pickerSprite, 
+                inCenterX - pickerW/2, inCenterY - pickerH/2,
+                white );
+
+    startNewSpriteLayer();
+
+    drawBlinkingSprite( pickerBorderSprite, 
                         inCenterX - pickerW/2, inCenterY - pickerH/2,
                         white );
 
