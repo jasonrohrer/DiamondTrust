@@ -16,6 +16,7 @@ units_simple.tga \
 activeUnitHalo.tga \
 moveDot.tga \
 diamond.tga \
+diamondBorder.tga \
 bidPicker.tga \
 pickerBorder.tga \
 bid.tga \

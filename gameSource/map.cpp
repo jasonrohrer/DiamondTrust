@@ -27,6 +27,7 @@ static int bottomHalfOffset = 128;
 
 int diamondSpriteID;
 int diamondSpriteW, diamondSpriteH;
+int diamondBorderSpriteID;
 
 int vaultSpriteID;
 int vaultSpriteW, vaultSpriteH;
@@ -49,6 +50,9 @@ static intPair mapRegionUnitPosition[ numMapRegions ][ 3 ];
 
 // positions of diamond marker in regions
 static intPair mapRegionDiamondPosition[ numMapRegions ];
+
+static char mapRegionDiamondAccumulating[ numMapRegions ];
+
 
 // positions of vault marker in regions
 static intPair mapRegionVaultPosition[ numMapRegions ];
@@ -399,6 +403,7 @@ void initMap() {
     diamondSpriteID = loadSprite( "diamond.tga", 
                                   &diamondSpriteW, &diamondSpriteH,
                                   true );
+    diamondBorderSpriteID = loadSprite( "diamondBorder.tga", true );
 
     vaultSpriteID = loadSprite( "vault.tga", 
                                 &vaultSpriteW, &vaultSpriteH,
@@ -418,6 +423,8 @@ void initMap() {
 
     for( i=0; i<numMapRegions; i++ ) {
         mapRegionDiamondCount[i] = 0;
+
+        mapRegionDiamondAccumulating[i] = false;
         }
     }
 
@@ -462,6 +469,12 @@ void drawMap() {
                     mapRegionDiamondPosition[i].x - diamondSpriteW/2, 
                     mapRegionDiamondPosition[i].y - diamondSpriteH/2, 
                     white );
+        if( mapRegionDiamondAccumulating[i] ) {
+            drawSprite( diamondBorderSpriteID, 
+                        mapRegionDiamondPosition[i].x - diamondSpriteW/2, 
+                        mapRegionDiamondPosition[i].y - diamondSpriteH/2, 
+                        white );
+            }        
         }
 
     startNewSpriteLayer();
@@ -574,7 +587,8 @@ void accumulateDiamondsStart() {
     for( int i=0; i<numMapRegions; i++ ) {
         numToAccumulate[i] = mapRegionDiamondRate[i];
         numAccumulated[i] = 0;
-        }
+        mapRegionDiamondAccumulating[i] = false;
+        }    
 
     // toggle between 1 and 2 (used for next Start)
     mapRegionDiamondRate[ 7 ] %= 2;
@@ -583,17 +597,30 @@ void accumulateDiamondsStart() {
 
 
 char accumulateDiamondsStep() {
-    for( int i=0; i<numMapRegions; i++ ) {
+    int i;
+    
+    for( i=0; i<numMapRegions; i++ ) {
         if( numToAccumulate[i] > numAccumulated[i] ) {
             numAccumulated[i]++;
             mapRegionDiamondCount[i]++;
+         
+            // previous region done
+            // safe to do this, because first producing region has i=2
+            mapRegionDiamondAccumulating[i-1] = false;
             
+            mapRegionDiamondAccumulating[i] = true;
             // not done
             return false;
             }
         }
     
+    
     // get here, done
+
+    for( i=0; i<numMapRegions; i++ ) {
+        mapRegionDiamondAccumulating[i] = false;
+        }    
+
     return true;
     }
 
