@@ -172,14 +172,10 @@ static void postSellTransition() {
 static void postBuyTransition() {
     printOut( "Transition after buy\n" );
     
-    if( getPlayerDiamonds(0) > 0 || getPlayerDiamonds(1) > 0 ) {
-        currentGameState = sellDiamondsState;
-        }
-    else {
-        // skip selling
 
-        postSellTransition();
-        }
+    // always do sell transtion, because players earn money even when
+    // they have none to sell
+    currentGameState = sellDiamondsState;
     }
 
 

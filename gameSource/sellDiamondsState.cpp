@@ -134,7 +134,7 @@ void SellDiamondsState::clickState( int inX, int inY ) {
 
         setPlayerNumToSell( 0, newSale );
         }
-
+    
  
     if( !sentInitialMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
@@ -150,8 +150,6 @@ void SellDiamondsState::clickState( int inX, int inY ) {
         }
     else if( ( sentInitialMove && gotInitialMove ) && !sentMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
-            setAllUnitsNotSelectable();
-            
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
             
             sendMoveMessage();
@@ -225,7 +223,8 @@ void SellDiamondsState::stepState() {
         }
     
 
-    if( sentMove && !gotMove && stepsSinceSentMove > minSteps ) {
+    if( gotInitialMove && sentMove && !gotMove && 
+        stepsSinceSentMove > minSteps ) {
         
         if( checkConnectionStatus() == -1 ) {
             statusSubMessage = 
@@ -352,6 +351,17 @@ void SellDiamondsState::enterState() {
     
     statusMessage = translate( "phaseStatus_sellDiamonds" );
     statusSubMessage = translate( "phaseSubStatus_sellDiamonds" );
+
+    if( getPlayerDiamonds( 0 ) == 0 ) {
+        // we've got none to sell
+        // don't trouble user with non-choice
+        
+        pickingSale = false;
+        
+        // wait for player to hit done
+        
+        statusSubMessage = translate( "phaseSubStatus_sellDiamondsNone" );
+        }
     }
 
 
