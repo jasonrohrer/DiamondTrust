@@ -1,8 +1,8 @@
 status_next  "Next:"
 
 button_done "Done"
-button_parent "Parent"
-button_child "Child"
+button_parent "Host Game"
+button_child "Join Game"
 
 
 stats_selling "Selling:"
