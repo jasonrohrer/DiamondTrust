@@ -44,6 +44,7 @@ extern GameState *confiscateState;
 extern GameState *moveInspectorState;
 extern GameState *buyDiamondsState;
 extern GameState *sellDiamondsState;
+extern GameState *gameEndState;
 
 
 Button *doneButton;
@@ -111,6 +112,8 @@ void gameInit() {
     // show opponent's money at start of game
     setOpponentMoneyUnknown( false );
     
+    setMonthsLeft( 12 );
+    
 
     currentGameState = connectState;
     currentGameState->enterState();
@@ -147,7 +150,19 @@ static void postAccumulateTransition() {
 
 
 static void postSellTransition() {
-    currentGameState = accumulateDiamondsState;
+
+    if( getMonthsLeft() > 0 ) {
+        decrementMonthsLeft();        
+        currentGameState = accumulateDiamondsState;
+        }
+    else {
+        // game over
+        currentGameState = gameEndState;
+        
+        // reveal
+        setOpponentMoneyUnknown( false );
+        }
+    
     }
 
 

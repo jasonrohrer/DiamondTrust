@@ -8,6 +8,8 @@
 #include "minorGems/util/stringUtils.h"
 
 
+static int monthsLeft = 12;
+
 static int money[2] = {0,0};
 static int diamonds[2] = {0,0};
 static int selling[2] = {0,0};
@@ -22,6 +24,24 @@ static char revealSaleFlag = false;
 
 static char *sellZeroNote = NULL;
 static char *sellSomeNote = NULL;
+
+
+void setMonthsLeft( int inMonths ) {
+    monthsLeft = inMonths;
+    }
+
+int getMonthsLeft() {
+    return monthsLeft;
+    }
+
+void decrementMonthsLeft() {
+    monthsLeft--;
+    if( monthsLeft < 0 ) {
+        monthsLeft = 0;
+        }
+    }
+
+
 
 
 
@@ -63,12 +83,18 @@ void setOpponentMoneyUnknown( char inUnknown ) {
 static int statusPanelSprite;
 static int panelW, panelH;
 
+static int datePanelSprite;
+static int datePanelW, datePanelH;
+
+
 static int unitInfoPanelSprite;
 static int unitPanelW, unitPanelH;
 
 void initStats() {
     statusPanelSprite = loadSprite( "statsPanel.tga", 
                                     &panelW, &panelH, true );
+    datePanelSprite = loadSprite( "datePanel.tga", 
+                                  &datePanelW, &datePanelH, true );
     unitInfoPanelSprite = loadSprite( "unitInfoPanel.tga", 
                                       &unitPanelW, &unitPanelH, true );
 
@@ -272,10 +298,10 @@ static void drawPanelContents( int inX, int inPlayer ) {
     
             
     
-    drawMoneyValue16( inX, baseY + 6, money[ inPlayer ], black, !showMoney );
+    drawMoneyValue16( inX, baseY + 10, money[ inPlayer ], black, !showMoney );
 
-    inX += 90;
-    drawDiamondCounter( inX, baseY + panelH / 2, diamonds[ inPlayer ] );
+    inX += 64;
+    drawDiamondCounter( inX, baseY + panelH / 2 + 2, diamonds[ inPlayer ] );
     }
 
 
@@ -327,15 +353,42 @@ static void drawSellStats( int inX, int inPlayer ) {
 // draws stats onto upper screen
 void drawStats() {
     drawSprite( statusPanelSprite, 0, 0, panelColors[0] );
+    
+    int secondPanelX = 255 - 100;
+    
+    drawSprite( statusPanelSprite, secondPanelX, 0, panelColors[1] );
 
-    drawSprite( statusPanelSprite, panelW, 0, panelColors[1] );
+
+    drawSprite( datePanelSprite, 128 - datePanelW / 2, 0, white );
+    
 
     startNewSpriteLayer();
 
     drawPanelContents( 0, 0 );
-    drawPanelContents( panelW, 1 );
+    drawPanelContents( secondPanelX, 1 );
 
 
+    char *monthString = autoSprintf( "%d", monthsLeft );
+    
+    font16->drawString( monthString, 
+                        128, 
+                        3,
+                        black, 
+                        alignCenter );
+    delete [] monthString;
+    
+    font8->drawString( translate( "stats_monthsLeft_A" ), 
+                        128, 
+                        16,
+                        black, 
+                        alignCenter );
+    font8->drawString( translate( "stats_monthsLeft_B" ), 
+                        128, 
+                        24,
+                        black, 
+                        alignCenter );
+
+    
     if( showSaleFlag ) {
         
         drawSellStats( 10, 0 );

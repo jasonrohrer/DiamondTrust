@@ -20,6 +20,7 @@ confiscateState.cpp \
 moveInspectorState.cpp \
 buyDiamondsState.cpp \
 sellDiamondsState.cpp \
+gameEndState.cpp \
 bidPicker.cpp \
 salePicker.cpp \
 gameStats.cpp \
@@ -55,6 +56,7 @@ s/^moveInspectorState\.o/\.\.\/moveInspectorState\.o/; \
 s/^confiscateState\.o/\.\.\/confiscateState\.o/; \
 s/^buyDiamondsState\.o/\.\.\/buyDiamondsState\.o/; \
 s/^sellDiamondsState\.o/\.\.\/sellDiamondsState\.o/; \
+s/^gameEndState\.o/\.\.\/gameEndState\.o/; \
 s/^bidPicker\.o/\.\.\/bidPicker\.o/; \
 s/^salePicker\.o/\.\.\/salePicker\.o/; \
 s/^gameStats\.o/\.\.\/gameStats\.o/; \

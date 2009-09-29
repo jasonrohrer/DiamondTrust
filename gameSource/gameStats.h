@@ -4,6 +4,11 @@ void initStats();
 void freeStats();
 
 
+void setMonthsLeft( int inMonths );
+int getMonthsLeft();
+void decrementMonthsLeft();
+
+
 // 0 player, 1 enemy
 int getPlayerMoney( int inPlayer );
 int getPlayerDiamonds( int inPlayer );

@@ -21,6 +21,7 @@ bidPicker.tga \
 pickerBorder.tga \
 bid.tga \
 statsPanel.tga \
+datePanel.tga \
 unitInfoPanel.tga \
 bribedMarker.tga \
 miniDiamond.tga \

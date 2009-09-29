@@ -17,6 +17,9 @@ static char gotMove = false;
 static char stepsSinceSentMove = 0;
 static char minSteps = 30;
 
+static char stepsSinceExecute = 0;
+static char minStepsSinceExecute = 60;
+
 
 extern Button *doneButton;
 extern char *statusMessage;
@@ -447,6 +450,7 @@ void MoveUnitsState::stepState() {
     
     stepUnits();
     stepsSinceSentMove ++;
+    stepsSinceExecute ++;
     
     if( sentInitialMove && !gotInitialMove && stepsSinceSentMove > minSteps ) {
         if( checkConnectionStatus() == -1 ) {
@@ -521,11 +525,18 @@ void MoveUnitsState::stepState() {
             
             showAllUnitMoves( true );
             executeUnitMoves();
+
+            stepsSinceExecute = 0;
             }        
         }
 
     if( sentMove && gotMove ) {
-        if( unitAnimationsDone() ) {
+        if( unitAnimationsDone() 
+            && 
+            stepsSinceExecute > minStepsSinceExecute ) {
+            
+            // use minimum to avoid flicker if no one is moving or winning
+
             stateDone = true;
             }
         }
