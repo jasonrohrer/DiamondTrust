@@ -129,6 +129,8 @@ class Unit {
         int mNumExecutionSteps;
 
         int mNumDiamondsHeld;
+
+        int mTripCost;
     };
 
 

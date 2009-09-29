@@ -439,8 +439,29 @@ void drawStats() {
 
         drawDiamondCounter( 34, 78, u->mNumDiamondsHeld );
         
+        int xOffset, x, y;
+        
+        if( u->mTripCost > 0 ) {
+            
+            xOffset = font8->measureString( translate( "stats_tripCost" ) );
+            
+            x = 54;
+            y = 74;
+            
+            font8->drawString( translate( "stats_tripCost" ), 
+                                x, 
+                                y,
+                                black, 
+                                alignLeft );
+            xOffset += 6;
+            
+            drawMoneyValue8( x + xOffset, y, 
+                             u->mTripCost, 
+                             black, false );
+            }
+        
 
-        int xOffset = font16->measureString( translate( "stats_salary" ) );
+        xOffset = font16->measureString( translate( "stats_salary" ) );
         int otherOffset = 
             font16->measureString( translate( "stats_bribes" ) );
         if( otherOffset > xOffset ) {
@@ -449,8 +470,8 @@ void drawStats() {
     
         xOffset += 10;
         
-        int x = 10;
-        int y = 89;
+        x = 10;
+        y = 89;
         
         font16->drawString( translate( "stats_salary" ), 
                             x, 

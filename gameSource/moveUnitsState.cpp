@@ -55,6 +55,21 @@ class MoveUnitsState : public GameState {
 
 
 
+static int getMoveCost( int inStartRegion, int inEndRegion ) {
+    if( inStartRegion == inEndRegion ) {
+        return 0;
+        }
+    if( inStartRegion == 0 || inEndRegion == 0 || 
+        inStartRegion == 1 || inEndRegion == 1 ) {
+        // moving to/from home region
+        return 2;
+        }
+    // moving between producing regions
+    return 1;
+    }
+
+
+
 
 static void sendMoveMessage() {
     // send our move as a message
@@ -119,6 +134,10 @@ static int getMoveMessage() {
                 
             setUnitDestination( oppUnit,
                                 message[ index++ ] );
+
+            totalBidsAndBribes += getMoveCost( getUnitRegion( oppUnit ),
+                                               getUnitDestination( oppUnit ) );
+            
             
             int bid = message[ index++ ];
                 
@@ -149,6 +168,10 @@ static int getMoveMessage() {
 
     return -1;
     }
+
+
+
+
 
         
 
@@ -289,36 +312,12 @@ void MoveUnitsState::clickState( int inX, int inY ) {
 
             setAllUnitsNotSelectable();
 
-            //int unitDest = getUnitDestination( activeUnit );
-            
-            // clear any old move
-            int unitRegion = getUnitRegion( activeUnit );
-            /*
-            setUnitDestination( activeUnit, unitRegion );
-            
-            int oldBid = getUnitBid( activeUnit );
-            
-            addPlayerMoney( 0, oldBid );
-            setUnitBid( activeUnit, 0 );
-
-            int oldBribe = getUnitInspectorBribe( activeUnit );
-            
-            addPlayerMoney( 0, oldBribe );
-            setUnitInspectorBribe( activeUnit, 0 );
-            */
        
             // unit can move to any region that's not already
             // a destination of friendly units
 
-            // can always move back home
-            //, if not already there
-            //if( unitRegion != 0 ) {                
-                setRegionSelectable( 0, true );
-                //    }
-                //else {
-                //setRegionSelectable( 0, false );
-                //}
-                    
+            setRegionSelectable( 0, true );
+                                
                     
             // never move into region 1 (enemy home)
             
@@ -355,6 +354,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         int chosenRegion = getChosenRegion( inX, inY );
             
         if( chosenRegion != -1 ) {
+            int currentRegion = getUnitRegion( activeUnit );
             
             // different dest chose?
             int oldDest = getUnitDestination( activeUnit );
@@ -373,6 +373,15 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
                 setUnitDestination( activeUnit, chosenRegion );
                 setPickerBid( 0 );
+
+
+                int oldMoveCost = getMoveCost( currentRegion, oldDest );
+                addPlayerMoney( 0, oldMoveCost );
+                
+                int newMoveCost = getMoveCost( currentRegion, chosenRegion );
+                addPlayerMoney( 0, -newMoveCost );
+
+                getUnit( activeUnit )->mTripCost = newMoveCost;
                 }
             else {
                 // same region

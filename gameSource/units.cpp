@@ -154,6 +154,7 @@ void initUnits() {
         gameUnit[ i ].mExecutionStep = 0;
 
         gameUnit[ i ].mNumDiamondsHeld = 0;
+        gameUnit[ i ].mTripCost = 0;
         }
     
 

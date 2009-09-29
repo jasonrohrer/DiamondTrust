@@ -20,6 +20,9 @@ stats_bribes "Bribes:"
 stats_bribing "Bribing:"
 stats_bribedBy "Bribed by:"
 
+stats_tripCost "Trip cost:"
+
+
 
 phaseStatus_connect  "Connect to opponent"
 phaseSubStatus_parentOrChild  "Start as parent or as child"
