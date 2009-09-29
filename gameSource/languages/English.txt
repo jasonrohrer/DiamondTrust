@@ -5,6 +5,9 @@ button_parent "Host Game"
 button_child "Join Game"
 
 
+stats_monthsLeft_A "months"
+stats_monthsLeft_B "left"
+
 stats_selling "Selling:"
 stats_earning  "Earning:"
 
@@ -69,4 +72,9 @@ phaseStatus_sellPeek  "Bribed unit reveals sale"
 phaseSubStatus_sellDiamonds  "Pick number to sell on open market (or hit Done)"
 phaseSubStatus_sellDiamondsAdjust  "Adjust sale?  Pick new number to sell (or hit Done)"
 
+
+
+phaseStatus_youWin       "You win"
+phaseStatus_opponentWins "You lose"
+phaseStatus_tie "Tie game"
 
