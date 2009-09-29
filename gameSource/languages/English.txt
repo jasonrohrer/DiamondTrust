@@ -15,6 +15,7 @@ stats_salary "Salary:"
 stats_bribes "Bribes:"
 
 stats_bribing "Bribing:"
+stats_bribedBy "Bribed by:"
 
 
 phaseStatus_connect  "Connect to opponent"

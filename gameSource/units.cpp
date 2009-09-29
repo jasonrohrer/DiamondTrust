@@ -240,7 +240,7 @@ static char isBribeStatusVisible( int inUnit ) {
     
     if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe ) {
             
-        char visible = true;
+        visible = true;
         
         if( i < 3 ) {
             // one of our units!  Should we let the player know about this?
