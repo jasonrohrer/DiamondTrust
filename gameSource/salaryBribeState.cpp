@@ -26,6 +26,9 @@ extern char *statusMessage;
 extern char *statusSubMessage;
 
 
+static int backupLastBribingUnit[ numUnits ];
+
+
 
 class SalaryBribeState : public GameState {
     public:
@@ -127,7 +130,10 @@ void SalaryBribeState::clickState( int inX, int inY ) {
                         }
                     }
                 }
-            
+            else {
+                // restore to previous bribing unit (current bribe down to 0)
+                u->mLastBribingUnit = backupLastBribingUnit[ activeUnit ];
+                }
             }
 
         if( isBidDone() ) {
@@ -395,7 +401,11 @@ void SalaryBribeState::enterState() {
 
     statusMessage = translate( "phaseStatus_payAgents" );
     statusSubMessage = translate( "phaseSubStatus_pickAgent" ); 
-   
+    
+
+    for( int i=0; i<numUnits; i++ ) {
+        backupLastBribingUnit[i] = getUnit(i)->mLastBribingUnit;
+        }
     }
 
 

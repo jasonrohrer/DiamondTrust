@@ -382,8 +382,8 @@ void drawStats() {
                         black, hideBribe );
 
         if( ! hideBribe && u->mLastBribingUnit >= 0 ) {
-            x = 50;
-            y = 70;
+            x = 55;
+            y = 72;
             
             font16->drawString( translate( "stats_bribedBy" ), 
                                 x, 
@@ -394,7 +394,7 @@ void drawStats() {
             int xOffset = 
                 font16->measureString( translate( "stats_bribedBy" ) );
 
-            drawUnit( u->mLastBribingUnit, x + xOffset + 8, y + 12 );
+            drawUnit( u->mLastBribingUnit, x + xOffset + 10, y + 12 );
             }
         
         }
