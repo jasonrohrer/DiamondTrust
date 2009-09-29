@@ -134,6 +134,9 @@ void initUnits() {
         gameUnit[ i + 3].mLastBribePayment = 0;
         gameUnit[ i ].mLastBribingUnit = -1;
         gameUnit[ i + 3].mLastBribingUnit = -1;
+
+        gameUnit[ i ].mEnemyContactSinceBribeHidden = false;
+        gameUnit[ i + 3].mEnemyContactSinceBribeHidden = false;
         }
     
     // inspector 
@@ -258,6 +261,11 @@ static char isBribeStatusVisible( int inUnit ) {
                 }
             else {
                 visible = false;
+                }
+
+            if( ! gameUnit[i].mEnemyContactSinceBribeHidden ) {
+                // old bribe knowledge still valid
+                visible = true;
                 }
             }
         }

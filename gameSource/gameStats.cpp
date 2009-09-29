@@ -397,7 +397,8 @@ void drawStats() {
 
         char hideBribe = false;
         if( activeUnit < numPlayerUnits ) {
-                    
+            // our unit
+            
             // hide if bribing unit not bribed
             hideBribe = true;
             
@@ -409,6 +410,11 @@ void drawStats() {
                     hideBribe = false;
                     }
                 }
+
+            if( ! u->mEnemyContactSinceBribeHidden ) {
+                // old bribe knowledge still valid
+                hideBribe = false;
+                }
             }
         
         
@@ -417,6 +423,8 @@ void drawStats() {
                           black, hideBribe );
 
         if( ! hideBribe && u->mLastBribingUnit >= 0 ) {
+            printOut( "mLastBribingUnit = %d\n", u->mLastBribingUnit );
+            
             x = 241;
             y = 109;
             

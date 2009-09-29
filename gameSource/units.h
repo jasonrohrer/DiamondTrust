@@ -121,6 +121,8 @@ class Unit {
         int mLastBribePayment;
         char mShowBribePayment;
         
+        char mEnemyContactSinceBribeHidden;
+        
         int mLastBribingUnit;
 
         int mExecutionStep;

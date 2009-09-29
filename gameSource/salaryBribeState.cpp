@@ -197,6 +197,7 @@ void SalaryBribeState::clickState( int inX, int inY ) {
 
             // 2 chars per unit (both player and opponent)
             // salary or bribe, last bribing unit
+
             int messageLength = numPlayerUnits * 2 * 2;
             unsigned char message[ numPlayerUnits * 2 * 2 ];
 
@@ -300,10 +301,15 @@ void SalaryBribeState::stepState() {
                     u->mLastBribePayment = message[ index++ ];
                     totalSalaryAndBribes += u->mLastBribePayment;
                     
-                    u->mLastBribingUnit = message[ index++ ];
+                    // might be -1
+                    u->mLastBribingUnit = (char)message[ index++ ];
                     
-                    // adjust to describe opponent unit that is bribing us
-                    u->mLastBribingUnit += numPlayerUnits;
+                    
+                    if( u->mLastBribingUnit >= 0 ) {
+                        // adjust to describe opponent unit that is bribing us
+                        u->mLastBribingUnit += numPlayerUnits;
+                        }
+                    
                     }
                 }
 
@@ -326,6 +332,44 @@ void SalaryBribeState::stepState() {
 
                 u->mTotalBribe += u->mLastBribePayment;
                 u->mLastBribePayment = 0;
+ 
+
+                char bribeKnown = false;
+                
+                // check status of bribing unit
+                if( u->mLastBribingUnit >= 0 ) {
+                    
+                    Unit *bribingUnit = getUnit( u->mLastBribingUnit );
+                    if( bribingUnit->mTotalBribe > 
+                        bribingUnit->mTotalSalary ) {
+                        
+                        // bribe visible to unit's owner
+                        u->mEnemyContactSinceBribeHidden = false;
+                        bribeKnown = true;
+                        }
+                    }
+                
+                if( !bribeKnown ) {
+                    // is old knowledge still good?
+                    // not if we're in the same region as an enemy
+                
+                    if( u->mRegion > 1 ) {
+                        // not home
+
+                        for( int j=0; j<numPlayerUnits*2; j++ ) {
+                            if( j != i ) {
+                                if( getUnitRegion( j ) == u->mRegion ) {
+                                    
+                                    // unit tainted
+                                    u->mEnemyContactSinceBribeHidden = true;
+                                    } 
+                                }
+                            }
+                        }                    
+                    }
+                
+
+
                 }
             
                 
