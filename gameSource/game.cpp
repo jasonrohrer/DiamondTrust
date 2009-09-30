@@ -230,7 +230,13 @@ static void postMoveUnitsTransition() {
         }
     }
 
+
+
     
+// force a pause between all state transitions to give player a chance
+// to read screen
+static int stateDoneTicks = 0;
+static int minStateDoneTicks = 60;
 
 
 
@@ -242,9 +248,21 @@ int lastTouchX, lastTouchY;
 void gameLoopTick() {
     stepSprites();
 
-    currentGameState->stepState();
+    
     
     if( currentGameState->isStateDone() ) {
+        stateDoneTicks ++;
+        }
+    else {
+        stateDoneTicks = 0;
+
+        // only step if not done
+        currentGameState->stepState();
+        }
+    
+    if( stateDoneTicks > minStateDoneTicks ) {
+        // enough ticks have passed since last state ended
+        
         
         // state transition
         if( currentGameState == connectState ) {
