@@ -1279,6 +1279,11 @@ void acceptConnection() {
 
 
 void connectToServer( char *inAddress ) {
+    // ignore address
+    // prevent compiler warnings for unused
+    inAddress = NULL;
+
+
     isParent = false;
     initWM();
     }
