@@ -219,7 +219,7 @@ static void drawMoneyValue16( int inX, int inY, int inValue,
     // "$" position
 
     // hackish fix if 3+ digits are required (violate right-alignment)
-    int numDigits = strlen( moneyString );
+    unsigned int numDigits = strlen( moneyString );
     if( numDigits > 2 ) {
         inX += 11 * (numDigits - 2) + 2 * (numDigits - 2);
         }
@@ -254,7 +254,7 @@ static void drawMoneyValue8( int inX, int inY, int inValue,
     // "$" position
 
     // hackish fix if 3+ digits are required (violate right-alignment)
-    int numDigits = strlen( moneyString );
+    unsigned int numDigits = strlen( moneyString );
     if( numDigits > 2 ) {
         inX += 5 * (numDigits - 2) + 1 * (numDigits - 2);
         }

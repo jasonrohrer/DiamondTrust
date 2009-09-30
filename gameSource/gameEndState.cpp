@@ -48,6 +48,9 @@ class GameEndState : public GameState {
 void GameEndState::clickState( int inX, int inY ) {
     
     // no clicking!
+
+    // avoid unused variable warnings
+    inX = inY;
     }
 
 

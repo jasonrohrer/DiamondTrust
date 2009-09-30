@@ -47,6 +47,9 @@ class AccumulateDiamondsState : public GameState {
 void AccumulateDiamondsState::clickState( int inX, int inY ) {
     
     // no clicking!
+
+    // avoid unused variable warnings
+    inX = inY;
     }
 
 

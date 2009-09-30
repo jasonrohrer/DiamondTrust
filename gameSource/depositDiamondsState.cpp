@@ -48,6 +48,9 @@ class DepositDiamondsState : public GameState {
 void DepositDiamondsState::clickState( int inX, int inY ) {
     
     // no clicking!
+
+    // avoid unused variable warnings
+    inX = inY;
     }
 
 

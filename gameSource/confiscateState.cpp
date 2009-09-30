@@ -48,6 +48,9 @@ class ConfiscateState : public GameState {
 void ConfiscateState::clickState( int inX, int inY ) {
     
     // no clicking!
+
+    // avoid unused variable warnings
+    inX = inY;
     }
 
 

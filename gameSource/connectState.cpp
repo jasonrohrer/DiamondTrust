@@ -143,7 +143,8 @@ void ConnectState::stepState() {
             if( isParent && ! sentMessage ) {
                 // send inspector's starting region
                 unsigned char message[1];
-                message[0] = getUnit( numUnits - 1 )->mRegion;
+                message[0] = 
+                    (unsigned char)( getUnit( numUnits - 1 )->mRegion );
 
                 sendMessage( message, 1 );
                 

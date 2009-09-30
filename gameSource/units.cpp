@@ -143,7 +143,7 @@ void initUnits() {
     
     // inspector 
     // start in random producing region
-    gameUnit[ 6 ].mRegion = getRandom( numMapRegions - 2 ) + 2;
+    gameUnit[ 6 ].mRegion = (int)getRandom( numMapRegions - 2 ) + 2;
     // always starts in last region
     // gameUnit[ 6 ].mRegion = numMapRegions - 1;
     gameUnit[ 6 ].mSpriteID = spriteIDs[ 3 ];
@@ -182,7 +182,7 @@ Unit *getUnit( int inUnit ) {
 
 
 
-char getUnitMoveVisible( int inUnit ) {
+static char getUnitMoveVisible( int inUnit ) {
     if( inUnit < numPlayerUnits ) {
         return true;
         }
@@ -200,7 +200,7 @@ char getUnitMoveVisible( int inUnit ) {
 
 
 
-intPair getUnitCurrentPosition( int inUnit ) {
+static intPair getUnitCurrentPosition( int inUnit ) {
     int i=inUnit;
     
     intPair start = getUnitPositionInRegion( gameUnit[i].mRegion, i );
@@ -231,7 +231,7 @@ intPair getUnitCurrentPosition( int inUnit ) {
     }
 
 
-int getHomeRegion( int inUnit ) {
+static int getHomeRegion( int inUnit ) {
     if( inUnit < numPlayerUnits ) {
         return 0;
         }
