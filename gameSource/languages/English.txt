@@ -23,6 +23,10 @@ stats_bribedBy "Bribed by:"
 stats_tripCost "Trip cost:"
 
 
+stats_inspectorBlocking "Will block sale of:"
+stats_inspectorConfiscating "Will confiscate:"
+
+
 
 phaseStatus_connect  "Connect to opponent"
 phaseSubStatus_parentOrChild  "Host a game or join one started by your friend"
@@ -39,6 +43,7 @@ phaseSubStatus_accumulate  "Regions produce more diamonds"
 phaseStatus_payAgents  "Pay agents"
 phaseSubStatus_pickSalary  "Select salary payment for this agent"
 phaseSubStatus_pickOpponentBribe  "Select bribe payment for this opponent agent"
+phaseSubStatus_payAgentCannot  "None are payable (hit Done when ready)"
 
 
 
