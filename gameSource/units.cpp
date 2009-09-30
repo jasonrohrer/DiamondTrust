@@ -427,8 +427,9 @@ void drawUnits() {
                 c = enemyColor;
                 }
             else {
-                // inspector sprite already contains color
-                c = white;
+                // this is the only sprite that doesn't contain
+                // inspector color already
+                c = inspectorColor;
                 }            
 
             // center

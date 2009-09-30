@@ -9,6 +9,7 @@ extern rgbaColor trans75white;
 
 extern rgbaColor playerColor;
 extern rgbaColor enemyColor;
+extern rgbaColor inspectorColor;
 
 extern rgbaColor playerRegionColor;
 extern rgbaColor enemyRegionColor;
