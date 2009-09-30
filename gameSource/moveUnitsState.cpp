@@ -566,7 +566,9 @@ void MoveUnitsState::stepState() {
             
             showAllUnitMoves( true );
             executeUnitMoves();
-
+            
+            setMovePeeking( false );
+            
             stepsSinceExecute = 0;
             }        
         }
@@ -654,6 +656,8 @@ void MoveUnitsState::enterState() {
     
     setActiveUnit( -1 );
     showUnitMoves( true );
+
+    setMovePeeking( false );
     
     for( int i=0; i<numPlayerUnits * 2; i++ ) {
         setUnitBid( i, 0 );
