@@ -13,6 +13,8 @@ extern rgbaColor enemyColor;
 extern rgbaColor playerRegionColor;
 extern rgbaColor enemyRegionColor;
 
+extern rgbaColor inspectorPanelColor;
+
 
 extern rgbaColor diamondPurple;
 

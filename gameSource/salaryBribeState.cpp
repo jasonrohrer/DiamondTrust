@@ -57,13 +57,18 @@ class SalaryBribeState : public GameState {
     };
 
 
-static void setPayableUnitsSelectable() {
+// returns num payable
+static int setPayableUnitsSelectable() {
+    int numPayable = 0;
+
     // home player units
     int i;
     for( i=0; i<numPlayerUnits; i++ ) {
         if( getUnitRegion( i ) == 0 ) {
             setUnitSelectable( i, true );
             getUnit( i )->mShowSalaryPayment = true;
+            
+            numPayable++;
             }
         }
     // opponent units in shared regions
@@ -75,9 +80,13 @@ static void setPayableUnitsSelectable() {
             if( getUnitRegion( j ) == oppRegion ) {
                 setUnitSelectable( oppUnit, true );
                 getUnit( oppUnit )->mShowBribePayment = true;
+                
+                numPayable++;
                 }
             }
         }
+
+    return numPayable;
     }
 
 
@@ -445,12 +454,18 @@ void SalaryBribeState::enterState() {
     showUnitMoves( false );
     
     // user needs to pick one
-    setPayableUnitsSelectable();
+    int numPayable = setPayableUnitsSelectable();
 
     statusMessage = translate( "phaseStatus_payAgents" );
-    statusSubMessage = translate( "phaseSubStatus_pickAgent" ); 
-    
 
+    if( numPayable > 0 && getPlayerMoney( 0 ) > 0 ) {
+        
+        statusSubMessage = translate( "phaseSubStatus_pickAgent" ); 
+        }
+    else {
+        statusSubMessage = translate( "phaseSubStatus_payAgentCannot" ); 
+        }
+    
     for( int i=0; i<numUnits; i++ ) {
         backupLastBribingUnit[i] = getUnit(i)->mLastBribingUnit;
         }

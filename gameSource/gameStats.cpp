@@ -4,6 +4,7 @@
 #include "Font.h"
 #include "colors.h"
 #include "units.h"
+#include "map.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -162,7 +163,8 @@ int getPlayerEarnings( int inPlayer ) {
 
 
 
-static rgbaColor panelColors[2] = { playerRegionColor, enemyRegionColor };
+static rgbaColor panelColors[3] = { playerRegionColor, enemyRegionColor,
+                                    inspectorPanelColor };
 
 
 extern Font *font16;
@@ -595,6 +597,84 @@ void drawStats() {
             }
         
             
+        }
+
+
+    if( activeUnit == numUnits - 1 ) {
+        // show inspector destination panel
+        Unit *u = getUnit( numUnits - 1 );
+
+
+        drawSprite( unitInfoPanelSprite, 0, 64, panelColors[2] );
+
+        startNewSpriteLayer();
+
+        
+        int dest = u->mDest;
+        
+        
+        
+        
+        font16->drawString( translate( "stats_inspectorBlocking" ), 
+                            128, 
+                            72,
+                            black, 
+                            alignCenter );
+        
+        int width = 
+            font16->measureString( translate( "stats_inspectorBlocking" ) );
+        
+
+        drawDiamondCounter( 128 + width / 2 + 15, 80, 
+                            getDiamondsInRegion( dest ) );
+
+        int i;
+        char someFound = false;
+        
+        for( int i=0; i<numPlayerUnits*2; i++ ) {
+            Unit *playerUnit = getUnit( i );
+            if( playerUnit->mRegion == dest && 
+                playerUnit->mNumDiamondsHeld > 0 ) {
+                
+                someFound = true;
+                }
+            }
+        
+        if( someFound ) {
+            font16->drawString( translate( "stats_inspectorConfiscating" ), 
+                                128, 
+                                92,
+                                black, 
+                                alignCenter );
+            
+            
+            int x = 96;
+            int y = 122;
+            
+            for( i=0; i<numPlayerUnits*2; i++ ) {
+                Unit *playerUnit = getUnit( i );
+                if( playerUnit->mRegion == dest && 
+                    playerUnit->mNumDiamondsHeld > 0 ) {
+
+                    if( i < numPlayerUnits ) {
+                        x = 96;
+                        }
+                    else {
+                        x = 160;
+                        }
+                    
+                    
+                    drawUnit( i, x, y );
+
+                    drawDiamondCounter( x+19, y-6, 
+                                        playerUnit->mNumDiamondsHeld );
+
+                    }
+                }
+
+            }
+        
+        
         }
     
     }

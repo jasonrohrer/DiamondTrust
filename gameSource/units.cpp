@@ -976,7 +976,9 @@ char isAnyUnitPayable() {
     // home units
     int i;
     for( i=0; i<numPlayerUnits*2; i++ ) {
-        if( getUnitRegion( i ) == 0 ) {
+        if( getUnitRegion( i ) == 0 || 
+            getUnitRegion( i ) == 1 ) {
+            
             return true;
             }
         }

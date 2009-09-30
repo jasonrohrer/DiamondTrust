@@ -15,6 +15,8 @@ rgbaColor playerRegionColor = { 77, 255, 77, 255 };
 
 rgbaColor enemyRegionColor = { 255, 77, 77, 255 };
 
+rgbaColor inspectorPanelColor = { 84, 84, 255, 255 };
+
 
 
 rgbaColor diamondPurple = { 128, 0, 192, 255 };
