@@ -104,13 +104,15 @@ void initUnits() {
     delete [] unitRGBA;
     
 
+    // all player units start at home
+
     // player
-    gameUnit[ 0 ].mRegion = 2;
+    gameUnit[ 0 ].mRegion = 0;
     gameUnit[ 1 ].mRegion = 0;
     gameUnit[ 2 ].mRegion = 0;
 
     // enemy
-    gameUnit[ 3 ].mRegion = 2;
+    gameUnit[ 3 ].mRegion = 1;
     gameUnit[ 4 ].mRegion = 1;
     gameUnit[ 5 ].mRegion = 1;
 
@@ -140,8 +142,10 @@ void initUnits() {
         }
     
     // inspector 
+    // start in random producing region
+    gameUnit[ 6 ].mRegion = getRandom( numMapRegions - 2 ) + 2;
     // always starts in last region
-    gameUnit[ 6 ].mRegion = numMapRegions - 1;
+    // gameUnit[ 6 ].mRegion = numMapRegions - 1;
     gameUnit[ 6 ].mSpriteID = spriteIDs[ 3 ];
     gameUnit[ 6 ].mDotSpriteID = moveDotSpriteIDs[ 3 ];
 

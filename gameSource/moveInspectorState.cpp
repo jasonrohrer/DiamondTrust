@@ -14,8 +14,8 @@ static char waiting = false;
 static char sentMove = false;
 static char gotMove = false;
 
-static char stepsWaiting = 0;
-static char minSteps = 30;
+static int stepsWaiting = 0;
+static int minSteps = 30;
 
 extern Button *doneButton;
 extern char *statusMessage;

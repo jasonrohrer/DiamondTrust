@@ -13,8 +13,8 @@ static char sentMove = false;
 static char gotMove = false;
 
 // wait at least 2 seconds between wait and display
-static char stepsSinceSentMove = 0;
-static char minSteps = 30;
+static int stepsSinceSentMove = 0;
+static int minSteps = 30;
 
 
 static char pickingSalary = false;

@@ -2,6 +2,7 @@
 #include "Button.h"
 #include "common.h"
 #include "gameStats.h"
+#include "units.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -13,10 +14,13 @@ extern Button *childButton;
 extern char *statusMessage;
 extern char *statusSubMessage;
 
+static char isParent;
+static char sentMessage, gotMessage;
+
 
 // wait at least 2 seconds between wait and display
-static char stepsSinceConnectTry = 0;
-static char minSteps = 30;
+static int stepsSinceConnectTry = 0;
+static int minSteps = 30;
 
 
 
@@ -70,7 +74,8 @@ void ConnectState::clickState( int inX, int inY ) {
  
     if( ! connecting ) {
         if( parentButton->getPressed( inX, inY ) ) {
-
+            isParent = true;
+            
             acceptConnection();
             char *serverAddress = getLocalAddress();
             
@@ -99,6 +104,7 @@ void ConnectState::clickState( int inX, int inY ) {
             stepsSinceConnectTry = 0;
             }
         else if( childButton->getPressed( inX, inY ) ) {
+            isParent = false;
 
             connectToServer( NULL );
 
@@ -129,13 +135,64 @@ void ConnectState::stepState() {
         
         if( checkConnectionStatus() == 0 ) {
             // still trying
+            printOut( "No connection yet %d\n", stepsSinceConnectTry );
             return;
             }
         
         if( checkConnectionStatus() == 1 ) {
             
-            // connected!
-            stateDone = true;
+            if( isParent && ! sentMessage ) {
+                // send inspector's starting region
+                unsigned char message[1];
+                message[0] = getUnit( numUnits - 1 )->mRegion;
+
+                sendMessage( message, 1 );
+                
+                sentMessage = true;
+                
+                // connected!
+                stateDone = true;
+
+                printOut( "Sent first message to client %d\n", 
+                          stepsSinceConnectTry );
+                
+                }
+            else if( !isParent && ! gotMessage ) {
+                
+                unsigned int messageLength;
+                unsigned char *message = getMessage( &messageLength );
+                
+                if( message != NULL ) {
+                    printOut( "Got message from parent\n" );
+
+                    if( messageLength != 1 ) {
+                        printOut( "Bad message length from opponent\n" );
+                        stateDone = true;
+
+                        delete [] message;
+                        return;
+                        }
+
+                    // set inspector region
+                    getUnit( numUnits - 1 )->mRegion = message[0];
+                    getUnit( numUnits - 1 )->mDest = message[0];
+                    
+
+                    delete [] message;
+
+                    gotMessage = true;
+                
+                    // connected!
+                    stateDone = true;
+                    }
+                else {
+                    printOut( "Waiting message from parent\n" );
+                    }
+                
+                
+                }
+            
+
             }
         }            
     }
@@ -161,7 +218,10 @@ void ConnectState::enterState() {
 
     statusMessage = translate( "phaseStatus_connect" );
     statusSubMessage = translate( "phaseSubStatus_parentOrChild" ); 
-   
+    
+    isParent = false;
+    sentMessage = false;
+    gotMessage = false;
     }
 
 

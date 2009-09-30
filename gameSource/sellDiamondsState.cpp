@@ -14,8 +14,8 @@ static char gotInitialMove = false;
 static char sentMove = false;
 static char gotMove = false;
 
-static char stepsSinceSentMove = 0;
-static char minSteps = 30;
+static int stepsSinceSentMove = 0;
+static int minSteps = 30;
 
 
 extern Button *doneButton;

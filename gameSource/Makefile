@@ -36,9 +36,13 @@ PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))
 
 
 
-all: ${PATH_GAME_GRAPHICS}
+
+all: ${PATH_GAME_GRAPHICS} gameData
 	cp languages/*.txt gameData
 
+
+gameData:
+	mkdir gameData
 
 clean:
 	rm -f ${PATH_GAME_GRAPHICS}

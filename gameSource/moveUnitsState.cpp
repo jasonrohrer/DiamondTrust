@@ -14,11 +14,11 @@ static char gotInitialMove = false;
 static char sentMove = false;
 static char gotMove = false;
 
-static char stepsSinceSentMove = 0;
-static char minSteps = 30;
+static int stepsSinceSentMove = 0;
+static int minSteps = 30;
 
-static char stepsSinceExecute = 0;
-static char minStepsSinceExecute = 60;
+static int stepsSinceExecute = 0;
+static int minStepsSinceExecute = 60;
 
 
 extern Button *doneButton;
@@ -544,8 +544,15 @@ void MoveUnitsState::stepState() {
             && 
             stepsSinceExecute > minStepsSinceExecute ) {
             
-            // use minimum to avoid flicker if no one is moving or winning
+            // use minimum steps to avoid flicker if 
+            // no one is moving or winning
 
+
+            for( int i=0; i<numPlayerUnits*2; i++ ) {
+                // reset trip costs
+                getUnit( i )->mTripCost = 0;
+                }
+            
             stateDone = true;
             }
         }
