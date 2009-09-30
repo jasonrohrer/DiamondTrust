@@ -135,7 +135,6 @@ void ConnectState::stepState() {
         
         if( checkConnectionStatus() == 0 ) {
             // still trying
-            printOut( "No connection yet %d\n", stepsSinceConnectTry );
             return;
             }
         
@@ -152,10 +151,6 @@ void ConnectState::stepState() {
                 
                 // connected!
                 stateDone = true;
-
-                printOut( "Sent first message to client %d\n", 
-                          stepsSinceConnectTry );
-                
                 }
             else if( !isParent && ! gotMessage ) {
                 
@@ -163,8 +158,7 @@ void ConnectState::stepState() {
                 unsigned char *message = getMessage( &messageLength );
                 
                 if( message != NULL ) {
-                    printOut( "Got message from parent\n" );
-
+                
                     if( messageLength != 1 ) {
                         printOut( "Bad message length from opponent\n" );
                         stateDone = true;
@@ -184,11 +178,7 @@ void ConnectState::stepState() {
                 
                     // connected!
                     stateDone = true;
-                    }
-                else {
-                    printOut( "Waiting message from parent\n" );
-                    }
-                
+                    }                
                 
                 }
             
