@@ -303,7 +303,10 @@ void SellDiamondsState::stepState() {
 
             if( !changedSome ) {
                 showSale( false );
-
+                
+                setPlayerNumToSell( 0, 0 );
+                setPlayerNumToSell( 1, 0 );
+                
                 stateDone = true;
                 }
             }
