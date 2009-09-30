@@ -948,13 +948,21 @@ int getPlayerBribedInspector() {
     int highBribe = 0;
     
     for( int i=0; i<numPlayerUnits*2; i++ ) { 
-        if( gameUnit[i].mRegion == gameUnit[numUnits - 1].mRegion
-            &&
-            gameUnit[i].mInspectorBribe > highBribe ) {
+        if( gameUnit[i].mRegion == gameUnit[numUnits - 1].mRegion ) {
             
-            highBribe = gameUnit[i].mInspectorBribe;
+            int bribe = gameUnit[i].mInspectorBribe;
+            if( bribe > highBribe ) {
             
-            highBribingUnit = i;
+                highBribe = gameUnit[i].mInspectorBribe;
+            
+                highBribingUnit = i;
+                }
+            else if( bribe == highBribe ) {
+                // ties with previous high bribe
+                // cancels it
+                highBribingUnit = -1;
+                }
+            
             }
         }
     
