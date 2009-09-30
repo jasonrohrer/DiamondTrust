@@ -98,6 +98,9 @@ void MoveInspectorState::clickState( int inX, int inY ) {
             
             sentMove = true;
 
+            // turn off halo now that move specification done
+            setActiveUnit( -1 );
+
             showAllUnitMoves( true );
             executeUnitMoves();
             }
@@ -188,6 +191,9 @@ void MoveInspectorState::enterState() {
 
     statusMessage = translate( "phaseStatus_moveInspector" );
             
+    moving = false;
+    waiting = false;
+    
     if( getPlayerBribedInspector() == 0 ) {
         moving = true;
         setActiveUnit( numUnits - 1 );
