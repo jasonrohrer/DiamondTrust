@@ -25,7 +25,7 @@ stats_tripCost "Trip cost:"
 
 
 phaseStatus_connect  "Connect to opponent"
-phaseSubStatus_parentOrChild  "Start as parent or as child"
+phaseSubStatus_parentOrChild  "Host a game or join one started by your friend"
 phaseSubStatus_waitingConnect  "Waiting for a connection"
 phaseSubStatus_waitingConnectOn  "Waiting for a connection on "
 phaseSubStatus_connectingToParent  "Connecting to parent... "
