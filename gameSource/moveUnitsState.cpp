@@ -315,8 +315,40 @@ void MoveUnitsState::clickState( int inX, int inY ) {
        
             // unit can move to any region that's not already
             // a destination of friendly units
+            
+            char affordable[ numMapRegions ];
+            
+            int currentRegion = getUnitRegion( activeUnit );
+            
 
-            setRegionSelectable( 0, true );
+            int r;
+            for( r=0; r<numMapRegions; r++ ) {
+                
+                if( r == 1 ) {
+                    // forbidden
+                    affordable[r] = false;
+                    }
+                else {
+                    if( getMoveCost( currentRegion, r ) 
+                        <= getPlayerMoney( 0 ) 
+                        || 
+                        getUnitDestination( activeUnit ) == r ) {
+                        
+                        // we have enough money to move there, OR
+                        // it is already this unit's dest, so it's already
+                        // paid for
+                        affordable[r] = true;
+                        }
+                    else {
+                        affordable[r] = false;
+                        }
+                    }                    
+                }
+            
+                
+                
+
+            setRegionSelectable( 0, affordable[0] );
                                 
                     
             // never move into region 1 (enemy home)
@@ -338,7 +370,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                     }
 
                 if( !alreadyDest ) {
-                    setRegionSelectable( r, true );
+                    setRegionSelectable( r, affordable[r] );
                     }
                 else {
                     setRegionSelectable( r, false );
