@@ -725,6 +725,8 @@ static void wmPortCallback( void *inArg ) {
         }
     else {
         if( callbackArg->state == WM_STATECODE_PORT_RECV ) {
+            printOut( "wmPortCallback getting message of length %d\n",
+                      callbackArg->length );
             
             receiveFifo.addData( (unsigned char*)callbackArg->data, 
                                  (unsigned int)callbackArg->length );
@@ -1180,7 +1182,7 @@ void startNextSend() {
     if( data != NULL ) {
         sendPending = true;
         
-        printOut( "Starting data send\n" );
+        printOut( "Starting data send of %d bytes\n", numBytes );
         
         unsigned short receiverBitmap = (unsigned short)( 1 << remoteAID );
         
@@ -1295,17 +1297,75 @@ int checkConnectionStatus() {
 
 
 void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
-    sendFifo.addData( inMessage, inLength );
+    printOut( "Putting message of %d bytes onto send fifo\n", inLength );
+    
+    // add first 4 bytes, which is message length
+    // must do this because DS data sharing doesn't seem to preserve
+    // data length (sometimes longer than message that was sent, with
+    // garbage bytes at end).
+    unsigned int sendSize = inLength + 4;
+    unsigned char *sendData = new unsigned char[ sendSize ];
+                
+    sendData[0] = (unsigned char)( ( inLength >> 24 ) & 0xFF );
+    sendData[1] = (unsigned char)( ( inLength >> 16 ) & 0xFF );
+    sendData[2] = (unsigned char)( ( inLength >> 8 ) & 0xFF );
+    sendData[3] = (unsigned char)( ( inLength ) & 0xFF );
+    
+    memcpy( &( sendData[4] ), inMessage, inLength );
+
+
+    sendFifo.addData( sendData, sendSize );
+    delete [] sendData;
+    
     if( !sendPending ) {
         // start a new one 
         startNextSend();
         }
+
+    
     // else new one will start when current one finishes (in callback)
     }
 
 
 unsigned char *getMessage( unsigned int *outLength ) {
-    return receiveFifo.getData( outLength );
+    unsigned int dataLength;
+    unsigned char *data = receiveFifo.getData( &dataLength );
+    
+    if( data == NULL ) {
+        return NULL;
+        }
+    
+
+    // else decode the length header at start of message
+
+    if( dataLength < 4 ) {
+        printOut( "getMessage Error:  message too short for length header\n" );
+        delete [] data;
+        return NULL;
+        }
+    
+    unsigned int messageLength =
+        (unsigned int)( data[0] << 24 ) |
+        (unsigned int)( data[1] << 16 ) |
+        (unsigned int)( data[2] << 8 ) |
+        (unsigned int)( data[3] );
+
+    // make sure size is sane
+    if( messageLength > 10000000 ) {
+        printOut( "Huge message size of %u received\n",
+                  messageLength );
+        delete [] data;
+        return NULL;
+        } 
+
+    unsigned char *message = new unsigned char[ messageLength ];
+    memcpy( message, &( data[4] ), messageLength );
+    
+    delete [] data;
+    
+    *outLength = messageLength;
+    
+    return message;
     }
 
 
