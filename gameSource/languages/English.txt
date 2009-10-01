@@ -1,11 +1,16 @@
 status_next  "Next:"
+status_finished  "Finished:"
+subStatus_moveOn "Press Next to continue"
+
 
 button_done "Done"
+button_next "Next"
 button_parent "Host Game"
 button_child "Join Game"
 
 
-stats_monthsLeft_A "months"
+stats_monthsLeft_As "months"
+stats_monthsLeft_A "month"
 stats_monthsLeft_B "left"
 
 stats_selling "Selling:"
@@ -37,7 +42,7 @@ phaseSubStatus_connectFailed  "Connection failed"
 
 
 phaseStatus_accumulate  "Diamonds accumulate"
-phaseSubStatus_accumulate  "Regions produce more diamonds"
+phaseSubStatus_accumulate  "New month, regions produce more diamonds"
 
 
 phaseStatus_payAgents  "Pay agents"
