@@ -102,6 +102,13 @@ void MoveInspectorState::clickState( int inX, int inY ) {
             setActiveUnit( -1 );
 
             showAllUnitMoves( true );
+
+
+            // turn off inspector bribe tags for move
+            for( int i=0; i<numPlayerUnits*2; i++ ) {
+                showInspectorBribe( i, false );
+                }
+            
             executeUnitMoves();
             }
         }

@@ -662,6 +662,22 @@ void MoveUnitsState::enterState() {
     for( int i=0; i<numPlayerUnits * 2; i++ ) {
         setUnitBid( i, 0 );
         setUnitInspectorBribe( i, 0 );
+
+        // turn off inspector bribe tags for any unit not in
+        // inspector's region (might be on, left over from last move)
+        int inspRegion = getUnitRegion( numUnits - 1 );
+        
+        for( int i=0; i<numPlayerUnits*2; i++ ) {
+            if( getUnitRegion( i ) != inspRegion ) {
+                
+                showInspectorBribe( i, false );
+                }
+            else {
+                showInspectorBribe( i, true );
+                }
+            
+            }
+            
         }
     
 
