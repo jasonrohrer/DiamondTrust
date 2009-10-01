@@ -150,6 +150,8 @@ void SellDiamondsState::clickState( int inX, int inY ) {
         }
     else if( ( sentInitialMove && gotInitialMove ) && !sentMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
+            pickingSale = false;
+            
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
             
             sendMoveMessage();
