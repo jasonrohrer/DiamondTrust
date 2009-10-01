@@ -258,7 +258,7 @@ char touchDownOnLastCheck = false;
 int lastTouchX, lastTouchY;
 
 
-void goToNextGameState() {
+static void goToNextGameState() {
     // state transition
     if( currentGameState == connectState ) {
         currentGameState = accumulateDiamondsState;
