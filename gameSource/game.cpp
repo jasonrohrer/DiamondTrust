@@ -48,6 +48,7 @@ extern GameState *gameEndState;
 
 
 Button *doneButton;
+Button *nextButton;
 Button *parentButton;
 Button *childButton;
 
@@ -90,7 +91,9 @@ void gameInit() {
     
     initButton();
 
-    doneButton = new Button( font16, translate( "button_done" ), 7, 84 );
+    doneButton = new Button( font16, translate( "button_done" ), 7, 74 );
+    
+    nextButton = new Button( font16, translate( "button_next" ), 7, 94 );
     
     parentButton = new Button( font16, translate( "button_parent" ),
                                                   128 - 64,
@@ -112,7 +115,7 @@ void gameInit() {
     // show opponent's money at start of game
     setOpponentMoneyUnknown( false );
     
-    setMonthsLeft( 12 );
+    setMonthsLeft( 2 );
     
 
     currentGameState = connectState;
@@ -125,6 +128,7 @@ void gameFree() {
     delete font8;
     delete font16;
     delete doneButton;
+    delete nextButton;
     delete parentButton;
     delete childButton;
     
@@ -170,12 +174,19 @@ static void postSellTransition() {
     
 
 static void postBuyTransition() {
-    printOut( "Transition after buy\n" );
     
-
-    // always do sell transtion, because players earn money even when
-    // they have none to sell
-    currentGameState = sellDiamondsState;
+    if( getMonthsLeft() > 0 ) {
+        
+        // always do sell transtion, because players earn money even when
+        // they have none to sell
+        currentGameState = sellDiamondsState;
+        }
+    else {
+        // end of game... selling diamonds never makes sense, so
+        // don't let players do it
+        postSellTransition();
+        }
+    
     }
 
 
@@ -233,11 +244,8 @@ static void postMoveUnitsTransition() {
 
 
     
-// force a pause between all state transitions to give player a chance
-// to read screen
-static int stateDoneTicks = 0;
-static int minStateDoneTicks = 60;
-
+// track whether current state has finished
+static char stateDone = false;
 
 
 // only register a click when stylus/mouse lifted
@@ -245,57 +253,70 @@ char touchDownOnLastCheck = false;
 int lastTouchX, lastTouchY;
 
 
+void goToNextGameState() {
+    // state transition
+    if( currentGameState == connectState ) {
+        currentGameState = accumulateDiamondsState;
+        }
+    else if( currentGameState == accumulateDiamondsState ) {
+        postAccumulateTransition();
+        }
+    else if( currentGameState == salaryBribeState ) {
+        currentGameState = moveUnitsState;
+        }
+    else if( currentGameState == moveUnitsState ) {
+        postMoveUnitsTransition();
+        }
+    else if( currentGameState == depositDiamondsState ) {
+        postDepositeTransition();
+        }
+    else if( currentGameState == moveInspectorState ) {
+        postMoveInspectorTransition();
+        }
+    else if( currentGameState == confiscateState ) {
+        postConfiscateTransition();
+        }
+    else if( currentGameState == buyDiamondsState ) {
+        postBuyTransition();
+        }
+    else if( currentGameState == sellDiamondsState ) {
+        // beginning of next round
+        postSellTransition();
+        }
+                
+    currentGameState->enterState();
+    }
+
+    
+
 void gameLoopTick() {
     stepSprites();
 
     
     
     if( currentGameState->isStateDone() ) {
-        stateDoneTicks ++;
+        if( !stateDone ) {
+            // just finished
+
+            if( currentGameState != gameEndState ) {
+                // change status sub message to tell player
+                // about pushing next button
+                statusSubMessage = translate( "subStatus_moveOn" );
+                
+                // wait for next button before state change
+                }
+            
+            }
+        
+        stateDone = true;
         }
     else {
-        stateDoneTicks = 0;
+        stateDone = false;
 
         // only step if not done
         currentGameState->stepState();
         }
     
-    if( stateDoneTicks > minStateDoneTicks ) {
-        // enough ticks have passed since last state ended
-        
-        
-        // state transition
-        if( currentGameState == connectState ) {
-            currentGameState = accumulateDiamondsState;
-            }
-        else if( currentGameState == accumulateDiamondsState ) {
-            postAccumulateTransition();
-            }
-        else if( currentGameState == salaryBribeState ) {
-            currentGameState = moveUnitsState;
-            }
-        else if( currentGameState == moveUnitsState ) {
-            postMoveUnitsTransition();
-            }
-        else if( currentGameState == depositDiamondsState ) {
-            postDepositeTransition();
-            }
-        else if( currentGameState == moveInspectorState ) {
-            postMoveInspectorTransition();
-            }
-        else if( currentGameState == confiscateState ) {
-            postConfiscateTransition();
-            }
-        else if( currentGameState == buyDiamondsState ) {
-            postBuyTransition();
-            }
-        else if( currentGameState == sellDiamondsState ) {
-            // beginning of next round
-            postSellTransition();
-            }
-                
-        currentGameState->enterState();
-        }
         
 
     int tx, ty;
@@ -313,8 +334,22 @@ void gameLoopTick() {
         ty = lastTouchY;
         
         // this achieves the equivalent of a "mouse released" event
-                
-        currentGameState->clickState( tx, ty );        
+        
+        // don't pass clicks to done states
+        if( !currentGameState->isStateDone() ) {
+            currentGameState->clickState( tx, ty );        
+            }
+        else if( currentGameState != gameEndState ) {
+        
+            // next button visible
+
+            if( nextButton->getPressed( tx, ty ) ) {
+                goToNextGameState();
+                }
+            
+            }
+        
+        
         }
     }
 
@@ -330,9 +365,26 @@ void drawTopScreen() {
 
     if( statusMessage != NULL ) {
         
-        font16->drawString( translate( "status_next" ), 
+        char *headerString;
+        
+        if( !currentGameState->isStateDone() &&
+            currentGameState != gameEndState ) {
+            headerString = translate( "status_next" );
+            
+            }
+        else if( currentGameState->isStateDone() ) {
+            // state done
+            headerString = translate( "status_finished" );
+            }
+        else {
+            // blank header
+            headerString = "";
+            }
+        
+        font16->drawString( headerString, 
                             128, 
                             145, white, alignCenter );
+        
         font16->drawString( statusMessage, 
                             128, 
                             160, white, alignCenter );
@@ -352,4 +404,11 @@ void drawBottomScreen() {
     
     currentGameState->drawState();
 
+
+    if( currentGameState->isStateDone() 
+        && currentGameState != gameEndState ) {
+    
+        nextButton->draw();
+        }
+    
     }

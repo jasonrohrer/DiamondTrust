@@ -379,11 +379,23 @@ void drawStats() {
                         alignCenter );
     delete [] monthString;
     
-    font8->drawString( translate( "stats_monthsLeft_A" ), 
-                        128, 
-                        16,
-                        black, 
-                        alignCenter );
+    if( monthsLeft == 1 ) {
+        // singular
+        font8->drawString( translate( "stats_monthsLeft_A" ), 
+                           128, 
+                           16,
+                           black, 
+                           alignCenter );
+        }
+    else {
+        // plural
+        font8->drawString( translate( "stats_monthsLeft_As" ), 
+                           128, 
+                           16,
+                           black, 
+                           alignCenter );
+        }
+    
     font8->drawString( translate( "stats_monthsLeft_B" ), 
                         128, 
                         24,
