@@ -154,6 +154,8 @@ static void postAccumulateTransition() {
 
 
 static void postSellTransition() {
+    // user hit next, hide sale display
+    showSale( false );
 
     if( getMonthsLeft() > 0 ) {
         decrementMonthsLeft();        
@@ -204,6 +206,9 @@ static void postConfiscateTransition() {
         
 
 static void postMoveInspectorTransition() {
+    // always hide inspector panel after inspector done moving
+    showInspectorPanel( false );
+    
     if( isAnyConfiscationNeeded() ) {
         currentGameState = confiscateState;
         }

@@ -17,6 +17,8 @@ static int selling[2] = {0,0};
 
 static char opponentMoneyUnknown = false;
 
+static char showInspectorPanelFlag = false;
+
 
 
 static char showSaleFlag = false;
@@ -77,6 +79,12 @@ void addPlayerDiamonds( int inPlayer, int inDiamonds ) {
 void setOpponentMoneyUnknown( char inUnknown ) {
     opponentMoneyUnknown = inUnknown;
     }
+
+
+void showInspectorPanel( char inShow ) {
+    showInspectorPanelFlag = inShow;
+    }
+
 
 
 
@@ -612,7 +620,8 @@ void drawStats() {
         }
 
 
-    if( activeUnit == numUnits - 1 ) {
+
+    if( showInspectorPanelFlag ) {
         // show inspector destination panel
         Unit *u = getUnit( numUnits - 1 );
 

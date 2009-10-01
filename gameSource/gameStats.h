@@ -24,6 +24,9 @@ void addPlayerDiamonds( int inPlayer, int inDiamonds );
 void setOpponentMoneyUnknown( char inUnknown );
 
 
+void showInspectorPanel( char inShow );
+
+
 
 #define noSaleFlatRate 18
 #define saleNet 24

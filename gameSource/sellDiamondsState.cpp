@@ -304,7 +304,8 @@ void SellDiamondsState::stepState() {
         
 
             if( !changedSome ) {
-                showSale( false );
+                // leave display up after state end
+                // showSale( false );
                 
                 setPlayerNumToSell( 0, 0 );
                 setPlayerNumToSell( 1, 0 );

@@ -103,7 +103,7 @@ void MoveInspectorState::clickState( int inX, int inY ) {
 
             showAllUnitMoves( true );
 
-
+            
             // turn off inspector bribe tags for move
             for( int i=0; i<numPlayerUnits*2; i++ ) {
                 showInspectorBribe( i, false );
@@ -162,6 +162,10 @@ void MoveInspectorState::stepState() {
                 translate( "phaseSubStatus_moveExecute" );
             
             showAllUnitMoves( true );
+
+            // now that destination is known, show result
+            showInspectorPanel( true );
+
             executeUnitMoves();
             }        
         }
@@ -169,6 +173,8 @@ void MoveInspectorState::stepState() {
 
     if( sentMove || gotMove ) {
         if( unitAnimationsDone() ) {
+
+            // This state ends with inspector panel still visible
             stateDone = true;
             }
         }
@@ -202,6 +208,8 @@ void MoveInspectorState::enterState() {
     waiting = false;
     
     if( getPlayerBribedInspector() == 0 ) {
+        
+        
         moving = true;
         setActiveUnit( numUnits - 1 );
 
@@ -210,11 +218,14 @@ void MoveInspectorState::enterState() {
         for( int r=2; r<numMapRegions; r++ ) {
             setRegionSelectable( r, true );
             }
+
+        showInspectorPanel( true );
         }
     else {
         waiting = true;
         statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
         stepsWaiting = 0;
+        showInspectorPanel( false );
         }
     
     sentMove = false;
