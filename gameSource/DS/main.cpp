@@ -605,6 +605,7 @@ char getTouch( int *outX, int *outY ) {
 static unsigned char wmBuffer[ WM_SYSTEM_BUF_SIZE ] ATTRIBUTE_ALIGN( 32 );
 
 int wmStatus = 0;
+char mpRunning = false;
 
 // true for parent, false for child
 char isParent = false;
@@ -651,6 +652,7 @@ static void wmEndCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmEndCallback\n" );
         }
     else {
         if( sendBuffer != NULL ) {
@@ -671,6 +673,7 @@ static void wmDisconnectCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmDisconnectCallback\n" );
         }
     else {
         WM_End( wmEndCallback );
@@ -695,10 +698,11 @@ static void wmEndMPCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmEndMPCallback\n" );
         }
     else {
-
-        disconnect();
+        mpRunning = false;
+        //disconnect();
         }
     }
 
@@ -720,6 +724,8 @@ static void wmPortCallback( void *inArg ) {
     WMPortRecvCallback *callbackArg = (WMPortRecvCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        printOut( "Error returned to wmPortCallback\n" );
+
         wmStatus = -1;
         WM_EndMP( wmEndMPCallback );
         }
@@ -742,12 +748,14 @@ static void wmStartMPCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmStartMPCallback\n" );
         disconnect();
         }
     else {
         if( callbackArg->state == WM_STATECODE_MP_START ) {
             wmStatus = 1;
-
+            mpRunning = true;
+            
             // prepare to receive data
             WMErrCode result = WM_SetPortCallback(
                 portNumber, wmPortCallback, NULL );
@@ -767,6 +775,7 @@ static void wmStartParentCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmStartParentCallback\n" );
         WM_End( wmEndCallback );
         }
     else {
@@ -819,9 +828,16 @@ static void wmStartParentCallback( void *inArg ) {
                 return;
             case WM_STATECODE_DISCONNECTED:
 
+                printOut( "Disconnected in wmStartParent\n" );
+                
                 // FIXME:
                 //parent_load_status();
                     
+                if( mpRunning ) {
+                    printOut( "Waiting for child to connect again\n" );
+                    WM_EndMP( wmEndMPCallback );
+                    }
+                
                 return;
                     
             default:
@@ -841,6 +857,7 @@ static void wmSetParentParamCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmSetParentParamCallback\n" );
         WM_End( wmEndCallback );
         }
     else {
@@ -864,6 +881,7 @@ static void wmMeasureChannelCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmMeasureChannelCallback\n" );
         WM_End( wmEndCallback );
         }
     else {
@@ -959,12 +977,60 @@ void measureNextChannel() {
 
 
 
+
+
+static void wmStartConnectCallback( void *inArg );
+
+
+// connect to the game that we found
+static void startConnect() {
+    WMErrCode result = WM_StartConnect(
+        wmStartConnectCallback,
+        &scanBssDesc,
+        // FIXME:
+        // can specify a 24-byte SSID here that parent
+        // can check... parent not checking, so NULL for now
+        // which forces all zeros as SSID
+        NULL );
+    
+    if( result != WM_ERRCODE_OPERATING ) {
+        wmStatus = -1;
+        printOut( "Error on startConnect\n" );
+        WM_End( wmEndCallback );
+        }
+    }
+
+
+
+static void wmResetCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        printOut( "Error returned to wmResetCallback\n" );
+        WM_End( wmEndCallback );
+        }
+    else {
+        // reset only called from child
+
+        // start connection process again to same parent
+        printOut( "Trying to connect to parent again after reset\n" );
+        startConnect();
+        }
+    
+    }
+
+
+
 static void wmStartConnectCallback( void *inArg ) {
     WMStartConnectCallback *callbackArg = (WMStartConnectCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
-        WM_End( wmEndCallback );
+        printOut( "Error returned to wmStartConnectCallback\n" );
+
+        printOut( "Trying to reset\n" );
+        WM_Reset( wmResetCallback );
         }
     else {
         switch( callbackArg->state ) {
@@ -1017,12 +1083,21 @@ static void wmStartConnectCallback( void *inArg ) {
                 break;
 
             case WM_STATECODE_BEACON_LOST:
-                
+                printOut( "Beacon lost in wmStartConnect\n" );
+
                 //__callback(CHILD_BEACONLOST, 0);
                 
                 break;
                 
             case WM_STATECODE_DISCONNECTED:
+                
+                printOut( "Disconnected in wmStartConnect\n" );
+                
+                printOut( "Trying to connect again\n" );
+                
+                printOut( "Resetting connection\n" );
+                
+                WM_Reset( wmResetCallback );
                 
                 //__callback(CHILD_DISCONNECTED, 0);
                 
@@ -1041,6 +1116,7 @@ static void wmEndScanCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmEndScanCallback\n" );
         WM_End( wmEndCallback );
         }
     else {
@@ -1048,19 +1124,8 @@ static void wmEndScanCallback( void *inArg ) {
 
         // use this game
                 
-        WMErrCode result = WM_StartConnect(
-            wmStartConnectCallback,
-            &scanBssDesc,
-            // FIXME:
-            // can specify a 24-byte SSID here that parent
-            // can check... parent not checking, so NULL for now
-            // which forces all zeros as SSID
-            NULL );
-                
-        if( result != WM_ERRCODE_OPERATING ) {
-            wmStatus = -1;
-            WM_End( wmEndCallback );
-            }
+        startConnect();
+        
 
         }
     }
@@ -1075,6 +1140,7 @@ static void wmStartScanCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmStartScanCallback\n" );
         WM_End( wmEndCallback );
         }
     else {
@@ -1161,6 +1227,7 @@ static void wmPortSendCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
+        printOut( "Error returned to wmPortSendCallback\n" );
         WM_EndMP( wmEndMPCallback );
         }
     else {
@@ -1207,6 +1274,7 @@ static void wmInitializeCallback( void *inArg ) {
     WMCallback *callbackArg = (WMCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        printOut( "Error in wmInitialize\n" );
         wmStatus = -1;
         }
     else {
