@@ -745,6 +745,20 @@ static void wmPortCallback( void *inArg ) {
 
 
 
+void startNextSend();
+
+static void dummyC() {
+    startNextSend();
+    }
+
+static void dummyB() {
+    dummyC();
+    }
+
+static void dummyA() {
+    dummyB();
+    }
+
 
 static void wmStartMPCallback( void *inArg ) {
     WMStartMPCallback *callbackArg = (WMStartMPCallback *)inArg;
@@ -765,8 +779,11 @@ static void wmStartMPCallback( void *inArg ) {
         }
     else {
         if( callbackArg->state == WM_STATECODE_MP_START ) {
+            printOut( "MP Started\n" );
+            
             wmStatus = 1;
             mpRunning = true;
+            
             
             // prepare to receive data
             WMErrCode result = WM_SetPortCallback(
@@ -776,9 +793,71 @@ static void wmStartMPCallback( void *inArg ) {
                 wmStatus = -1;
                 WM_End( wmEndCallback );
                 }
+            else {
+                // send any data that is waiting to go
+                //startNextSend();
+                //dummyA();
+                }
+            
             }
         }
     }
+
+
+static void startMP() {
+    
+    if( sendBuffer != NULL ) {
+        delete [] sendBuffer;
+        sendBuffer = NULL;
+        }
+    if( receiveBuffer != NULL ) {
+        delete [] receiveBuffer;
+        receiveBuffer = NULL;
+        }
+
+
+    unsigned short sendBufferSize = 
+        (unsigned short)WM_GetMPSendBufferSize();
+    unsigned short receiveBufferSize = 
+        (unsigned short)WM_GetMPReceiveBufferSize();
+    printOut( "Send,receive buffer sizes are: %d,%d\n", 
+              sendBufferSize,
+              receiveBufferSize );
+                 
+    // make sure they are sane before allocating memory based
+    // on them, because these sizes come from what the
+    // parent sends
+    if( sendBufferSize > 1920 || receiveBufferSize > 1920 ) {
+        // bad sizes, bail out    
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        return;
+        }
+                
+    // sizes okay to allocate memory with
+    // allocations are automatically 32-byte aligned
+    sendBuffer = 
+        new unsigned char[ sendBufferSize ];
+    receiveBuffer = 
+        new unsigned char[ receiveBufferSize ];
+
+    // start multi port communications
+    WMErrCode result =
+        WM_StartMP(
+            wmStartMPCallback,
+            (u16*)receiveBuffer,
+            receiveBufferSize,
+            (u16*)sendBuffer,
+            sendBufferSize,
+            1 );  // one communication per frame
+                
+    if( result !=  WM_ERRCODE_OPERATING ) {
+        wmStatus = -1;
+        WM_End( wmEndCallback );
+        }
+
+    }
+
 
 
 
@@ -804,34 +883,7 @@ static void wmStartParentCallback( void *inArg ) {
                 remoteAID = callbackArg->aid;
                 printOut( "Parent sees child remote AID of %d\n", remoteAID );
                 
-                unsigned short sendBufferSize = 
-                    (unsigned short)WM_GetMPSendBufferSize();
-                unsigned short receiveBufferSize = 
-                    (unsigned short)WM_GetMPReceiveBufferSize();
-                printOut( "Send,receive buffer sizes are: %d,%d\n",
-                          sendBufferSize, receiveBufferSize );
-                    
-                // allocations are automatically 32-byte aligned
-                sendBuffer = 
-                    new unsigned char[ sendBufferSize ];
-                receiveBuffer = 
-                    new unsigned char[ receiveBufferSize ];
-                    
-                    
-                // start multiplayer
-                WMErrCode result =
-                    WM_StartMP(
-                        wmStartMPCallback,
-                        (u16*)receiveBuffer,
-                        receiveBufferSize,
-                        (u16*)sendBuffer,
-                        sendBufferSize,
-                        1 );  // one communication per frame
-
-                if( result !=  WM_ERRCODE_OPERATING ) {
-                    wmStatus = -1;
-                    WM_End( wmEndCallback );
-                    }
+                startMP();
 
                 // FIXME:
                 //parent_load_status();
@@ -1037,7 +1089,8 @@ static void wmStartConnectCallback( void *inArg ) {
     WMStartConnectCallback *callbackArg = (WMStartConnectCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
-        wmStatus = -1;
+        // no longer a fatal error
+        //wmStatus = -1;
         printOut( "Error returned to wmStartConnectCallback\n" );
 
         printOut( "Trying to reset\n" );
@@ -1047,47 +1100,8 @@ static void wmStartConnectCallback( void *inArg ) {
         switch( callbackArg->state ) {
             case WM_STATECODE_CONNECTED: {
                 
-                unsigned short sendBufferSize = 
-                    (unsigned short)WM_GetMPSendBufferSize();
-                unsigned short receiveBufferSize = 
-                    (unsigned short)WM_GetMPReceiveBufferSize();
-                printOut( "Send,receive buffer sizes are: %d,%d\n", 
-                          sendBufferSize,
-                          receiveBufferSize );
-                 
-                // make sure they are sane before allocating memory based
-                // on them, because these sizes come from what the
-                // parent sends
-                if( sendBufferSize > 1920 || receiveBufferSize > 1920 ) {
-                    // bad sizes, bail out    
-                    wmStatus = -1;
-                    WM_End( wmEndCallback );
-                    return;
-                    }
+                startMP();
                 
-                // sizes okay to allocate memory with
-                // allocations are automatically 32-byte aligned
-                sendBuffer = 
-                    new unsigned char[ sendBufferSize ];
-                receiveBuffer = 
-                    new unsigned char[ receiveBufferSize ];
-
-                // start multiplayer
-                WMErrCode result =
-                    WM_StartMP(
-                        wmStartMPCallback,
-                        (u16*)receiveBuffer,
-                        receiveBufferSize,
-                        (u16*)sendBuffer,
-                        sendBufferSize,
-                        1 );  // one communication per frame
-                
-                if( result !=  WM_ERRCODE_OPERATING ) {
-                    wmStatus = -1;
-                    WM_End( wmEndCallback );
-                    return;
-                    }
-
                 //aid = cb->aid;
                 }
         
@@ -1107,6 +1121,9 @@ static void wmStartConnectCallback( void *inArg ) {
                 printOut( "Trying to connect again\n" );
                 
                 printOut( "Resetting connection\n" );
+                
+                // flag MP as not running here
+                mpRunning = false;
                 
                 WM_Reset( wmResetCallback );
                 
@@ -1231,7 +1248,6 @@ void scanNextChannel() {
 
 
 
-void startNextSend();
 
 static void wmPortSendCallback( void *inArg ) {
     WMPortSendCallback *callbackArg = (WMPortSendCallback *)inArg;
@@ -1242,10 +1258,34 @@ static void wmPortSendCallback( void *inArg ) {
         WM_EndMP( wmEndMPCallback );
         }
     else {
-        printOut( "Data send successful\n" );
+
+        if( callbackArg->sentBitmap == callbackArg->destBitmap ) {
+            
+            printOut( "Data send successful\n" );
+            delete [] callbackArg->data;
+            sendPending = false;
+            
+            // next send will start during next network step
+            }
+        else {
+            printOut( "Data send did not reach all recipients\n" );
+
+            // put back on send fifo in next position to try again
+            sendFifo.pushData( (unsigned char *)( callbackArg->data ), 
+                               callbackArg->length );
+            sendPending = false;
+            
+            delete [] callbackArg->data;
+
+            if( !mpRunning ) {
+                printOut( "Will try resending when MP starts again\n" );
+                }
+            else {
+                printOut( "MP still running, trying to send again\n" );
+                // next send during next network step
+                }                
+            }
         
-        delete [] callbackArg->data;
-        startNextSend();
         }
     }
 
@@ -1272,6 +1312,35 @@ void startNextSend() {
             receiverBitmap,
             portNumber,
             0 );
+
+        if( result == WM_ERRCODE_ILLEGAL_STATE ) {
+            printOut( "Trying to send from illegal state\n" );
+            
+            printOut( "Pushing data back onto send fifo until later\n" );
+            
+            sendFifo.pushData( data, numBytes );
+            delete [] data;
+            
+            // what state are we in?
+            WMStatus status;
+            WM_ReadStatus( &status );
+            
+            if( status.state == WM_STATE_PARENT ||
+                status.state == WM_STATE_CHILD ) {
+                
+                printOut( "During send:  "
+                          "no longer in MP state, "
+                          "trying to start MP again\n" );
+                
+                printOut( "Will retry send after MP restarts\n" );
+                
+                mpRunning = false;
+                startMP();
+                }
+            
+                
+            }
+        
         }
     else{
         sendPending = false;
@@ -1396,13 +1465,7 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
     sendFifo.addData( sendData, sendSize );
     delete [] sendData;
     
-    if( !sendPending ) {
-        // start a new one 
-        startNextSend();
-        }
-
-    
-    // else new one will start when current one finishes (in callback)
+    // send will start during next network step
     }
 
 
@@ -1442,6 +1505,9 @@ unsigned char *getMessage( unsigned int *outLength ) {
                   dataLength - ( messageLength + 4 ) );
         }
     
+    printOut( "Message of length %d waiting in receive FIFO for getMessage\n", 
+              messageLength );
+    
     unsigned char *message = new unsigned char[ messageLength ];
     memcpy( message, &( data[4] ), messageLength );
     
@@ -1450,6 +1516,15 @@ unsigned char *getMessage( unsigned int *outLength ) {
     *outLength = messageLength;
     
     return message;
+    }
+
+
+
+static void stepNetwork() {
+    if( !sendPending && mpRunning ) {
+        // try sending next message
+        startNextSend();
+        }
     }
 
 
@@ -1804,6 +1879,8 @@ static void VBlankCallback() {
             
             // game loop every-other screen
             gameLoopTick();
+            // same for network step
+            stepNetwork();
             }
         else {
             drawBottomScreen();
