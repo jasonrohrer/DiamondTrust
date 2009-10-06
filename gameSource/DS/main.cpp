@@ -98,8 +98,11 @@ void printOut( const char *inFormatString, ... ) {
     va_list argList;
     va_start( argList, inFormatString );
 
-    OS_VPrintf( inFormatString, argList );
-
+    
+    //OS_VPrintf( inFormatString, argList );
+    // simpler to reduce stack overhead
+    OS_TVPrintf( inFormatString, argList );
+    
     va_end( argList );
     }
 
@@ -747,9 +750,18 @@ static void wmStartMPCallback( void *inArg ) {
     WMStartMPCallback *callbackArg = (WMStartMPCallback *)inArg;
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
-        wmStatus = -1;
-        printOut( "Error returned to wmStartMPCallback\n" );
-        disconnect();
+
+        if( callbackArg->errcode == WM_ERRCODE_SEND_FAILED ) {
+            printOut( "Send failed during MP, trying to continue\n" );
+            }
+        else if( callbackArg->errcode == WM_ERRCODE_TIMEOUT ) {
+            printOut( "Timeout during MP, trying to continue\n" );
+            }
+        else {    
+            wmStatus = -1;
+            printOut( "Fatal error returned to wmStartMPCallback\n" );
+            disconnect();
+            }
         }
     else {
         if( callbackArg->state == WM_STATECODE_MP_START ) {
@@ -908,9 +920,8 @@ static void wmMeasureChannelCallback( void *inArg ) {
                 }
             else {
                 // found one
-                
-                
-                
+                printOut( "Picking best channel:  %d\n", bestChannel );
+                                
 
                 // set parent params
                 // FIXME:  use userGameInfo to specify identifying
@@ -1426,6 +1437,11 @@ unsigned char *getMessage( unsigned int *outLength ) {
         return NULL;
         } 
 
+    if( dataLength > messageLength + 4 ) {
+        printOut( "Extra bytes padded onto end of received message:%d\n",
+                  dataLength - ( messageLength + 4 ) );
+        }
+    
     unsigned char *message = new unsigned char[ messageLength ];
     memcpy( message, &( data[4] ), messageLength );
     
