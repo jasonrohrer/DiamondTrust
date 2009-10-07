@@ -205,8 +205,13 @@ void SellDiamondsState::stepState() {
                 statusMessage = translate( "phaseStatus_sellPeek" );
                 statusSubMessage = 
                     translate( "phaseSubStatus_sellDiamondsAdjust" );
-                
-                peekSale();
+
+                if( isOpponentHomeBribed() ) {
+                    // only peek at opponent if opponent home is compromised
+                    
+                    peekSale();
+                    }
+                // else allow player to adjust, but don't peek
                 
                 pickingSale = true;
                 }
