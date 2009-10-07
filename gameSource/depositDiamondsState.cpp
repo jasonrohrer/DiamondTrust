@@ -79,7 +79,7 @@ void DepositDiamondsState::stepState() {
                 &&
                 unitDiamonds > 0 ) {
                 
-                printOut( "Unit diamonds = %d\n", unitDiamonds );
+                //printOut( "Unit diamonds = %d\n", unitDiamonds );
                 
                 found = true;
                 

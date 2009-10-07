@@ -87,6 +87,11 @@ phaseSubStatus_sellDiamondsAdjust  "Adjust sale?  Pick new number to sell (or hi
 phaseSubStatus_sellDiamondsNone "You have none to sell (hit Done when ready)"
 
 
+
+phaseStatus_flyHome   "Final trip home"
+phaseSubStatus_flyHome   "Time to get out of Angola"
+
+
 phaseStatus_youWin       "You win"
 phaseStatus_opponentWins "You lose"
 phaseStatus_tie "Tie game"

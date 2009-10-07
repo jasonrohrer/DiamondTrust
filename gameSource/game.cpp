@@ -44,6 +44,7 @@ extern GameState *confiscateState;
 extern GameState *moveInspectorState;
 extern GameState *buyDiamondsState;
 extern GameState *sellDiamondsState;
+extern GameState *flyHomeState;
 extern GameState *gameEndState;
 
 
@@ -162,11 +163,29 @@ static void postSellTransition() {
         currentGameState = accumulateDiamondsState;
         }
     else {
-        // game over
-        currentGameState = gameEndState;
         
-        // reveal
-        setOpponentMoneyUnknown( false );
+        // are some units not home?
+        char someNotHome = false;
+        for( int i=0; i<numPlayerUnits*2; i++ ) {
+            int region = getUnitRegion( i );
+            if( region != 0 && region != 1 ) {
+                someNotHome = true;
+                }
+            }
+        
+        
+        if( someNotHome ) {
+            currentGameState = flyHomeState;
+            }
+        else {    
+
+            // game over
+            currentGameState = gameEndState;
+        
+            // reveal
+            setOpponentMoneyUnknown( false );
+            }
+        
         }
     
     }
@@ -271,6 +290,9 @@ static void goToNextGameState() {
         }
     else if( currentGameState == moveUnitsState ) {
         postMoveUnitsTransition();
+        }
+    else if( currentGameState == flyHomeState ) {
+        currentGameState = depositDiamondsState;
         }
     else if( currentGameState == depositDiamondsState ) {
         postDepositeTransition();
