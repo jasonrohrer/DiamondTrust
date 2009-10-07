@@ -72,32 +72,26 @@ void drawSalePicker( int inCenterX, int inCenterY ) {
 
 
 void clickSalePicker( int inX, int inY ) {
-    
-    if( intAbs( inY - lastCenter.y ) > 22 ) {
-        // off top or bottom
+    if( intAbs( inY - lastCenter.y ) > 25 ) {
+        // off top or bottom by a large margin 
         return;
         }
-    if( intAbs( inX - lastCenter.x ) > 8 ) {
-        // off left or right
+    if( intAbs( inX - lastCenter.x ) > 11 ) {
+        // off left or right by a large margin
         return;
         }
-    
-    intPair upCenter = lastCenter;
-    intPair downCenter = lastCenter;
-    
-    upCenter.y -= 14;
-    downCenter.y += 14;
-    
-    intPair click = { inX, inY };
-    
-    if( intDistance( click, upCenter ) < 6 ) {
+
+
+    // only consider y values, make it as easy to click as possible    
+    if( lastCenter.y - inY > 2 ) {
         sale ++;
         }
-    else if( intDistance( click, downCenter ) < 6 ) {
+    else if( inY - lastCenter.y > 0 ) {
         sale --;
         if( sale < 0 ) {
             sale = 0;
             }
         }
+        
     }
 
