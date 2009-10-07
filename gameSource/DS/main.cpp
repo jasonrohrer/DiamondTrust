@@ -773,8 +773,9 @@ static void wmStartMPCallback( void *inArg ) {
             }
         else {    
             wmStatus = -1;
-            printOut( "Fatal error returned to wmStartMPCallback\n" );
-            disconnect();
+            printOut( "Fatal error %d returned to wmStartMPCallback\n",
+                      callbackArg->errcode );
+            //disconnect();
             }
         }
     else {
@@ -899,6 +900,7 @@ static void wmStartParentCallback( void *inArg ) {
                     
                 if( mpRunning ) {
                     printOut( "Waiting for child to connect again\n" );
+                    mpRunning = false;
                     WM_EndMP( wmEndMPCallback );
                     }
                 
@@ -1319,6 +1321,9 @@ void startNextSend() {
             printOut( "Pushing data back onto send fifo until later\n" );
             
             sendFifo.pushData( data, numBytes );
+
+            sendPending = false;
+            
             delete [] data;
             
             // what state are we in?
@@ -1329,13 +1334,15 @@ void startNextSend() {
                 status.state == WM_STATE_CHILD ) {
                 
                 printOut( "During send:  "
-                          "no longer in MP state, "
-                          "trying to start MP again\n" );
+                          "no longer in MP state\n" );
                 
                 printOut( "Will retry send after MP restarts\n" );
                 
                 mpRunning = false;
-                startMP();
+                
+                // don't restart MP here... assume it will be restarted
+                // elsewhere upon reconnect
+                // startMP();
                 }
             
                 
