@@ -312,8 +312,8 @@ void SellDiamondsState::stepState() {
                 // leave display up after state end
                 // showSale( false );
                 
-                setPlayerNumToSell( 0, 0 );
-                setPlayerNumToSell( 1, 0 );
+                //setPlayerNumToSell( 0, 0 );
+                //setPlayerNumToSell( 1, 0 );
                 
                 stateDone = true;
                 }
@@ -357,7 +357,12 @@ void SellDiamondsState::enterState() {
 
     pickingSale = true;
     setPickerSale( 0 );
-    
+
+    // reset sale numbers
+    setPlayerNumToSell( 0, 0 );
+    setPlayerNumToSell( 1, 0 );
+
+
     showSale( true );
     
     setActiveUnit( -1 );
