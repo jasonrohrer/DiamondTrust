@@ -812,28 +812,9 @@ char isAnyOpponentBribed() {
 
 
 
-static char isPlayerUnitKnownBribed( int inUnit ) {
-    int i = inUnit;
-    
-    if( gameUnit[i].mTotalSalary < gameUnit[i].mTotalBribe ) {
-        int bribingUnit = gameUnit[i].mLastBribingUnit;
-        
-        if( gameUnit[bribingUnit].mTotalSalary < 
-            gameUnit[bribingUnit].mTotalBribe ) {
-            
-            // bribing unit has been bribed!
-            return true;
-            }
-        }
-
-    return false;
-    }
-
-
-
 char isAnyPlayerUnitKnownBribed() {
     for( int i=0; i<numPlayerUnits; i++ ) {
-        if( isPlayerUnitKnownBribed( i ) ) {
+        if( isBribeStatusVisible( i ) ) {
             return true;
             }
         }
@@ -858,7 +839,7 @@ char isOpponentHomeBribed() {
 
 char isPlayerHomeKnownBribed() {
     for( int i=0; i<numPlayerUnits; i++ ) {
-        if( isPlayerUnitKnownBribed( i )
+        if( isBribeStatusVisible( i )
             && 
             gameUnit[i].mRegion == 0 ) {
 
