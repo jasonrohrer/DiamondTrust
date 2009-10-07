@@ -116,7 +116,7 @@ void gameInit() {
     // show opponent's money at start of game
     setOpponentMoneyUnknown( false );
     
-    setMonthsLeft( 12 );
+    setMonthsLeft( 8 );
     
 
     currentGameState = connectState;
