@@ -28,6 +28,29 @@ void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes ) {
 
 
 
+void DataFifo::pushData( unsigned char *inData, unsigned int inNumBytes ) {
+    dataFifoElement *f = new dataFifoElement;
+            
+    f->next = NULL;
+    f->previous = mTail;
+            
+    if( mTail != NULL ) {
+        mTail->next = f;
+        }
+    else{
+        //empty
+        mHead = f;
+        }
+
+    mTail = f;
+    f->numBytes = inNumBytes;
+            
+    f->data = new unsigned char[ inNumBytes ];
+            
+    memcpy( f->data, inData, inNumBytes );
+    }
+
+
 unsigned char *DataFifo::getData( unsigned int *outSize ) {
     if( mTail == NULL ) {
         return NULL;

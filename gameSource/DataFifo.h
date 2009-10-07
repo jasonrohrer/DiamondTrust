@@ -24,8 +24,12 @@ class DataFifo {
         
 
         // inData copied internally
+        // added to head, returned last
         void addData( unsigned char *inData, unsigned int inNumBytes );
         
+        // added to tail, returned first
+        void pushData( unsigned char *inData, unsigned int inNumBytes );
+
         
         // gets and removes next item
         // NULL if empty
