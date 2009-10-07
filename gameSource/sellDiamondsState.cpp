@@ -210,6 +210,11 @@ void SellDiamondsState::stepState() {
                     // only peek at opponent if opponent home is compromised
                     
                     peekSale();
+                    
+                    // try this:
+                    // if peeking, show computed earnings and let player
+                    // adjust to test strategies before picking one
+                    finishSale();
                     }
                 // else allow player to adjust, but don't peek
                 
