@@ -3,6 +3,8 @@
 
 extern rgbaColor black;
 extern rgbaColor white;
+extern rgbaColor transparent;
+extern rgbaColor red;
 
 extern rgbaColor trans75white;
 

@@ -3,6 +3,8 @@
 
 rgbaColor black = {0, 0, 0, 255 };
 rgbaColor white = {255, 255, 255, 255 };
+rgbaColor transparent = {0, 0, 0, 0 };
+rgbaColor red = {255, 0, 0, 255 };
 
 rgbaColor trans75white = {255, 255, 255, 192 };
 

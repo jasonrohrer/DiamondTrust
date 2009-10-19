@@ -72,6 +72,12 @@ int intAbs( int inX ) {
     }
 
 
+char equals( intPair inA, intPair inB ) {
+    return inA.x == inB.x && inA.y == inB.y;
+    }
+
+
+
 
 
 

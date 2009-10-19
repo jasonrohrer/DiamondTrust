@@ -6,6 +6,7 @@
 #include "sprite.h"
 #include "Font.h"
 #include "colors.h"
+#include "arrows.h"
 
 
 #include "minorGems/util/stringUtils.h"
@@ -168,7 +169,69 @@ void initUnits() {
     
     bribedMarkerSprite = loadSprite( "bribedMarker.tga", true );
 
+
+
+
+
+    // now pre-build arrow sprites
+
+    // first player avoids region 1
+    for( i=0; i<numMapRegions; i++ ) {
+        if( i != 1 ) {
+            
+            intPair start = getUnitPositionInRegion( i, 0 );
+            
+            for( int j=0; j<numMapRegions; j++ ) {
+                if( j != i && j != 1 ) {
+                    if( j == numMapRegions - 2 ) {
+                        printOut( "break!\n" );
+                        }
+                    
+                    intPair end = getUnitPositionInRegion( j, 0 );
+                    
+                    buildArrow( start, end );
+                    }
+                
+                }
+            }
+        }
+
+    // second player avoids region 0
+    for( i=0; i<numMapRegions; i++ ) {
+        if( i != 0 ) {
+            
+            intPair start = getUnitPositionInRegion( i, numPlayerUnits );
+            
+            for( int j=0; j<numMapRegions; j++ ) {
+                if( j != i && j != 0 ) {
+                    
+                    intPair end = getUnitPositionInRegion( j, numPlayerUnits );
+                    
+                    buildArrow( start, end );
+                    }
+                
+                }
+            }        
+        }
+
+    // inspector only moves in producing regions
+    for( i=2; i<numMapRegions; i++ ) {
+        
+        intPair start = getUnitPositionInRegion( i, numUnits - 1 );
+
+        for( int j=2; j<numMapRegions; j++ ) {
+            if( j != i ) {
+                
+                intPair end = getUnitPositionInRegion( j, numUnits - 1 );
+                
+                buildArrow( start, end );
+                }
+            
+            }
+        }
     }
+
+    
 
 
 
@@ -378,13 +441,20 @@ void drawUnits() {
             gameUnit[i].mDest != gameUnit[i].mRegion ) {
             // move chosen
             
+
+            
+            
             // draw line
             intPair start = 
                 getUnitPositionInRegion( gameUnit[i].mRegion, i );
             
             intPair end = 
                 getUnitPositionInRegion( gameUnit[i].mDest, i );
-            
+
+            // try drawing arrow
+            drawArrow( start, end, c );
+
+                /*
             int distance = intDistance( start, end );
             
             int numDots = distance / 7;
@@ -403,7 +473,7 @@ void drawUnits() {
 
                 drawSprite( gameUnit[i].mDotSpriteID, dotX, dotY, c );
                 }
-
+            */
             // new layer for each line drawn
             startNewSpriteLayer();
             
