@@ -27,7 +27,9 @@ void stepSprites() {
 void drawBlinkingSprite( int inHandle, 
                          int inX, int inY, rgbaColor inColor ) {
     
-    inColor.a = (unsigned char)blinkingSpriteAlpha;
+    
+
+    inColor.a = (unsigned char)( ( blinkingSpriteAlpha * inColor.a ) / 255 );
     
     drawSprite( inHandle, inX, inY, inColor );
     }

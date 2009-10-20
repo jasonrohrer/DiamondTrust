@@ -24,6 +24,10 @@ static int mapBackgroundTopSpriteID;
 static int mapBackgroundBottomSpriteID;
 static int bottomHalfOffset = 128;
 
+static int mapNamesTopSpriteID;
+static int mapNamesBottomSpriteID;
+
+
 
 int diamondSpriteID;
 int diamondSpriteW, diamondSpriteH;
@@ -65,10 +69,13 @@ static int mapW, mapH;
 static rgbaColor regionColor[ numMapRegions ];
 
 
-// a color unused in map image, used for tagging during processing
-static rgbaColor tagColor = { 255, 0, 255, 255 }; 
+#define regionBorderWidth 3
+// colors unused in map image, used for tagging during processing
+static rgbaColor tagColor[ regionBorderWidth ] = 
+{ { 255, 0, 255, 255 },
+  { 255, 0, 254, 255 },
+  { 255, 0, 253, 255 } }; 
 
-static int regionBorderWidth = 3;
 
 
 
@@ -303,7 +310,11 @@ void initMap() {
     
     
     
-    unsigned int tagColorInt = toInt( tagColor );
+    unsigned int tagColorInt[ regionBorderWidth ];
+    for( i=0; i<regionBorderWidth; i++ ) {
+        tagColorInt[i] = toInt( tagColor[i] );
+        }
+    
     
 
     for( i=0; i<numMapRegions; i++ ) {
@@ -348,8 +359,8 @@ void initMap() {
             
             for( int j=0; j<numMapPixels; j++ ) {
                 if( tagMap[j] ) {
-                    mapRGBA[j] = tagColor;
-                    mapPixelInts[j] = tagColorInt;
+                    mapRGBA[j] = tagColor[b];
+                    mapPixelInts[j] = tagColorInt[b];
                     }
                 }
             }
@@ -365,21 +376,37 @@ void initMap() {
             }
 
         // restore border color
-        // make it darker
+        // make it darker near edge, and fade to white
         rgbaColor darkRegionColor = thisRegionColor;
-        darkRegionColor.r /= 2;
-        darkRegionColor.g /= 2;
-        darkRegionColor.b /= 2;
+        darkRegionColor.r /= 3;
+        darkRegionColor.g /= 3;
+        darkRegionColor.b /= 3;
             
+        for( int b=0; b<regionBorderWidth; b++ ) {
             
-        for( j=0; j<numMapPixels; j++ ) {
-            if( mapPixelInts[j] == tagColorInt ) {
-                mapRGBA[j] = darkRegionColor;
+            rgbaColor borderRingColor;
+            borderRingColor.r = 
+                ( (regionBorderWidth - b) * darkRegionColor.r +
+                  b * white.r ) / regionBorderWidth;
+            borderRingColor.g = 
+                ( (regionBorderWidth - b) * darkRegionColor.g +
+                  b * white.g ) / regionBorderWidth;
+            borderRingColor.b = 
+                ( (regionBorderWidth - b) * darkRegionColor.b +
+                  b * white.b ) / regionBorderWidth;
+            
+            borderRingColor.a = thisRegionColor.a;
+            
 
-                // doesn't matter what we set int to, as long as it's
-                // not tag color
-                // done with region color, use that
-                mapPixelInts[j] = thisRegionColorInt;
+            for( j=0; j<numMapPixels; j++ ) {
+                if( mapPixelInts[j] == tagColorInt[b] ) {
+                    mapRGBA[j] = borderRingColor;
+                    
+                    // doesn't matter what we set int to, as long as it's
+                    // not tag color
+                    // done with region color, use that
+                    mapPixelInts[j] = thisRegionColorInt;
+                    }
                 }
             } 
         }
@@ -398,6 +425,43 @@ void initMap() {
     delete [] mapRGBA;
     delete [] mapPixelInts;
 
+
+
+
+
+    int namesW, namesH;
+    
+    rgbaColor *namesRGBA = readTGAFile( "map_names.tga",
+                                        &namesW, &namesH );
+
+    if( namesRGBA == NULL
+        ||
+        namesW < 256 ) {
+        
+        printOut( "Reading map names file failed.\n" );
+        return;
+        }
+
+    // make transparent
+    int numNamePixels = namesW * namesH;
+    rgbaColor transColor = namesRGBA[0];
+    for( i=0; i<numNamePixels; i++ ) {
+        if( equals( namesRGBA[i], transColor ) ) {
+            namesRGBA[i].a = 0;
+            }
+        }
+    
+    mapNamesTopSpriteID = addSprite( namesRGBA, namesW, bottomHalfOffset );
+
+    bottomHalfPointer = 
+        &( namesRGBA[ bottomHalfOffset * namesW ] );
+    
+    mapNamesBottomSpriteID = addSprite( bottomHalfPointer, namesW, 
+                                        namesH - bottomHalfOffset );
+
+    delete [] namesRGBA;
+
+    
 
 
     diamondSpriteID = loadSprite( "diamond.tga", 
@@ -443,17 +507,40 @@ void drawMap() {
     drawSprite( mapBackgroundTopSpriteID, 0, 0, white );
     drawSprite( mapBackgroundBottomSpriteID, 0, bottomHalfOffset, white );
     
-    startNewSpriteLayer();
+    startNewSpriteLayer();    
+
+    rgbaColor regionColor = white;
     
     int i;
     for( i=0; i<numMapRegions; i++ ) {
+
+        if( mapRegionSelectable[i] ) {
+            // darker so flashing more visible
+            regionColor.a = 224;
+            }
+        else {
+            // transparent so border shows when not flashing
+            regionColor.a = 160;
+            //regionColor.a = 128;
+            }
+        
+        
         drawSprite( mapRegionSpriteID[i], 
                     mapRegionOffset[i].x, mapRegionOffset[i].y,
-                    white,
+                    regionColor,
                     mapRegionSelectable[ i ] );
         }
     
     startNewSpriteLayer();
+
+    
+    // names, transparent
+    rgbaColor nameColor = white;
+    nameColor.a = 64;
+    drawSprite( mapNamesTopSpriteID, 0, 0, nameColor );
+    drawSprite( mapNamesBottomSpriteID, 0, bottomHalfOffset, nameColor );
+
+
 
     // next vaults (only in home regions
     for( i=0; i<2; i++ ) {

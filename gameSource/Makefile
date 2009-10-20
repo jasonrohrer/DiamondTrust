@@ -27,6 +27,7 @@ bribedMarker.tga \
 miniDiamond.tga \
 vault.tga \
 salePicker.tga \
+map_names.tga \
 
 
 
