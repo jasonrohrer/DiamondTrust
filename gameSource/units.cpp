@@ -176,59 +176,76 @@ void initUnits() {
     // now pre-build arrow sprites
 
     // first player avoids region 1
-    for( i=0; i<numMapRegions; i++ ) {
-        if( i != 1 ) {
-            
-            intPair start = getUnitPositionInRegion( i, 0 );
-            
-            for( int j=0; j<numMapRegions; j++ ) {
-                if( j != i && j != 1 ) {
-                    if( j == numMapRegions - 2 ) {
-                        printOut( "break!\n" );
-                        }
-                    
-                    intPair end = getUnitPositionInRegion( j, 0 );
-                    
-                    buildArrow( start, end );
-                    }
-                
-                }
-            }
-        }
-
-    // second player avoids region 0
-    for( i=0; i<numMapRegions; i++ ) {
-        if( i != 0 ) {
-            
-            intPair start = getUnitPositionInRegion( i, numPlayerUnits );
-            
-            for( int j=0; j<numMapRegions; j++ ) {
-                if( j != i && j != 0 ) {
-                    
-                    intPair end = getUnitPositionInRegion( j, numPlayerUnits );
-                    
-                    buildArrow( start, end );
-                    }
-                
-                }
-            }        
-        }
-
-    // inspector only moves in producing regions
-    for( i=2; i<numMapRegions; i++ ) {
+    // second avoids region 0
+    // inspector avoids 0 and 1
+    for( int u=0; u<numUnits; u++ ) {
         
-        intPair start = getUnitPositionInRegion( i, numUnits - 1 );
 
-        for( int j=2; j<numMapRegions; j++ ) {
-            if( j != i ) {
-                
-                intPair end = getUnitPositionInRegion( j, numUnits - 1 );
-                
-                buildArrow( start, end );
+        for( i=0; i<numMapRegions; i++ ) {
+            
+            char skip = false;
+            
+            if( u < numPlayerUnits && i == 1 ) {
+                skip = true;
+                }
+            else if( u >= numPlayerUnits && u < numPlayerUnits * 2 &&
+                     i == 0 ) {
+                skip = true;
+                }
+            else if( u >= numPlayerUnits * 2 && i < 2 ) {
+                // inspector
+                skip = true;
                 }
             
+            if( skip ) {
+                printOut( "Skipping arrow for u=%d, r=%d\n", u, i );
+                }
+            
+
+            if( ! skip ) {
+                
+                intPair start = getUnitPositionInRegion( i, u );
+            
+                for( int j=0; j<numMapRegions; j++ ) {                    
+                    if( j != i ) {
+
+                        skip = false;
+
+                        if( u < numPlayerUnits && j == 1 ) {
+                            skip = true;
+                            }
+                        else if( u >= numPlayerUnits && 
+                                 u < numPlayerUnits * 2 &&
+                                 j == 0 ) {
+                            skip = true;
+                            }
+                        else if( u >= numPlayerUnits * 2 && j < 2 ) {
+                            // inspector
+                            skip = true;
+                            }
+
+                        if( skip ) {
+                            printOut( "Skipping arrow for u=%d, r=%d,%d\n", 
+                                      u, i, j );
+                            }
+                        if( !skip ) {
+                            
+                            intPair end = getUnitPositionInRegion( j, u );
+                    
+                            printOut( "Adding arrow from %d,%d to %d,%d\n",
+                                      start.x, start.y, end.x, end.y );
+                            
+                            buildArrow( start, end );
+                            }
+                        
+                        }
+                
+                    }
+                }
             }
         }
+
+             
     }
 
     

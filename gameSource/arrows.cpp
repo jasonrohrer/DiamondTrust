@@ -100,10 +100,27 @@ void drawLine( rgbaColor *inImage, int inImageW, int inImageH,
 
 
 
+static arrowParts *getBuiltArrow( intPair inStart, intPair inEnd ) {
+    int numBuilt = prebuiltArrows.size();
+    for( int i=0; i<numBuilt; i++ ) {
+        arrowParts *p = prebuiltArrows.getElement( i );
+        if( equals( p->mStart, inStart ) && equals( p->mEnd, inEnd ) ) {
+            return p;
+            }
+        }
+    return NULL;
+    }
+
 
 
 void buildArrow( intPair inStart, intPair inEnd ) {
     
+    if( getBuiltArrow( inStart, inEnd ) != NULL ) {
+        // already built, skip it
+        return;
+        }
+    
+
     arrowParts p;
     p.mStart = inStart;
     p.mEnd = inEnd;
@@ -432,17 +449,15 @@ void freeArrows() {
 
 
 void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
-    int numBuilt = prebuiltArrows.size();
-    arrowParts p;
-    char found = false;
-    for( int i=0; i<numBuilt && !found; i++ ) {
-        p = *( prebuiltArrows.getElement( i ) );
-        if( equals( p.mStart, inStart ) && equals( p.mEnd, inEnd ) ) {
-            found = true;
-            }
-        }
+    arrowParts *pPointer = getBuiltArrow( inStart, inEnd );
     
-    if( found ) {
+
+    
+    
+    if( pPointer != NULL ) {
+
+        arrowParts p = *pPointer;
+        
         for( int i=0; i<p.mNumLineSteps; i++ ) {
             intPair step = p.mLineSteps[i];
             
