@@ -10,16 +10,16 @@ typedef struct arrowParts {
         int mTailSpriteID;
         int mBodySpriteID;
         int mHeadSpriteID;
-
-        int mStepX;
-        int mStepY;
+        
+        int mNumLineSteps;
+        intPair mLineSteps[32];
         
     } arrowParts;
 
 
 static SimpleVector<arrowParts> prebuiltArrows;
-static int w = 32;
-static int h = 32;
+static int w = 16;
+static int h = 16;
 
 
 
@@ -143,28 +143,43 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     
 
-    // scale by 3/4 image diameter
-    int scaleFactor = (3 * w ) / 4;
+    // scale by 2/3 image diameter
+    int scaleFactor = (2 * w ) / 3;
     centeredStart.x = (centeredStart.x * scaleFactor) / dist;
     centeredStart.y = (centeredStart.y * scaleFactor) / dist;
     
     centeredEnd.x = (centeredEnd.x * scaleFactor) / dist;
     centeredEnd.y = (centeredEnd.y * scaleFactor) / dist;
     
+
+    // rotate 90
+    intPair perpStart = { centeredStart.y, -centeredStart.x };
+    intPair perpEnd = { centeredEnd.y, -centeredEnd.x };
+    
+    
+            
+
     // adjust so it's centered at image center instead of 0,0
     centeredStart.x += w/2;
     centeredStart.y += h/2;
     centeredEnd.x += w/2;
     centeredEnd.y += h/2;
     
+    perpStart.x += w/2;
+    perpStart.y += h/2;
+    perpEnd.x += w/2;
+    perpEnd.y += h/2;
+    
+    
+
     printOut( "Arrow %d, start(%d,%d), end(%d,%d)\n",
               prebuiltArrows.size(), centeredStart.x, centeredStart.y,
               centeredEnd.x, centeredEnd.y );
     
     // now it fits in a 16x16 square image
 
-    p.mStepX = centeredEnd.x - centeredStart.x;
-    p.mStepY = centeredEnd.y - centeredStart.y;
+    int stepX = centeredEnd.x - centeredStart.x;
+    int stepY = centeredEnd.y - centeredStart.y;
     
 
     
@@ -175,7 +190,29 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     if( xDist > yDist ) {
         // horizontal-ish
+
+        // extra pixel to avoid overlap
+        if( stepX < 0 ) {
+            stepX--;
+            }
+        else {
+            stepX++;
+            }
         
+        int stepIndex = 0;
+        for( int x=inStart.x; x<inEnd.x; x+=stepX ) {
+            int y = 
+                ( ( x - inStart.x ) * (inEnd.y - inStart.y) ) 
+                /
+                ( inEnd.x - inStart.x ) + inStart.y;
+            intPair step = { x, y };
+            
+            p.mLineSteps[ stepIndex ] = step;
+            stepIndex ++;
+            }
+        p.mNumLineSteps = stepIndex;
+                    
+        /*
         // edges above and below
 
         intPair edgeStart = centeredStart;
@@ -216,11 +253,36 @@ void buildArrow( intPair inStart, intPair inEnd ) {
                     }
                 }
             }
+        */
         }
     else {
         // vertical-ish
         
+        // extra pixel to avoid overlap
+        if( stepY < 0 ) {
+            stepY--;
+            }
+        else {
+            stepY++;
+            }
 
+
+        int stepIndex = 0;
+        for( int y=inStart.y; y<inEnd.y; y+=stepY ) {
+            int x = 
+                ( ( y - inStart.y ) * (inEnd.x - inStart.x) ) 
+                /
+                ( inEnd.y - inStart.y ) + inStart.x;
+            
+            intPair step = { x, y };
+            
+            p.mLineSteps[ stepIndex ] = step;
+            stepIndex ++;
+            }
+        p.mNumLineSteps = stepIndex;
+
+
+        /*
         // edges to left and right
 
         intPair edgeStart = centeredStart;
@@ -231,6 +293,7 @@ void buildArrow( intPair inStart, intPair inEnd ) {
         drawLine( bodyRGBA, w, h,
                   edgeStart, edgeEnd,
                   black );
+
         
         edgeStart.x += 6;
         edgeEnd.x += 6;
@@ -260,10 +323,98 @@ void buildArrow( intPair inStart, intPair inEnd ) {
                     }
                 }
             }
+
+        // extra border
+        edgeStart.x += 1;
+        edgeEnd.x += 1;
+
+        drawLine( bodyRGBA, w, h,
+                  edgeStart, edgeEnd,
+                  black );
+        */
         }
     
-
+    
     //drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, red );
+    //drawLine( bodyRGBA, w, h, perpStart, perpEnd, red );
+
+    // draw rotated v shape
+    drawLine( bodyRGBA, w, h, centeredEnd, perpStart, white );
+    drawLine( bodyRGBA, w, h, centeredEnd, perpEnd, white );
+   
+    // grow white area
+    char *tagMap = new char[ numPixels ];
+    
+    memset( tagMap, false, (unsigned int)numPixels );
+
+
+    for( int y=1; y<h-1; y++ ) {
+        for( int x=1; x<w-1; x++ ) {
+                    
+            int j = y * w + x;
+            tagMap[j] = false;
+            if( ! equals( bodyRGBA[j], white ) ) {
+                int upJ = j - w;
+                int downJ = j + w;
+                int leftJ = j - 1;
+                int rightJ = j + 1;
+
+                if( equals( bodyRGBA[ downJ ], white ) ||
+                    equals( bodyRGBA[ upJ ], white ) ||
+                    equals( bodyRGBA[ leftJ ], white ) ||
+                    equals( bodyRGBA[ rightJ ], white ) ) {
+                    
+                    // in border area
+                    tagMap[j] = true;
+                    }
+                }
+            }
+        }
+    for( int i=0; i<numPixels; i++ ) {
+        if( tagMap[i] ) {
+            bodyRGBA[i] = white;
+            }
+        }
+
+
+    
+    // grow one more time, this time in black
+    memset( tagMap, false, (unsigned int)numPixels );
+
+
+    for( int y=1; y<h-1; y++ ) {
+        for( int x=1; x<w-1; x++ ) {
+                    
+            int j = y * w + x;
+            tagMap[j] = false;
+            if( ! equals( bodyRGBA[j], white ) ) {
+                int upJ = j - w;
+                int downJ = j + w;
+                int leftJ = j - 1;
+                int rightJ = j + 1;
+
+                if( equals( bodyRGBA[ downJ ], white ) ||
+                    equals( bodyRGBA[ upJ ], white ) ||
+                    equals( bodyRGBA[ leftJ ], white ) ||
+                    equals( bodyRGBA[ rightJ ], white ) ) {
+                    
+                    // in border area
+                    tagMap[j] = true;
+                    }
+                }
+            }
+        }
+    for( int i=0; i<numPixels; i++ ) {
+        if( tagMap[i] ) {
+            bodyRGBA[i] = black;
+            }
+        }
+
+    
+
+    delete [] tagMap;
+    
+
 
     p.mBodySpriteID = addSprite( bodyRGBA, w, h );
     delete [] bodyRGBA;
@@ -292,21 +443,10 @@ void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
         }
     
     if( found ) {
-        
-
-        intPair current = inStart;
-        
-        while( intAbs( current.x - inStart.x ) < 
-               intAbs( inEnd.x - inStart.x ) 
-               &&
-               intAbs( current.y - inStart.y ) < 
-               intAbs( inEnd.y - inStart.y ) ) {
+        for( int i=0; i<p.mNumLineSteps; i++ ) {
+            intPair step = p.mLineSteps[i];
             
-            drawSprite( p.mBodySpriteID, 
-                        current.x - w/2, current.y -  h/2, 
-                        inColor );
-            current.x += p.mStepX;
-            current.y += p.mStepY;
+            drawSprite( p.mBodySpriteID, step.x - w/2, step.y - h/2, inColor );
             }
         }
     else {
