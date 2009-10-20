@@ -160,8 +160,8 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     
 
-    // scale by 2/3 image diameter
-    int scaleFactor = (2 * w ) / 3;
+    // scale by 1/2 image diameter
+    int scaleFactor = w / 2;
     centeredStart.x = (centeredStart.x * scaleFactor) / dist;
     centeredStart.y = (centeredStart.y * scaleFactor) / dist;
     
@@ -356,9 +356,33 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     //drawLine( bodyRGBA, w, h, perpStart, perpEnd, red );
 
     // draw rotated v shape
-    drawLine( bodyRGBA, w, h, centeredEnd, perpStart, white );
-    drawLine( bodyRGBA, w, h, centeredEnd, perpEnd, white );
-   
+    drawLine( bodyRGBA, w, h, centeredEnd, perpStart, black );
+    drawLine( bodyRGBA, w, h, centeredEnd, perpEnd, black );
+
+    // now back up along centered line a bit
+    intPair delta;
+    delta.x = ((centeredEnd.x - centeredStart.x) * 1 ) / 2;
+    delta.y = ((centeredEnd.y - centeredStart.y) * 1 ) / 2;
+    
+    intPair newEnd;
+    newEnd.x = centeredEnd.x - delta.x;
+    newEnd.y = centeredEnd.y - delta.y;
+    
+    intPair newPerpStart, newPerpEnd;
+    
+    newPerpStart.x = perpStart.x - delta.x;
+    newPerpStart.y = perpStart.y - delta.y;
+    newPerpEnd.x = perpEnd.x - delta.x;
+    newPerpEnd.y = perpEnd.y - delta.y;
+
+
+    drawLine( bodyRGBA, w, h, newEnd, newPerpStart, black );
+    drawLine( bodyRGBA, w, h, newEnd, newPerpEnd, black );
+
+    drawLine( bodyRGBA, w, h, perpStart, newPerpStart, black );
+    drawLine( bodyRGBA, w, h, perpEnd, newPerpEnd, black );
+            
+    /*
     // grow white area
     char *tagMap = new char[ numPixels ];
     
@@ -430,7 +454,7 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
 
     delete [] tagMap;
-    
+    */
 
 
     p.mBodySpriteID = addSprite( bodyRGBA, w, h );
