@@ -4,8 +4,8 @@
 
 
 // linger on each pip for 10 frames
-//static int chaseSpeedFactor = 10;
-static int chaseSpeedFactor = 2;
+static int chaseSpeedFactor = 10;
+//static int chaseSpeedFactor = 100;
 
 
 typedef struct arrowParts {
@@ -717,12 +717,13 @@ void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
                     if( factor < chaseSpeedFactor / 2 ) {
                         // fade out
                         drawColor.a = 
-                            255 - ( 255 * factor ) / ( chaseSpeedFactor / 2 );
+                            inColor.a - 
+                            ( inColor.a * factor ) / ( chaseSpeedFactor / 2 );
                         }
                     else {
                         // fade back in
                         drawColor.a = 
-                            ( 255 * (factor - chaseSpeedFactor/2) ) 
+                            ( inColor.a * (factor - chaseSpeedFactor/2) ) 
                             / ( chaseSpeedFactor / 2 );
                         }
                     
