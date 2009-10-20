@@ -208,9 +208,6 @@ void initUnits() {
             
                 for( int j=0; j<numMapRegions; j++ ) {                    
                     if( j != i ) {
-                        if( u == 0 && i == 7 && j == 4 ) {
-                            printOut( "Break\n" );
-                            }
                         
                         skip = false;
 

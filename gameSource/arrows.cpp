@@ -99,6 +99,107 @@ void drawLine( rgbaColor *inImage, int inImageW, int inImageH,
     }
 
 
+#define stackSize 256
+
+intPair pointStack[stackSize];
+
+int stackTop = -1;
+
+static char push( intPair inPair ) {
+    if( stackTop < stackSize -1 ) {
+        stackTop++;
+        pointStack[stackTop] = inPair;
+        return true;
+        }
+
+    printOut( "Stack overflow in flood fill\n" );
+    return false;
+    }
+
+static char pop( intPair *outPair ) {
+    if( stackTop >= 0 ) {
+        *outPair = pointStack[stackTop];
+        stackTop--;
+        return true;
+        }
+    return false;
+    }
+
+static void empty() {
+    stackTop = -1;
+    }
+
+
+
+static void floodFillWorker( rgbaColor *inImage, int inImageW, int inImageH,
+                             intPair inStart, rgbaColor inFillColor ) {
+
+    rgbaColor oldColor = inImage[ inStart.y * inImageW + inStart.x ];
+    
+    if( !push( inStart ) ) {
+        return;
+        }
+    intPair next;
+    
+    while( pop( &next ) ) {
+        int x = next.x;
+        int y = next.y;
+        
+        int index = y * inImageW + x;
+        
+        if( equals( inImage[ index ], oldColor ) ) {
+            
+            inImage[ index ] = inFillColor;
+        
+            // add neighbors to be checked
+            intPair neighbor = next;
+            
+            if( x - 1 >= 0 ) {
+                neighbor.x = x - 1;
+                if( !push( neighbor ) ) {
+                    return;
+                    }
+                }
+            if( x + 1 < inImageW ) {
+                neighbor.x = x + 1;
+                if( !push( neighbor ) ) {
+                    return;
+                    }
+                }
+    
+            neighbor.x = next.x;
+            
+            if( y - 1 >= 0 ) {
+                neighbor.y = y - 1;
+                if( !push( neighbor ) ) {
+                    return;
+                    }
+                }
+            if( y + 1 < inImageH ) {
+                neighbor.y = y + 1;
+                if( !push( neighbor ) ) {
+                    return;
+                    }
+                }
+            }
+        }    
+    }
+
+
+
+static void floodFill( rgbaColor *inImage, int inImageW, int inImageH,
+                intPair inStart, rgbaColor inFillColor ) {
+    
+    // call worker
+    floodFillWorker( inImage, inImageW, inImageH,
+                     inStart, inFillColor );
+    
+    // clean up at end (only has effect in case of stack overflow)
+    empty();
+    }
+
+
+
 
 static arrowParts *getBuiltArrow( intPair inStart, intPair inEnd ) {
     int numBuilt = prebuiltArrows.size();
@@ -122,6 +223,7 @@ static char isBetween( int inX, int inA, int inB ) {
         }
     return false;
     }
+
 
 
 void buildArrow( intPair inStart, intPair inEnd ) {
@@ -171,13 +273,13 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     
 
-    // scale by 1/2 image diameter
-    int scaleFactor = w / 2;
-    centeredStart.x = (centeredStart.x * scaleFactor) / dist;
-    centeredStart.y = (centeredStart.y * scaleFactor) / dist;
+    // scale to 1/2 image diameter, rounding
+    int scaleFactor = (1 * w) / 2;
+    centeredStart.x = (centeredStart.x * scaleFactor + dist/2 ) / dist;
+    centeredStart.y = (centeredStart.y * scaleFactor + dist/2 ) / dist;
     
-    centeredEnd.x = (centeredEnd.x * scaleFactor) / dist;
-    centeredEnd.y = (centeredEnd.y * scaleFactor) / dist;
+    centeredEnd.x = (centeredEnd.x * scaleFactor + dist/2 ) / dist;
+    centeredEnd.y = (centeredEnd.y * scaleFactor + dist/2 ) / dist;
     
 
     // rotate 90
@@ -385,6 +487,17 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     newEnd.x = centeredEnd.x - delta.x;
     newEnd.y = centeredEnd.y - delta.y;
     
+    /*
+    if( intDistance( newEnd, centeredEnd ) < 3 ) {
+        // bigger delta needed
+        delta.x *= 2;
+        delta.y *= 2;
+        
+        newEnd.x = centeredEnd.x - delta.x;
+        newEnd.y = centeredEnd.y - delta.y;
+        }
+    */
+
     intPair newPerpStart, newPerpEnd;
     
     newPerpStart.x = perpStart.x - delta.x;
@@ -393,13 +506,23 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     newPerpEnd.y = perpEnd.y - delta.y;
 
 
-    drawLine( bodyRGBA, w, h, newEnd, newPerpStart, black );
-    drawLine( bodyRGBA, w, h, newEnd, newPerpEnd, black );
+    //drawLine( bodyRGBA, w, h, newEnd, newPerpStart, black );
+    //drawLine( bodyRGBA, w, h, newEnd, newPerpEnd, black );
+    drawLine( bodyRGBA, w, h, newPerpStart, newPerpEnd, black );
 
     drawLine( bodyRGBA, w, h, perpStart, newPerpStart, black );
     drawLine( bodyRGBA, w, h, perpEnd, newPerpEnd, black );
     
-    drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, black );
+    //drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, black );
+    //drawLine( bodyRGBA, w, h, perpStart, perpEnd, black );
+
+    // now fill with white
+    intPair fillStart;
+    fillStart.x = (newEnd.x + centeredEnd.x)/2;
+    fillStart.y = (newEnd.y + centeredEnd.y)/2;
+    
+    floodFill( bodyRGBA, w, h, fillStart, white );
+    
     /*
     // grow white area
     char *tagMap = new char[ numPixels ];
