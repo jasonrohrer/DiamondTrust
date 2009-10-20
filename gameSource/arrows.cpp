@@ -113,6 +113,17 @@ static arrowParts *getBuiltArrow( intPair inStart, intPair inEnd ) {
 
 
 
+static char isBetween( int inX, int inA, int inB ) {
+    if( inX >= inA && inX <= inB ) {
+        return true;
+        }
+    if( inX >= inB && inX <= inA ) {
+        return true;
+        }
+    return false;
+    }
+
+
 void buildArrow( intPair inStart, intPair inEnd ) {
     
     if( getBuiltArrow( inStart, inEnd ) != NULL ) {
@@ -217,7 +228,10 @@ void buildArrow( intPair inStart, intPair inEnd ) {
             }
         
         int stepIndex = 0;
-        for( int x=inStart.x; x<inEnd.x; x+=stepX ) {
+        for( int x=inStart.x; 
+             isBetween( x, inStart.x, inEnd.x ); 
+             x+=stepX ) {
+            
             int y = 
                 ( ( x - inStart.x ) * (inEnd.y - inStart.y) ) 
                 /
@@ -285,7 +299,10 @@ void buildArrow( intPair inStart, intPair inEnd ) {
 
 
         int stepIndex = 0;
-        for( int y=inStart.y; y<inEnd.y; y+=stepY ) {
+        for( int y=inStart.y; 
+             isBetween( y, inStart.y, inEnd.y ); 
+             y+=stepY ) {
+            
             int x = 
                 ( ( y - inStart.y ) * (inEnd.x - inStart.x) ) 
                 /
@@ -381,7 +398,8 @@ void buildArrow( intPair inStart, intPair inEnd ) {
 
     drawLine( bodyRGBA, w, h, perpStart, newPerpStart, black );
     drawLine( bodyRGBA, w, h, perpEnd, newPerpEnd, black );
-            
+    
+    drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, black );
     /*
     // grow white area
     char *tagMap = new char[ numPixels ];
