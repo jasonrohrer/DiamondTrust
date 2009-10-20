@@ -280,7 +280,9 @@ int lastTouchX, lastTouchY;
 static void goToNextGameState() {
     // state transition
     if( currentGameState == connectState ) {
-        currentGameState = accumulateDiamondsState;
+        // FIXME  for testing
+        //currentGameState = accumulateDiamondsState;
+        currentGameState = moveUnitsState;
         }
     else if( currentGameState == accumulateDiamondsState ) {
         postAccumulateTransition();

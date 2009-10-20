@@ -666,6 +666,7 @@ void stepArrows() {
                     p->mStartupDone = true;
                     }
                 }
+            /*
             else {
                 // chase running
                 p->mChaseProgress ++;
@@ -677,6 +678,7 @@ void stepArrows() {
                     p->mChaseProgress = 0;
                     }
                 }
+            */
             }
         }
         
@@ -704,8 +706,9 @@ void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
         for( int i=0; i<drawLimit; i++ ) {
             intPair step = p.mLineSteps[i];
             
+            /*
             rgbaColor drawColor = inColor;
-            
+
             if( p.mStartupDone ) {
             
                 // chase effect in alpha
@@ -729,10 +732,10 @@ void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
                     
                     }
                 }
-            
+            */
 
             drawSprite( p.mBodySpriteID, step.x - w/2, step.y - h/2, 
-                        drawColor );
+                        inColor );
             }
         }
     else {
