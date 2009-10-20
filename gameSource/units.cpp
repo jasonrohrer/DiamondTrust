@@ -447,7 +447,9 @@ void drawUnits() {
             }
         else {
             // inspector sprite already contains color
-            c = white;
+            //c = white;
+            // color needed with new procedural arrows
+            c = inspectorColor;
             }
 
         // trans
@@ -1000,6 +1002,7 @@ void stepUnits() {
             }
         }
     
+    stepArrows();
     }
 
 

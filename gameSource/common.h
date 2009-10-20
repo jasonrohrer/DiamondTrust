@@ -20,6 +20,10 @@ int intAbs( int inX );
 
 char equals( intPair inA, intPair inB );
 
+intPair add( intPair inA, intPair inB );
+
+intPair subtract( intPair inA, intPair inB );
+
 
 
 // finds power of 2 that value fits inside

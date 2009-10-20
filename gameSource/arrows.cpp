@@ -3,6 +3,11 @@
 #include "minorGems/util/SimpleVector.h"
 
 
+// linger on each pip for 10 frames
+//static int chaseSpeedFactor = 10;
+static int chaseSpeedFactor = 2;
+
+
 typedef struct arrowParts {
         intPair mStart;
         intPair mEnd;
@@ -13,6 +18,15 @@ typedef struct arrowParts {
         
         int mNumLineSteps;
         intPair mLineSteps[32];
+
+        char mStartupDone;
+        int mStartupProgress;
+
+        char mDrawnThisStep;
+
+        int mChaseProgress;
+        
+        
         
     } arrowParts;
 
@@ -238,6 +252,11 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     p.mStart = inStart;
     p.mEnd = inEnd;
 
+    p.mStartupDone = false;
+    p.mStartupProgress = 0;
+    p.mDrawnThisStep = false;
+    p.mChaseProgress = 0;
+    
 
     int numPixels = w * h;
     
@@ -273,13 +292,13 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     
 
-    // scale to 1/2 image diameter, rounding
+    // scale to 1/2 image diameter
     int scaleFactor = (1 * w) / 2;
-    centeredStart.x = (centeredStart.x * scaleFactor + dist/2 ) / dist;
-    centeredStart.y = (centeredStart.y * scaleFactor + dist/2 ) / dist;
+    centeredStart.x = (centeredStart.x * scaleFactor) / dist;
+    centeredStart.y = (centeredStart.y * scaleFactor) / dist;
     
-    centeredEnd.x = (centeredEnd.x * scaleFactor + dist/2 ) / dist;
-    centeredEnd.y = (centeredEnd.y * scaleFactor + dist/2 ) / dist;
+    centeredEnd.x = (centeredEnd.x * scaleFactor) / dist;
+    centeredEnd.y = (centeredEnd.y * scaleFactor) / dist;
     
 
     // rotate 90
@@ -321,12 +340,12 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     if( xDist > yDist ) {
         // horizontal-ish
 
-        // extra pixel to avoid overlap
+        // extra pixels to avoid overlap
         if( stepX < 0 ) {
-            stepX--;
+            stepX -= 4;
             }
         else {
-            stepX++;
+            stepX += 4;
             }
         
         int stepIndex = 0;
@@ -391,12 +410,12 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     else {
         // vertical-ish
         
-        // extra pixel to avoid overlap
+        // extra pixels to avoid overlap
         if( stepY < 0 ) {
-            stepY--;
+            stepY -= 4;
             }
         else {
-            stepY++;
+            stepY += 4;
             }
 
 
@@ -474,6 +493,28 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     //drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, red );
     //drawLine( bodyRGBA, w, h, perpStart, perpEnd, red );
 
+    // draw line tickmark
+
+    intPair perpDelta = subtract( perpEnd, perpStart );
+    
+    perpDelta.x = (perpDelta.x ) / 3;
+    perpDelta.y = (perpDelta.y ) / 3;
+    
+    
+    intPair edgeAStart = add( centeredStart, perpDelta );
+    intPair edgeAEnd = add( centeredEnd, perpDelta );
+    
+    intPair edgeBStart = subtract( centeredStart, perpDelta );
+    intPair edgeBEnd = subtract( centeredEnd, perpDelta );
+    
+    drawLine( bodyRGBA, w, h, edgeAStart, edgeAEnd, black );
+    drawLine( bodyRGBA, w, h, edgeBStart, edgeBEnd, black );
+    
+    drawLine( bodyRGBA, w, h, edgeAStart, edgeBStart, black );
+    drawLine( bodyRGBA, w, h, edgeAEnd, edgeBEnd, black );
+
+
+    /*
     // draw rotated v shape
     drawLine( bodyRGBA, w, h, centeredEnd, perpStart, black );
     drawLine( bodyRGBA, w, h, centeredEnd, perpEnd, black );
@@ -485,18 +526,7 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     intPair newEnd;
     newEnd.x = centeredEnd.x - delta.x;
-    newEnd.y = centeredEnd.y - delta.y;
-    
-    /*
-    if( intDistance( newEnd, centeredEnd ) < 3 ) {
-        // bigger delta needed
-        delta.x *= 2;
-        delta.y *= 2;
-        
-        newEnd.x = centeredEnd.x - delta.x;
-        newEnd.y = centeredEnd.y - delta.y;
-        }
-    */
+    newEnd.y = centeredEnd.y - delta.y;/
 
     intPair newPerpStart, newPerpEnd;
     
@@ -515,11 +545,13 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     //drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, black );
     //drawLine( bodyRGBA, w, h, perpStart, perpEnd, black );
+    */
+
 
     // now fill with white
-    intPair fillStart;
-    fillStart.x = (newEnd.x + centeredEnd.x)/2;
-    fillStart.y = (newEnd.y + centeredEnd.y)/2;
+    intPair fillStart = {8,8};
+    //fillStart.x = (newEnd.x + centeredEnd.x)/2;
+    //fillStart.y = (newEnd.y + centeredEnd.y)/2;
     
     floodFill( bodyRGBA, w, h, fillStart, white );
     
@@ -612,6 +644,45 @@ void freeArrows() {
 
 
 
+void stepArrows() {
+    int numBuilt = prebuiltArrows.size();
+    for( int i=0; i<numBuilt; i++ ) {
+        arrowParts *p = prebuiltArrows.getElement( i );
+        
+        if( !p->mDrawnThisStep ) {
+            // reset attributes for undrawn arrows
+            p->mStartupDone = false;
+            p->mStartupProgress = 0;
+            p->mChaseProgress = 0;
+            }
+        else {
+            // keep attributes, reset step flag to check again
+            p->mDrawnThisStep = false;
+
+            // step it
+            if( !p->mStartupDone ) {
+                p->mStartupProgress += 2;
+                if( p->mStartupProgress >= p->mNumLineSteps ) {
+                    p->mStartupDone = true;
+                    }
+                }
+            else {
+                // chase running
+                p->mChaseProgress ++;
+                
+                if( p->mChaseProgress >= 
+                    p->mNumLineSteps * chaseSpeedFactor ) {
+                    
+                    // wrap
+                    p->mChaseProgress = 0;
+                    }
+                }
+            }
+        }
+        
+    }
+
+
 
 void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
     arrowParts *pPointer = getBuiltArrow( inStart, inEnd );
@@ -620,13 +691,47 @@ void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
     
     
     if( pPointer != NULL ) {
-
+        pPointer->mDrawnThisStep = true;
+        
         arrowParts p = *pPointer;
         
-        for( int i=0; i<p.mNumLineSteps; i++ ) {
+        int drawLimit = p.mNumLineSteps;
+        if( !p.mStartupDone ) {
+            // fill them in gradually
+            drawLimit = p.mStartupProgress;
+            }
+        
+        for( int i=0; i<drawLimit; i++ ) {
             intPair step = p.mLineSteps[i];
             
-            drawSprite( p.mBodySpriteID, step.x - w/2, step.y - h/2, inColor );
+            rgbaColor drawColor = inColor;
+            
+            if( p.mStartupDone ) {
+            
+                // chase effect in alpha
+                if( p.mChaseProgress / chaseSpeedFactor == i ) {
+                    // this one affected
+                    
+                    int factor = p.mChaseProgress % chaseSpeedFactor;
+                    
+                    if( factor < chaseSpeedFactor / 2 ) {
+                        // fade out
+                        drawColor.a = 
+                            255 - ( 255 * factor ) / ( chaseSpeedFactor / 2 );
+                        }
+                    else {
+                        // fade back in
+                        drawColor.a = 
+                            ( 255 * (factor - chaseSpeedFactor/2) ) 
+                            / ( chaseSpeedFactor / 2 );
+                        }
+                    
+                    }
+                }
+            
+
+            drawSprite( p.mBodySpriteID, step.x - w/2, step.y - h/2, 
+                        drawColor );
             }
         }
     else {

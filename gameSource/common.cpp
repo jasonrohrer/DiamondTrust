@@ -78,6 +78,27 @@ char equals( intPair inA, intPair inB ) {
 
 
 
+intPair add( intPair inA, intPair inB ) {
+    intPair returnVal;
+    returnVal.x = inA.x + inB.x;
+    returnVal.y = inA.y + inB.y;
+    
+    return returnVal;
+    }
+
+
+
+intPair subtract( intPair inA, intPair inB ) {
+    intPair returnVal;
+    returnVal.x = inA.x - inB.x;
+    returnVal.y = inA.y - inB.y;
+    
+    return returnVal;
+    }
+
+
+
+
 
 
 
