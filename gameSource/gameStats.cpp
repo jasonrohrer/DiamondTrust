@@ -212,7 +212,7 @@ static void drawDiamondCounter( int inX, int inY, int inCount ) {
 static void drawMoneyValue16( int inX, int inY, int inValue, 
                             rgbaColor inColor, char inValueHidden ) {
 
-    font16->drawString( "$", inX, inY - 2, inColor, alignLeft );
+    font16->drawString( "$", inX, inY - 1, inColor, alignLeft );
     
     char *moneyString;
         
