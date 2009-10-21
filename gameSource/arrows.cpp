@@ -371,49 +371,6 @@ void buildArrow( intPair inStart, intPair inEnd ) {
             stepIndex ++;
             }
         p.mNumLineSteps = stepIndex;
-                    
-        /*
-        // edges above and below
-
-        intPair edgeStart = centeredStart;
-        intPair edgeEnd = centeredEnd;
-        edgeStart.y -= 3;
-        edgeEnd.y -= 3;
-        
-                
-        drawLine( bodyRGBA, w, h,
-                  edgeStart, edgeEnd,
-                  black );
-        
-        edgeStart.y += 6;
-        edgeEnd.y += 6;
-
-        drawLine( bodyRGBA, w, h,
-                  edgeStart, edgeEnd,
-                  black );
-
-        // fill vertically between edges
-        for( int x=0; x<w; x++ ) {
-            char fillStarted = false;
-            char fillDone = false;
-            for( int y=0; y<h && !fillDone; y++ ) {
-                if( !fillStarted ) {
-                    if( equals( bodyRGBA[ y * w + x ], black ) ) {
-                        fillStarted = true;
-                        }
-                    }
-                else {
-                    if( equals( bodyRGBA[ y * w + x ], black ) ) {
-                        fillDone = true;
-                        }
-                    else {
-                        // middle, fill it
-                        bodyRGBA[ y * w + x ] = white;
-                        }
-                    }
-                }
-            }
-        */
         }
     else {
         // vertical-ish
@@ -449,64 +406,9 @@ void buildArrow( intPair inStart, intPair inEnd ) {
             stepIndex ++;
             }
         p.mNumLineSteps = stepIndex;
-
-
-        /*
-        // edges to left and right
-
-        intPair edgeStart = centeredStart;
-        intPair edgeEnd = centeredEnd;
-        edgeStart.x -= 3;
-        edgeEnd.x -= 3;
-        
-        drawLine( bodyRGBA, w, h,
-                  edgeStart, edgeEnd,
-                  black );
-
-        
-        edgeStart.x += 6;
-        edgeEnd.x += 6;
-
-        drawLine( bodyRGBA, w, h,
-                  edgeStart, edgeEnd,
-                  black );
-
-        // fill horizontally between edges
-        for( int y=0; y<h; y++ ) {
-            char fillStarted = false;
-            char fillDone = false;
-            for( int x=0; x<w && !fillDone; x++ ) {
-                if( !fillStarted ) {
-                    if( equals( bodyRGBA[ y * w + x ], black ) ) {
-                        fillStarted = true;
-                        }
-                    }
-                else {
-                    if( equals( bodyRGBA[ y * w + x ], black ) ) {
-                        fillDone = true;
-                        }
-                    else {
-                        // middle, fill it
-                        bodyRGBA[ y * w + x ] = white;
-                        }
-                    }
-                }
-            }
-
-        // extra border
-        edgeStart.x += 1;
-        edgeEnd.x += 1;
-
-        drawLine( bodyRGBA, w, h,
-                  edgeStart, edgeEnd,
-                  black );
-        */
         }
     
     
-    //drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, red );
-    //drawLine( bodyRGBA, w, h, perpStart, perpEnd, red );
-
     // draw line tickmark
 
     intPair perpDelta = subtract( perpEnd, perpStart );
@@ -528,120 +430,10 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     drawLine( bodyRGBA, w, h, edgeAEnd, edgeBEnd, black );
 
 
-    /*
-    // draw rotated v shape
-    drawLine( bodyRGBA, w, h, centeredEnd, perpStart, black );
-    drawLine( bodyRGBA, w, h, centeredEnd, perpEnd, black );
-
-    // now back up along centered line a bit
-    intPair delta;
-    delta.x = ((centeredEnd.x - centeredStart.x) * 1 ) / 2;
-    delta.y = ((centeredEnd.y - centeredStart.y) * 1 ) / 2;
-    
-    intPair newEnd;
-    newEnd.x = centeredEnd.x - delta.x;
-    newEnd.y = centeredEnd.y - delta.y;/
-
-    intPair newPerpStart, newPerpEnd;
-    
-    newPerpStart.x = perpStart.x - delta.x;
-    newPerpStart.y = perpStart.y - delta.y;
-    newPerpEnd.x = perpEnd.x - delta.x;
-    newPerpEnd.y = perpEnd.y - delta.y;
-
-
-    //drawLine( bodyRGBA, w, h, newEnd, newPerpStart, black );
-    //drawLine( bodyRGBA, w, h, newEnd, newPerpEnd, black );
-    drawLine( bodyRGBA, w, h, newPerpStart, newPerpEnd, black );
-
-    drawLine( bodyRGBA, w, h, perpStart, newPerpStart, black );
-    drawLine( bodyRGBA, w, h, perpEnd, newPerpEnd, black );
-    
-    //drawLine( bodyRGBA, w, h, centeredStart, centeredEnd, black );
-    //drawLine( bodyRGBA, w, h, perpStart, perpEnd, black );
-    */
-
-
     // now fill with white
     intPair fillStart = {8,8};
-    //fillStart.x = (newEnd.x + centeredEnd.x)/2;
-    //fillStart.y = (newEnd.y + centeredEnd.y)/2;
     
-    floodFill( bodyRGBA, w, h, fillStart, white );
-    
-    /*
-    // grow white area
-    char *tagMap = new char[ numPixels ];
-    
-    memset( tagMap, false, (unsigned int)numPixels );
-
-
-    for( int y=1; y<h-1; y++ ) {
-        for( int x=1; x<w-1; x++ ) {
-                    
-            int j = y * w + x;
-            tagMap[j] = false;
-            if( ! equals( bodyRGBA[j], white ) ) {
-                int upJ = j - w;
-                int downJ = j + w;
-                int leftJ = j - 1;
-                int rightJ = j + 1;
-
-                if( equals( bodyRGBA[ downJ ], white ) ||
-                    equals( bodyRGBA[ upJ ], white ) ||
-                    equals( bodyRGBA[ leftJ ], white ) ||
-                    equals( bodyRGBA[ rightJ ], white ) ) {
-                    
-                    // in border area
-                    tagMap[j] = true;
-                    }
-                }
-            }
-        }
-    for( int i=0; i<numPixels; i++ ) {
-        if( tagMap[i] ) {
-            bodyRGBA[i] = white;
-            }
-        }
-
-
-    
-    // grow one more time, this time in black
-    memset( tagMap, false, (unsigned int)numPixels );
-
-
-    for( int y=1; y<h-1; y++ ) {
-        for( int x=1; x<w-1; x++ ) {
-                    
-            int j = y * w + x;
-            tagMap[j] = false;
-            if( ! equals( bodyRGBA[j], white ) ) {
-                int upJ = j - w;
-                int downJ = j + w;
-                int leftJ = j - 1;
-                int rightJ = j + 1;
-
-                if( equals( bodyRGBA[ downJ ], white ) ||
-                    equals( bodyRGBA[ upJ ], white ) ||
-                    equals( bodyRGBA[ leftJ ], white ) ||
-                    equals( bodyRGBA[ rightJ ], white ) ) {
-                    
-                    // in border area
-                    tagMap[j] = true;
-                    }
-                }
-            }
-        }
-    for( int i=0; i<numPixels; i++ ) {
-        if( tagMap[i] ) {
-            bodyRGBA[i] = black;
-            }
-        }
-
-    
-
-    delete [] tagMap;
-    */
+    floodFill( bodyRGBA, w, h, fillStart, white );    
 
 
     p.mBodySpriteID = addSprite( bodyRGBA, w, h );
