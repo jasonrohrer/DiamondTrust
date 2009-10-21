@@ -60,17 +60,6 @@ void initUnits() {
         printOut( "Reading unit sprite file failed.\n" );
         return;
         }
-
-    int w,h;
-    rgbaColor *moveDotRGBA = readTGAFile( "moveDot.tga",
-                                       &w, &h );
-    
-    
-    if( moveDotRGBA == NULL || w != unitSpriteW || h != imageH ) {
-        printOut( "Reading unit move dot file failed.\n" );
-        return;
-        }
-
     
 
 
@@ -78,8 +67,7 @@ void initUnits() {
     unitSpriteH = ((imageH + 1) /  4 ) - 1;
     
     int spriteIDs[ 4 ];
-    int moveDotSpriteIDs[ 4 ];
-    
+        
     int i;
     
     for( i=0; i<4; i++ ) {
@@ -91,17 +79,7 @@ void initUnits() {
 
         spriteIDs[i] = 
             addSprite( subImage, unitSpriteW, unitSpriteH );
-    
-
-        subImage = 
-            &( moveDotRGBA[ i * (unitSpriteH + 1) * unitSpriteW ] );
-        
-        applyCornerTransparency( subImage, unitSpriteW * unitSpriteH );
-
-        moveDotSpriteIDs[i] = 
-            addSprite( subImage, unitSpriteW, unitSpriteH );
         }
-    delete [] moveDotRGBA;
     delete [] unitRGBA;
     
 
@@ -120,10 +98,6 @@ void initUnits() {
     for( i=0; i<3; i++ ) {
         gameUnit[ i ].mSpriteID = spriteIDs[ i ];
         gameUnit[ i + 3 ].mSpriteID = spriteIDs[ i ];
-        
-        gameUnit[ i ].mDotSpriteID = moveDotSpriteIDs[ i ];
-        gameUnit[ i + 3 ].mDotSpriteID = moveDotSpriteIDs[ i ];
-
 
         gameUnit[ i ].mTotalSalary = 0;
         gameUnit[ i + 3].mTotalSalary = 0;
@@ -148,8 +122,7 @@ void initUnits() {
     // always starts in last region
     // gameUnit[ 6 ].mRegion = numMapRegions - 1;
     gameUnit[ 6 ].mSpriteID = spriteIDs[ 3 ];
-    gameUnit[ 6 ].mDotSpriteID = moveDotSpriteIDs[ 3 ];
-
+    
 
     // destinations -- nowhere
     // bids -- none
@@ -460,8 +433,6 @@ void drawUnits() {
             gameUnit[i].mDest != gameUnit[i].mRegion ) {
             // move chosen
             
-
-            
             
             // draw line
             intPair start = 
@@ -473,26 +444,6 @@ void drawUnits() {
             // try drawing arrow
             drawArrow( start, end, c );
 
-                /*
-            int distance = intDistance( start, end );
-            
-            int numDots = distance / 7;
-            
-            for( int d=0; d<numDots; d++ ) {
-                int dotX = 
-                    ( d * end.x + 
-                      ( (numDots - 1) - d ) * start.x ) / (numDots - 1 );
-                int dotY = 
-                    ( d * end.y + 
-                      ( (numDots - 1) - d ) * start.y ) / (numDots - 1 );
-                
-                dotX -= unitSpriteW / 2;
-                dotY -= unitSpriteH / 2;
-                    
-
-                drawSprite( gameUnit[i].mDotSpriteID, dotX, dotY, c );
-                }
-            */
             // new layer for each line drawn
             startNewSpriteLayer();
             
