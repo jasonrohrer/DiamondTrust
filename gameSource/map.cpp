@@ -445,14 +445,7 @@ void initMap() {
         return;
         }
 
-    // make transparent
-    int numNamePixels = namesW * namesH;
-    rgbaColor transColor = namesRGBA[0];
-    for( i=0; i<numNamePixels; i++ ) {
-        if( equals( namesRGBA[i], transColor ) ) {
-            namesRGBA[i].a = 0;
-            }
-        }
+    applyCornerTransparency( namesRGBA, namesW * namesH );
     
     mapNamesTopSpriteID = addSprite( namesRGBA, namesW, bottomHalfOffset );
 
