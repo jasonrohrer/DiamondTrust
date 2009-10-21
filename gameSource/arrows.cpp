@@ -292,13 +292,30 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     
 
-    // scale to 1/2 image diameter
-    int scaleFactor = (1 * w) / 2;
-    centeredStart.x = (centeredStart.x * scaleFactor) / dist;
-    centeredStart.y = (centeredStart.y * scaleFactor) / dist;
+    // scale to 1/2 image diameter, target length of w/2
+    int targetLength = w/2;
+    intPair unscaledStart = centeredStart;
+    intPair unscaledEnd = centeredEnd;
     
-    centeredEnd.x = (centeredEnd.x * scaleFactor) / dist;
-    centeredEnd.y = (centeredEnd.y * scaleFactor) / dist;
+    int extra = 0;
+    
+    int tickLength = 0;
+
+    while( tickLength < targetLength ) {
+        
+        int scaleFactor = ( (10+extra) * w) / 20;
+        
+        centeredStart.x = (unscaledStart.x * scaleFactor) / dist;
+        centeredStart.y = (unscaledStart.y * scaleFactor) / dist;
+    
+        centeredEnd.x = (unscaledEnd.x * scaleFactor) / dist;
+        centeredEnd.y = (unscaledEnd.y * scaleFactor) / dist;
+    
+        tickLength = intDistance( centeredStart, centeredEnd );
+        
+        extra++;
+        }
+    
     
 
     // rotate 90
@@ -415,7 +432,13 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     perpDelta.x = (perpDelta.x ) / 3;
     perpDelta.y = (perpDelta.y ) / 3;
-    
+
+    // constrain all tick widths within a range
+    // target radius is 2 pixles
+    // 10x to magnify round-off errors
+    // (thus target 10x radius is 20)
+    int tenTimesDeltaLength = intSqrt( 10 * perpDelta.x * 10 * perpDelta.x + 
+                                       10 * perpDelta.y * 10 * perpDelta.y );
     
     intPair edgeAStart = add( centeredStart, perpDelta );
     intPair edgeAEnd = add( centeredEnd, perpDelta );
@@ -423,6 +446,23 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     intPair edgeBStart = subtract( centeredStart, perpDelta );
     intPair edgeBEnd = subtract( centeredEnd, perpDelta );
     
+    if( tenTimesDeltaLength < 15 ) {
+        // send one edge out a bit more, total diameter of three
+        edgeAStart = add( edgeAStart, perpDelta );
+        edgeAEnd = add( edgeAEnd, perpDelta );
+        }
+    else if( tenTimesDeltaLength > 25 ) {
+        // bring one edge in a bit more
+
+        // bring it in by half a delta
+        perpDelta.x /= 2;
+        perpDelta.y /= 2;
+
+        edgeAStart = subtract( edgeAStart, perpDelta );
+        edgeAEnd = subtract( edgeAEnd, perpDelta );
+        }
+    
+
     drawLine( bodyRGBA, w, h, edgeAStart, edgeAEnd, black );
     drawLine( bodyRGBA, w, h, edgeBStart, edgeBEnd, black );
     
