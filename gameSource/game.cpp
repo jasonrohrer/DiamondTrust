@@ -88,7 +88,7 @@ void gameInit() {
     font8 = new Font( "font8.tga", 1, 4, false );
 
     printOut( "Loading 16-pixel font\n" );
-    font16 = new Font( "font16.tga", 2, 8, false );
+    font16 = new Font( "font16_sans.tga", 2, 6, false );
     
     initButton();
 

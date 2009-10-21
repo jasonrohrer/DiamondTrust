@@ -9,7 +9,7 @@ button.tga \
 longButton.tga \
 angola_map.tga \
 font8.tga \
-font16.tga \
+font16_sans.tga \
 testDirectColor.tga \
 test250Color.tga \
 units_simple.tga \
