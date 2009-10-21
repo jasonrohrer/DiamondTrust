@@ -6,7 +6,7 @@
 #include "sprite.h"
 #include "Font.h"
 #include "colors.h"
-
+#include "gameStats.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -26,6 +26,9 @@ static int bottomHalfOffset = 128;
 
 static int mapNamesTopSpriteID;
 static int mapNamesBottomSpriteID;
+
+static int mapPaperTopSpriteID;
+static int mapPaperBottomSpriteID;
 
 
 
@@ -461,6 +464,32 @@ void initMap() {
 
     delete [] namesRGBA;
 
+
+
+
+    int paperW, paperH;
+    
+    rgbaColor *paperRGBA = readTGAFile( "paper.tga",
+                                        &paperW, &paperH );
+
+    if( paperRGBA == NULL
+        ||
+        paperW < 256 ) {
+        
+        printOut( "Reading map paper file failed.\n" );
+        return;
+        }
+
+    mapPaperTopSpriteID = addSprite( paperRGBA, paperW, bottomHalfOffset );
+
+    bottomHalfPointer = 
+        &( paperRGBA[ bottomHalfOffset * paperW ] );
+    
+    mapPaperBottomSpriteID = addSprite( bottomHalfPointer, paperW, 
+                                        paperH - bottomHalfOffset );
+
+    delete [] paperRGBA;
+
     
 
 
@@ -504,8 +533,24 @@ extern Font *font16;
 
 
 void drawMap() {
-    drawSprite( mapBackgroundTopSpriteID, 0, 0, white );
-    drawSprite( mapBackgroundBottomSpriteID, 0, bottomHalfOffset, white );
+    // paper under it all
+    
+    drawSprite( mapPaperTopSpriteID, 0, 0, white );
+    drawSprite( mapPaperBottomSpriteID, 0, bottomHalfOffset, white );
+    
+    startNewSpriteLayer();
+    
+    
+    rgbaColor backgroundColor = white;
+    // map image gets more and more faint as game wears on
+    // starts at 75%, fades down to 50%
+    backgroundColor.a = 128 + ( 64 * getMonthsLeft() ) / 8;
+    
+
+
+    drawSprite( mapBackgroundTopSpriteID, 0, 0, backgroundColor );
+    drawSprite( mapBackgroundBottomSpriteID, 0, bottomHalfOffset, 
+                backgroundColor );
     
     startNewSpriteLayer();    
 
