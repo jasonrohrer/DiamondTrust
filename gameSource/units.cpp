@@ -168,12 +168,7 @@ void initUnits() {
             else if( u >= numPlayerUnits * 2 && i < 2 ) {
                 // inspector
                 skip = true;
-                }
-            
-            if( skip ) {
-                printOut( "Skipping arrow for u=%d, r=%d\n", u, i );
-                }
-            
+                }            
 
             if( ! skip ) {
                 
@@ -197,10 +192,6 @@ void initUnits() {
                             skip = true;
                             }
 
-                        if( skip ) {
-                            printOut( "Skipping arrow for u=%d, r=%d,%d\n", 
-                                      u, i, j );
-                            }
                         if( !skip ) {
                             
                             intPair end = getUnitPositionInRegion( j, u );
