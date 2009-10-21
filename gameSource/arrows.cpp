@@ -321,10 +321,11 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     
     
 
-    printOut( "Arrow %d, start(%d,%d), end(%d,%d)\n",
+    /*printOut( "Arrow %d, start(%d,%d), end(%d,%d)\n",
               prebuiltArrows.size(), centeredStart.x, centeredStart.y,
               centeredEnd.x, centeredEnd.y );
-    
+    */
+
     // now it fits in a 16x16 square image
 
     int stepX = centeredEnd.x - centeredStart.x;
@@ -348,6 +349,13 @@ void buildArrow( intPair inStart, intPair inEnd ) {
             stepX += 4;
             }
         
+        
+        int xDelta = intAbs( inEnd.x - inStart.x );
+        // round step size up to allow exact filling of span
+        int numSteps = xDelta / stepX;
+        stepX = xDelta / numSteps;
+        
+
         int stepIndex = 0;
         for( int x=inStart.x; 
              isBetween( x, inStart.x, inEnd.x ); 
@@ -418,6 +426,12 @@ void buildArrow( intPair inStart, intPair inEnd ) {
             stepY += 4;
             }
 
+        
+        int yDelta = intAbs( inEnd.y - inStart.y );
+        // round step size up to allow exact filling of span
+        int numSteps = yDelta / stepY;
+        stepY = yDelta / numSteps;
+        
 
         int stepIndex = 0;
         for( int y=inStart.y; 
