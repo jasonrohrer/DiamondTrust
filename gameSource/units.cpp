@@ -52,7 +52,7 @@ void initUnits() {
 
     int imageH;
     
-    rgbaColor *unitRGBA = readTGAFile( "units_simple.tga",
+    rgbaColor *unitRGBA = readTGAFile( "units.tga",
                                        &unitSpriteW, &imageH );
     
     

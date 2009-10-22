@@ -13,6 +13,7 @@ font16_sans.tga \
 testDirectColor.tga \
 test250Color.tga \
 units_simple.tga \
+units.tga \
 activeUnitHalo.tga \
 diamond.tga \
 diamondBorder.tga \
