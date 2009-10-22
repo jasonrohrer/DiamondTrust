@@ -131,6 +131,12 @@ class Unit {
         int mNumDiamondsHeld;
 
         int mTripCost;
+
+        int mAnimationFrameNumber;
+        int mAnimationDirection;
+        int mStepsUntilNextFrame;
+        int mWavesLeftBeforeBreak;
+        
     };
 
 

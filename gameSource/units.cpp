@@ -16,7 +16,9 @@
 
 Unit::Unit() 
         : mRegion( -1 ), mDest( -1 ), mSelectable( false ),
-          mSpriteID( -1 ) {
+          mSpriteID( -1 ), mAnimationFrameNumber( 0 ), 
+          mAnimationDirection( 1 ), mStepsUntilNextFrame( 0 ),
+          mWavesLeftBeforeBreak( 4 ) {
 
     }
 
@@ -47,12 +49,14 @@ static int bribedMarkerSprite;
 int unitSpriteW;
 int unitSpriteH;
 
+int unitSpriteIDs[5];
+
 
 void initUnits() {
 
     int imageH;
     
-    rgbaColor *unitRGBA = readTGAFile( "units.tga",
+    rgbaColor *unitRGBA = readTGAFile( "unit_waving.tga",
                                        &unitSpriteW, &imageH );
     
     
@@ -64,20 +68,19 @@ void initUnits() {
 
 
     // 1 pixel row between each sprite image
-    unitSpriteH = ((imageH + 1) /  4 ) - 1;
+    unitSpriteH = ((imageH + 1) /  5 ) - 1;
     
-    int spriteIDs[ 4 ];
         
     int i;
     
-    for( i=0; i<4; i++ ) {
+    for( i=0; i<5; i++ ) {
         
         rgbaColor *subImage = 
             &( unitRGBA[ i * (unitSpriteH + 1) * unitSpriteW ] );
         
         applyCornerTransparency( subImage, unitSpriteW * unitSpriteH );
 
-        spriteIDs[i] = 
+        unitSpriteIDs[i] = 
             addSprite( subImage, unitSpriteW, unitSpriteH );
         }
     delete [] unitRGBA;
@@ -96,9 +99,9 @@ void initUnits() {
     gameUnit[ 5 ].mRegion = 1;
 
     for( i=0; i<3; i++ ) {
-        gameUnit[ i ].mSpriteID = spriteIDs[ i ];
-        gameUnit[ i + 3 ].mSpriteID = spriteIDs[ i ];
-
+        gameUnit[ i ].mSpriteID = unitSpriteIDs[ i ];
+        gameUnit[ i + 3 ].mSpriteID = unitSpriteIDs[ i ];
+        
         gameUnit[ i ].mTotalSalary = 0;
         gameUnit[ i + 3].mTotalSalary = 0;
         gameUnit[ i ].mLastSalaryPayment = 0;
@@ -121,7 +124,7 @@ void initUnits() {
     gameUnit[ 6 ].mRegion = (int)getRandom( numMapRegions - 2 ) + 2;
     // always starts in last region
     // gameUnit[ 6 ].mRegion = numMapRegions - 1;
-    gameUnit[ 6 ].mSpriteID = spriteIDs[ 3 ];
+    gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 3 ];
     
 
     // destinations -- nowhere
@@ -344,10 +347,19 @@ static void drawUnitSprite( int inUnit, intPair inPos ) {
     inPos.x -= unitSpriteW / 2;
     inPos.y -= unitSpriteH;
     
-    drawSprite( gameUnit[i].mSpriteID, 
+    
+    int animFrame = gameUnit[i].mAnimationFrameNumber;
+    if( activeUnit == i ) {
+        // talking on phone sprite
+        animFrame = 4;
+        }
+    
+
+    // disable flashing, try waving based on animation frame number
+    drawSprite( unitSpriteIDs[ animFrame ], 
                 inPos.x, 
                 inPos.y, 
-                c, gameUnit[i].mSelectable );    
+                c, false /*gameUnit[i].mSelectable*/ );    
     }
 
 
@@ -449,7 +461,9 @@ void drawUnits() {
         intPair pos = getUnitCurrentPosition( i );
         
         drawUnitSprite( i, pos );
-        if( activeUnit == i ) {
+
+        // disable halo for now
+        if( false && activeUnit == i ) {
             rgbaColor c;
             if( i < 3 ) {
                 c = playerColor;
@@ -944,6 +958,66 @@ void stepUnits() {
             }
         }
     
+    // step animations for selectable units
+    for( int i=0; i<numUnits; i++ ) {
+        if( gameUnit[i].mSelectable ) {
+            if( gameUnit[i].mStepsUntilNextFrame == 0 ) {
+                // next frame
+
+                if( gameUnit[i].mAnimationFrameNumber == 0 ) {
+                    // just starting a fresh wave
+
+                    // pick how many times to wave
+                    gameUnit[i].mWavesLeftBeforeBreak = getRandom( 4 ) + 3;
+                    }
+                
+                
+                gameUnit[i].mAnimationFrameNumber += 
+                    gameUnit[i].mAnimationDirection;
+                if( gameUnit[i].mAnimationDirection == 1 &&
+                    gameUnit[i].mAnimationFrameNumber == 3 ) {
+                    
+                    // reverse
+                    gameUnit[i].mAnimationDirection *= -1;
+                    }
+                else if( gameUnit[i].mAnimationDirection == -1 &&
+                    gameUnit[i].mAnimationFrameNumber == 1 ) {
+                    
+                    // reverse
+                    gameUnit[i].mAnimationDirection *= -1;
+
+                    // finished another wave
+                    gameUnit[i].mWavesLeftBeforeBreak--;
+                    }
+
+                gameUnit[i].mStepsUntilNextFrame = getRandom( 4 ) + 4;
+
+                if( gameUnit[i].mWavesLeftBeforeBreak == 0 ) {
+                    
+                    // take a break
+                    gameUnit[i].mAnimationFrameNumber = 0;
+                    gameUnit[i].mAnimationDirection = 1;
+                    
+                    // hold arm down for a randon while
+                        
+                    gameUnit[i].mStepsUntilNextFrame = 
+                        getRandom( 60 ) + 30;
+                    }
+                }
+            else {
+                // count down
+                gameUnit[i].mStepsUntilNextFrame -= 1;
+                }
+            }
+        else {
+            // stop waving
+            gameUnit[i].mAnimationFrameNumber = 0;
+            gameUnit[i].mAnimationDirection = 1;
+            gameUnit[i].mStepsUntilNextFrame = 0;
+            }
+        }
+    
+
     stepArrows();
     }
 
