@@ -14,6 +14,7 @@ testDirectColor.tga \
 test250Color.tga \
 units_simple.tga \
 units.tga \
+unit_waving.tga \
 activeUnitHalo.tga \
 diamond.tga \
 diamondBorder.tga \
