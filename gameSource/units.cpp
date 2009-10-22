@@ -49,14 +49,14 @@ static int bribedMarkerSprite;
 int unitSpriteW;
 int unitSpriteH;
 
-int unitSpriteIDs[5];
+int unitSpriteIDs[3];
 
 
 void initUnits() {
 
     int imageH;
     
-    rgbaColor *unitRGBA = readTGAFile( "unit_waving.tga",
+    rgbaColor *unitRGBA = readTGAFile( "playerUnits.tga",
                                        &unitSpriteW, &imageH );
     
     
@@ -68,18 +68,40 @@ void initUnits() {
 
 
     // 1 pixel row between each sprite image
-    unitSpriteH = ((imageH + 1) /  5 ) - 1;
+    unitSpriteH = ((imageH + 1) /  3 ) - 1;
     
         
     int i;
     
-    for( i=0; i<5; i++ ) {
+    for( i=0; i<3; i++ ) {
         
         rgbaColor *subImage = 
             &( unitRGBA[ i * (unitSpriteH + 1) * unitSpriteW ] );
         
         applyCornerTransparency( subImage, unitSpriteW * unitSpriteH );
 
+
+        // roll player color right into sprite, replacing gray areas
+
+        int numSubPixels = unitSpriteH * unitSpriteW;
+        
+        for( int p=0; p<numSubPixels; p++ ) {
+            if( subImage[ p ].r == 
+                subImage[ p ].g
+                &&
+                subImage[ p ].r == 
+                subImage[ p ].b ) {
+                // gray
+                
+                // modulate by player color (make gray a shade of player
+                // color)
+                subImage[p].r = (subImage[p].r * playerColor.r) / 255;
+                subImage[p].g = (subImage[p].g * playerColor.g) / 255;
+                subImage[p].b = (subImage[p].b * playerColor.b) / 255;
+                }
+            }
+        
+                
         unitSpriteIDs[i] = 
             addSprite( subImage, unitSpriteW, unitSpriteH );
         }
@@ -124,7 +146,8 @@ void initUnits() {
     gameUnit[ 6 ].mRegion = (int)getRandom( numMapRegions - 2 ) + 2;
     // always starts in last region
     // gameUnit[ 6 ].mRegion = numMapRegions - 1;
-    gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 3 ];
+    //gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 3 ];
+    gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 2 ];
     
 
     // destinations -- nowhere
@@ -342,21 +365,28 @@ static void drawUnitSprite( int inUnit, intPair inPos ) {
         c = white;
         }
     
+    // ignore color for now
+    c = white;
+    
         
     // center
     inPos.x -= unitSpriteW / 2;
     inPos.y -= unitSpriteH;
     
     
+    /*
+      // used for waving animation
+
     int animFrame = gameUnit[i].mAnimationFrameNumber;
     if( activeUnit == i ) {
         // talking on phone sprite
         animFrame = 4;
         }
-    
+    */
 
     // disable flashing, try waving based on animation frame number
-    drawSprite( unitSpriteIDs[ animFrame ], 
+    //drawSprite( unitSpriteIDs[ animFrame ], 
+    drawSprite( gameUnit[i].mSpriteID, 
                 inPos.x, 
                 inPos.y, 
                 c, false /*gameUnit[i].mSelectable*/ );    
