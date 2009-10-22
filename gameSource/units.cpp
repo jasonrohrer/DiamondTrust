@@ -774,13 +774,13 @@ intPair getUnitBidPosition( int inUnit ) {
     intPair end = 
         getDiamondPositionInRegion( gameUnit[inUnit].mDest );
 
-    end.y -= ( 6 + bidH / 2 );
+    end.y -= ( 8 + bidH / 2 );
     
     if( inUnit < 3 ) {
-        end.x -= 10;
+        end.x -= 13;
         }
     else {
-        end.x += 10;
+        end.x += 13;
         }        
 
     return end;
@@ -795,12 +795,12 @@ intPair getUnitInspectorBribePosition( int inUnit ) {
 
     
     if( inUnit < 3 ) {
-        end.x -= (10 + 5);
+        end.x -= (14 + 5);
         }
     else {
-        end.x += (10 + 5);
+        end.x += (14 + 5);
         }
-    end.y -= 6;
+    end.y -= 7;
     
     
     return end;
@@ -813,8 +813,8 @@ intPair getUnitSalaryPosition( int inUnit ) {
     intPair end = 
         getUnitPositionInRegion( gameUnit[inUnit].mRegion, inUnit );
 
-    end.x += (10 + 5);
-    end.y -= 6;
+    end.x += (14 + 5);
+    end.y -= 7;
     return end;
     }
 

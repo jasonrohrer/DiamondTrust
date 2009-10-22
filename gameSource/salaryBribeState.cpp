@@ -422,7 +422,7 @@ void SalaryBribeState::drawState() {
         intPair bidPos = getUnitSalaryPosition( activeUnit );
         
 
-        drawBidPicker( bidPos.x + 18, bidPos.y );
+        drawBidPicker( bidPos.x + 22, bidPos.y );
         }
 
     if( pickingBribe ) {
@@ -436,7 +436,7 @@ void SalaryBribeState::drawState() {
 
         intPair bribePos = getUnitBribePosition( activeUnit );
         
-        drawBidPicker( bribePos.x + 18, bribePos.y );
+        drawBidPicker( bribePos.x + 22, bribePos.y );
         }
     
     }

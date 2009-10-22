@@ -15,9 +15,11 @@ rgbaColor playerColor = { 0, 255, 0, 255 };
 rgbaColor enemyColor = { 255, 0, 0, 255 };
 rgbaColor inspectorColor = { 84, 84, 255, 255 };
 
-rgbaColor playerRegionColor = { 77, 255, 77, 255 };
+//rgbaColor playerRegionColor = { 77, 255, 77, 255 };
+rgbaColor playerRegionColor = { 126, 238, 126, 255 };
 
-rgbaColor enemyRegionColor = { 255, 77, 77, 255 };
+//rgbaColor enemyRegionColor = { 255, 77, 77, 255 };
+rgbaColor enemyRegionColor = { 254, 142, 142, 255 };
 
 rgbaColor inspectorPanelColor = { 84, 84, 255, 255 };
 
