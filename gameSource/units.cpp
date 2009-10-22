@@ -462,8 +462,7 @@ void drawUnits() {
         
         drawUnitSprite( i, pos );
 
-        // disable halo for now
-        if( false && activeUnit == i ) {
+        if( activeUnit == i ) {
             rgbaColor c;
             if( i < 3 ) {
                 c = playerColor;
