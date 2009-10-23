@@ -119,7 +119,7 @@ void gameInit() {
     setMonthsLeft( 8 );
     
 
-    currentGameState = moveUnitsState;//connectState;
+    currentGameState = connectState;
     currentGameState->enterState();
     }
 

@@ -49,13 +49,13 @@ static int bribedMarkerSprite;
 int unitSpriteW;
 int unitSpriteH;
 
-int unitSpriteIDs[6];
+int unitSpriteIDs[7];
 
 
 int armSpriteW;
 int armSpriteH;
 
-int unitArmSpriteIDs[6][5];
+int unitArmSpriteIDs[7][5];
 
 
 void initUnits() {
@@ -85,6 +85,20 @@ void initUnits() {
 
     // 1 pixel row between each sprite image
     unitSpriteH = ((imageH + 1) /  3 ) - 1;
+
+
+    int inspectorSpriteW, inspectorSpriteH;
+    
+    rgbaColor *inspectorUnitRGBA = readTGAFile( "inspectorUnit.tga",
+                                                &inspectorSpriteW, 
+                                                &inspectorSpriteH );
+    
+    
+    if( inspectorUnitRGBA == NULL ) {
+        printOut( "Reading inspector unit sprite file failed.\n" );
+        return;
+        }
+
 
 
 
@@ -195,16 +209,28 @@ void initUnits() {
     
 
         
-    for( i=0; i<6; i++ ) {
+    for( i=0; i<7; i++ ) {
         
         rgbaColor *rgbaSource = playerUnitRGBA;
         if( i > 2 ) {
             rgbaSource = enemyUnitRGBA;
             }
+        if( i > 5 ) {
+            rgbaSource = inspectorUnitRGBA;
+            }
         
+        
+        
+        rgbaColor *subImage;
 
-        rgbaColor *subImage = 
-            &( rgbaSource[ ( i % 3 ) * (unitSpriteH + 1) * unitSpriteW ] );
+        if( i<6 ) {
+            subImage = 
+                &( rgbaSource[ ( i % 3 ) * (unitSpriteH + 1) * unitSpriteW ] );
+            }
+        else {
+            // only one frame in inspector image
+            subImage = inspectorUnitRGBA;
+            }
         
         applyCornerTransparency( subImage, unitSpriteW * unitSpriteH );
 
@@ -215,6 +241,10 @@ void initUnits() {
         if( i > 2 ) {
             subColor = enemyColor;
             }
+        if( i > 5 ) {
+            subColor = inspectorColor;
+            }
+        
         
 
         int numSubPixels = unitSpriteH * unitSpriteW;
@@ -322,12 +352,14 @@ void initUnits() {
     // inspector 
     // start in random producing region
     gameUnit[ 6 ].mRegion = (int)getRandom( numMapRegions - 2 ) + 2;
-    // always starts in last region
-    // gameUnit[ 6 ].mRegion = numMapRegions - 1;
-    //gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 3 ];
-    gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 2 ];
     
-    // no arm sprites for inspector
+    gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 6 ];
+    
+
+    // inspector has arms too, though only cell phone one is used
+    for( int a=0; a<5; a++ ) {
+        gameUnit[ 6 ].mArmSpriteID[a] = unitArmSpriteIDs[6][a];
+        }
 
 
 

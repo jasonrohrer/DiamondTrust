@@ -17,6 +17,7 @@ units.tga \
 unit_waving.tga \
 playerUnits.tga \
 enemyUnits.tga \
+inspectorUnit.tga \
 unit_arm_map.tga \
 unit_arm_sourceMap.tga \
 unit_noArm_mask.tga \
