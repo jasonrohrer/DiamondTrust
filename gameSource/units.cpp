@@ -1082,7 +1082,7 @@ intPair getUnitInspectorBribePosition( int inUnit ) {
         end.x -= (14 + 5);
         }
     else {
-        end.x += (14 + 5);
+        end.x += (14 + 4);
         }
     end.y -= 7;
     
