@@ -108,6 +108,7 @@ class Unit {
         int mDest;
         char mSelectable;
         int mSpriteID;
+        int mArmSpriteID[5];
         int mDotSpriteID;
         int mBid;
         int mInspectorBribe;

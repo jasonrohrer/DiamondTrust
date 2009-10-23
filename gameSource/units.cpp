@@ -49,43 +49,178 @@ static int bribedMarkerSprite;
 int unitSpriteW;
 int unitSpriteH;
 
-int unitSpriteIDs[3];
+int unitSpriteIDs[6];
+
+
+int armSpriteW;
+int armSpriteH;
+
+int unitArmSpriteIDs[6][5];
 
 
 void initUnits() {
-
+    int i;
+    
     int imageH;
     
-    rgbaColor *unitRGBA = readTGAFile( "playerUnits.tga",
-                                       &unitSpriteW, &imageH );
+    rgbaColor *playerUnitRGBA = readTGAFile( "playerUnits.tga",
+                                             &unitSpriteW, &imageH );
     
     
-    if( unitRGBA == NULL ) {
-        printOut( "Reading unit sprite file failed.\n" );
+    if( playerUnitRGBA == NULL ) {
+        printOut( "Reading player unit sprite file failed.\n" );
         return;
         }
+
+
+    rgbaColor *enemyUnitRGBA = readTGAFile( "enemyUnits.tga",
+                                             &unitSpriteW, &imageH );
     
+    
+    if( enemyUnitRGBA == NULL ) {
+        printOut( "Reading enemy unit sprite file failed.\n" );
+        return;
+        }
 
 
     // 1 pixel row between each sprite image
     unitSpriteH = ((imageH + 1) /  3 ) - 1;
+
+
+
+    int maskW, maskH;
+    rgbaColor *unitMaskRGBA = readTGAFile( "unit_noArm_mask.tga",
+                                           &maskW, &maskH );
     
+    if( unitMaskRGBA == NULL || 
+        maskW != unitSpriteW || maskH != unitSpriteH ) {
         
-    int i;
+        printOut( "Reading unit sprite mask file failed.\n" );
+        return;
+        }
+
+
+    int armImageH;
     
-    for( i=0; i<3; i++ ) {
+    rgbaColor *armMapRGBA = readTGAFile( "unit_arm_map.tga",
+                                         &armSpriteW, &armImageH );
+    
+    if( armMapRGBA == NULL ) {
+        printOut( "Reading arm map sprite file failed.\n" );
+        return;
+        }
+
+    // 1 pixel row between each sprite image
+    armSpriteH = ((armImageH + 1) / 5) - 1;
+
+    int numArmSpritePixels = armSpriteW * armSpriteH;
+    
+    
+    int sourceMapImageW, sourceMapImageH;
+    
+    rgbaColor *armSourceMapRGBA = readTGAFile( "unit_arm_sourceMap.tga",
+                                               &sourceMapImageW,
+                                               &sourceMapImageH );
+    
+    if( armSourceMapRGBA == NULL || 
+        sourceMapImageW != unitSpriteW || sourceMapImageH != unitSpriteH ) {
+
+        printOut( "Reading arm source map sprite file failed.\n" );
+        return;
+        }
+
+    
+
+
+    // decode arm map once into coordinates
+    // source index plus 5 dest indices, one for each arm position
+    // source index maps into source map, dest index map into full
+    // arm sprite image (which contains 5 arm position images)
+    // Each arm has 6 pixels in it that need to be mapped
+    int sourceIndex[6];
+    int destIndex[5][6];
+
+    int numSourcePixels = sourceMapImageH * sourceMapImageW;
+    for( i=0; i<6; i++ ) {
+
+        // colors "listed" in first 6 pixels of image
+        rgbaColor mapColor = armSourceMapRGBA[ i ];
         
+
+        // search rest of map for it
+        char found = false;
+        for( int j=i+1; j<numSourcePixels &&!found; j++ ) {
+            if( equals( armSourceMapRGBA[j], mapColor ) ) {
+                found = true;
+                
+                sourceIndex[i] = j;
+                }
+            }
+    
+        if( !found ) {
+            printOut( "Failed to map color %d in arm map\n", i );
+            return;
+            }
+        
+        // now find it in destination sub images
+        for( int s=0; s<5; s++ ) {
+
+            int indexOffset = s * (armSpriteH + 1) * armSpriteW;
+            
+            rgbaColor *subImage = 
+                &( armMapRGBA[ indexOffset ] );
+
+
+            applyCornerTransparency( subImage, armSpriteW * armSpriteH );
+
+            
+            found = false;
+            for( int j=0; j<numArmSpritePixels &&!found; j++ ) {
+                if( equals( subImage[j], mapColor ) ) {
+                    found = true;
+                
+                    // map into full arm image
+                    destIndex[s][i] = j + indexOffset;
+                    }
+                }
+
+            // flag not found
+            if( !found ) { 
+                destIndex[s][i] = -1;
+                }
+            
+            }
+        
+        }
+    
+
+        
+    for( i=0; i<6; i++ ) {
+        
+        rgbaColor *rgbaSource = playerUnitRGBA;
+        if( i > 2 ) {
+            rgbaSource = enemyUnitRGBA;
+            }
+        
+
         rgbaColor *subImage = 
-            &( unitRGBA[ i * (unitSpriteH + 1) * unitSpriteW ] );
+            &( rgbaSource[ ( i % 3 ) * (unitSpriteH + 1) * unitSpriteW ] );
         
         applyCornerTransparency( subImage, unitSpriteW * unitSpriteH );
 
 
         // roll player color right into sprite, replacing gray areas
+        
+        rgbaColor subColor = playerColor;
+        if( i > 2 ) {
+            subColor = enemyColor;
+            }
+        
 
         int numSubPixels = unitSpriteH * unitSpriteW;
         
-        for( int p=0; p<numSubPixels; p++ ) {
+        int p;
+        for( p=0; p<numSubPixels; p++ ) {
             if( subImage[ p ].r == 
                 subImage[ p ].g
                 &&
@@ -95,17 +230,64 @@ void initUnits() {
                 
                 // modulate by player color (make gray a shade of player
                 // color)
-                subImage[p].r = (subImage[p].r * playerColor.r) / 255;
-                subImage[p].g = (subImage[p].g * playerColor.g) / 255;
-                subImage[p].b = (subImage[p].b * playerColor.b) / 255;
+                subImage[p].r = (subImage[p].r * subColor.r) / 255;
+                subImage[p].g = (subImage[p].g * subColor.g) / 255;
+                subImage[p].b = (subImage[p].b * subColor.b) / 255;
                 }
             }
         
                 
+
+
+        // construct arm sprites using map
+
+        rgbaColor *armMapWorking = new rgbaColor[ armImageH * armSpriteW ];
+        memcpy( armMapWorking, armMapRGBA, 
+                armImageH * armSpriteW * sizeof( rgbaColor ) );
+        
+        // 6 source pixels
+        for( int s=0; s<6; s++ ) {
+            rgbaColor spritePixelColor = subImage[ sourceIndex[s] ];
+        
+            // place color into 5 destination arm images
+            for( int d=0; d<5; d++ ) {
+                if( destIndex[d][s] >= 0 ) {
+                    armMapWorking[ destIndex[d][s] ] = spritePixelColor;
+                    }
+                // else no mapping for this pixel
+                }    
+            }
+        
+        // our arm sprites are ready to be split and added
+        
+        for( int a=0; a<5; a++ ) {
+            rgbaColor * armSubImage = 
+                &( armMapWorking[ a * (armSpriteH + 1) * armSpriteW ] );
+
+            unitArmSpriteIDs[i][a] = 
+                addSprite( armSubImage, armSpriteW, armSpriteH );
+            }
+        delete [] armMapWorking;
+
+
+        // now clear out an area of unit sprite that will be replaced by
+        // arm sprite
+
+        for( p=0; p<numSubPixels; p++ ) {
+            if( unitMaskRGBA[p].r == 0 ) {
+                subImage[p].a = 0;
+                }
+            }
+        
+
         unitSpriteIDs[i] = 
             addSprite( subImage, unitSpriteW, unitSpriteH );
         }
-    delete [] unitRGBA;
+
+    delete [] playerUnitRGBA;
+    delete [] enemyUnitRGBA;
+    delete [] armMapRGBA;
+    delete [] armSourceMapRGBA;
     
 
     // all player units start at home
@@ -120,25 +302,21 @@ void initUnits() {
     gameUnit[ 4 ].mRegion = 1;
     gameUnit[ 5 ].mRegion = 1;
 
-    for( i=0; i<3; i++ ) {
+    for( i=0; i<6; i++ ) {
         gameUnit[ i ].mSpriteID = unitSpriteIDs[ i ];
-        gameUnit[ i + 3 ].mSpriteID = unitSpriteIDs[ i ];
         
-        gameUnit[ i ].mTotalSalary = 0;
-        gameUnit[ i + 3].mTotalSalary = 0;
-        gameUnit[ i ].mLastSalaryPayment = 0;
-        gameUnit[ i + 3].mLastSalaryPayment = 0;
+        for( int a=0; a<5; a++ ) {
+            gameUnit[ i ].mArmSpriteID[a] = unitArmSpriteIDs[i][a];
+            }
 
+        gameUnit[ i ].mTotalSalary = 0;
+        gameUnit[ i ].mLastSalaryPayment = 0;
 
         gameUnit[ i ].mTotalBribe = 0;
-        gameUnit[ i + 3].mTotalBribe = 0;
         gameUnit[ i ].mLastBribePayment = 0;
-        gameUnit[ i + 3].mLastBribePayment = 0;
         gameUnit[ i ].mLastBribingUnit = -1;
-        gameUnit[ i + 3].mLastBribingUnit = -1;
 
         gameUnit[ i ].mEnemyContactSinceBribeHidden = false;
-        gameUnit[ i + 3].mEnemyContactSinceBribeHidden = false;
         }
     
     // inspector 
@@ -149,6 +327,10 @@ void initUnits() {
     //gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 3 ];
     gameUnit[ 6 ].mSpriteID = unitSpriteIDs[ 2 ];
     
+    // no arm sprites for inspector
+
+
+
 
     // destinations -- nowhere
     // bids -- none
@@ -370,8 +552,9 @@ static void drawUnitSprite( int inUnit, intPair inPos ) {
     
         
     // center
-    inPos.x -= unitSpriteW / 2;
-    inPos.y -= unitSpriteH;
+    intPair drawPos = inPos;
+    drawPos.x -= unitSpriteW / 2;
+    drawPos.y -= unitSpriteH;
     
     
     /*
@@ -387,9 +570,32 @@ static void drawUnitSprite( int inUnit, intPair inPos ) {
     // disable flashing, try waving based on animation frame number
     //drawSprite( unitSpriteIDs[ animFrame ], 
     drawSprite( gameUnit[i].mSpriteID, 
-                inPos.x, 
-                inPos.y, 
-                c, false /*gameUnit[i].mSelectable*/ );    
+                drawPos.x, 
+                drawPos.y, 
+                c, false /*gameUnit[i].mSelectable*/ );
+
+
+    intPair armSpritePos = inPos;
+    armSpritePos.x -= armSpriteW / 2 + 2;
+    armSpritePos.y -= armSpriteH + 3; 
+
+    int armToDraw;
+    
+    if( i == activeUnit ) {
+        // cell phone arm
+        armToDraw = 4;
+        }
+    else {
+        armToDraw = gameUnit[i].mAnimationFrameNumber;
+        }
+    
+    
+    drawSprite( gameUnit[i].mArmSpriteID[ armToDraw ], 
+                armSpritePos.x, 
+                armSpritePos.y, 
+                c, false );
+    
+    
     }
 
 

@@ -16,6 +16,10 @@ units_simple.tga \
 units.tga \
 unit_waving.tga \
 playerUnits.tga \
+enemyUnits.tga \
+unit_arm_map.tga \
+unit_arm_sourceMap.tga \
+unit_noArm_mask.tga \
 activeUnitHalo.tga \
 diamond.tga \
 diamondBorder.tga \
