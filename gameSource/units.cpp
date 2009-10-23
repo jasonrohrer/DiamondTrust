@@ -747,7 +747,10 @@ void drawUnits() {
             // center
             pos.x -= unitSpriteW / 2;
             pos.y -= unitSpriteH;
-
+            
+            // tweak a bit
+            pos.y += 2;
+            
             drawSprite( activeUnitSprite, 
                         pos.x, 
                         pos.y, 
@@ -1094,8 +1097,8 @@ intPair getUnitSalaryPosition( int inUnit ) {
     intPair end = 
         getUnitPositionInRegion( gameUnit[inUnit].mRegion, inUnit );
 
-    end.x += (14 + 5);
-    end.y -= 7;
+    end.x += (14 + 4);
+    end.y -= 9;
     return end;
     }
 
