@@ -36,6 +36,7 @@ vault.tga \
 salePicker.tga \
 map_names.tga \
 paper.tga \
+jet_rotated.tga \
 
 
 

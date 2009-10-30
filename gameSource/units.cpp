@@ -58,6 +58,13 @@ int armSpriteH;
 int unitArmSpriteIDs[7][5];
 
 
+int jetSpriteH;
+int jetSpriteW;
+
+int jetSpriteIDs[8];
+
+
+
 void initUnits() {
     int i;
     
@@ -319,6 +326,35 @@ void initUnits() {
     delete [] armMapRGBA;
     delete [] armSourceMapRGBA;
     
+
+    rgbaColor *jetRGBA = readTGAFile( "jet_rotated.tga",
+                                      &jetSpriteW, &imageH );
+    
+    
+    if( jetRGBA == NULL ) {
+        printOut( "Reading jet sprite file failed.\n" );
+        return;
+        }
+
+
+    // 1 pixel row between each sprite image
+    jetSpriteH = ((imageH + 1) /  8 ) - 1;
+
+    for( int r=0; r<8; r++ ) {
+        rgbaColor * jetSubImage = 
+                &( jetRGBA[ r * (jetSpriteH + 1) * jetSpriteW ] );
+
+        applyCornerTransparency( jetSubImage, jetSpriteW * jetSpriteH );
+
+        jetSpriteIDs[r] = 
+            addSprite( jetSubImage, jetSpriteW, jetSpriteH );
+        }
+    delete [] jetRGBA;
+    
+    
+
+
+
 
     // all player units start at home
 
@@ -727,10 +763,38 @@ void drawUnits() {
     
     for( int i=0; i<numUnits; i++ ) {
         intPair pos = getUnitCurrentPosition( i );
-        
-        drawUnitSprite( i, pos );
 
-        if( activeUnit == i ) {
+        if( ! gameUnit[i].mFlying ) {
+            
+            drawUnitSprite( i, pos );
+        
+            if( activeUnit == i ) {
+                rgbaColor c;
+                if( i < 3 ) {
+                    c = playerColor;
+                    }
+                else if( i<6 ) {
+                    c = enemyColor;
+                    }
+                else {
+                    c = inspectorColor;
+                    }            
+                
+                // center
+                pos.x -= unitSpriteW / 2;
+                pos.y -= unitSpriteH;
+                
+                // tweak a bit
+                pos.y += 2;
+                
+                drawSprite( activeUnitSprite, 
+                            pos.x, 
+                            pos.y, 
+                            c, gameUnit[i].mSelectable );
+                }
+            }
+        else {
+            // draw plane instead
             rgbaColor c;
             if( i < 3 ) {
                 c = playerColor;
@@ -739,23 +803,23 @@ void drawUnits() {
                 c = enemyColor;
                 }
             else {
-                // this is the only sprite that doesn't contain
-                // inspector color already
                 c = inspectorColor;
                 }            
-
-            // center
-            pos.x -= unitSpriteW / 2;
-            pos.y -= unitSpriteH;
             
+            // center
+            pos.x -= jetSpriteW / 2;
+            pos.y -= jetSpriteH / 2;
+                
             // tweak a bit
             pos.y += 2;
             
-            drawSprite( activeUnitSprite, 
+            drawSprite( jetSpriteIDs[ gameUnit[i].mPlaneSpriteIndex ], 
                         pos.x, 
                         pos.y, 
-                        c, gameUnit[i].mSelectable );
+                        c, false );
             }
+        
+        
 
         }
 
@@ -1207,13 +1271,82 @@ void stepUnits() {
         for( int i=0; i<numUnits && !foundNext; i++ ) {
             if( gameUnit[i].mExecutionStep < gameUnit[i].mNumExecutionSteps ) {
                 foundNext = true;
-                gameUnit[i].mExecutionStep++;
+                gameUnit[i].mFlying = true;
 
+                if( gameUnit[i].mExecutionStep == 0 ) {
+                    // just starting
+                    // compute which plane sprite to use
+                    
+                    // maps a 4-bit binary number, describing x,y motion vector
+                    // attributes with its bits, to a sprite index
+                    int binaryToSpriteIndexMap[16] = 
+                        { -1,  2,  0,  6, 0, 1, -1, 7, 
+                          -1, -1, -1, -1, 4, 3, -1, 5 };
+                    
+                    // compose a 4-bit binary number using attributes
+                    // from normalized motion vector
+                    // bits are:  abcd = [x-sign][x][y-sign][y]
+
+                    intPair start = 
+                        getUnitPositionInRegion( gameUnit[i].mRegion, i );
+                    intPair end = 
+                        getUnitPositionInRegion( gameUnit[i].mDest, i );
+                    
+                    intPair delta = subtract( end, start );
+                    
+                    int bitA = ( delta.x < 0 );
+                    int bitC = ( delta.y < 0 );
+                    int bitB = 0;
+                    int bitD = 0;
+                    
+                    int absX = intAbs( delta.x );
+                    int absY = intAbs( delta.y );
+                    
+
+                    if( absX > absY ) {
+                        bitB = 1;
+
+                        if( absX > absY * 2 ) {
+                            bitD = 0;
+                            bitC = 0;
+                            }
+                        else {
+                            bitD = 1;
+                            }
+                        }
+                    else {
+                        bitD = 1;
+                        
+                        if( absY > absX * 2 ) {
+                            bitB = 0;
+                            bitA = 0;
+                            }
+                        else {
+                            bitB = 1;
+                            }
+                        }
+                    
+                    int fourBitIndex = 
+                        bitA << 3 | bitB << 2 | bitC << 1 | bitD;
+                    
+                    //printOut( "fourBitIndex = %d\n", fourBitIndex );
+                    
+                    gameUnit[i].mPlaneSpriteIndex = 
+                        binaryToSpriteIndexMap[ fourBitIndex ];
+
+                    //printOut( "plane sprite = %d\n", 
+                    //          gameUnit[i].mPlaneSpriteIndex );
+                    }
+                
+
+                gameUnit[i].mExecutionStep++;
+                
                 if( gameUnit[i].mExecutionStep == 
                     gameUnit[i].mNumExecutionSteps ) {
                     
                     // unit done moving, clear destination
                     gameUnit[i].mRegion = gameUnit[i].mDest;
+                    gameUnit[i].mFlying = false;
                     }
                 
                 }

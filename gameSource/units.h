@@ -125,7 +125,9 @@ class Unit {
         char mEnemyContactSinceBribeHidden;
         
         int mLastBribingUnit;
-
+        
+        char mFlying;
+        int mPlaneSpriteIndex;
         int mExecutionStep;
         int mNumExecutionSteps;
 

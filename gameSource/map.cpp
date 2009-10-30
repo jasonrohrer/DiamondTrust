@@ -508,7 +508,7 @@ void initMap() {
     mapRegionDiamondRate[ 7 ] = 1;
 
     for( i=0; i<numMapRegions; i++ ) {
-        mapRegionDiamondCount[i] = 44;
+        mapRegionDiamondCount[i] = 0;
 
         mapRegionDiamondAccumulating[i] = false;
         }
