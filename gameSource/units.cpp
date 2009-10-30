@@ -813,10 +813,36 @@ void drawUnits() {
             // tweak a bit
             pos.y += 2;
             
+
+            // fade in and out at begining and end
+            int step = gameUnit[i].mExecutionStep;
+            int numSteps = gameUnit[i].mNumExecutionSteps;
+            
+            if( step < 8 ) {
+                int alpha = step * 32;
+                if( alpha > 255 ) {
+                    alpha = 255;
+                    }
+                c.a = alpha;
+                }
+            else if( step > numSteps - 8 ) {
+                int alpha = (numSteps - step) * 32;
+                if( alpha > 255 ) {
+                    alpha = 255;
+                    }
+                c.a = alpha;
+                }
+            
+
             drawSprite( jetSpriteIDs[ gameUnit[i].mPlaneSpriteIndex ], 
                         pos.x, 
                         pos.y, 
                         c, false );
+
+            // FIXME:  show unit fading out in start region and
+            // fading back in in end region as plane fades in/out
+            //if( c.a < 255 ) {
+                
             }
         
         
