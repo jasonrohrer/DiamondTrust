@@ -25,4 +25,5 @@ rgbaColor inspectorPanelColor = { 84, 84, 255, 255 };
 
 
 
-rgbaColor diamondPurple = { 128, 0, 192, 255 };
+// rgbaColor diamondPurple = { 128, 0, 192, 255 };
+rgbaColor diamondPurple = {0, 0, 0, 255 };

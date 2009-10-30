@@ -200,7 +200,7 @@ static void drawDiamondCounter( int inX, int inY, int inCount ) {
     
     font16->drawString( countString, 
                         inX, 
-                        inY - 8,
+                        inY - 7,
                         diamondPurple, 
                         alignCenter );
 
