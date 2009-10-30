@@ -54,13 +54,15 @@ void AccumulateDiamondsState::clickState( int inX, int inY ) {
 
 
 static int stepsSinceDiamondTick = 0;
-static int minDiamondSteps = 30;
+static int minDiamondSteps = 32;
 
 
 void AccumulateDiamondsState::stepState() {
 
     stepsSinceDiamondTick++;
         
+    stepDiamondBorderFade();
+
     if( stepsSinceDiamondTick > minDiamondSteps ) {
         stepsSinceDiamondTick = 0;
         char done =  accumulateDiamondsStep();

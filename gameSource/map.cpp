@@ -508,7 +508,7 @@ void initMap() {
     mapRegionDiamondRate[ 7 ] = 1;
 
     for( i=0; i<numMapRegions; i++ ) {
-        mapRegionDiamondCount[i] = 0;
+        mapRegionDiamondCount[i] = 44;
 
         mapRegionDiamondAccumulating[i] = false;
         }
@@ -523,6 +523,9 @@ void freeMap() {
 
 
 extern Font *font16;
+
+
+unsigned char diamondBorderAlpha = 255;
 
 
 void drawMap() {
@@ -595,10 +598,13 @@ void drawMap() {
                     mapRegionDiamondPosition[i].y - diamondSpriteH/2, 
                     white );
         if( mapRegionDiamondAccumulating[i] ) {
+            rgbaColor borderColor = white;
+            borderColor.a = diamondBorderAlpha;
+            
             drawSprite( diamondBorderSpriteID, 
                         mapRegionDiamondPosition[i].x - diamondSpriteW/2, 
                         mapRegionDiamondPosition[i].y - diamondSpriteH/2, 
-                        white );
+                        borderColor );
             }        
         }
 
@@ -721,6 +727,18 @@ void accumulateDiamondsStart() {
     }
 
 
+void stepDiamondBorderFade() {
+    unsigned char stepSize = 8;
+    
+    if( diamondBorderAlpha > stepSize ) {
+        diamondBorderAlpha -= stepSize;
+        }
+    else {
+        diamondBorderAlpha = 0;
+        }
+    }
+
+
 char accumulateDiamondsStep() {
     int i;
     
@@ -734,6 +752,9 @@ char accumulateDiamondsStep() {
             mapRegionDiamondAccumulating[i-1] = false;
             
             mapRegionDiamondAccumulating[i] = true;
+
+            diamondBorderAlpha = 255;
+            
             // not done
             return false;
             }

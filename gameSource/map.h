@@ -34,6 +34,8 @@ void accumulateDiamondsStart();
 // returns true when done
 char accumulateDiamondsStep();
 
+void stepDiamondBorderFade();
+
 
 int getDiamondsInRegion( int inRegion );
 void decrementDiamonds( int inRegion );
