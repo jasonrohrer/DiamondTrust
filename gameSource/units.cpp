@@ -600,7 +600,7 @@ static char isBribeStatusVisible( int inUnit ) {
 
 
 
-static void drawUnitSprite( int inUnit, intPair inPos ) {
+static void drawUnitSprite( int inUnit, intPair inPos, int inAlpha = 255 ) {
     int i = inUnit;
     
     rgbaColor c;
@@ -617,6 +617,7 @@ static void drawUnitSprite( int inUnit, intPair inPos ) {
     
     // ignore color for now
     c = white;
+    c.a = inAlpha;
     
         
     // center
@@ -839,9 +840,27 @@ void drawUnits() {
                         pos.y, 
                         c, false );
 
-            // FIXME:  show unit fading out in start region and
+            // show unit fading out in start region and
             // fading back in in end region as plane fades in/out
-            //if( c.a < 255 ) {
+            if( c.a < 255 ) {
+
+                // invert
+                int alpha = 255 - c.a;
+
+                intPair anchorPos;
+                
+                if( step < 8 ) {
+                    anchorPos = 
+                        getUnitPositionInRegion( gameUnit[i].mRegion, i );
+                    }
+                else {    
+                    anchorPos = 
+                        getUnitPositionInRegion( gameUnit[i].mDest, i );
+                    }
+                
+                drawUnitSprite( i, anchorPos, alpha );                
+                }
+            
                 
             }
         
