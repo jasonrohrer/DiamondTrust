@@ -54,6 +54,30 @@ unsigned long intSqrt( unsigned long inX ) {
     }
 
 
+// integer arctan2 found here:
+// http://cboard.cprogramming.com/c-programming/110593-trig-functions-without-math-h.html#post820808
+int intArctan2( int inX, int inY ) {
+   int angle;
+   int absY = intAbs( inY );
+
+   if( inX >= 0 ) {
+       angle = ( 45 - ( 45 * ( inX - absY ) / ( inX + absY ) ) );
+       }
+   else {
+       angle = ( 135 - ( 45 * ( inX + absY ) / ( absY - inX ) ) );
+       }
+   
+
+   if( inY < 0 ) {
+       // negate if in quad III or IV
+       return 360 - angle;     
+       }
+   else {
+       return angle;
+       }
+    }
+
+
 
 int intDistance( intPair inA, intPair inB ) {
     int dx = inA.x - inB.x;

@@ -14,6 +14,12 @@ typedef struct intPair {
 
 unsigned long intSqrt( unsigned long inX );
 
+// computes angle in degrees [0,360] for a vector from (0,0) to (x,y)
+// rough integer approximation (off by at most 6 degrees for x or y values in
+// range [-256,256]
+int intArctan2( int inX, int inY );
+
+
 int intDistance( intPair inA, intPair inB );
 
 int intAbs( int inX );
