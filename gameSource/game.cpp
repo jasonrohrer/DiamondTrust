@@ -119,8 +119,8 @@ void gameInit() {
     setMonthsLeft( 8 );
     
 
-    currentGameState = connectState;
-    //currentGameState = accumulateDiamondsState;
+    //currentGameState = connectState;
+    currentGameState = accumulateDiamondsState;
     currentGameState->enterState();
     }
 

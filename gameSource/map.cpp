@@ -581,6 +581,7 @@ void drawMap() {
     drawSprite( mapNamesTopSpriteID, 0, 0, nameColor );
     drawSprite( mapNamesBottomSpriteID, 0, bottomHalfOffset, nameColor );
 
+    startNewSpriteLayer();
 
 
     // next vaults (only in home regions
