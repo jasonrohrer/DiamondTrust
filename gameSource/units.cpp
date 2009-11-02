@@ -843,6 +843,8 @@ void drawUnits() {
                         pos.y, 
                         c, false );
 
+            startNewSpriteLayer();
+
             // show unit fading out in start region and
             // fading back in in end region as plane fades in/out
             if( c.a < 255 ) {
