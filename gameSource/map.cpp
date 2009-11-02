@@ -119,16 +119,21 @@ void initMap() {
     unsigned int unitMarkerColorInt = toInt( unitMarkerColor );
     // clear it
     mapRGBA[ numMapRegions + 1 ] = backgroundColor;
+    mapPixelInts[ numMapRegions + 1 ] = backgroundColorInt;
+
 
     rgbaColor diamondMarkerColor = mapRGBA[ numMapRegions + 2 ];
     unsigned int diamondMarkerColorInt = toInt( diamondMarkerColor );
     // clear it
     mapRGBA[ numMapRegions + 2 ] = backgroundColor;
+    mapPixelInts[ numMapRegions + 2 ] = backgroundColorInt;
+
 
     rgbaColor vaultMarkerColor = mapRGBA[ numMapRegions + 3 ];
     unsigned int vaultMarkerColorInt = toInt( vaultMarkerColor );
     // clear it
     mapRGBA[ numMapRegions + 3 ] = backgroundColor;
+    mapPixelInts[ numMapRegions + 3 ] = backgroundColorInt;
 
 
     int i;
