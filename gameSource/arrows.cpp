@@ -41,7 +41,7 @@ void initArrows() {
     }
 
 
-void swap( int *inA, int *inB ) {
+static void swap( int *inA, int *inB ) {
     int temp = *inA;
     *inA = *inB;
     *inB = temp;
@@ -50,9 +50,11 @@ void swap( int *inA, int *inB ) {
 
 // Bresenham's integer line algorithm
 // found in wikipedia
-void drawLine( rgbaColor *inImage, int inImageW, int inImageH,
-               intPair inStart, intPair inEnd,
-               rgbaColor inLineColor ) {
+static void drawLine( rgbaColor *inImage, int inImageW, int inImageH,
+                      intPair inStart, intPair inEnd,
+                      rgbaColor inLineColor ) {
+    // suppress warnings
+    int h = inImageH;
     
     int x0 = inStart.x;
     int y0 = inStart.y;
@@ -437,8 +439,10 @@ void buildArrow( intPair inStart, intPair inEnd ) {
     // target radius is 2 pixles
     // 10x to magnify round-off errors
     // (thus target 10x radius is 20)
-    int tenTimesDeltaLength = intSqrt( 10 * perpDelta.x * 10 * perpDelta.x + 
-                                       10 * perpDelta.y * 10 * perpDelta.y );
+    unsigned long tenTimesDeltaLength = 
+        intSqrt( (unsigned long)( 
+                     10 * perpDelta.x * 10 * perpDelta.x + 
+                     10 * perpDelta.y * 10 * perpDelta.y ) );
     
     intPair edgeAStart = add( centeredStart, perpDelta );
     intPair edgeAEnd = add( centeredEnd, perpDelta );

@@ -388,15 +388,15 @@ void initMap() {
         for( int b=0; b<regionBorderWidth; b++ ) {
             
             rgbaColor borderRingColor;
-            borderRingColor.r = 
+            borderRingColor.r = (unsigned char)( 
                 ( (regionBorderWidth - b) * darkRegionColor.r +
-                  b * white.r ) / regionBorderWidth;
-            borderRingColor.g = 
+                  b * white.r ) / regionBorderWidth );
+            borderRingColor.g = (unsigned char)( 
                 ( (regionBorderWidth - b) * darkRegionColor.g +
-                  b * white.g ) / regionBorderWidth;
-            borderRingColor.b = 
+                  b * white.g ) / regionBorderWidth );
+            borderRingColor.b = (unsigned char)( 
                 ( (regionBorderWidth - b) * darkRegionColor.b +
-                  b * white.b ) / regionBorderWidth;
+                  b * white.b ) / regionBorderWidth );
             
             borderRingColor.a = thisRegionColor.a;
             
@@ -540,7 +540,7 @@ void drawMap() {
     rgbaColor backgroundColor = white;
     // map image gets more and more faint as game wears on
     // starts at 75%, fades down to 50%
-    backgroundColor.a = 128 + ( 64 * getMonthsLeft() ) / 8;
+    backgroundColor.a = (unsigned char)( 128 + ( 64 * getMonthsLeft() ) / 8 );
     
 
 

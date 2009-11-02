@@ -267,9 +267,12 @@ void initUnits() {
                 
                 // modulate by player color (make gray a shade of player
                 // color)
-                subImage[p].r = (subImage[p].r * subColor.r) / 255;
-                subImage[p].g = (subImage[p].g * subColor.g) / 255;
-                subImage[p].b = (subImage[p].b * subColor.b) / 255;
+                subImage[p].r = 
+                    (unsigned char)( (subImage[p].r * subColor.r) / 255 );
+                subImage[p].g = 
+                    (unsigned char)( (subImage[p].g * subColor.g) / 255 );
+                subImage[p].b = 
+                    (unsigned char)( (subImage[p].b * subColor.b) / 255 );
                 }
             }
         
@@ -617,7 +620,7 @@ static void drawUnitSprite( int inUnit, intPair inPos, int inAlpha = 255 ) {
     
     // ignore color for now
     c = white;
-    c.a = inAlpha;
+    c.a = (unsigned char)inAlpha;
     
         
     // center
@@ -824,14 +827,14 @@ void drawUnits() {
                 if( alpha > 255 ) {
                     alpha = 255;
                     }
-                c.a = alpha;
+                c.a = (unsigned char)alpha;
                 }
             else if( step > numSteps - 8 ) {
                 int alpha = (numSteps - step) * 32;
                 if( alpha > 255 ) {
                     alpha = 255;
                     }
-                c.a = alpha;
+                c.a = (unsigned char)alpha;
                 }
             
 
@@ -1416,7 +1419,8 @@ void stepUnits() {
                     // just starting a fresh wave
 
                     // pick how many times to wave
-                    gameUnit[i].mWavesLeftBeforeBreak = getRandom( 4 ) + 3;
+                    gameUnit[i].mWavesLeftBeforeBreak = 
+                        (int)( getRandom( 4 ) + 3 );
                     }
                 
                 
@@ -1438,7 +1442,8 @@ void stepUnits() {
                     gameUnit[i].mWavesLeftBeforeBreak--;
                     }
 
-                gameUnit[i].mStepsUntilNextFrame = getRandom( 4 ) + 4;
+                gameUnit[i].mStepsUntilNextFrame = 
+                    (int)( getRandom( 4 ) + 4 );
 
                 if( gameUnit[i].mWavesLeftBeforeBreak == 0 ) {
                     
@@ -1449,7 +1454,7 @@ void stepUnits() {
                     // hold arm down for a randon while
                         
                     gameUnit[i].mStepsUntilNextFrame = 
-                        getRandom( 60 ) + 30;
+                        (int)( getRandom( 60 ) + 30 );
                     }
                 }
             else {

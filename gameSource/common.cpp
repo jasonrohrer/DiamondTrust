@@ -32,8 +32,8 @@ int roundUpToPowerOfTwo( int inValue ) {
 
 // integer square root found here:
 // http://www.codecodex.com/wiki/Calculate_an_integer_square_root
-unsigned long intSqrt( unsigned long inX ) {
-    unsigned long op, res, one;
+unsigned int intSqrt( unsigned int inX ) {
+    unsigned int op, res, one;
 
     op = inX;
     res = 0;
