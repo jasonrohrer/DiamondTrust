@@ -108,6 +108,30 @@ unsigned char *getMessage( unsigned int *outLength );
 
 
 
+// camera support
+
+// true if this platform has a camera
+// NOTE:  on DS, try  BOOL OS_IsRunOnTwl( void );
+char isCameraSupported();
+
+// start producing frames
+void startCamera();
+
+// stop producing frames
+void stopCamera();
+
+// FIXME:  specify trimming size?
+
+// get the next frame
+void getFrame( unsigned char *inBuffer /* length?? */ );
+
+// snap the next frame as a finished picture
+void snapPicture( unsigned char *inBuffer /* length?? */ );
+
+
+
+
+
 
 
 // **
