@@ -37,7 +37,7 @@ salePicker.tga \
 map_names.tga \
 paper.tga \
 jet_rotated.tga \
-
+piper_rotated.tga \
 
 
 
