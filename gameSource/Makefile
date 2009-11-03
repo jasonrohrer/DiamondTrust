@@ -68,3 +68,11 @@ clean:
 #
 gameData/%.tga: graphics/%.png
 	convert $< $@
+
+
+
+#graphics/jet_rotated.png: graphics/jet.png
+#	cd graphics; ./rotateAndSizeSprite.sh jet.png jet_rotated.png; cd ..
+
+graphics/%_rotated.png: graphics/%.png
+	graphics/rotateAndSizeSprite.sh $< $@

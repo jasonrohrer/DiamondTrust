@@ -61,9 +61,9 @@ int unitArmSpriteIDs[7][5];
 int jetSpriteH;
 int jetSpriteW;
 
-// rotations in 22.5 degree steps
-int jetSpriteIDs[16];
-int jetSpriteAngles[16];
+// rotations in 11.25 degree steps
+int jetSpriteIDs[32];
+int jetSpriteAngles[32];
 
 
 
@@ -343,22 +343,27 @@ void initUnits() {
 
 
     // 1 pixel row between each sprite image
-    // four base images in sprite file (first quadrant) that we rotate
+    // 8 base images in sprite file (first quadrant) that we rotate
     // by 90 degrees to fill other 3 quadrants
-    jetSpriteH = ((imageH + 1) /  4 ) - 1;
+    jetSpriteH = ((imageH + 1) /  8 ) - 1;
 
     if( jetSpriteH != jetSpriteW ) {
         printOut( "Only square jet images supported.\n" );
         return;
         }
     
-    jetSpriteAngles[0] = 0;
-    jetSpriteAngles[1] = 23;
-    jetSpriteAngles[2] = 45;
-    jetSpriteAngles[3] = 68;
     
+    // each increment is 11.25
+    int angleSumTimes100 = 0;
+    int angleIncrementTimes100 = 1125;
 
-    for( int r=0; r<4; r++ ) {
+    for( int r=0; r<8; r++ ) {
+        // round down
+        jetSpriteAngles[r] = angleSumTimes100 / 100;
+        angleSumTimes100 += angleIncrementTimes100;
+        
+        
+
         rgbaColor * jetSubImage = 
                 &( jetRGBA[ r * (jetSpriteH + 1) * jetSpriteW ] );
 
@@ -380,7 +385,7 @@ void initUnits() {
         // remaining quadrants
         for( int q=1; q<4; q++ ) {
             
-            int spriteIndex = q * 4 + r;
+            int spriteIndex = q * 8 + r;
             
             jetSpriteAngles[ spriteIndex ] = jetSpriteAngles[r] + 90 * q;
             
@@ -1409,7 +1414,7 @@ void stepUnits() {
                         }
 
                     // rest of angles can be handled as general case
-                    for( int a=1; a<16; a++ ) {
+                    for( int a=1; a<32; a++ ) {
                         int delta = intAbs( jetSpriteAngles[a] - tripAngle );
                     
                         if( delta < closestDelta ) {
