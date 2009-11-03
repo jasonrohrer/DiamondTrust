@@ -61,7 +61,9 @@ int unitArmSpriteIDs[7][5];
 int jetSpriteH;
 int jetSpriteW;
 
-int jetSpriteIDs[8];
+// rotations in 22.5 degree steps
+int jetSpriteIDs[16];
+int jetSpriteAngles[16];
 
 
 
@@ -341,16 +343,73 @@ void initUnits() {
 
 
     // 1 pixel row between each sprite image
-    jetSpriteH = ((imageH + 1) /  8 ) - 1;
+    // four base images in sprite file (first quadrant) that we rotate
+    // by 90 degrees to fill other 3 quadrants
+    jetSpriteH = ((imageH + 1) /  4 ) - 1;
 
-    for( int r=0; r<8; r++ ) {
+    if( jetSpriteH != jetSpriteW ) {
+        printOut( "Only square jet images supported.\n" );
+        return;
+        }
+    
+    jetSpriteAngles[0] = 0;
+    jetSpriteAngles[1] = 23;
+    jetSpriteAngles[2] = 45;
+    jetSpriteAngles[3] = 68;
+    
+
+    for( int r=0; r<4; r++ ) {
         rgbaColor * jetSubImage = 
                 &( jetRGBA[ r * (jetSpriteH + 1) * jetSpriteW ] );
 
-        applyCornerTransparency( jetSubImage, jetSpriteW * jetSpriteH );
+        int numJetPixels = jetSpriteW * jetSpriteH;
+        
+        applyCornerTransparency( jetSubImage, numJetPixels );
 
+        // first quadrant
         jetSpriteIDs[r] = 
             addSprite( jetSubImage, jetSpriteW, jetSpriteH );
+
+        // accumulate rotations here
+        rgbaColor *jetAccumRotated = new rgbaColor[ numJetPixels ];
+        memcpy( jetAccumRotated, jetSubImage, 
+                numJetPixels * sizeof( rgbaColor ) );
+        
+        
+
+        // remaining quadrants
+        for( int q=1; q<4; q++ ) {
+            
+            int spriteIndex = q * 4 + r;
+            
+            jetSpriteAngles[ spriteIndex ] = jetSpriteAngles[r] + 90 * q;
+            
+            // copy accum into this, rotating by 90 again
+            rgbaColor *jetRotated = new rgbaColor[ numJetPixels ];
+            
+            // source and dest x,y
+            for( int sY=0; sY<jetSpriteH; sY++ ) {
+                int dX = (jetSpriteH - 1) - sY;
+
+                for( int sX=0; sX<jetSpriteH; sX++ ) {
+                    
+                    int dY = sX;
+                    
+                    jetRotated[ dY * jetSpriteW + dX ] =
+                        jetAccumRotated[ sY * jetSpriteW + sX ];
+                    }
+                }
+            
+            // save into accume
+            memcpy( jetAccumRotated, jetRotated, 
+                    numJetPixels * sizeof( rgbaColor ) );
+            
+            delete [] jetRotated;
+
+            jetSpriteIDs[ spriteIndex ] = 
+                addSprite( jetAccumRotated, jetSpriteW, jetSpriteH );
+            }
+        
         }
     delete [] jetRGBA;
     
@@ -1326,16 +1385,8 @@ void stepUnits() {
                 if( gameUnit[i].mExecutionStep == 0 ) {
                     // just starting
                     // compute which plane sprite to use
-                    
-                    // maps a 4-bit binary number, describing x,y motion vector
-                    // attributes with its bits, to a sprite index
-                    int binaryToSpriteIndexMap[16] = 
-                        { -1,  2,  0,  6, 0, 1, -1, 7, 
-                          -1, -1, -1, -1, 4, 3, -1, 5 };
-                    
-                    // compose a 4-bit binary number using attributes
-                    // from normalized motion vector
-                    // bits are:  abcd = [x-sign][x][y-sign][y]
+
+                    // based on angle of trip
 
                     intPair start = 
                         getUnitPositionInRegion( gameUnit[i].mRegion, i );
@@ -1343,47 +1394,32 @@ void stepUnits() {
                         getUnitPositionInRegion( gameUnit[i].mDest, i );
                     
                     intPair delta = subtract( end, start );
-                    
-                    int bitA = ( delta.x < 0 );
-                    int bitC = ( delta.y < 0 );
-                    int bitB = 0;
-                    int bitD = 0;
-                    
-                    int absX = intAbs( delta.x );
-                    int absY = intAbs( delta.y );
-                    
 
-                    if( absX > absY ) {
-                        bitB = 1;
-
-                        if( absX > absY * 2 ) {
-                            bitD = 0;
-                            bitC = 0;
-                            }
-                        else {
-                            bitD = 1;
-                            }
+                    int tripAngle = intArctan2( delta.x, delta.y );
+                    
+                    // compare to all sprite angles to find closest
+                    
+                    // special case for a=0; because that's also 360 degrees
+                    int closestIndex = 0;
+                    int closestDelta = 
+                        intAbs( jetSpriteAngles[0] - tripAngle );
+                    int altDelta = intAbs( 360 - tripAngle );
+                    if( altDelta < closestDelta ) {
+                        closestDelta = altDelta;
                         }
-                    else {
-                        bitD = 1;
-                        
-                        if( absY > absX * 2 ) {
-                            bitB = 0;
-                            bitA = 0;
-                            }
-                        else {
-                            bitB = 1;
+
+                    // rest of angles can be handled as general case
+                    for( int a=1; a<16; a++ ) {
+                        int delta = intAbs( jetSpriteAngles[a] - tripAngle );
+                    
+                        if( delta < closestDelta ) {
+                            closestDelta = delta;
+                            closestIndex = a;
                             }
                         }
                     
-                    int fourBitIndex = 
-                        bitA << 3 | bitB << 2 | bitC << 1 | bitD;
+                    gameUnit[i].mPlaneSpriteIndex = closestIndex;
                     
-                    //printOut( "fourBitIndex = %d\n", fourBitIndex );
-                    
-                    gameUnit[i].mPlaneSpriteIndex = 
-                        binaryToSpriteIndexMap[ fourBitIndex ];
-
                     //printOut( "plane sprite = %d\n", 
                     //          gameUnit[i].mPlaneSpriteIndex );
                     }
