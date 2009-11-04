@@ -1155,8 +1155,26 @@ void drawUnitBribe( int inUnit, int inX, int inY ) {
 
 
 
+static int getArmHoldDownTime() {
+    return (int)( getRandom( 60 ) + 30 );
+    }
+
+
+
 void setUnitSelectable( int inUnit, char inSelectable ) {
-    gameUnit[ inUnit ].mSelectable = inSelectable;
+    int i = inUnit;
+    
+    char oldSelectable = gameUnit[ i ].mSelectable;
+
+    gameUnit[ i ].mSelectable = inSelectable;
+
+    if( inSelectable && ! oldSelectable ) {
+        // selectable just turned on
+
+        // hold down arm for random time
+        gameUnit[i].mStepsUntilNextFrame = getArmHoldDownTime();
+        }
+    
     }
 
 
@@ -1516,8 +1534,7 @@ void stepUnits() {
                     
                     // hold arm down for a randon while
                         
-                    gameUnit[i].mStepsUntilNextFrame = 
-                        (int)( getRandom( 60 ) + 30 );
+                    gameUnit[i].mStepsUntilNextFrame = getArmHoldDownTime();
                     }
                 }
             else {
