@@ -1205,8 +1205,9 @@ void setUnitSelectable( int inUnit, char inSelectable ) {
     if( inSelectable && ! oldSelectable ) {
         // selectable just turned on
 
-        // hold down arm for random time
-        gameUnit[i].mStepsUntilNextFrame = getArmHoldDownTime();
+        // hold down arm for random time, a bit shorter than between-wave
+        // hold-downs
+        gameUnit[i].mStepsUntilNextFrame = getArmHoldDownTime() - 30;
         }
     
     }
