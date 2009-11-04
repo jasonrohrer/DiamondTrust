@@ -2,17 +2,19 @@
 
 #include "platform.h"
 #include "common.h"
+#include "colors.h"
 #include "minorGems/util/stringUtils.h"
 
 
 
 static int buttonSpriteID;
 static int buttonW, buttonH;
+static int buttonDisplayW = 60;
+
 
 static int longButtonSpriteID;
 static int longButtonW, longButtonH;
 
-static rgbaColor white = { 255, 255, 255, 255 };
 
 
 void initButton() {
@@ -30,7 +32,7 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     
     int textWidth = mFont->measureString( mText );
 
-    if( textWidth > buttonW ) {
+    if( textWidth > buttonDisplayW ) {
         mLong = true;
         }
     else {
@@ -44,7 +46,7 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
         mTextX = mX + longButtonW / 2;
         }
     
-    mTextY = mY + 2;
+    mTextY = mY + 10;
     }
 
 
@@ -58,7 +60,7 @@ char Button::getPressed( int inClickX, int inClickY ) {
     if( !mLong ) {    
         if( inClickY > mY && inClickY < mY + buttonH
             &&
-            inClickX > mX && inClickX < mX + buttonW ) {
+            inClickX > mX && inClickX < mX + buttonDisplayW ) {
             
             return true;
             }
@@ -87,5 +89,5 @@ void Button::draw() {
     
     startNewSpriteLayer();
 
-    mFont->drawString( mText, mTextX, mTextY, white, alignCenter );
+    mFont->drawString( mText, mTextX, mTextY, black, alignCenter );
     }
