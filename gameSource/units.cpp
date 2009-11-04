@@ -681,7 +681,8 @@ static char isBribeStatusVisible( int inUnit ) {
 
 
 
-static void drawUnitSprite( int inUnit, intPair inPos, int inAlpha = 255 ) {
+static void drawUnitSprite( int inUnit, intPair inPos, 
+                            unsigned char inAlpha = 255 ) {
     int i = inUnit;
     
     rgbaColor c;
@@ -698,7 +699,7 @@ static void drawUnitSprite( int inUnit, intPair inPos, int inAlpha = 255 ) {
     
     // ignore color for now
     c = white;
-    c.a = (unsigned char)inAlpha;
+    c.a = inAlpha;
     
         
     // center
@@ -750,7 +751,8 @@ static void drawUnitSprite( int inUnit, intPair inPos, int inAlpha = 255 ) {
 
 
 
-static void drawUnitBribedMarker( int inUnit, intPair inPos ) {
+static void drawUnitBribedMarker( int inUnit, intPair inPos, 
+                                  unsigned char inAlpha = 255  ) {
     int i = inUnit;
 
     // color of marker (opposite)
@@ -762,6 +764,8 @@ static void drawUnitBribedMarker( int inUnit, intPair inPos ) {
         c = playerColor;
         }
             
+    c.a = inAlpha;
+    
     // center
     inPos.x -= unitSpriteW / 2;
     inPos.y -= unitSpriteH;
@@ -769,7 +773,7 @@ static void drawUnitBribedMarker( int inUnit, intPair inPos ) {
     drawSprite( bribedMarkerSprite, 
                 inPos.x, 
                 inPos.y, 
-                c, gameUnit[i].mSelectable );
+                c, false );
     }
 
 
@@ -844,9 +848,8 @@ void drawUnits() {
     // now draw units on top
     
     for( int i=0; i<numUnits; i++ ) {
-        intPair pos = getUnitCurrentPosition( i );
-
         if( ! gameUnit[i].mFlying ) {
+            intPair pos = getUnitCurrentPosition( i );
             
             drawUnitSprite( i, pos );
         
@@ -872,97 +875,25 @@ void drawUnits() {
                 drawSprite( activeUnitSprite, 
                             pos.x, 
                             pos.y, 
-                            c, gameUnit[i].mSelectable );
+                            c, false );
                 }
             }
-        else {
-            // draw vehicle instead
-            int vehicleType;
-            rgbaColor c;
-            if( i < 3 ) {
-                vehicleType = 0;
-                c = playerColor;
-                }
-            else if( i<6 ) {
-                vehicleType = 1;
-                c = enemyColor;
-                }
-            else {
-                vehicleType = 2;
-                c = inspectorColor;
-                }            
-            
-            // center
-            pos.x -= vehicleSpriteW / 2;
-            pos.y -= vehicleSpriteH / 2;
-                
-            // tweak a bit
-            pos.y += 2;
-            
-
-            // fade in and out at begining and end
-            int step = gameUnit[i].mExecutionStep;
-            int numSteps = gameUnit[i].mNumExecutionSteps;
-            
-            if( step < 8 ) {
-                int alpha = step * 32;
-                if( alpha > 255 ) {
-                    alpha = 255;
-                    }
-                c.a = (unsigned char)alpha;
-                }
-            else if( step > numSteps - 8 ) {
-                int alpha = (numSteps - step) * 32;
-                if( alpha > 255 ) {
-                    alpha = 255;
-                    }
-                c.a = (unsigned char)alpha;
-                }
-            
-
-            drawSprite( vehicleSpriteIDs
-                          [ vehicleType ]
-                          [ gameUnit[i].mVehicleSpriteIndex ], 
-                        pos.x, 
-                        pos.y, 
-                        c, false );
-
-            startNewSpriteLayer();
-
-            // show unit fading out in start region and
-            // fading back in in end region as vehicle fades in/out
-            if( c.a < 255 ) {
-
-                // invert
-                int alpha = 255 - c.a;
-
-                intPair anchorPos;
-                
-                if( step < 8 ) {
-                    anchorPos = 
-                        getUnitPositionInRegion( gameUnit[i].mRegion, i );
-                    }
-                else {    
-                    anchorPos = 
-                        getUnitPositionInRegion( gameUnit[i].mDest, i );
-                    }
-                
-                drawUnitSprite( i, anchorPos, alpha );                
-                }
-            
-                
-            }
-        
-        
-
         }
 
+
+
+    
+    
 
     startNewSpriteLayer();
 
     // mark any bribed units
     for( int i=0; i<numUnits; i++ ) {
-        if( isBribeStatusVisible( i ) ) {
+
+        if( isBribeStatusVisible( i ) &&
+            // don't draw bribed marker on top of moving vehicle
+            ! gameUnit[i].mFlying ) {
+            
             drawUnitBribedMarker( i, getUnitCurrentPosition( i ) );
             }
         }
@@ -1050,6 +981,109 @@ void drawUnits() {
             drawUnitPaymentNumber( end, gameUnit[i].mInspectorBribe );
             }
         }
+
+
+
+    
+    
+    // now draw any moving vehicles on top of stationary units
+    // (they fly over top, not under, even on top of diamond bids and 
+    //   inspector bribes)
+    startNewSpriteLayer();
+    
+    for( int i=0; i<numUnits; i++ ) {
+        if( gameUnit[i].mFlying ) {
+            intPair pos = getUnitCurrentPosition( i );
+
+            // draw vehicle instead
+            int vehicleType;
+            rgbaColor c;
+            if( i < 3 ) {
+                vehicleType = 0;
+                c = playerColor;
+                }
+            else if( i<6 ) {
+                vehicleType = 1;
+                c = enemyColor;
+                }
+            else {
+                vehicleType = 2;
+                c = inspectorColor;
+                }            
+            
+            // center
+            pos.x -= vehicleSpriteW / 2;
+            pos.y -= vehicleSpriteH / 2;
+                
+            // tweak a bit
+            pos.y += 2;
+            
+
+            // fade in and out at begining and end
+            int step = gameUnit[i].mExecutionStep;
+            int numSteps = gameUnit[i].mNumExecutionSteps;
+            
+            if( step < 8 ) {
+                int alpha = step * 32;
+                if( alpha > 255 ) {
+                    alpha = 255;
+                    }
+                c.a = (unsigned char)alpha;
+                }
+            else if( step > numSteps - 8 ) {
+                int alpha = (numSteps - step) * 32;
+                if( alpha > 255 ) {
+                    alpha = 255;
+                    }
+                c.a = (unsigned char)alpha;
+                }
+            
+
+            drawSprite( vehicleSpriteIDs
+                          [ vehicleType ]
+                          [ gameUnit[i].mVehicleSpriteIndex ], 
+                        pos.x, 
+                        pos.y, 
+                        c, false );
+
+            startNewSpriteLayer();
+
+            // show unit fading out in start region and
+            // fading back in in end region as vehicle fades in/out
+            if( c.a < 255 ) {
+
+                // invert
+                unsigned char alpha = 255 - c.a;
+
+                intPair anchorPos;
+                
+                if( step < 8 ) {
+                    anchorPos = 
+                        getUnitPositionInRegion( gameUnit[i].mRegion, i );
+                    }
+                else {    
+                    anchorPos = 
+                        getUnitPositionInRegion( gameUnit[i].mDest, i );
+                    }
+                
+                drawUnitSprite( i, anchorPos, alpha );            
+                
+                if( isBribeStatusVisible( i ) ) {
+                    startNewSpriteLayer();
+                    drawUnitBribedMarker( i, anchorPos, alpha );
+                    }
+                    
+                
+                }
+            
+                
+            }
+        }
+
+
+
+
+
 
 
 
