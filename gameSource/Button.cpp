@@ -32,21 +32,20 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     
     int textWidth = mFont->measureString( mText );
 
+    mClickRadiusY = 13;
+    
     if( textWidth > buttonDisplayW ) {
         mLong = true;
+        mClickRadiusX = 64;
         }
     else {
         mLong = false;
+        mClickRadiusX = 33;
         }
     
-    if( !mLong ) {
-        mTextX = mX + buttonW / 2;
-        }
-    else {
-        mTextX = mX + longButtonW / 2;
-        }
-    
-    mTextY = mY + 10;
+    mTextX = mX;
+
+    mTextY = mY - 6;
     }
 
 
@@ -57,23 +56,12 @@ Button::~Button() {
 
 
 char Button::getPressed( int inClickX, int inClickY ) {
-    if( !mLong ) {    
-        if( inClickY > mY && inClickY < mY + buttonH
-            &&
-            inClickX > mX && inClickX < mX + buttonDisplayW ) {
-            
-            return true;
-            }
+    if( inClickY > mY - mClickRadiusY && inClickY < mY + mClickRadiusY
+        &&
+        inClickX > mX - mClickRadiusX && inClickX < mX + mClickRadiusX ) {
+        
+        return true;
         }
-    else {
-        if( inClickY > mY && inClickY < mY + longButtonH
-            &&
-            inClickX > mX && inClickX < mX + longButtonW ) {
-            
-            return true;
-            }
-        }
-    
 
     return false;
     }
@@ -81,11 +69,13 @@ char Button::getPressed( int inClickX, int inClickY ) {
 
 void Button::draw() {
     int spriteID = buttonSpriteID;
+    int w = buttonW;
     if( mLong ) {
         spriteID = longButtonSpriteID;
+        w = longButtonW;
         } 
 
-    drawSprite( spriteID, mX, mY, white );
+    drawSprite( spriteID, mX - w/2, mY - buttonH/2, white );
     
     startNewSpriteLayer();
 

@@ -10,6 +10,7 @@ class Button {
 
     public:
         
+        // center position x,y
         Button( Font *inFont, char *inText, int inX, int inY );
         
         ~Button();
@@ -26,7 +27,10 @@ class Button {
         Font *mFont;
         char *mText;
         int mX, mY;
+        int mClickRadiusX;
+        int mClickRadiusY;
         
+
         int mTextX, mTextY;
         char mLong;
         

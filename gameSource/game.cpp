@@ -92,16 +92,16 @@ void gameInit() {
     
     initButton();
 
-    doneButton = new Button( font16, translate( "button_done" ), 7, 74 );
+    doneButton = new Button( font16, translate( "button_done" ), 38, 87 );
     
-    nextButton = new Button( font16, translate( "button_next" ), 7, 94 );
+    nextButton = new Button( font16, translate( "button_next" ), 38, 111 );
     
     parentButton = new Button( font16, translate( "button_parent" ),
-                                                  128 - 64,
-                                                  76 - 8 );
+                                                  128,
+                                                  76 );
     childButton = new Button( font16, translate( "button_child" ),
-                                                 128 - 64,
-                                                 116 - 8 );
+                                                 128,
+                                                 116 );
 
     initMap();
     initUnits();
