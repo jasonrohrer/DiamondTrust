@@ -127,7 +127,7 @@ class Unit {
         int mLastBribingUnit;
         
         char mFlying;
-        int mPlaneSpriteIndex;
+        int mVehicleSpriteIndex;
         int mExecutionStep;
         int mNumExecutionSteps;
 

@@ -38,6 +38,7 @@ map_names.tga \
 paper.tga \
 jet_rotated.tga \
 piper_rotated.tga \
+jeep_rotated.tga \
 
 
 

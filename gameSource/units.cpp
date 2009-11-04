@@ -58,12 +58,17 @@ int armSpriteH;
 int unitArmSpriteIDs[7][5];
 
 
-int jetSpriteH;
-int jetSpriteW;
+int vehicleSpriteH;
+int vehicleSpriteW;
 
 // rotations in 11.25 degree steps
-int jetSpriteIDs[32];
-int jetSpriteAngles[32];
+// one set per side (player, enemy, un)
+int vehicleSpriteIDs[3][32];
+int vehicleSpriteAngles[32];
+char *vehicleSpriteFileNames[3] = {"piper_rotated.tga", "jet_rotated.tga", 
+                                   "jeep_rotated.tga" };
+
+
 
 
 
@@ -332,92 +337,101 @@ void initUnits() {
     delete [] armSourceMapRGBA;
     
 
-    rgbaColor *jetRGBA = readTGAFile( "jet_rotated.tga",
-                                      &jetSpriteW, &imageH );
+
+
+
+    // construct vehicle sprites
+    for( int t=0; t<3; t++ ) {
+        
+        rgbaColor *vehicleRGBA = readTGAFile( vehicleSpriteFileNames[t],
+                                              &vehicleSpriteW, &imageH );
     
     
-    if( jetRGBA == NULL ) {
-        printOut( "Reading jet sprite file failed.\n" );
-        return;
-        }
-
-
-    // 1 pixel row between each sprite image
-    // 8 base images in sprite file (first quadrant) that we rotate
-    // by 90 degrees to fill other 3 quadrants
-    jetSpriteH = ((imageH + 1) /  8 ) - 1;
-
-    if( jetSpriteH != jetSpriteW ) {
-        printOut( "Only square jet images supported.\n" );
-        return;
-        }
-    
-    
-    // each increment is 11.25
-    int angleSumTimes100 = 0;
-    int angleIncrementTimes100 = 1125;
-
-    for( int r=0; r<8; r++ ) {
-        // round down
-        jetSpriteAngles[r] = angleSumTimes100 / 100;
-        angleSumTimes100 += angleIncrementTimes100;
-        
-        
-
-        rgbaColor * jetSubImage = 
-                &( jetRGBA[ r * (jetSpriteH + 1) * jetSpriteW ] );
-
-        int numJetPixels = jetSpriteW * jetSpriteH;
-        
-        applyCornerTransparency( jetSubImage, numJetPixels );
-
-        // first quadrant
-        jetSpriteIDs[r] = 
-            addSprite( jetSubImage, jetSpriteW, jetSpriteH );
-
-        // accumulate rotations here
-        rgbaColor *jetAccumRotated = new rgbaColor[ numJetPixels ];
-        memcpy( jetAccumRotated, jetSubImage, 
-                numJetPixels * sizeof( rgbaColor ) );
-        
-        
-
-        // remaining quadrants
-        for( int q=1; q<4; q++ ) {
-            
-            int spriteIndex = q * 8 + r;
-            
-            jetSpriteAngles[ spriteIndex ] = jetSpriteAngles[r] + 90 * q;
-            
-            // copy accum into this, rotating by 90 again
-            rgbaColor *jetRotated = new rgbaColor[ numJetPixels ];
-            
-            // source and dest x,y
-            for( int sY=0; sY<jetSpriteH; sY++ ) {
-                int dX = (jetSpriteH - 1) - sY;
-
-                for( int sX=0; sX<jetSpriteH; sX++ ) {
-                    
-                    int dY = sX;
-                    
-                    jetRotated[ dY * jetSpriteW + dX ] =
-                        jetAccumRotated[ sY * jetSpriteW + sX ];
-                    }
-                }
-            
-            // save into accume
-            memcpy( jetAccumRotated, jetRotated, 
-                    numJetPixels * sizeof( rgbaColor ) );
-            
-            delete [] jetRotated;
-
-            jetSpriteIDs[ spriteIndex ] = 
-                addSprite( jetAccumRotated, jetSpriteW, jetSpriteH );
+        if( vehicleRGBA == NULL ) {
+            printOut( "Reading jet sprite file failed.\n" );
+            return;
             }
+
+
+        // 1 pixel row between each sprite image
+        // 8 base images in sprite file (first quadrant) that we rotate
+        // by 90 degrees to fill other 3 quadrants
+        vehicleSpriteH = ((imageH + 1) /  8 ) - 1;
+
+        if( vehicleSpriteH != vehicleSpriteW ) {
+            printOut( "Only square vehicle images supported.\n" );
+            return;
+            }
+    
+    
+        // each increment is 11.25
+        int angleSumTimes100 = 0;
+        int angleIncrementTimes100 = 1125;
+
+        for( int r=0; r<8; r++ ) {
+            // round down
+            vehicleSpriteAngles[r] = angleSumTimes100 / 100;
+            angleSumTimes100 += angleIncrementTimes100;
+        
+        
+
+            rgbaColor * jetSubImage = 
+                &( vehicleRGBA[ r * (vehicleSpriteH + 1) * vehicleSpriteW ] );
+
+            int numJetPixels = vehicleSpriteW * vehicleSpriteH;
+        
+            applyCornerTransparency( jetSubImage, numJetPixels );
+
+            // first quadrant
+            vehicleSpriteIDs[t][r] = 
+                addSprite( jetSubImage, vehicleSpriteW, vehicleSpriteH );
+
+            // accumulate rotations here
+            rgbaColor *jetAccumRotated = new rgbaColor[ numJetPixels ];
+            memcpy( jetAccumRotated, jetSubImage, 
+                    numJetPixels * sizeof( rgbaColor ) );
+        
+        
+
+            // remaining quadrants
+            for( int q=1; q<4; q++ ) {
+            
+                int spriteIndex = q * 8 + r;
+            
+                vehicleSpriteAngles[ spriteIndex ] = 
+                    vehicleSpriteAngles[r] + 90 * q;
+            
+                // copy accum into this, rotating by 90 again
+                rgbaColor *jetRotated = new rgbaColor[ numJetPixels ];
+            
+                // source and dest x,y
+                for( int sY=0; sY<vehicleSpriteH; sY++ ) {
+                    int dX = (vehicleSpriteH - 1) - sY;
+
+                    for( int sX=0; sX<vehicleSpriteH; sX++ ) {
+                    
+                        int dY = sX;
+                    
+                        jetRotated[ dY * vehicleSpriteW + dX ] =
+                            jetAccumRotated[ sY * vehicleSpriteW + sX ];
+                        }
+                    }
+            
+                // save into accume
+                memcpy( jetAccumRotated, jetRotated, 
+                        numJetPixels * sizeof( rgbaColor ) );
+            
+                delete [] jetRotated;
+
+                vehicleSpriteIDs[t][ spriteIndex ] = 
+                    addSprite( jetAccumRotated, 
+                               vehicleSpriteW, vehicleSpriteH );
+                }
+        
+            }
+        delete [] vehicleRGBA;
         
         }
-    delete [] jetRGBA;
-    
     
 
 
@@ -862,21 +876,25 @@ void drawUnits() {
                 }
             }
         else {
-            // draw plane instead
+            // draw vehicle instead
+            int vehicleType;
             rgbaColor c;
             if( i < 3 ) {
+                vehicleType = 0;
                 c = playerColor;
                 }
             else if( i<6 ) {
+                vehicleType = 1;
                 c = enemyColor;
                 }
             else {
+                vehicleType = 2;
                 c = inspectorColor;
                 }            
             
             // center
-            pos.x -= jetSpriteW / 2;
-            pos.y -= jetSpriteH / 2;
+            pos.x -= vehicleSpriteW / 2;
+            pos.y -= vehicleSpriteH / 2;
                 
             // tweak a bit
             pos.y += 2;
@@ -902,7 +920,9 @@ void drawUnits() {
                 }
             
 
-            drawSprite( jetSpriteIDs[ gameUnit[i].mPlaneSpriteIndex ], 
+            drawSprite( vehicleSpriteIDs
+                          [ vehicleType ]
+                          [ gameUnit[i].mVehicleSpriteIndex ], 
                         pos.x, 
                         pos.y, 
                         c, false );
@@ -910,7 +930,7 @@ void drawUnits() {
             startNewSpriteLayer();
 
             // show unit fading out in start region and
-            // fading back in in end region as plane fades in/out
+            // fading back in in end region as vehicle fades in/out
             if( c.a < 255 ) {
 
                 // invert
@@ -1389,7 +1409,7 @@ void stepUnits() {
 
                 if( gameUnit[i].mExecutionStep == 0 ) {
                     // just starting
-                    // compute which plane sprite to use
+                    // compute which vehicle sprite to use
 
                     // based on angle of trip
 
@@ -1407,7 +1427,7 @@ void stepUnits() {
                     // special case for a=0; because that's also 360 degrees
                     int closestIndex = 0;
                     int closestDelta = 
-                        intAbs( jetSpriteAngles[0] - tripAngle );
+                        intAbs( vehicleSpriteAngles[0] - tripAngle );
                     int altDelta = intAbs( 360 - tripAngle );
                     if( altDelta < closestDelta ) {
                         closestDelta = altDelta;
@@ -1415,7 +1435,7 @@ void stepUnits() {
 
                     // rest of angles can be handled as general case
                     for( int a=1; a<32; a++ ) {
-                        int delta = intAbs( jetSpriteAngles[a] - tripAngle );
+                        int delta = intAbs( vehicleSpriteAngles[a] - tripAngle );
                     
                         if( delta < closestDelta ) {
                             closestDelta = delta;
@@ -1423,10 +1443,10 @@ void stepUnits() {
                             }
                         }
                     
-                    gameUnit[i].mPlaneSpriteIndex = closestIndex;
+                    gameUnit[i].mVehicleSpriteIndex = closestIndex;
                     
-                    //printOut( "plane sprite = %d\n", 
-                    //          gameUnit[i].mPlaneSpriteIndex );
+                    //printOut( "vehicle sprite = %d\n", 
+                    //          gameUnit[i].mVehicleSpriteIndex );
                     }
                 
 
