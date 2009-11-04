@@ -66,7 +66,7 @@ int vehicleSpriteW;
 int vehicleSpriteIDs[3][32];
 int vehicleSpriteAngles[32];
 char *vehicleSpriteFileNames[3] = {"piper_rotated.tga", "jet_rotated.tga", 
-                                   "jeep_rotated.tga" };
+                                   "puma_rotated.tga" };
 
 
 
