@@ -40,6 +40,8 @@ jet_rotated.tga \
 piper_rotated.tga \
 jeep_rotated.tga \
 puma_rotated.tga \
+angola_satellite.tga \
+
 
 
 # prepend path

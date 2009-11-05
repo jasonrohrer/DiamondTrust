@@ -3,11 +3,16 @@
 #include "common.h"
 #include "gameStats.h"
 #include "units.h"
+#include "colors.h"
 
 #include "minorGems/util/stringUtils.h"
 
 
 static char stateDone = false;
+
+extern int satelliteTopSpriteID;
+extern int satelliteBottomSpriteID;
+extern int satelliteBottomHalfOffset;
 
 extern Button *parentButton;
 extern Button *childButton;
@@ -191,6 +196,11 @@ void ConnectState::stepState() {
 
 
 void ConnectState::drawState() {
+    
+    drawSprite( satelliteTopSpriteID, 
+                0,0, white );
+    drawSprite( satelliteBottomSpriteID, 
+                0,satelliteBottomHalfOffset, white );
     
     if( !connecting ) {
         

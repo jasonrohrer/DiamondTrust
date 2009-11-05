@@ -19,6 +19,11 @@
 
 
 
+int satelliteTopSpriteID;
+int satelliteBottomSpriteID;
+int satelliteBottomHalfOffset;
+unsigned char satelliteFade;
+
 
 Font *font8;
 Font *font16;
@@ -83,7 +88,39 @@ void gameInit() {
         delete [] textData;
         }
 
+
     
+    printOut( "Loading satellite map\n" );
+    satelliteFade = 255;
+    int satelliteW, satelliteH;
+    rgbaColor *satelliteRGBA = readTGAFile( "angola_satellite.tga",
+                                            &satelliteW, &satelliteH );
+
+    if( satelliteRGBA == NULL
+        ||
+        satelliteW < 256 ) {
+        
+        printOut( "Reading satellite map file failed.\n" );
+        return;
+        }
+    satelliteBottomHalfOffset = 128;
+    
+    satelliteTopSpriteID = 
+        addSprite( satelliteRGBA, satelliteW, satelliteBottomHalfOffset );
+
+    rgbaColor *bottomHalfPointer = 
+        &( satelliteRGBA[ satelliteBottomHalfOffset * satelliteW ] );
+    
+    satelliteBottomSpriteID = 
+        addSprite( bottomHalfPointer, satelliteW, 
+                   satelliteH - satelliteBottomHalfOffset );
+
+    delete [] satelliteRGBA;
+
+
+
+
+
     printOut( "Loading 8-pixel font\n" );
     font8 = new Font( "font8.tga", 1, 4, false );
 
