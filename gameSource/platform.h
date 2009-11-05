@@ -55,6 +55,27 @@ typedef struct rgbaColor {
 // data destroyed by caller
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 
+
+
+// add a 256-color sprite (1 byte per pixel) that indexes into a 16-bit
+// palette (ABGR 1555)
+int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
+                  unsigned short inPalette[256] );
+
+
+// replaces sprite with new image data
+//
+// Only works on 256-color images
+//
+// inSpriteID must be an ID previously returned by addSprite
+// new image must have same dimensions as original
+// original palette is also reused
+void replaceSprite256( int inSpriteID, 
+                       unsigned char *inDataRGBA, int inWidth, int inHeight );
+
+
+
+
 // draws sprite at position and with color, including alpha for transparency
 // sprite is drawn on the currently-drawing screen
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
@@ -120,13 +141,15 @@ void startCamera();
 // stop producing frames
 void stopCamera();
 
-// FIXME:  specify trimming size?
+// Trimming size fixed at 160x120
+// format fixed at grayscale 256 levels
 
 // get the next frame
-void getFrame( unsigned char *inBuffer /* length?? */ );
+// inBuffer is where 160x120 grayscale pixels will be returned
+void getFrame( unsigned char *inBuffer );
 
 // snap the next frame as a finished picture
-void snapPicture( unsigned char *inBuffer /* length?? */ );
+void snapPicture( unsigned char *inBuffer );
 
 
 
