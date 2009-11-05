@@ -146,10 +146,11 @@ int numTexturePaletteBytesAdded = 0;
 unsigned short textureColors[ 256 ] ATTRIBUTE_ALIGN(4);
 
 
-int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
-    
-    textureInfo t;
 
+
+static textureInfo makeTextureInfo( int inWidth, int inHeight ) {
+    textureInfo t;
+    
     t.slotAddress = nextTextureSlotAddress;
     t.w = inWidth;
     t.h = inHeight;
@@ -220,6 +221,115 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     t.texCoordCorners[2] = GX_ST( inWidth << FX32_SHIFT,  0 );
     t.texCoordCorners[3] = GX_ST( inWidth << FX32_SHIFT,  
                                   inHeight << FX32_SHIFT );
+
+    return t;
+    }
+
+
+
+static void addPalette( textureInfo *inT, 
+                        unsigned short inPalette, int inPaletteEntries ) {
+    
+    t->paletteSlotAddress = nextTexturePaletteAddress;
+
+
+    // copy into aligned memory
+    int paletteBytes = inPaletteEntries * sizeof( short );
+    
+    memcpy( textureColors, inPalette, paletteBytes );
+    
+    
+
+    DC_FlushRange( textureColors, paletteBytes );
+    
+    GX_BeginLoadTexPltt();
+    GX_LoadTexPltt( textureColors,
+                    t.paletteSlotAddress,
+                    paletteBytes );
+    GX_EndLoadTexPltt();
+
+    unsigned int offset = paletteBytes;
+
+    if( offset < 16 ) {
+        // offset to next palette must be 16 bytes for 
+        //   16- and 256-color palettes
+        // so our 8-byte offset (for this 4-color palette) is
+        // not enough.
+        offset = 16;
+        }
+
+    nextTexturePaletteAddress += offset;
+    
+    numTexturePaletteBytesAdded += offset;
+    //printOut( "Added %d paletteBytes bytes so far.\n", 
+    //          numTexturePaletteBytesAdded );
+    }
+
+
+
+static void addTextureData( textureInfo *inT,
+                            unsigned short *inPackedTextureData,
+                            int inNumBytes ) {
+    
+    DC_FlushRange( inPackedTextureData, inNumBytes );
+
+    GX_BeginLoadTex();
+    
+    GX_LoadTex( (unsigned short *)inPackedTextureData, 
+                t->slotAddress,
+                inNumBytes );
+    
+    GX_EndLoadTex(); 
+
+    
+
+    
+    nextTextureSlotAddress += inNumBytes;
+    
+    numTextureBytesAdded += inNumBytes;
+    }
+
+
+
+
+int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
+                  unsigned short inPalette[256] ) {
+    
+    int numPixels = inWidth * inHeight;
+    
+    textureInfo t = makeTextureInfo( inWidth, inHeight );
+
+    t.texFormat = GX_TEXFMT_PLTT256;
+    
+    addPalette( &t, inPalette, 256 );
+    
+    addTextureData( &t, (unsigned short*)inDataBytes, numPixels );
+    
+    textureInfoArray[ nextTextureInfoIndex ] = t;
+    int returnIndex = nextTextureInfoIndex;
+    
+    nextTextureInfoIndex++;
+    
+    return returnIndex;
+    }
+
+
+void replaceSprite256( int inSpriteID, 
+                       unsigned char *inDataBytes, 
+                       int inWidth, int inHeight ) {
+
+    int numPixels = inWidth * inHeight;
+
+    addTextureData( &( textureInfoArray[ inSpriteID ] ), 
+                    (unsigned short*)inDataBytes, numPixels );
+    }
+
+
+
+
+int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
+    
+    textureInfo t = makeTextureInfo( inWidth, inHeight );
     
     
 
@@ -395,59 +505,20 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         
 
         t.paletteSlotAddress = nextTexturePaletteAddress;
-        unsigned int paletteBytes = paletteSize * 2;
-        
-        //printOut( "Adding %d palette bytes\n", paletteBytes );
-        
-        DC_FlushRange( textureColors, paletteBytes );
 
-        GX_BeginLoadTexPltt();
-        GX_LoadTexPltt( textureColors,
-                        t.paletteSlotAddress,
-                        paletteBytes );
-        GX_EndLoadTexPltt();
-
-        unsigned int offset = paletteBytes;
-        
-        if( offset < 16 ) {
-            // offset to next palette must be 16 bytes for 
-            //   16- and 256-color palettes
-            // so our 8-byte offset (for this 4-color palette) is
-            // not enough.
-            offset = 16;
-            }
-
-        nextTexturePaletteAddress += offset;
-        
-        numTexturePaletteBytesAdded += offset;
-
-        //printOut( "Added %d paletteBytes bytes so far.\n", 
-        //          numTexturePaletteBytesAdded );
+        addPalette( &t, textureColors, paletteSize );
         }
     
 
     unsigned int numTextureBytes = numTextureShorts * 2;
-
-    DC_FlushRange( packedTextureData, numTextureBytes );
-
-    GX_BeginLoadTex();
-    
-    GX_LoadTex( (unsigned short *)packedTextureData, 
-                t.slotAddress,
-                numTextureBytes );
-    
-    GX_EndLoadTex(); 
+    addTextureData( &t, packedTextureData, numTextureBytes );
 
     
     textureInfoArray[ nextTextureInfoIndex ] = t;
     int returnIndex = nextTextureInfoIndex;
     
     nextTextureInfoIndex++;
-
     
-    nextTextureSlotAddress += numTextureBytes;
-    
-    numTextureBytesAdded += numTextureBytes;
     
     //printOut( "Added %d texture bytes so far.\n", numTextureBytesAdded );
     
@@ -1533,6 +1604,37 @@ static void stepNetwork() {
         startNextSend();
         }
     }
+
+
+
+/*
+FIXME:  camera stuff
+
+
+char isCameraSupported();
+
+// start producing frames
+void startCamera();
+
+// stop producing frames
+void stopCamera();
+
+// Trimming size fixed at 160x120
+// format fixed at grayscale 256 levels
+
+// get the next frame
+// inBuffer is where 160x120 grayscale pixels will be returned
+void getFrame( unsigned char *inBuffer );
+
+// snap the next frame as a finished picture
+void snapPicture( unsigned char *inBuffer );
+
+*/
+
+
+
+
+
 
 
 

@@ -651,6 +651,23 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     }
 
 
+int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
+                  unsigned short inPalette[256] ) {
+    
+    // do nothing
+
+    printOut( "Warning:  unsupported addSprite256 called on SDL platform" );
+    return -1;
+    }
+
+void replaceSprite256( int inSpriteID, 
+                       unsigned char *inDataRGBA, int inWidth, int inHeight ) {
+    printOut( 
+        "Warning:  unsupported replaceSprite256 called on SDL platform" );
+    }
+
+
+
 
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     
@@ -1044,4 +1061,33 @@ void freeNetwork() {
         delete [] nextIncomingMessage;
         nextIncomingMessage = NULL;
         }    
+    }
+
+
+
+
+
+char isCameraSupported() {
+    return false;
+    }
+
+
+void startCamera() {
+    printOut( "Warning:  unsupported startCamera called on SDL platform\n" );
+    }
+
+
+void stopCamera() {
+    printOut( "Warning:  unsupported stopCamera called on SDL platform\n" );
+    }
+
+
+
+void getFrame( unsigned char *inBuffer ) {
+    printOut( "Warning:  unsupported getFrame called on SDL platform\n" );
+    }
+
+
+void snapPicture( unsigned char *inBuffer ) {
+    printOut( "Warning:  unsupported snapPicture called on SDL platform\n" );
     }
