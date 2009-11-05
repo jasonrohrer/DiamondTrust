@@ -202,6 +202,10 @@ void ConnectState::stepState() {
                 
                     // connected!
                     stateDone = true;
+
+                    // force title to fade all the way out
+                    // in case it hasn't already
+                    titleFade = 0;
                     }                
                 
                 }
