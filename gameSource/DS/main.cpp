@@ -124,6 +124,7 @@ struct textureInfoStruct {
         GXTexFmt texFormat;
         // if format is DIRECT, this is not set:
         unsigned int paletteSlotAddress;
+        char colorZeroTransparent;
         int w;
         int h;
         GXTexSizeS sizeS;
@@ -293,7 +294,7 @@ static void addTextureData( textureInfo *inT,
 
 
 int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
-                  unsigned short inPalette[256] ) {
+                  unsigned short inPalette[256], char inZeroTransparent ) {
     
     int numPixels = inWidth * inHeight;
     
@@ -305,6 +306,8 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
     
     addTextureData( &t, (unsigned short*)inDataBytes, numPixels );
     
+    t.colorZeroTransparent = inZeroTransparent;
+
     textureInfoArray[ nextTextureInfoIndex ] = t;
     int returnIndex = nextTextureInfoIndex;
     
@@ -419,9 +422,15 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         
         numTextureShorts = numPixels;
         packedTextureData = textureData;
-        
+
+        // only use color zero as transparent for paletted textures
+        // (direct color textures have 1-bit alpha)
+        t.colorZeroTransparent = false;        
         }
     else {
+        // force zero transparent for paletted textures
+        t.colorZeroTransparent = true;
+        
         //printOut( "Texture uses only %d colors\n", numUniqueColors );
         
         // palette colors are RGB 555 (alpha bit (bit 15) ignored... set to
@@ -559,10 +568,8 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     //printOut( "Drawing sprite at address %d\n", t.slotAddress );
 
 
-    // only use color zero as transparent for paletted textures
-    // (direct color textures have 1-bit alpha
     GXTexPlttColor0 colorZeroFlag;
-    if( t.texFormat == GX_TEXFMT_DIRECT ) {
+    if( ! t.colorZeroTransparent ) {
         colorZeroFlag = GX_TEXPLTTCOLOR0_USE;
         }
     else {

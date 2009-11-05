@@ -625,9 +625,18 @@ unsigned int getRandom( unsigned int inMax ) {
 #include "minorGems/graphics/openGL/SingleTextureGL.h"
 
 
+typedef struct texturePalette {
+        rgbaColor fullColorPalette[256];
+    } texturePalette;
+
+
+
 SimpleVector<SingleTextureGL*> spriteTextures;
 SimpleVector<unsigned int> spriteWidths;
 SimpleVector<unsigned int> spriteHeights;
+// save palettes to be reused if 8-bit texture data changes
+// these will only contain placeholders for non-8-bit sprites
+SimpleVector<texturePalette> spritePalettes;
 
 
 void freeSprites() {
@@ -638,7 +647,9 @@ void freeSprites() {
     }
 
 
-int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
+static int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
+                      texturePalette *inP ) {
+    
     SingleTextureGL *s = new SingleTextureGL( (unsigned char*)inDataRGBA,
                                               inWidth, inHeight );
     spriteTextures.push_back( s );
@@ -646,24 +657,75 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     spriteWidths.push_back( inWidth );
     spriteHeights.push_back( inHeight );
     
+    spritePalettes.push_back( *inP );
 
     return spriteTextures.size() - 1;
     }
 
 
-int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
-                  unsigned short inPalette[256] ) {
-    
-    // do nothing
+int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
+    // placeholder
+    texturePalette p;
 
-    printOut( "Warning:  unsupported addSprite256 called on SDL platform" );
-    return -1;
+    return addSprite( inDataRGBA, inWidth, inHeight, &p );
     }
 
+
+int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
+                  unsigned short inPalette[256], char inZeroTransparent ) {
+    
+    // map palette to RGBA colors
+    texturePalette p;
+    
+    for( int c=0; c<256; c++ ) {
+        unsigned short colorShort = inPalette[c];
+        
+        p.fullColorPalette[c].r = ( colorShort & 0x001F ) << 3;
+        p.fullColorPalette[c].g = ( (colorShort >>  5) & 0x001F ) << 3;
+        p.fullColorPalette[c].b = ( (colorShort >> 10) & 0x001F ) << 3;
+        // force non-transparent for all
+        p.fullColorPalette[c].a = 255;    
+        }
+
+    if( inZeroTransparent ) {
+        // color zero in palette represents transparent areas
+        p.fullColorPalette[0].a = 0;
+        }
+    
+    
+    int numPixels = inWidth * inHeight;
+    rgbaColor *fullColorImage = new rgbaColor[ numPixels ];
+    for( int i=0; i<numPixels; i++ ) {
+        fullColorImage[i] = p.fullColorPalette[ inDataBytes[i] ];
+        }
+    
+    int id = addSprite( fullColorImage, inWidth, inHeight, &p );
+    
+    delete [] fullColorImage;
+    
+    return id;
+    }
+
+
 void replaceSprite256( int inSpriteID, 
-                       unsigned char *inDataRGBA, int inWidth, int inHeight ) {
-    printOut( 
-        "Warning:  unsupported replaceSprite256 called on SDL platform" );
+                       unsigned char *inDataBytes, 
+                       int inWidth, int inHeight ) {
+    
+    texturePalette p = *( spritePalettes.getElement( inSpriteID ) );
+
+    int numPixels = inWidth * inHeight;
+    
+    rgbaColor *fullColorImage = new rgbaColor[ numPixels ];
+    for( int i=0; i<numPixels; i++ ) {
+        fullColorImage[i] = p.fullColorPalette[ inDataBytes[i] ];
+        }
+    
+    SingleTextureGL *s = *( spriteTextures.getElement( inSpriteID ) );
+
+    s->replaceTextureData( (unsigned char*)fullColorImage,
+                           inWidth, inHeight );
+
+    delete [] fullColorImage;
     }
 
 
@@ -1068,7 +1130,7 @@ void freeNetwork() {
 
 
 char isCameraSupported() {
-    return false;
+    return true;
     }
 
 
@@ -1084,10 +1146,19 @@ void stopCamera() {
 
 
 void getFrame( unsigned char *inBuffer ) {
-    printOut( "Warning:  unsupported getFrame called on SDL platform\n" );
+    int numPixels = 160*120;
+    for( int i=0; i<numPixels; i++ ) {
+        inBuffer[i] = getRandom( 255 );
+        }
+    
+    //printOut( "Warning:  unsupported getFrame called on SDL platform\n" );
     }
 
 
 void snapPicture( unsigned char *inBuffer ) {
-    printOut( "Warning:  unsupported snapPicture called on SDL platform\n" );
+    //printOut( "Warning:  unsupported snapPicture called on SDL platform\n" );
+    int numPixels = 160*120;
+    for( int i=0; i<numPixels; i++ ) {
+        inBuffer[i] = getRandom( 255 );
+        }
     }

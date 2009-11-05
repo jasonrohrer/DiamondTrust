@@ -5,6 +5,12 @@
 #include "common.h"
 #include "salePicker.h"
 #include "gameStats.h"
+#include "Font.h"
+#include "colors.h"
+
+
+#include "minorGems/util/stringUtils.h"
+
 
 
 //static int activeUnit = -1;
@@ -18,9 +24,46 @@ static int stepsSinceSentMove = 0;
 static int minSteps = 30;
 
 
+static char takingPicture = false;
+static char receivingPicture = true;
+
+
+extern int pictureDisplaySpriteID;
+extern int pictureDisplayW;
+extern int pictureDisplayH;
+extern int pictureDisplaySpriteW;
+extern int pictureDisplaySpriteH;
+
+extern int pictureSendSpriteID;
+extern int pictureSendW;
+extern int pictureSendH;
+extern int pictureSendSpriteW;
+extern int pictureSendSpriteH;
+
+extern char pictureSendSpriteSet;
+
+
+static unsigned char *pictureDisplayData = NULL;
+
+static unsigned char *pictureSendData = NULL;
+static unsigned char *pictureReceiveData = NULL;
+static int pictureNumBytesReceived = 0;
+static int pictureReceiveTotalBytes = 0;
+
+static int pictureCountDown = 0;
+static int pictureStepsUntilTick = 30;
+
+
+
 extern Button *doneButton;
 extern char *statusMessage;
 extern char *statusSubMessage;
+
+
+
+extern Font *font16;
+
+
 
 
 
@@ -56,13 +99,29 @@ class SellDiamondsState : public GameState {
 static void sendMoveMessage() {
     // send our move as a message
 
-    // 1 char
-    // number sold
-    int messageLength = 1;
-    unsigned char message[ 1 ];
+    // 3 chars
+    // 0 = number sold
+    // 1 = image present in subsequent messages?
+    // 2 = number of 300-byte messages forthcoming to contain image
+    int messageLength = 3;
+    unsigned char message[ 3 ];
 
     message[0] = (unsigned char)getPickerSale();
-                
+    int numFutureMessages = 0;
+    
+    if( pictureSendData != NULL ) {
+        message[1] = 1;
+        int dataLength = pictureSendW * pictureSendH;
+        numFutureMessages = dataLength / 300;
+        message[2] = numFutureMessages;
+        }
+    else {
+        message[1] = 0;
+        message[2] = 0;
+        }
+    
+        
+
     printOut( "Sending message: " );
     for( int i=0; i<messageLength; i++ ) {
         printOut( "%d,", message[i] );
@@ -70,6 +129,21 @@ static void sendMoveMessage() {
     printOut( "\n" );
             
     sendMessage( message, (unsigned int)messageLength );
+
+
+    // now pack image into messages and send them
+    if( pictureSendData != NULL ) {
+        for( int i=0; i<numFutureMessages; i++ ) {
+            int offset = i * 300;
+            
+            unsigned char *pointer = &( pictureSendData[offset] );
+            
+            sendMessage( pointer, 300 );
+            }
+
+        delete [] pictureSendData;
+        pictureSendData = NULL;
+        }        
     }
 
 
@@ -83,8 +157,9 @@ static int getMoveMessage() {
         // got move!            
 
         // unpack it
-        if( messageLength != 1 ) {
-            printOut( "Bad message length from opponent\n" );
+        if( messageLength != 3 ) {
+            printOut( "Bad message length from opponent, %d\n",
+                      messageLength );
             stateDone = true;
 
             delete [] message;
@@ -95,6 +170,34 @@ static int getMoveMessage() {
         
         setPlayerNumToSell( 1, returnVal );
         
+        if( message[1] ) {
+            // image forthcoming
+            int numPixels = pictureSendW * pictureSendH;
+            
+            
+            // make sure size matches
+            int numMessages = message[2];
+            
+            if( numMessages * 300 != numPixels ) {
+                printOut( "Bad camera image length from opponent\n" );
+                stateDone = true;
+                
+                delete [] message;
+                return -1;
+                }
+            
+            pictureReceiveData = 
+                new unsigned char[ numPixels ];
+            
+            memset( pictureReceiveData, 0, numPixels );
+            
+
+            pictureNumBytesReceived = 0;            
+            pictureReceiveTotalBytes = numPixels;
+            receivingPicture = true;
+            }
+        
+
 
         delete [] message;
         
@@ -108,6 +211,7 @@ static int getMoveMessage() {
 
 
 static char pickingSale = false;
+static char waitingForDone = false;
 
 
 
@@ -139,18 +243,38 @@ void SellDiamondsState::clickState( int inX, int inY ) {
     if( !sentInitialMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
             pickingSale = false;
+            waitingForDone = false;
             
-            statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
+            int saleNumber = getPickerSale();
+            
+            if( saleNumber == 0 ||
+                ! isCameraSupported() ) {
+                
+                statusSubMessage = 
+                    translate( "phaseSubStatus_waitingOpponent" );
 
-            sendMoveMessage();
-            stepsSinceSentMove = 0;
+                sendMoveMessage();
+                stepsSinceSentMove = 0;
             
-            sentInitialMove = true;
+                sentInitialMove = true;
+                }
+            else {
+                // accessing vault and camera active
+                // start picture taking process
+                takingPicture = true;
+                pictureDisplayData = 
+                    new unsigned char[ pictureDisplayW * pictureDisplayH ];
+                startCamera();
+
+                statusSubMessage = 
+                    translate( "phaseSubStatus_sellDiamondsPicture" );
+                }            
             }
         }
     else if( ( sentInitialMove && gotInitialMove ) && !sentMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
             pickingSale = false;
+            waitingForDone = false;
             
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
             
@@ -167,6 +291,70 @@ void SellDiamondsState::clickState( int inX, int inY ) {
 
 
 
+static unsigned char *expandImage( unsigned char *inSource,
+                                   int inSourceW, int inSourceH, 
+                                   int inDestW, int inDestH ) {
+    
+    unsigned char *dest = new unsigned char[ inDestW * inDestH ];
+    
+    memset( dest, 0, inDestW * inDestH );
+    
+    for( int y=0; y<inSourceH; y++ ) {
+        for( int x=0; x<inSourceW; x++ ) {
+            dest[ y * inDestW + x ] = inSource[ y * inSourceW + x ];
+            }
+        }
+    
+    return dest;
+    }
+
+
+
+
+// called after move received or after move+picture received
+static void processInitialMove() {
+
+    if( getPlayerDiamonds( 0 ) > 0 &&
+        ( isOpponentHomeBribed() || isPlayerHomeKnownBribed() ) ) {
+        // show opponent sale to player and let player adjust
+
+        statusMessage = translate( "phaseStatus_sellPeek" );
+        statusSubMessage = 
+            translate( "phaseSubStatus_sellDiamondsAdjust" );
+
+        if( isOpponentHomeBribed() ) {
+            // only peek at opponent if opponent home is compromised
+                    
+            peekSale();
+                    
+            // try this:
+            // if peeking, show computed earnings and let player
+            // adjust to test strategies before picking one
+            finishSale();
+            }
+        // else allow player to adjust, but don't peek
+                
+        pickingSale = true;
+        waitingForDone = true;
+        }
+    else {
+        // no new info, 
+        // OR
+        // no room to adjust (we have 0 diamonds),
+        // no need to adjust!
+
+        // send final move to opponent right away
+        statusSubMessage = 
+            translate( "phaseSubStatus_waitingOpponent" );
+            
+        sendMoveMessage();
+                
+        sentMove = true;
+        }                
+    }
+
+
+
 static int playerEarnings[2] = {0,0};
 static int numSold[2] = {0,0};
 
@@ -175,10 +363,153 @@ static int minEarningsSteps = 10;
 
 
 void SellDiamondsState::stepState() {
-    
-    stepUnits();
+
+    if( takingPicture ) {
+        getFrame( pictureDisplayData );
+        
+        unsigned char *newSpriteData = expandImage( pictureDisplayData,
+                                                    pictureDisplayW,
+                                                    pictureDisplayH,
+                                                    pictureDisplaySpriteW,
+                                                    pictureDisplaySpriteH );
+        
+        replaceSprite256( pictureDisplaySpriteID, newSpriteData,
+                          pictureDisplaySpriteW, pictureDisplaySpriteH );
+        
+        delete [] newSpriteData;
+        
+
+        pictureStepsUntilTick--;
+        if( pictureStepsUntilTick == 0 ) {
+            // tick
+            pictureCountDown--;
+            pictureStepsUntilTick = 30;
+            
+            if( pictureCountDown == 0 ) {
+                // take picture
+
+                snapPicture( pictureDisplayData );
+                
+                unsigned char *newSpriteData = 
+                    expandImage( pictureDisplayData,
+                                 pictureDisplayW,
+                                 pictureDisplayH,
+                                 pictureDisplaySpriteW,
+                                 pictureDisplaySpriteH );
+        
+        
+                replaceSprite256( pictureDisplaySpriteID, newSpriteData,
+                                  pictureDisplaySpriteW, 
+                                  pictureDisplaySpriteH );
+                
+                delete [] newSpriteData;
+
+
+                // convert to send size
+                int scaleFactor = pictureDisplayW / pictureSendW;
+                pictureSendData = 
+                    new unsigned char[ pictureSendW * pictureSendH ];
+                
+                for( int y=0; y<pictureDisplayH; y++ ) {
+                    int sendY = y / scaleFactor;
+                    for( int x=0; x<pictureDisplayW; x++ ) {    
+                        int sendX = x / scaleFactor;
+                        
+                        pictureSendData[ sendY * pictureSendW + sendX ] =
+                            pictureDisplayData[ y * pictureDisplayW + x ];
+                        }
+                    }
+
+                delete [] pictureDisplayData;
+                pictureDisplayData = NULL;
+                
+                stopCamera();
+                
+                
+                takingPicture = false;
+                
+                // picture ready, send move
+                statusSubMessage = 
+                    translate( "phaseSubStatus_waitingOpponent" );
+
+                sendMoveMessage();
+                stepsSinceSentMove = 0;
+            
+                sentInitialMove = true;
+                }
+            }
+        }
+
+
     stepsSinceSentMove ++;
     
+    if( gotInitialMove && pictureReceiveData != NULL ) {
+        
+        unsigned int messageLength;
+        unsigned char *message = getMessage( &messageLength );
+        
+        if( message != NULL ) {
+            
+            if( messageLength != 300 ) {
+                printOut( "Bad partial image message length from opponent\n" );
+                stateDone = true;
+
+                delete [] message;
+                return;
+                }
+        
+            // add to image
+            memcpy( &( pictureReceiveData[ pictureNumBytesReceived ] ),
+                    message, 300 );
+            pictureNumBytesReceived += 300;
+            
+            delete [] message;
+
+            // try showing progress, message-by-message
+            unsigned char *newSpriteData = 
+                expandImage( pictureReceiveData,
+                             pictureSendW,
+                             pictureSendH,
+                             pictureSendSpriteW,
+                             pictureSendSpriteH );
+        
+            
+            replaceSprite256( pictureSendSpriteID, newSpriteData,
+                              pictureSendSpriteW, 
+                              pictureSendSpriteH );
+            
+            pictureSendSpriteSet = true;
+            
+            delete [] newSpriteData;
+
+            if( pictureNumBytesReceived == pictureReceiveTotalBytes ) {
+                // done
+                /*
+                replaceSprite256( pictureSendSpriteID, pictureReceiveData,
+                                  pictureSendW, pictureSendH );
+                */
+                delete [] pictureReceiveData;
+                pictureReceiveData = NULL;
+
+                // now done receiving initial move
+                processInitialMove();
+                }
+            else {
+                // still waiting for more
+                return;
+                }
+            
+
+            
+            }
+        else {
+            // still waiting for more
+            return;
+            }
+        }
+    
+
+
     if( sentInitialMove && !gotInitialMove && stepsSinceSentMove > minSteps ) {
         if( checkConnectionStatus() == -1 ) {
             statusSubMessage = 
@@ -196,44 +527,11 @@ void SellDiamondsState::stepState() {
             }
         else {
             gotInitialMove = true;
-            
 
-            if( getPlayerDiamonds( 0 ) > 0 &&
-                ( isOpponentHomeBribed() || isPlayerHomeKnownBribed() ) ) {
-                // show opponent sale to player and let player adjust
-
-                statusMessage = translate( "phaseStatus_sellPeek" );
-                statusSubMessage = 
-                    translate( "phaseSubStatus_sellDiamondsAdjust" );
-
-                if( isOpponentHomeBribed() ) {
-                    // only peek at opponent if opponent home is compromised
-                    
-                    peekSale();
-                    
-                    // try this:
-                    // if peeking, show computed earnings and let player
-                    // adjust to test strategies before picking one
-                    finishSale();
-                    }
-                // else allow player to adjust, but don't peek
-                
-                pickingSale = true;
+            if( pictureReceiveData == NULL ) {
+                processInitialMove();
                 }
-            else {
-                // no new info, 
-                // OR
-                // no room to adjust (we have 0 diamonds),
-                // no need to adjust!
-
-                // send final move to opponent right away
-                statusSubMessage = 
-                    translate( "phaseSubStatus_waitingOpponent" );
-            
-                sendMoveMessage();
-                
-                sentMove = true;
-                }                
+            // else wait for picture to arrive
             }        
 
         }
@@ -332,21 +630,59 @@ void SellDiamondsState::stepState() {
 
 
 void SellDiamondsState::drawState() {
-    drawMap();
-    startNewSpriteLayer();
-    
-    drawUnits();
 
-    if( !sentMove
-        &&
-        !( sentInitialMove && !gotInitialMove ) ) {
-        doneButton->draw();
+    if( takingPicture ) {
+        // cover map with camera display
+        int xOffset = (256 - 160)/2;
+        int yOffset = (192 - 120)/2;
+        
+        drawSprite( pictureDisplaySpriteID, 
+                    xOffset, yOffset, 
+                    white );
+
+        startNewSpriteLayer();
+        
+        char *countString = autoSprintf( "%d", pictureCountDown );
+    
+        font16->drawString( countString, 
+                            xOffset + pictureDisplayW / 2, 
+                            yOffset + pictureDisplayH + 16,
+                            white, 
+                            alignCenter );
+
+        delete [] countString;
+
+
+        // show a known breech at the last minute
+        if( isPlayerHomeKnownBribed() &&
+            pictureCountDown <= 2 ) {
+            char *breechString = translate( "camera_securityCompromised" );
+            
+            font16->drawString( breechString,
+                                xOffset + pictureDisplayW / 2,
+                                yOffset - 16,
+                                red,
+                                alignCenter );
+            }
+        }
+    else {
+        
+        
+        drawMap();
+        startNewSpriteLayer();
+        
+        drawUnits();
+        
+        if( waitingForDone ) {
+            doneButton->draw();
+            }
+        
+        
+        if( pickingSale ) {
+            drawSalePicker( 24, 137 );
+            }    
         }
     
-
-    if( pickingSale ) {
-        drawSalePicker( 24, 137 );
-        }    
     }
 
 
@@ -360,7 +696,13 @@ void SellDiamondsState::enterState() {
     sentMove = false;
     gotMove = false;
 
+    takingPicture = false;
+    receivingPicture = false;
+    pictureSendSpriteSet = false;
+    pictureCountDown = 5;
+    
     pickingSale = true;
+    waitingForDone = true;
     setPickerSale( 0 );
 
     // reset sale numbers

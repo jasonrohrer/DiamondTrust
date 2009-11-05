@@ -60,7 +60,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 // add a 256-color sprite (1 byte per pixel) that indexes into a 16-bit
 // palette (ABGR 1555)
 int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
-                  unsigned short inPalette[256] );
+                  unsigned short inPalette[256], 
+                  char inZeroTransparent = false );
 
 
 // replaces sprite with new image data

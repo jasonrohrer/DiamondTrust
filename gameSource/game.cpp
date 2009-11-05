@@ -28,6 +28,28 @@ int titleSpriteID;
 unsigned char titleFade;
 
 
+// sprites for these have dimensions that are next-largest powers of 2
+// (256x128  and 128x64)
+int pictureDisplaySpriteID;
+int pictureDisplayW = 160;
+int pictureDisplayH = 120;
+int pictureDisplaySpriteW = 256;
+int pictureDisplaySpriteH = 128;
+
+
+// NOTE:  must be an integer scale factor smaller than display image
+// also, WxH must be a multiple of 300 (image sent in 300-char blocks)
+int pictureSendSpriteID;
+int pictureSendW = 80;
+int pictureSendH = 60;
+int pictureSendSpriteW = 128;
+int pictureSendSpriteH = 64;
+
+// true if fresh data has been set to the sprite for display
+char pictureSendSpriteSet = false;
+
+
+
 Font *font8;
 Font *font16;
 
@@ -126,6 +148,52 @@ void gameInit() {
     titleSpriteID = loadSprite( "title.tga", true );
 
 
+
+    printOut( "Constructing camera picture sprites\n" );
+
+    // grayscale palette
+    unsigned short *picturePalette = new unsigned short[ 256 ];
+    for( int p=0; p<256; p++ ) {
+
+        // 5-bit gray
+        int grayLevel = p >> 3;
+        
+        picturePalette[p] = (unsigned short)( 
+            1  << 15 |
+            grayLevel << 10 |
+            grayLevel << 5 |
+            grayLevel );
+        }
+    
+    
+
+    // dummy data for now
+    unsigned char *data = 
+        new unsigned char[ pictureDisplaySpriteW * pictureDisplaySpriteH ];
+    
+    memset( data, 0, pictureDisplaySpriteW * pictureDisplaySpriteH );
+
+    pictureDisplaySpriteID = 
+        addSprite256( data, 
+                      pictureDisplaySpriteW, pictureDisplaySpriteH,
+                      picturePalette );
+    delete [] data;
+    
+    data = 
+        new unsigned char[ pictureSendSpriteW * pictureSendSpriteH ];
+    
+    memset( data, 0, pictureSendSpriteW * pictureSendSpriteH );
+
+    pictureSendSpriteID = 
+        addSprite256( data, 
+                      pictureSendSpriteW, pictureSendSpriteH,
+                      picturePalette );
+    delete [] data;
+    delete [] picturePalette;
+    
+
+
+
     printOut( "Loading 8-pixel font\n" );
     font8 = new Font( "font8.tga", 1, 4, false );
 
@@ -154,6 +222,14 @@ void gameInit() {
     
     setPlayerMoney( 0, 18 );
     setPlayerMoney( 1, 18 );    
+
+    setPlayerDiamonds( 0, 0 );
+    setPlayerDiamonds( 1, 0 );    
+
+    // FIXME:  testing
+    setPlayerDiamonds( 0, 10 );
+    setPlayerDiamonds( 1, 10 );    
+
 
     // show opponent's money at start of game
     setOpponentMoneyUnknown( false );
@@ -323,9 +399,9 @@ int lastTouchX, lastTouchY;
 static void goToNextGameState() {
     // state transition
     if( currentGameState == connectState ) {
-        currentGameState = accumulateDiamondsState;
+        //currentGameState = accumulateDiamondsState;
         // FIXME  for testing
-        //currentGameState = moveUnitsState;
+        currentGameState = sellDiamondsState;
         }
     else if( currentGameState == accumulateDiamondsState ) {
         postAccumulateTransition();

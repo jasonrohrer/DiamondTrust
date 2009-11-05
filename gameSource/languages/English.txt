@@ -32,6 +32,8 @@ stats_inspectorBlocking "Will block sale of:"
 stats_inspectorConfiscating "Will confiscate:"
 
 
+camera_securityCompromised "SECURITY COMPROMISED"
+
 
 phaseStatus_connect  "Connect to opponent"
 phaseSubStatus_parentOrChild  "Host a game or join one started by your friend"
@@ -86,6 +88,7 @@ phaseSubStatus_sellDiamonds  "Pick number to sell on open market (or hit Done)"
 phaseSubStatus_sellDiamondsAdjust  "Adjust sale?  Pick new number to sell (or hit Done)"
 phaseSubStatus_sellDiamondsNone "You have none to sell (hit Done when ready)"
 
+phaseSubStatus_sellDiamondsPicture "Security access to vault"
 
 
 phaseStatus_flyHome   "Final trip home"

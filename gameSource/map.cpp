@@ -622,7 +622,7 @@ void drawMap() {
         
         font16->drawString( countString, 
                             mapRegionDiamondPosition[i].x, 
-                            mapRegionDiamondPosition[i].y - 6,
+                            mapRegionDiamondPosition[i].y - 7,
                             diamondPurple, 
                             alignCenter );
 

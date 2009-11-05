@@ -333,6 +333,8 @@ void initUnits() {
 
     delete [] playerUnitRGBA;
     delete [] enemyUnitRGBA;
+    delete [] inspectorUnitRGBA;
+    delete [] unitMaskRGBA;
     delete [] armMapRGBA;
     delete [] armSourceMapRGBA;
     
@@ -375,21 +377,21 @@ void initUnits() {
         
         
 
-            rgbaColor * jetSubImage = 
+            rgbaColor * vehicleSubImage = 
                 &( vehicleRGBA[ r * (vehicleSpriteH + 1) * vehicleSpriteW ] );
 
-            int numJetPixels = vehicleSpriteW * vehicleSpriteH;
+            int numVehiclePixels = vehicleSpriteW * vehicleSpriteH;
         
-            applyCornerTransparency( jetSubImage, numJetPixels );
+            applyCornerTransparency( vehicleSubImage, numVehiclePixels );
 
             // first quadrant
             vehicleSpriteIDs[t][r] = 
-                addSprite( jetSubImage, vehicleSpriteW, vehicleSpriteH );
+                addSprite( vehicleSubImage, vehicleSpriteW, vehicleSpriteH );
 
             // accumulate rotations here
-            rgbaColor *jetAccumRotated = new rgbaColor[ numJetPixels ];
-            memcpy( jetAccumRotated, jetSubImage, 
-                    numJetPixels * sizeof( rgbaColor ) );
+            rgbaColor *vehicleAccumRotated = new rgbaColor[ numVehiclePixels ];
+            memcpy( vehicleAccumRotated, vehicleSubImage, 
+                    numVehiclePixels * sizeof( rgbaColor ) );
         
         
 
@@ -402,7 +404,7 @@ void initUnits() {
                     vehicleSpriteAngles[r] + 90 * q;
             
                 // copy accum into this, rotating by 90 again
-                rgbaColor *jetRotated = new rgbaColor[ numJetPixels ];
+                rgbaColor *vehicleRotated = new rgbaColor[ numVehiclePixels ];
             
                 // source and dest x,y
                 for( int sY=0; sY<vehicleSpriteH; sY++ ) {
@@ -412,22 +414,24 @@ void initUnits() {
                     
                         int dY = sX;
                     
-                        jetRotated[ dY * vehicleSpriteW + dX ] =
-                            jetAccumRotated[ sY * vehicleSpriteW + sX ];
+                        vehicleRotated[ dY * vehicleSpriteW + dX ] =
+                            vehicleAccumRotated[ sY * vehicleSpriteW + sX ];
                         }
                     }
             
                 // save into accume
-                memcpy( jetAccumRotated, jetRotated, 
-                        numJetPixels * sizeof( rgbaColor ) );
+                memcpy( vehicleAccumRotated, vehicleRotated, 
+                        numVehiclePixels * sizeof( rgbaColor ) );
             
-                delete [] jetRotated;
+                delete [] vehicleRotated;
 
                 vehicleSpriteIDs[t][ spriteIndex ] = 
-                    addSprite( jetAccumRotated, 
+                    addSprite( vehicleAccumRotated, 
                                vehicleSpriteW, vehicleSpriteH );
                 }
         
+            delete [] vehicleAccumRotated;
+            
             }
         delete [] vehicleRGBA;
         

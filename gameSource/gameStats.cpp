@@ -9,6 +9,11 @@
 #include "minorGems/util/stringUtils.h"
 
 
+extern char pictureSendSpriteID;
+extern char pictureSendSpriteSet;
+
+
+
 static int monthsLeft = 12;
 
 static int money[2] = {0,0};
@@ -417,6 +422,11 @@ void drawStats() {
 
         if( peekSaleFlag || revealSaleFlag ) {
             drawSellStats( 138, 1 );
+
+
+            if( peekSaleFlag && pictureSendSpriteSet ) {
+                drawSprite( pictureSendSpriteID, 176, 99, white );
+                }
             }
         
 
