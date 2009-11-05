@@ -16,6 +16,8 @@ extern int satelliteBottomSpriteID;
 extern int satelliteBottomHalfOffset;
 extern unsigned char satelliteFade;
 
+extern int titleSpriteID;
+
 
 
 class AccumulateDiamondsState : public GameState {

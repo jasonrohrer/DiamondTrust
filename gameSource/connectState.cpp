@@ -14,6 +14,10 @@ extern int satelliteTopSpriteID;
 extern int satelliteBottomSpriteID;
 extern int satelliteBottomHalfOffset;
 
+extern int titleSpriteID;
+extern unsigned char titleFade;
+
+
 extern Button *parentButton;
 extern Button *childButton;
 extern char *statusMessage;
@@ -127,6 +131,20 @@ void ConnectState::clickState( int inX, int inY ) {
 
 
 void ConnectState::stepState() {
+
+    if( connecting ) {
+        if( titleFade > 0 ) {
+        
+            if( titleFade >= 8 ) {
+                titleFade -= 8;
+                }
+            else {
+                titleFade = 0;
+                }
+            }
+        }
+    
+
     stepsSinceConnectTry ++;
     
     if( connecting && stepsSinceConnectTry > minSteps ) {
@@ -190,7 +208,10 @@ void ConnectState::stepState() {
             
 
             }
-        }            
+        } 
+
+
+           
     }
 
 
@@ -201,6 +222,16 @@ void ConnectState::drawState() {
                 0,0, white );
     drawSprite( satelliteBottomSpriteID, 
                 0,satelliteBottomHalfOffset, white );
+    
+    startNewSpriteLayer();
+    
+    if( titleFade > 0 ) {
+        rgbaColor titleColor = white;
+        titleColor.a = titleFade;
+        
+        drawSprite( titleSpriteID, 
+                    0,0, titleColor );
+        }
     
     if( !connecting ) {
         

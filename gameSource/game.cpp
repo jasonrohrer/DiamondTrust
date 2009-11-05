@@ -24,6 +24,9 @@ int satelliteBottomSpriteID;
 int satelliteBottomHalfOffset;
 unsigned char satelliteFade;
 
+int titleSpriteID;
+unsigned char titleFade;
+
 
 Font *font8;
 Font *font16;
@@ -118,7 +121,9 @@ void gameInit() {
     delete [] satelliteRGBA;
 
 
-
+    printOut( "Loading title image\n" );
+    titleFade = 255;
+    titleSpriteID = loadSprite( "title.tga", true );
 
 
     printOut( "Loading 8-pixel font\n" );
@@ -135,10 +140,10 @@ void gameInit() {
     
     parentButton = new Button( font16, translate( "button_parent" ),
                                                   128,
-                                                  76 );
+                                                  106 );
     childButton = new Button( font16, translate( "button_child" ),
                                                  128,
-                                                 116 );
+                                                 146 );
 
     initMap();
     initUnits();
