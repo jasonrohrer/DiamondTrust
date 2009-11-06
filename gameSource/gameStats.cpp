@@ -363,10 +363,10 @@ static void drawPanelContents( int inX, int inPlayer ) {
     
             
     
-    drawMoneyValue16( inX, baseY + 10, money[ inPlayer ], black, !showMoney );
+    drawMoneyValue16( inX, baseY + 12, money[ inPlayer ], black, !showMoney );
 
     inX += 64;
-    drawDiamondCounter( inX, baseY + panelH / 2 + 2, diamonds[ inPlayer ] );
+    drawDiamondCounter( inX, baseY + panelH / 2 + 3, diamonds[ inPlayer ] );
     }
 
 
