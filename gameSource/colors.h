@@ -17,6 +17,8 @@ extern rgbaColor inspectorColor;
 extern rgbaColor playerRegionColor;
 extern rgbaColor enemyRegionColor;
 
+extern rgbaColor playerPanelColor;
+extern rgbaColor enemyPanelColor;
 extern rgbaColor inspectorPanelColor;
 
 

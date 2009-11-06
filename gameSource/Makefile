@@ -42,7 +42,7 @@ jeep_rotated.tga \
 puma_rotated.tga \
 angola_satellite.tga \
 title.tga \
-
+rolodex.tga \
 
 # prepend path
 PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))

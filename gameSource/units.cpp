@@ -1178,10 +1178,10 @@ void drawUnitBribe( int inUnit, int inX, int inY ) {
     // color of marker (opposite)
     rgbaColor c;
     if( i < 3 ) {
-        c = enemyColor;
+        c = enemyRegionColor;
         }
     else if( i<6 ) {
-        c = playerColor;
+        c = playerRegionColor;
         }
 
     drawSprite( bidSprite, end.x - bidW / 2, end.y - bidH / 2, c );

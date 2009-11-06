@@ -109,7 +109,7 @@ void initStats() {
                                     &panelW, &panelH, true );
     datePanelSprite = loadSprite( "datePanel.tga", 
                                   &datePanelW, &datePanelH, true );
-    unitInfoPanelSprite = loadSprite( "unitInfoPanel.tga", 
+    unitInfoPanelSprite = loadSprite( "rolodex.tga", 
                                       &unitPanelW, &unitPanelH, true );
 
     sellZeroNote = autoSprintf( translate( "stats_sellZeroNote" ),
@@ -176,7 +176,7 @@ int getPlayerEarnings( int inPlayer ) {
 
 
 
-static rgbaColor panelColors[3] = { playerRegionColor, enemyRegionColor,
+static rgbaColor panelColors[3] = { playerPanelColor, enemyPanelColor,
                                     inspectorPanelColor };
 
 
@@ -460,16 +460,21 @@ void drawStats() {
             c = panelColors[1];
             }
         
-        drawSprite( unitInfoPanelSprite, 0, 64, c );
+        
+        int panelTop = 34;
+        
+
+
+        drawSprite( unitInfoPanelSprite, 0, panelTop, c );
 
         startNewSpriteLayer();
         
 
         // show stats for active unit
 
-        drawUnit( activeUnit, 15, 84 );
+        drawUnit( activeUnit, 15, 22 + panelTop );
 
-        drawDiamondCounter( 34, 78, u->mNumDiamondsHeld );
+        drawDiamondCounter( 34, 14 + panelTop, u->mNumDiamondsHeld );
         
         int xOffset, x, y;
         
@@ -478,7 +483,7 @@ void drawStats() {
             xOffset = font8->measureString( translate( "stats_tripCost" ) );
             
             x = 54;
-            y = 74;
+            y = 10 + panelTop;
             
             font8->drawString( translate( "stats_tripCost" ), 
                                 x, 
@@ -503,7 +508,7 @@ void drawStats() {
         xOffset += 10;
         
         x = 10;
-        y = 89;
+        y = 27 + panelTop;
         
         font16->drawString( translate( "stats_salary" ), 
                             x, 
@@ -561,13 +566,13 @@ void drawStats() {
                           black, hideBribe );
 
         if( ! hideBribe && u->mLastBribingUnit >= 0 ) {            
-            x = 241;
-            y = 109;
+            x = 242;
             
-            drawUnit( u->mLastBribingUnit, x, y + 12 );
+            drawUnit( u->mLastBribingUnit, x, 22 + panelTop );
             
-            x -= 10;
-            
+            x -= 12;
+            y = 7 + panelTop;
+
             font16->drawString( translate( "stats_bribedBy" ), 
                                 x, 
                                 y,
@@ -601,12 +606,12 @@ void drawStats() {
                 
             
                 font16->drawString( translate( "stats_bribing" ), 
-                                    150, 
-                                    72,
+                                    230, 
+                                    27 + panelTop,
                                     black, 
-                                    alignLeft );
-                x = 155;
-                y = 102;
+                                    alignRight );
+                x = 193;
+                y = 61 + panelTop;
                 
                 for( int i=0; i<numPlayerUnits*2; i++ ) {
                     Unit *other = getUnit(i);
@@ -615,9 +620,9 @@ void drawStats() {
                         
                         drawUnit( i, x, y );
                         
-                        drawUnitBribe( i, x + 15, y - 6 );
+                        drawUnitBribe( i, x + 18, y - 9 );
                         
-                        x += 33;
+                        y += 22;
                         }
                     }
 
@@ -635,11 +640,12 @@ void drawStats() {
         // show inspector destination panel
         Unit *u = getUnit( numUnits - 1 );
 
-
-        drawSprite( unitInfoPanelSprite, 0, 64, panelColors[2] );
+        int panelTop = 34;
+        drawSprite( unitInfoPanelSprite, 0, panelTop, panelColors[2] );
 
         startNewSpriteLayer();
 
+        drawUnit( numUnits - 1, 15, 22 + panelTop );
         
         int dest = u->mDest;
         
@@ -647,16 +653,17 @@ void drawStats() {
         
         
         font16->drawString( translate( "stats_inspectorBlocking" ), 
-                            128, 
-                            72,
+                            128,
+                            11 + panelTop,
                             black, 
                             alignCenter );
         
-        int width = 
-            font16->measureString( translate( "stats_inspectorBlocking" ) );
+        //int width = 
+        //    font16->measureString( translate( "stats_inspectorBlocking" ) );
         
 
-        drawDiamondCounter( 128 + width / 2 + 15, 80, 
+        drawDiamondCounter( 128, 
+                            43 + panelTop, 
                             getDiamondsInRegion( dest ) );
 
         int i;
@@ -674,13 +681,13 @@ void drawStats() {
         if( someFound ) {
             font16->drawString( translate( "stats_inspectorConfiscating" ), 
                                 128, 
-                                92,
+                                28 + panelTop,
                                 black, 
                                 alignCenter );
             
             
             int x = 96;
-            int y = 122;
+            int y = 58 + panelTop;
             
             for( i=0; i<numPlayerUnits*2; i++ ) {
                 Unit *playerUnit = getUnit( i );

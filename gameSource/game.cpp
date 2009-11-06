@@ -399,9 +399,9 @@ int lastTouchX, lastTouchY;
 static void goToNextGameState() {
     // state transition
     if( currentGameState == connectState ) {
-        //currentGameState = accumulateDiamondsState;
+        currentGameState = accumulateDiamondsState;
         // FIXME  for testing
-        currentGameState = sellDiamondsState;
+        //currentGameState = sellDiamondsState;
         }
     else if( currentGameState == accumulateDiamondsState ) {
         postAccumulateTransition();
