@@ -531,11 +531,11 @@ void drawTopScreen() {
         
         font16->drawString( headerString, 
                             128, 
-                            145, white, alignCenter );
+                            148, white, alignCenter );
         
         font16->drawString( statusMessage, 
                             128, 
-                            160, white, alignCenter );
+                            163, white, alignCenter );
 
         if( statusSubMessage != NULL ) {
             font8->drawString( statusSubMessage, 
