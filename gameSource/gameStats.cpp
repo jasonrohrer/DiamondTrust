@@ -5,6 +5,7 @@
 #include "colors.h"
 #include "units.h"
 #include "map.h"
+#include "tga.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -104,19 +105,68 @@ static int datePanelW, datePanelH;
 static int unitInfoPanelSprite;
 static int unitPanelW, unitPanelH;
 
+static int pictureSprites[2][3];
+static int pictureSpriteW, pictureSpriteH;
+
+
+
+static void loadMultiSprite( char *inFileName, int inNumFrames,
+                             int *outSpriteIDs, int *outW, int *outH ) {
+
+    int w, h;
+    
+    rgbaColor *spriteRGBA = readTGAFile( inFileName,
+                                         &w, &h );
+    
+    
+    if( spriteRGBA == NULL ) {
+        printOut( "Reading multisprite file %s failed.\n", inFileName );
+        return;
+        }
+
+
+    // 1 pixel row between each sprite image
+    int spriteH = ((h + 1) /  inNumFrames ) - 1;
+    
+    for( int f=0; f<inNumFrames; f++ ) {
+        
+        rgbaColor *frameSubImage = 
+            &( spriteRGBA[ f * (spriteH + 1) * w ] );
+        
+        int numPixels = spriteH * w;
+        
+        applyCornerTransparency( frameSubImage, numPixels );
+
+        // first quadrant
+        outSpriteIDs[f] = 
+            addSprite( frameSubImage, w, spriteH );
+        }
+
+    delete [] spriteRGBA;
+    }
+
+
+
+
 void initStats() {
     statusPanelSprite = loadSprite( "statsPanel.tga", 
                                     &panelW, &panelH, true );
     datePanelSprite = loadSprite( "datePanel.tga", 
                                   &datePanelW, &datePanelH, true );
-    unitInfoPanelSprite = loadSprite( "rolodex.tga", 
+    unitInfoPanelSprite = loadSprite( "rolodex_manilla.tga", 
                                       &unitPanelW, &unitPanelH, true );
+
+
+    loadMultiSprite( "playerPictures.tga", 3,
+                     pictureSprites[0], &pictureSpriteW, &pictureSpriteH );
+    loadMultiSprite( "enemyPictures.tga", 3,
+                     pictureSprites[1], &pictureSpriteW, &pictureSpriteH );
 
     sellZeroNote = autoSprintf( translate( "stats_sellZeroNote" ),
                                 noSaleFlatRate );
     sellSomeNote = autoSprintf( translate( "stats_sellSomeNote" ),
                                 saleNet );
-    
+
     }
 
 
@@ -452,13 +502,21 @@ void drawStats() {
         
         Unit *u = getUnit( activeUnit );
         
+        int pictureSpriteID;
+        
         rgbaColor c;
         if( activeUnit < numPlayerUnits ) {
             c = panelColors[0];
+            pictureSpriteID = pictureSprites[0][ activeUnit ];
+            
             }
         else {
             c = panelColors[1];
+            pictureSpriteID = pictureSprites[1][ activeUnit - numPlayerUnits ];
             }
+        
+        // let manilla show for now
+        c = white;
         
         
         int panelTop = 34;
@@ -476,6 +534,9 @@ void drawStats() {
 
         drawDiamondCounter( 34, 14 + panelTop, u->mNumDiamondsHeld );
         
+        drawSprite( pictureSpriteID, 11, 86, white );
+        
+
         int xOffset, x, y;
         
         if( u->mTripCost > 0 ) {
@@ -641,7 +702,7 @@ void drawStats() {
         Unit *u = getUnit( numUnits - 1 );
 
         int panelTop = 34;
-        drawSprite( unitInfoPanelSprite, 0, panelTop, panelColors[2] );
+        drawSprite( unitInfoPanelSprite, 0, panelTop, white );
 
         startNewSpriteLayer();
 
