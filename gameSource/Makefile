@@ -45,6 +45,7 @@ title.tga \
 rolodex_manilla.tga \
 playerPictures.tga \
 enemyPictures.tga \
+sellingPanel.tga \
 
 # prepend path
 PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))

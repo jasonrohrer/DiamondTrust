@@ -101,6 +101,11 @@ static int panelW, panelH;
 static int datePanelSprite;
 static int datePanelW, datePanelH;
 
+static int sellingPanelSprite;
+static int sellingPanelW, sellingPanelH;
+
+
+
 
 static int unitInfoPanelSprite;
 static int unitPanelW, unitPanelH;
@@ -153,6 +158,10 @@ void initStats() {
                                     &panelW, &panelH, true );
     datePanelSprite = loadSprite( "datePanel.tga", 
                                   &datePanelW, &datePanelH, true );
+    sellingPanelSprite = loadSprite( "sellingPanel.tga", 
+                                     &sellingPanelW, &sellingPanelH, true );
+    
+
     unitInfoPanelSprite = loadSprite( "rolodex_manilla.tga", 
                                       &unitPanelW, &unitPanelH, true );
 
@@ -372,8 +381,19 @@ static void drawPanelContents( int inX, int inPlayer ) {
 
 
 
-static void drawSellStats( int inX, int inPlayer ) {
-    int y = 50;
+static void drawSellStats( int inX, int inY, int inPlayer ) {
+    
+    int y = inY;
+    
+
+    drawSprite( sellingPanelSprite, inX, y, panelColors[ inPlayer ] );
+    
+    startNewSpriteLayer();
+    
+    inX += 8;
+    
+
+    y += 17;
     
     int xOffset = font16->measureString( translate( "stats_selling" ) );
     int otherOffset = 
@@ -387,28 +407,28 @@ static void drawSellStats( int inX, int inPlayer ) {
     font16->drawString( translate( "stats_selling" ), 
                         inX, 
                         y - 8,
-                        white, 
+                        black, 
                         alignLeft );
     
     
-    drawDiamondCounter( inX + xOffset, y, selling[inPlayer] );
+    drawDiamondCounter( inX + xOffset + 8, y - 1, selling[inPlayer] );
 
-    y += 20;
+    y += 12;
     font16->drawString( translate( "stats_earning" ), 
                         inX, 
                         y,
-                        white, 
+                        black, 
                         alignLeft );
     
     
     
     if( selling[inPlayer] == 0 ) {
-        drawMoneyValue16( inX + xOffset - 8, y, noSaleFlatRate, white, false );
+        drawMoneyValue16( inX + xOffset - 9, y, noSaleFlatRate, black, false );
         }
     else {
 
-        drawMoneyValue16( inX + xOffset - 8, y, 
-                          getPlayerEarnings( inPlayer ), white, 
+        drawMoneyValue16( inX + xOffset - 9, y, 
+                          getPlayerEarnings( inPlayer ), black, 
                           !revealSaleFlag );
         }
     }
@@ -468,10 +488,10 @@ void drawStats() {
     
     if( showSaleFlag ) {
         
-        drawSellStats( 10, 0 );
+        drawSellStats( 0, 56, 0 );
 
         if( peekSaleFlag || revealSaleFlag ) {
-            drawSellStats( 138, 1 );
+            drawSellStats( 128, 56, 1 );
 
 
             if( peekSaleFlag && pictureSendSpriteSet ) {
@@ -480,7 +500,7 @@ void drawStats() {
             }
         
 
-        int y = 90;
+        int y = 110;
         
         if( selling[0] == 0 ) {
             font8->drawString( sellZeroNote,

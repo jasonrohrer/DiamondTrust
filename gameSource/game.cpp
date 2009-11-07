@@ -238,7 +238,7 @@ void gameInit() {
     
 
     currentGameState = connectState;
-    //currentGameState = accumulateDiamondsState;
+    //currentGameState = sellDiamondsState;
     currentGameState->enterState();
     }
 
