@@ -291,8 +291,12 @@ static void drawMoneyValue16( int inX, int inY, int inValue,
     // "$" position
 
     // hackish fix if 3+ digits are required (violate right-alignment)
+
+    // even more hackish:  there seems to be room for a 1 to sneak in there
+    // for $100+ values
+    // but probably not a 2 for $200+ values
     unsigned int numDigits = strlen( moneyString );
-    if( numDigits > 2 ) {
+    if( numDigits > 2 && inValue > 199 ) {
         inX += 11 * (numDigits - 2) + 2 * (numDigits - 2);
         }
     
@@ -488,19 +492,19 @@ void drawStats() {
     
     if( showSaleFlag ) {
         
-        drawSellStats( 0, 56, 0 );
+        drawSellStats( 0, 49, 0 );
 
         if( peekSaleFlag || revealSaleFlag ) {
-            drawSellStats( 129, 56, 1 );
+            drawSellStats( 129, 49, 1 );
 
 
             if( peekSaleFlag && pictureSendSpriteSet ) {
-                drawSprite( pictureSendSpriteID, 176, 99, white );
+                drawSprite( pictureSendSpriteID, 175, 99, white );
                 }
             }
         
 
-        int y = 110;
+        int y = 39;
         
         if( selling[0] == 0 ) {
             font8->drawString( sellZeroNote,
