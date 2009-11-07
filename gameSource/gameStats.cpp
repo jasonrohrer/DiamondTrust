@@ -491,7 +491,7 @@ void drawStats() {
         drawSellStats( 0, 56, 0 );
 
         if( peekSaleFlag || revealSaleFlag ) {
-            drawSellStats( 128, 56, 1 );
+            drawSellStats( 129, 56, 1 );
 
 
             if( peekSaleFlag && pictureSendSpriteSet ) {
