@@ -237,8 +237,8 @@ void gameInit() {
     setMonthsLeft( 8 );
     
 
-    currentGameState = connectState;
-    //currentGameState = sellDiamondsState;
+    //currentGameState = connectState;
+    currentGameState = sellDiamondsState;
     currentGameState->enterState();
     }
 
