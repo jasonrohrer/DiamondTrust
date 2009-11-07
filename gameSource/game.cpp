@@ -237,8 +237,8 @@ void gameInit() {
     setMonthsLeft( 8 );
     
 
-    //currentGameState = connectState;
-    currentGameState = sellDiamondsState;
+    currentGameState = connectState;
+    //currentGameState = sellDiamondsState;
     currentGameState->enterState();
     }
 
@@ -399,9 +399,9 @@ int lastTouchX, lastTouchY;
 static void goToNextGameState() {
     // state transition
     if( currentGameState == connectState ) {
-        //currentGameState = accumulateDiamondsState;
+        currentGameState = accumulateDiamondsState;
         // FIXME  for testing
-        currentGameState = sellDiamondsState;
+        //currentGameState = sellDiamondsState;
         }
     else if( currentGameState == accumulateDiamondsState ) {
         postAccumulateTransition();
