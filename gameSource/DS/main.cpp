@@ -354,7 +354,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
     // reserve color 0 for transparency, but only if it's used!
     // check
-    int transUsed = false;
+    char transUsed = false;
     
     for( int i=0; i<numPixels && !transUsed; i++ ) {
         if( inDataRGBA[i].a == 0 ) {
@@ -452,8 +452,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         t.colorZeroTransparent = false;        
         }
     else {
-        // force zero transparent for paletted textures
-        t.colorZeroTransparent = true;
+        // force zero transparent for paletted textures if trans used
+        t.colorZeroTransparent = transUsed;
         
         //printOut( "Texture uses only %d colors\n", numUniqueColors );
         
