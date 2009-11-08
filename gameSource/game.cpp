@@ -24,7 +24,7 @@ int satelliteBottomSpriteID;
 int satelliteBottomHalfOffset;
 unsigned char satelliteFade;
 
-int titleSpriteID;
+int titleSpriteID[3];
 unsigned char titleFade;
 
 
@@ -147,8 +147,33 @@ void gameInit() {
 
     printOut( "Loading title image\n" );
     titleFade = 255;
-    titleSpriteID = loadSprite( "title16.tga", true );
 
+    int titleW, titleH;
+    rgbaColor *titleRGBA = readTGAFile( "title16.tga",
+                                        &titleW, &titleH );
+
+    applyCornerTransparency( titleRGBA, titleW * titleH );
+
+    if( titleRGBA == NULL ) {
+        
+        printOut( "Reading title file failed.\n" );
+        return;
+        }
+
+    // split into 3 parts to save texture memory
+    int bandHeights[3] = { 64, 16, 2 };
+    int nextBandOffset = 0;
+    for( int b=0; b<3; b++ ) {
+        rgbaColor *subPointer = 
+            &( titleRGBA[ nextBandOffset * titleW ] );
+    
+        titleSpriteID[b] = 
+            addSprite( subPointer, titleW, bandHeights[b] );
+        
+        nextBandOffset += bandHeights[b];
+        }
+    delete [] titleRGBA;
+    
 
 
     printOut( "Constructing camera picture sprites\n" );

@@ -22,7 +22,6 @@ pickerBorder.tga \
 bid.tga \
 statsPanel.tga \
 datePanel.tga \
-unitInfoPanel.tga \
 bribedMarker.tga \
 miniDiamond.tga \
 vault.tga \
@@ -54,6 +53,8 @@ sellingPanel.tga \
 # though change to 16-color version isn't so great
 #title.tga \
 #title256.tga \
+# dropping down to 4 colors changes the appearance completely
+# title16.tga \
 
 # this change cannot be seen, but change to 4-color not ideal
 #rolodex_manilla.tga \
