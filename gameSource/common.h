@@ -47,6 +47,12 @@ int loadSprite( char *inFileName, char inCornerTransparent = false );
 void applyCornerTransparency( rgbaColor *inImage, int inNumPixels );
 
 
+rgbaColor *extractRegion( rgbaColor *inImage, int inW, int inH,
+                          int inOffsetX, int inOffsetY, 
+                          int inExtractW, int inExtractH );
+
+                          
+
 
 
 inline char equals( rgbaColor inA, rgbaColor inB ) {

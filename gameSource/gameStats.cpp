@@ -107,7 +107,13 @@ static int sellingPanelW, sellingPanelH;
 
 
 
-static int unitInfoPanelSprite;
+// broken up into parts to save space
+// top, bottom, left, right, fill-block
+static int unitInfoPanelSprite[5];
+static intPair unitInfoPanelPartOffsets[5] = 
+  { {0,0}, {0,64}, {0,0}, {248,0}, {8,8} };
+static intPair unitInfoPanelPartSizes[5] = 
+  { {256,8}, {256,64}, {8,128}, {8,128}, {8,8} };
 static int unitPanelW, unitPanelH;
 
 static int pictureSprites[2][3];
@@ -165,8 +171,38 @@ void initStats() {
                                      &sellingPanelW, &sellingPanelH, true );
     
 
+    rgbaColor *unitInfoPanelRGBA = readTGAFile( "rolodex_manilla4.tga",
+                                                &unitPanelW, &unitPanelH );
+
+    if( unitInfoPanelRGBA == NULL ) {
+        
+        printOut( "Reading unitInfoPanel sprite failed.\n" );
+        return;
+        }
+    applyCornerTransparency( unitInfoPanelRGBA, unitPanelW * unitPanelH );
+    
+    /*
     unitInfoPanelSprite = loadSprite( "rolodex_manilla4.tga", 
                                       &unitPanelW, &unitPanelH, true );
+    */
+
+    for( int p=0; p<5; p++ ) {
+        intPair offset = unitInfoPanelPartOffsets[p];
+        intPair size = unitInfoPanelPartSizes[p];
+        
+        printOut( "Extracting region at %d,%d of size %d,%d\n",
+                  offset.x, offset.y,
+                  size.x, size.y );
+        
+        rgbaColor *partRGBA = extractRegion( unitInfoPanelRGBA, 
+                                             unitPanelW, unitPanelH,
+                                             offset.x, offset.y,
+                                             size.x, size.y );
+        unitInfoPanelSprite[p] = addSprite( partRGBA, size.x, size.y );
+    
+        delete [] partRGBA;
+        }
+    
 
 
     loadMultiSprite( "playerPictures16.tga", 3,
@@ -441,6 +477,35 @@ static void drawSellStats( int inX, int inY, int inPlayer ) {
     }
 
 
+static void drawInfoPanelBackground( int inX, int inY, rgbaColor inC ) {
+    for( int p=0; p<4; p++ ) {
+        intPair offset = unitInfoPanelPartOffsets[p];
+
+        drawSprite( unitInfoPanelSprite[p], 
+                    inX + offset.x, inY + offset.y, inC );
+        }
+    // 4 is fill block... fill 30x7 grid of blocks
+    int blockID = unitInfoPanelSprite[4];
+    intPair offset = unitInfoPanelPartOffsets[4];
+
+    int xOffset = inX + offset.x;
+    
+
+    for( int x=0; x<30; x++ ) {
+        
+        int yOffset = inY + offset.y;
+        
+        for( int y=0; y<7; y++ ) {
+            drawSprite( blockID, 
+                        xOffset, yOffset, inC );
+            yOffset += offset.y;
+            }
+        xOffset += offset.x;
+        }
+    
+    }
+
+
 
 // draws stats onto upper screen
 void drawStats() {
@@ -550,7 +615,8 @@ void drawStats() {
         
 
 
-        drawSprite( unitInfoPanelSprite, 0, panelTop, c );
+        //drawSprite( unitInfoPanelSprite, 0, panelTop, c );
+        drawInfoPanelBackground( 0, panelTop, c );
 
         startNewSpriteLayer();
         
@@ -729,7 +795,8 @@ void drawStats() {
         Unit *u = getUnit( numUnits - 1 );
 
         int panelTop = 34;
-        drawSprite( unitInfoPanelSprite, 0, panelTop, white );
+        //drawSprite( unitInfoPanelSprite, 0, panelTop, white );
+        drawInfoPanelBackground( 0, panelTop, white );
 
         startNewSpriteLayer();
 

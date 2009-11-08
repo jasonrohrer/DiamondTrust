@@ -215,7 +215,7 @@ static textureInfo makeTextureInfo( int inWidth, int inHeight ) {
             t.sizeT = GX_TEXSIZE_T1024;
             break;
         default:
-            printOut( "Unsupported texture width, %d\n", inWidth );
+            printOut( "Unsupported texture height, %d\n", inHeight );
         }
     
     t.texCoordCorners[0] = GX_ST( 0, inHeight << FX32_SHIFT );

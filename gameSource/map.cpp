@@ -18,18 +18,22 @@
 
 // split 192-row sprite into two power-of-two-height parts
 
-// 32x24   8x8-pixel blocks... makes it more likely that a given
-// block has <=16 colors to save texture RAM
+// 16x12   16x16-pixel blocks... makes it more likely that a given
+// block has <=16 (or <=4 !!!) colors to save texture RAM
+// also, reuse blocks wherever they are identical to recent blocks
 #define numChunks 16
 #define numSlices 12
 static int mapBackgroundSliceSpriteIDs[numChunks][ numSlices ];
 static int chunkW = 256 / numChunks;
 static int sliceH = 192 / numSlices;
 
+/*
 // top 128 rows
 static int mapBackgroundTopSpriteID;
 // bottom 64 rows
 static int mapBackgroundBottomSpriteID;
+*/
+
 static int bottomHalfOffset = 128;
 
 static int mapNamesTopSpriteID;
@@ -430,6 +434,9 @@ void initMap() {
     delete [] tagMap;
 
     rgbaColor *chunk = new rgbaColor[ chunkW * mapH ];
+    
+    int matchCount = 0;
+    
 
     for( int c=0; c<numChunks; c++ ) {
         
@@ -441,15 +448,52 @@ void initMap() {
                 }
             }
         
+        rgbaColor *lastSlicePointer = NULL;
+        int lastSpriteID = -1;
+
+        int numBlockPixels = sliceH * chunkW;
+
+
         for( int s=0; s<numSlices; s++ ) {
             printOut( "Background chunk %d, slice %d\n", c, s );
             rgbaColor *slicePointer = 
                 &( chunk[ s * sliceH * chunkW ] );
         
-            mapBackgroundSliceSpriteIDs[c][s] = 
-                addSprite( slicePointer, chunkW, sliceH );
+            char matchFound = false;
+            if( lastSlicePointer != NULL ) {
+                
+                // is this slice equal to last?
+                char same = true;
+                for( int p=0; p<numBlockPixels && same; p++ ) {
+                    if( ! equals( lastSlicePointer[p], slicePointer[p] ) ) {
+                        same = false;
+                        }
+                    }
+                if( same ) {
+                    matchFound = true;
+                    // reuse sprite ID
+                    mapBackgroundSliceSpriteIDs[c][s] = lastSpriteID;
+                    // keep same lastSpriteID and lastSlicePointer
+                    
+                    matchCount++;
+                    }
+                }
+            
+            if( ! matchFound ) {
+                
+                // new sprite
+                mapBackgroundSliceSpriteIDs[c][s] = 
+                    addSprite( slicePointer, chunkW, sliceH );
+            
+                // save to compare against next
+                lastSpriteID = mapBackgroundSliceSpriteIDs[c][s];
+                lastSlicePointer = slicePointer;
+                }
+            
             }
         }
+    printOut( "Saved %d 16x16 blocks by looking for matches\n", matchCount );
+
     delete [] chunk;
     
     

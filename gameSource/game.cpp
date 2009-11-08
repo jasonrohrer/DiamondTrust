@@ -161,7 +161,7 @@ void gameInit() {
         }
 
     // split into 3 parts to save texture memory
-    int bandHeights[3] = { 64, 16, 2 };
+    int bandHeights[3] = { 64, 16, 8 };
     int nextBandOffset = 0;
     for( int b=0; b<3; b++ ) {
         rgbaColor *subPointer = 
