@@ -65,8 +65,9 @@ int vehicleSpriteW;
 // one set per side (player, enemy, un)
 int vehicleSpriteIDs[3][32];
 int vehicleSpriteAngles[32];
-char *vehicleSpriteFileNames[3] = {"piper_rotated.tga", "jet_rotated.tga", 
-                                   "puma_rotated.tga" };
+char *vehicleSpriteFileNames[3] = { "piper_rotated16.tga", 
+                                    "jet_rotated16.tga", 
+                                    "puma_rotated16.tga" };
 
 
 
@@ -341,9 +342,11 @@ void initUnits() {
 
 
 
-
+    printOut( "Initing unit vehicle sprites\n" );
+    
     // construct vehicle sprites
     for( int t=0; t<3; t++ ) {
+        printOut( "Loading from file %s\n", vehicleSpriteFileNames[t] );
         
         rgbaColor *vehicleRGBA = readTGAFile( vehicleSpriteFileNames[t],
                                               &vehicleSpriteW, &imageH );
@@ -371,6 +374,8 @@ void initUnits() {
         int angleIncrementTimes100 = 1125;
 
         for( int r=0; r<8; r++ ) {
+            printOut( "Vehicle angle %d\n", r );
+            
             // round down
             vehicleSpriteAngles[r] = angleSumTimes100 / 100;
             angleSumTimes100 += angleIncrementTimes100;
@@ -1057,7 +1062,7 @@ void drawUnits() {
             if( c.a < 255 ) {
 
                 // invert
-                unsigned char alpha = 255 - c.a;
+                unsigned char alpha = (unsigned char)( 255 - c.a );
 
                 intPair anchorPos;
                 

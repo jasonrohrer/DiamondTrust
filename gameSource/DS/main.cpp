@@ -117,7 +117,8 @@ unsigned int getRandom( unsigned int inMax ) {
 
 
 
-#define MAX_TEXTURES  512
+//#define MAX_TEXTURES  512
+#define MAX_TEXTURES  1024
 
 struct textureInfoStruct {
         unsigned int slotAddress;
@@ -229,15 +230,16 @@ static textureInfo makeTextureInfo( int inWidth, int inHeight ) {
 
 
 static void addPalette( textureInfo *inT, 
-                        unsigned short inPalette, int inPaletteEntries ) {
+                        unsigned short *inPalette, 
+                        unsigned int inPaletteEntries ) {
     
-    t->paletteSlotAddress = nextTexturePaletteAddress;
+    inT->paletteSlotAddress = nextTexturePaletteAddress;
 
 
     // copy into aligned memory
-    int paletteBytes = inPaletteEntries * sizeof( short );
+    unsigned int paletteBytes = inPaletteEntries * sizeof( short );
     
-    memcpy( textureColors, inPalette, paletteBytes );
+    memcpy( (void *)textureColors, (void *)inPalette, paletteBytes );
     
     
 
@@ -245,7 +247,7 @@ static void addPalette( textureInfo *inT,
     
     GX_BeginLoadTexPltt();
     GX_LoadTexPltt( textureColors,
-                    t.paletteSlotAddress,
+                    inT->paletteSlotAddress,
                     paletteBytes );
     GX_EndLoadTexPltt();
 
@@ -262,22 +264,22 @@ static void addPalette( textureInfo *inT,
     nextTexturePaletteAddress += offset;
     
     numTexturePaletteBytesAdded += offset;
-    //printOut( "Added %d paletteBytes bytes so far.\n", 
-    //          numTexturePaletteBytesAdded );
+    printOut( "Added %d paletteBytes bytes so far.\n", 
+              numTexturePaletteBytesAdded );
     }
 
 
 
 static void addTextureData( textureInfo *inT,
                             unsigned short *inPackedTextureData,
-                            int inNumBytes ) {
+                            unsigned int inNumBytes ) {
     
     DC_FlushRange( inPackedTextureData, inNumBytes );
 
     GX_BeginLoadTex();
     
-    GX_LoadTex( (unsigned short *)inPackedTextureData, 
-                t->slotAddress,
+    GX_LoadTex( inPackedTextureData, 
+                inT->slotAddress,
                 inNumBytes );
     
     GX_EndLoadTex(); 
@@ -296,7 +298,7 @@ static void addTextureData( textureInfo *inT,
 int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
                   unsigned short inPalette[256], char inZeroTransparent ) {
     
-    int numPixels = inWidth * inHeight;
+    unsigned int numPixels = (unsigned int)( inWidth * inHeight );
     
     textureInfo t = makeTextureInfo( inWidth, inHeight );
 
@@ -321,7 +323,7 @@ void replaceSprite256( int inSpriteID,
                        unsigned char *inDataBytes, 
                        int inWidth, int inHeight ) {
 
-    int numPixels = inWidth * inHeight;
+    unsigned int numPixels = (unsigned int)( inWidth * inHeight );
 
     addTextureData( &( textureInfoArray[ inSpriteID ] ), 
                     (unsigned short*)inDataBytes, numPixels );
@@ -350,9 +352,24 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
         textureColors[k] = 0;
         }
 
-    // reserve color 0 for transparency
-    int numUniqueColors = 1;
+    // reserve color 0 for transparency, but only if it's used!
+    // check
+    int transUsed = false;
     
+    for( int i=0; i<numPixels && !transUsed; i++ ) {
+        if( inDataRGBA[i].a == 0 ) {
+            transUsed = true;
+            }
+        }
+    
+    int numUniqueColors = 0;
+    
+    if( transUsed ) {
+        // 0 already set asside for all transparent pixels
+        numUniqueColors = 1;
+        }
+    
+
     for( int i=0; i<numPixels; i++ ) {
         // discard lowest 3 bits for each color
         // discard all but 1 bit for alpha
@@ -372,20 +389,27 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
             char found = false;
 
-            int alpha = c.a >> 7;
-            if( alpha == 0 ) {
-                // matches palette color 0
-                texturePaletteIndices[i] = 0;
-                found = true;
+            if( transUsed ) {    
+                int alpha = c.a >> 7;
+                if( alpha == 0 ) {
+                    // matches palette color 0
+                    texturePaletteIndices[i] = 0;
+                    found = true;
+                    }
                 }
+            
             
             int jLimit = numUniqueColors;
             if( jLimit > 256 ) {
                 jLimit = 256;
                 }
             
-
-            for( int j=1; j<jLimit && !found; j++ ) {
+            int startColorIndex = 0;
+            if( transUsed ) {
+                startColorIndex = 1;
+                }
+            
+            for( int j=startColorIndex; j<jLimit && !found; j++ ) {
                 if( c16 == textureColors[ j ] ) {
                     found = true;
                     texturePaletteIndices[i] = (unsigned char)j;
@@ -529,7 +553,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
     nextTextureInfoIndex++;
     
     
-    //printOut( "Added %d texture bytes so far.\n", numTextureBytesAdded );
+    printOut( "Added %d texture bytes so far (last texture had %d colors).\n",
+              numTextureBytesAdded, numUniqueColors );
     
     delete [] packedTextureData;
     
@@ -1614,29 +1639,40 @@ static void stepNetwork() {
 
 
 
-/*
-FIXME:  camera stuff
+
+//FIXME:  camera stuff
 
 
-char isCameraSupported();
+char isCameraSupported() {
+    return true;
+    }
+
 
 // start producing frames
-void startCamera();
+void startCamera() {
+    }
+
 
 // stop producing frames
-void stopCamera();
+void stopCamera() {
+    }
+
 
 // Trimming size fixed at 160x120
 // format fixed at grayscale 256 levels
 
 // get the next frame
 // inBuffer is where 160x120 grayscale pixels will be returned
-void getFrame( unsigned char *inBuffer );
+void getFrame( unsigned char *inBuffer ) {
+    }
+
 
 // snap the next frame as a finished picture
-void snapPicture( unsigned char *inBuffer );
+void snapPicture( unsigned char *inBuffer ) {
+    }
 
-*/
+
+
 
 
 

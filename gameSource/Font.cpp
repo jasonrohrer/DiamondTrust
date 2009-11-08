@@ -66,12 +66,29 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
                         }
                     }
                 
+                // don't bother consuming texture ram for blank sprites
+                char allTransparent = true;
                 
-                mSpriteMap[i] = 
-                    addSprite( charRGBA, mSpriteWidth, mSpriteWidth );
+                for( int p=0; p<pixelsPerChar && allTransparent; p++ ) {
+                    if( charRGBA[ p ].a != 0 ) {
+                        allTransparent = false;
+                        }
+                    }
+                
+                if( !allTransparent ) {
+                    mSpriteMap[i] = 
+                        addSprite( charRGBA, mSpriteWidth, mSpriteWidth );
+                    }
+                else {
+                    mSpriteMap[i] = -1;
+                    }
                 
 
                 if( mFixedWidth ) {
+                    mCharLeftEdgeOffset[i] = 0;
+                    mCharWidth[i] = mSpriteWidth;
+                    }
+                else if( allTransparent ) {
                     mCharLeftEdgeOffset[i] = 0;
                     mCharWidth[i] = mSpriteWidth;
                     }
@@ -178,9 +195,11 @@ int Font::drawCharacter( char inC, int inX, int inY, rgbaColor inColor ) {
         charStartX -= mCharLeftEdgeOffset[ (int)inC ];
         }
     
+    int spriteID = mSpriteMap[ (int)inC ];
     
-    drawSprite( mSpriteMap[ (int)inC ], charStartX, inY, inColor );
-    
+    if( spriteID != -1 ) {
+        drawSprite( mSpriteMap[ (int)inC ], charStartX, inY, inColor );
+        }
     
     if( mFixedWidth ) {
         return mSpriteWidth;

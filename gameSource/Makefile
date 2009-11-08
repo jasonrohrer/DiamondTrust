@@ -1,8 +1,6 @@
 
 
 GAME_GRAPHICS = \
-testTexture.tga \
-testTexture2.tga \
 parentButton.tga \
 childButton.tga \
 button.tga \
@@ -10,11 +8,6 @@ longButton.tga \
 angola_map.tga \
 font8.tga \
 font16_sans.tga \
-testDirectColor.tga \
-test250Color.tga \
-units_simple.tga \
-units.tga \
-unit_waving.tga \
 playerUnits.tga \
 enemyUnits.tga \
 inspectorUnit.tga \
@@ -35,17 +28,42 @@ miniDiamond.tga \
 vault.tga \
 salePicker.tga \
 map_names.tga \
-paper.tga \
-jet_rotated.tga \
-piper_rotated.tga \
-jeep_rotated.tga \
-puma_rotated.tga \
-angola_satellite.tga \
-title.tga \
-rolodex_manilla.tga \
-playerPictures.tga \
-enemyPictures.tga \
+paper16.tga \
+jet_rotated16.tga \
+piper_rotated16.tga \
+puma_rotated16.tga \
+angola_satellite16.tga \
+title16.tga \
+rolodex_manilla4.tga \
+playerPictures16.tga \
+enemyPictures16.tga \
 sellingPanel.tga \
+
+
+# not ideal!
+#playerPictures.tga \
+#enemyPictures.tga \
+
+# this change is less than ideal! \
+#paper.tga \
+
+# this change is less than ideal! \
+#angola_satellite.tga \
+
+# this change cannot be seen \
+# though change to 16-color version isn't so great
+#title.tga \
+#title256.tga \
+
+# this change cannot be seen, but change to 4-color not ideal
+#rolodex_manilla.tga \
+#rolodex_manilla16.tga \
+
+# this change cannot be seen
+#jet_rotated.tga \
+#piper_rotated.tga \
+#puma_rotated.tga \
+
 
 # prepend path
 PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))

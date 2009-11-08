@@ -148,6 +148,9 @@ static void loadMultiSprite( char *inFileName, int inNumFrames,
         }
 
     delete [] spriteRGBA;
+
+    *outW = pictureSpriteW;
+    *outH = pictureSpriteH;
     }
 
 
@@ -162,13 +165,13 @@ void initStats() {
                                      &sellingPanelW, &sellingPanelH, true );
     
 
-    unitInfoPanelSprite = loadSprite( "rolodex_manilla.tga", 
+    unitInfoPanelSprite = loadSprite( "rolodex_manilla4.tga", 
                                       &unitPanelW, &unitPanelH, true );
 
 
-    loadMultiSprite( "playerPictures.tga", 3,
+    loadMultiSprite( "playerPictures16.tga", 3,
                      pictureSprites[0], &pictureSpriteW, &pictureSpriteH );
-    loadMultiSprite( "enemyPictures.tga", 3,
+    loadMultiSprite( "enemyPictures16.tga", 3,
                      pictureSprites[1], &pictureSpriteW, &pictureSpriteH );
 
     sellZeroNote = autoSprintf( translate( "stats_sellZeroNote" ),

@@ -118,7 +118,7 @@ void gameInit() {
     printOut( "Loading satellite map\n" );
     satelliteFade = 255;
     int satelliteW, satelliteH;
-    rgbaColor *satelliteRGBA = readTGAFile( "angola_satellite.tga",
+    rgbaColor *satelliteRGBA = readTGAFile( "angola_satellite16.tga",
                                             &satelliteW, &satelliteH );
 
     if( satelliteRGBA == NULL
@@ -132,20 +132,22 @@ void gameInit() {
     
     satelliteTopSpriteID = 
         addSprite( satelliteRGBA, satelliteW, satelliteBottomHalfOffset );
-
+    
     rgbaColor *bottomHalfPointer = 
         &( satelliteRGBA[ satelliteBottomHalfOffset * satelliteW ] );
     
     satelliteBottomSpriteID = 
         addSprite( bottomHalfPointer, satelliteW, 
                    satelliteH - satelliteBottomHalfOffset );
-
+    // FIXME
+    //satelliteTopSpriteID = satelliteBottomSpriteID;
+    
     delete [] satelliteRGBA;
 
 
     printOut( "Loading title image\n" );
     titleFade = 255;
-    titleSpriteID = loadSprite( "title.tga", true );
+    titleSpriteID = loadSprite( "title16.tga", true );
 
 
 
@@ -171,7 +173,8 @@ void gameInit() {
     unsigned char *data = 
         new unsigned char[ pictureDisplaySpriteW * pictureDisplaySpriteH ];
     
-    memset( data, 0, pictureDisplaySpriteW * pictureDisplaySpriteH );
+    memset( data, 0, 
+            (unsigned int)( pictureDisplaySpriteW * pictureDisplaySpriteH ) );
 
     pictureDisplaySpriteID = 
         addSprite256( data, 
@@ -182,7 +185,8 @@ void gameInit() {
     data = 
         new unsigned char[ pictureSendSpriteW * pictureSendSpriteH ];
     
-    memset( data, 0, pictureSendSpriteW * pictureSendSpriteH );
+    memset( data, 0, 
+            (unsigned int)( pictureSendSpriteW * pictureSendSpriteH ) );
 
     pictureSendSpriteID = 
         addSprite256( data, 
@@ -213,13 +217,25 @@ void gameInit() {
                                                  128,
                                                  146 );
 
+    printOut( "  ++++++  Init map\n" );
     initMap();
+
+    printOut( "  ++++++  Init units\n" );
     initUnits();
+
+    printOut( "  ++++++  Init bid picker\n" );
     initBidPicker();
+
+    printOut( "  ++++++  Init game stats\n" );
     initStats();
+
+    printOut( "  ++++++  Init flying diamonds\n" );
     initFlyingDiamonds();
+
+    printOut( "  ++++++  Init sale picker\n" );
     initSalePicker();
     
+
     setPlayerMoney( 0, 18 );
     setPlayerMoney( 1, 18 );    
 

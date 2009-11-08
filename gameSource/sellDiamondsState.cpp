@@ -113,7 +113,7 @@ static void sendMoveMessage() {
         message[1] = 1;
         int dataLength = pictureSendW * pictureSendH;
         numFutureMessages = dataLength / 300;
-        message[2] = numFutureMessages;
+        message[2] = (unsigned char)numFutureMessages;
         }
     else {
         message[1] = 0;
@@ -189,7 +189,7 @@ static int getMoveMessage() {
             pictureReceiveData = 
                 new unsigned char[ numPixels ];
             
-            memset( pictureReceiveData, 0, numPixels );
+            memset( pictureReceiveData, 0, (unsigned int)numPixels );
             
 
             pictureNumBytesReceived = 0;            
@@ -297,7 +297,7 @@ static unsigned char *expandImage( unsigned char *inSource,
     
     unsigned char *dest = new unsigned char[ inDestW * inDestH ];
     
-    memset( dest, 0, inDestW * inDestH );
+    memset( dest, 0, (unsigned int)( inDestW * inDestH ) );
     
     for( int y=0; y<inSourceH; y++ ) {
         for( int x=0; x<inSourceW; x++ ) {

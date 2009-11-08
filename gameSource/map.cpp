@@ -18,6 +18,14 @@
 
 // split 192-row sprite into two power-of-two-height parts
 
+// 32x24   8x8-pixel blocks... makes it more likely that a given
+// block has <=16 colors to save texture RAM
+#define numChunks 16
+#define numSlices 12
+static int mapBackgroundSliceSpriteIDs[numChunks][ numSlices ];
+static int chunkW = 256 / numChunks;
+static int sliceH = 192 / numSlices;
+
 // top 128 rows
 static int mapBackgroundTopSpriteID;
 // bottom 64 rows
@@ -420,16 +428,42 @@ void initMap() {
         }
    
     delete [] tagMap;
-    
 
+    rgbaColor *chunk = new rgbaColor[ chunkW * mapH ];
+
+    for( int c=0; c<numChunks; c++ ) {
+        
+        // extract vertical chunk
+        int xStart = c * chunkW;
+        for( int y=0; y<mapH; y++ ) {
+            for( int x=0; x<chunkW; x++ ) {
+                chunk[ y * chunkW + x ] = mapRGBA[ y * mapW + x + xStart ];
+                }
+            }
+        
+        for( int s=0; s<numSlices; s++ ) {
+            printOut( "Background chunk %d, slice %d\n", c, s );
+            rgbaColor *slicePointer = 
+                &( chunk[ s * sliceH * chunkW ] );
+        
+            mapBackgroundSliceSpriteIDs[c][s] = 
+                addSprite( slicePointer, chunkW, sliceH );
+            }
+        }
+    delete [] chunk;
+    
+    
+    rgbaColor *bottomHalfPointer;
+    
+    /*
     mapBackgroundTopSpriteID = addSprite( mapRGBA, mapW, bottomHalfOffset );
 
-    rgbaColor *bottomHalfPointer = 
+    bottomHalfPointer = 
         &( mapRGBA[ bottomHalfOffset * mapW ] );
     
     mapBackgroundBottomSpriteID = addSprite( bottomHalfPointer, mapW, 
                                              mapH - bottomHalfOffset );
-
+    */
     delete [] mapRGBA;
     delete [] mapPixelInts;
 
@@ -467,7 +501,7 @@ void initMap() {
 
     int paperW, paperH;
     
-    rgbaColor *paperRGBA = readTGAFile( "paper.tga",
+    rgbaColor *paperRGBA = readTGAFile( "paper16.tga",
                                         &paperW, &paperH );
 
     if( paperRGBA == NULL
@@ -548,11 +582,19 @@ void drawMap() {
     backgroundColor.a = (unsigned char)( 128 + ( 64 * getMonthsLeft() ) / 8 );
     
 
-
+    for( int c=0; c<numChunks; c++ ) {
+        for( int s=0; s<numSlices; s++ ) {
+            drawSprite( mapBackgroundSliceSpriteIDs[c][s], 
+                        c * chunkW, s * sliceH, 
+                        backgroundColor );
+            }
+        }
+    
+    /*
     drawSprite( mapBackgroundTopSpriteID, 0, 0, backgroundColor );
     drawSprite( mapBackgroundBottomSpriteID, 0, bottomHalfOffset, 
                 backgroundColor );
-    
+    */
     startNewSpriteLayer();    
 
     rgbaColor regionColor = white;
