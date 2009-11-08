@@ -101,8 +101,14 @@ static int panelW, panelH;
 static int datePanelSprite;
 static int datePanelW, datePanelH;
 
-static int sellingPanelSprite;
-static int sellingPanelW, sellingPanelH;
+// broken up into parts to save space
+// left, middle, right, fill-column
+static int sellingPanelSprite[4];
+static intPair sellingPanelPartOffsets[4] = 
+  { {0,0}, {72,0}, {120,0}, {8,0} };
+static intPair sellingPanelPartSizes[4] = 
+  { {8,64}, {16,64}, {8,64}, {8,64} };
+//static int sellingPanelW, sellingPanelH;
 
 
 
@@ -114,7 +120,7 @@ static intPair unitInfoPanelPartOffsets[5] =
   { {0,0}, {0,64}, {0,0}, {248,0}, {8,8} };
 static intPair unitInfoPanelPartSizes[5] = 
   { {256,8}, {256,64}, {8,128}, {8,128}, {8,8} };
-static int unitPanelW, unitPanelH;
+//static int unitPanelW, unitPanelH;
 
 static int pictureSprites[2][3];
 static int pictureSpriteW, pictureSpriteH;
@@ -161,16 +167,73 @@ static void loadMultiSprite( char *inFileName, int inNumFrames,
 
 
 
+static void loadTiledSprites( char *inFileName, int inNumParts,
+                              int *outSpriteIDs, 
+                              intPair *inOffsets, intPair *inSizes,
+                              char inCornerTransparent ) {
+
+    int w, h;
+    
+    rgbaColor *spriteRGBA = readTGAFile( inFileName, &w, &h );
+
+    if( spriteRGBA == NULL ) {
+        
+        printOut( "Reading sprite from %s failed.\n", inFileName );
+        return;
+        }
+    
+    if( inCornerTransparent ) {    
+        applyCornerTransparency( spriteRGBA, w * h );
+        }
+    
+    /*
+    unitInfoPanelSprite = loadSprite( "rolodex_manilla4.tga", 
+                                      &unitPanelW, &unitPanelH, true );
+    */
+
+    for( int p=0; p<inNumParts; p++ ) {
+        intPair offset = inOffsets[p];
+        intPair size = inSizes[p];
+        
+        rgbaColor *partRGBA = extractRegion( spriteRGBA, 
+                                             w, h,
+                                             offset.x, offset.y,
+                                             size.x, size.y );
+        outSpriteIDs[p] = addSprite( partRGBA, size.x, size.y );
+    
+        delete [] partRGBA;
+        }
+
+    delete [] spriteRGBA;
+
+    }
+
+
 
 void initStats() {
     statusPanelSprite = loadSprite( "statsPanel.tga", 
                                     &panelW, &panelH, true );
     datePanelSprite = loadSprite( "datePanel.tga", 
                                   &datePanelW, &datePanelH, true );
+    /*
     sellingPanelSprite = loadSprite( "sellingPanel.tga", 
                                      &sellingPanelW, &sellingPanelH, true );
-    
+    */
 
+    loadTiledSprites( "sellingPanel.tga", 4,
+                      sellingPanelSprite, 
+                      sellingPanelPartOffsets, sellingPanelPartSizes, true );
+    
+    /*
+      unitInfoPanelSprite = loadSprite( "rolodex_manilla4.tga", 
+      &unitPanelW, &unitPanelH, true );
+    */
+
+    
+    loadTiledSprites( "rolodex_manilla4.tga", 5,
+                      unitInfoPanelSprite, 
+                      unitInfoPanelPartOffsets, unitInfoPanelPartSizes, true );
+    /*
     rgbaColor *unitInfoPanelRGBA = readTGAFile( "rolodex_manilla4.tga",
                                                 &unitPanelW, &unitPanelH );
 
@@ -181,11 +244,7 @@ void initStats() {
         }
     applyCornerTransparency( unitInfoPanelRGBA, unitPanelW * unitPanelH );
     
-    /*
-    unitInfoPanelSprite = loadSprite( "rolodex_manilla4.tga", 
-                                      &unitPanelW, &unitPanelH, true );
-    */
-
+    
     for( int p=0; p<5; p++ ) {
         intPair offset = unitInfoPanelPartOffsets[p];
         intPair size = unitInfoPanelPartSizes[p];
@@ -202,7 +261,9 @@ void initStats() {
     
         delete [] partRGBA;
         }
-    
+        
+    delete [] unitInfoPanelRGBA;
+    */
 
 
     loadMultiSprite( "playerPictures16.tga", 3,
@@ -429,8 +490,40 @@ static void drawSellStats( int inX, int inY, int inPlayer ) {
     int y = inY;
     
 
-    drawSprite( sellingPanelSprite, inX, y, panelColors[ inPlayer ] );
+    // drawSprite( sellingPanelSprite, inX, y, panelColors[ inPlayer ] );
     
+
+    for( int p=0; p<3; p++ ) {
+        intPair offset = sellingPanelPartOffsets[p];
+
+        drawSprite( sellingPanelSprite[p], 
+                    inX + offset.x, y + offset.y, panelColors[ inPlayer ] );
+        }
+    // 3 is fill block... fill 8x1 grid of blocks starting at 8
+    int blockID = sellingPanelSprite[3];
+    intPair offset = sellingPanelPartOffsets[3];
+
+    int xOffset = inX + offset.x;
+
+    int x;
+    for( x=0; x<8; x++ ) {
+        drawSprite( blockID, 
+                    xOffset, y, panelColors[ inPlayer ] );
+        xOffset += offset.x;
+        }
+    
+    // then fill 4x1 grid of blocks starting at 88
+    xOffset = inX + 88;
+    
+    for( int x=0; x<4; x++ ) {
+        drawSprite( blockID, 
+                    xOffset, y, panelColors[ inPlayer ] );
+        xOffset += offset.x;
+        }
+
+
+
+
     startNewSpriteLayer();
     
     inX += 8;
@@ -438,7 +531,7 @@ static void drawSellStats( int inX, int inY, int inPlayer ) {
 
     y += 17;
     
-    int xOffset = font16->measureString( translate( "stats_selling" ) );
+    xOffset = font16->measureString( translate( "stats_selling" ) );
     int otherOffset = 
         font16->measureString( translate( "stats_earning" ) );
     if( otherOffset > xOffset ) {
