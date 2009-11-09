@@ -1666,25 +1666,7 @@ int writingToBuffer = 0;
 #define CAM_DMA_NO 1
 
 
-static void CameraIntrVsync( CAMERAResult inResult ){
-#pragma unused( inResult )
-
-    // frame done, copy into back buffer
-
-    /*
-    memcpy( cameraBackBuffer, cameraFrameBuffer, 
-            CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
-    */
-
-    /*
-      MI_CpuCopyFast( cameraFrameBuffer, cameraBackBuffer, 
-         CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
-      DC_InvalidateRange( cameraBackBuffer, 
-         CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
-    */
-    }
-
-
+#ifdef SDK_TWL
 
 static void CameraDmaRecvCallback( void* inArg) {
 #pragma unused( inArg )
@@ -1712,19 +1694,19 @@ static void CameraDmaRecvCallback( void* inArg) {
         
         }
     }
+#endif
 
 
 
 // start producing frames
 void startCamera() {
 
+#ifdef SDK_TWL
     CAMERAResult result = CAMERA_Init();
     if( result != CAMERA_RESULT_SUCCESS ) {
         printOut( "Init camera failed.\n" );
         return;
         }
-
-    //CAMERA_SetVsyncCallback( CameraIntrVsync );
 
     // 160x120
     result = CAMERA_I2CSize( CAMERA_SELECT_IN, CAMERA_SIZE_QQVGA );
@@ -1736,8 +1718,6 @@ void startCamera() {
     CAMERA_SetOutputFormat( CAMERA_OUTPUT_RGB );
     
     CAMERA_SetTransferLines( CAMERA_GET_MAX_LINES( CAM_W ) ); 
-
-    CAMERA_SetVsyncCallback( CameraIntrVsync );
 
     result = CAMERA_Start( CAMERA_SELECT_IN );
     
@@ -1760,12 +1740,14 @@ void startCamera() {
                          CAMERA_GetBytesAtOnce( CAM_W), 
                          CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H), 
                          CameraDmaRecvCallback, NULL );
+#endif
     }
 
 
 // stop producing frames
 void stopCamera() {
 
+#ifdef SDK_TWL
     CAMERAResult result;
     result = CAMERA_Stop();
 
@@ -1782,6 +1764,7 @@ void stopCamera() {
         }
 
     CAMERA_End();
+#endif
     }
 
 
@@ -1819,47 +1802,6 @@ void getFrame( unsigned char *inBuffer ) {
         
         inBuffer[ i ] = gray;
         }
-    /*
-    DC_InvalidateRange( cameraFrameBuffer, 
-                        CAMERA_GET_LINE_BYTES( CAM_W ) * CAM_H);
-    */
-    /*
-int lines = CAMERA_GetTransferLines();
-    
-    int currentLine = 0;
-    
-    while( currentLine < CAM_H ) {
-        int currentLineByteOffset = currentLine * CAM_W;
-        
-        CAMERA_DmaRecv( 1, cameraFrameBuffer, CAMERA_GetBytesAtOnce( CAM_W ), 
-                        CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
-        
-        unsigned short sumMax = 0x3FFF;
-    
-        for( int i=0; i<lines; i++ ) {
-            
-            int lineOffset = i * CAM_W;
-            
-            currentLineByteOffset += lineOffset;
-
-            for( int p=0; p<CAM_W; p++ ) {
-                unsigned short pixel = cameraLineBuffer[ lineOffset + p ];
-                
-                int r = ( pixel & 0x001F );
-                int g = ( (pixel >>  5) & 0x001F );
-                int b = ( (pixel >> 10) & 0x001F );
-                
-                int sum = r + g + b;
-                
-                unsigned char gray = (unsigned char)( (sum * 255) / sumMax );
-                
-                inBuffer[ currentLineByteOffset + p ] = gray;
-                }
-            }
-
-        currentLine += lines;
-        }
-    */
     }
 
 
