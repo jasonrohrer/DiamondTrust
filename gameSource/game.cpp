@@ -268,8 +268,8 @@ void gameInit() {
     setPlayerDiamonds( 1, 0 );    
 
     // FIXME:  testing
-    //setPlayerDiamonds( 0, 10 );
-    //setPlayerDiamonds( 1, 10 );    
+    setPlayerDiamonds( 0, 10 );
+    setPlayerDiamonds( 1, 10 );    
 
 
     // show opponent's money at start of game
@@ -278,8 +278,8 @@ void gameInit() {
     setMonthsLeft( 8 );
     
 
-    currentGameState = connectState;
-    //currentGameState = sellDiamondsState;
+    //currentGameState = connectState;
+    currentGameState = sellDiamondsState;
     currentGameState->enterState();
     }
 

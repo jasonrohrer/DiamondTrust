@@ -132,6 +132,9 @@ unsigned char *getMessage( unsigned int *outLength );
 
 // camera support
 
+#define CAM_W 160
+#define CAM_H 120
+
 // true if this platform has a camera
 // NOTE:  on DS, try  BOOL OS_IsRunOnTwl( void );
 char isCameraSupported();
