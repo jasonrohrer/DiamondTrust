@@ -910,8 +910,8 @@ void drawStats() {
         //    font16->measureString( translate( "stats_inspectorBlocking" ) );
         
 
-        drawDiamondCounter( 128, 
-                            43 + panelTop, 
+        drawDiamondCounter( 256 - 25, 
+                            18 + panelTop, 
                             getDiamondsInRegion( dest ) );
 
         int i;
@@ -935,7 +935,7 @@ void drawStats() {
             
             
             int x = 96;
-            int y = 58 + panelTop;
+            int y = 61 + panelTop;
             
             for( i=0; i<numPlayerUnits*2; i++ ) {
                 Unit *playerUnit = getUnit( i );

@@ -268,8 +268,14 @@ void gameInit() {
     setPlayerDiamonds( 1, 0 );    
 
     // FIXME:  testing
-    setPlayerDiamonds( 0, 10 );
-    setPlayerDiamonds( 1, 10 );    
+    //setPlayerDiamonds( 0, 10 );
+    //setPlayerDiamonds( 1, 10 );    
+
+    // actually, it makes sense for players to start the game with a few
+    // diamonds (so that the SellDiamonds phase has an interesting decision
+    // right off the bat).  2 each allows full exploration of payoff matrix.
+    setPlayerDiamonds( 0, 2 );
+    setPlayerDiamonds( 1, 2 );    
 
 
     // show opponent's money at start of game
@@ -440,9 +446,9 @@ int lastTouchX, lastTouchY;
 static void goToNextGameState() {
     // state transition
     if( currentGameState == connectState ) {
-        //currentGameState = accumulateDiamondsState;
+        currentGameState = accumulateDiamondsState;
         // FIXME  for testing
-        currentGameState = sellDiamondsState;
+        //currentGameState = sellDiamondsState;
         }
     else if( currentGameState == accumulateDiamondsState ) {
         postAccumulateTransition();
