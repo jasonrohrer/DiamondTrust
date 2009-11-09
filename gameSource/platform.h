@@ -71,8 +71,13 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
 // inSpriteID must be an ID previously returned by addSprite
 // new image must have same dimensions as original
 // original palette is also reused
+//
+// inReplaceSafe turns on a safe mode that reduces the chance of conflicts with
+// the platform's texturing system.  If artifacts are visible (due to memory
+//   access contention), try using safe mode.
 void replaceSprite256( int inSpriteID, 
-                       unsigned char *inDataRGBA, int inWidth, int inHeight );
+                       unsigned char *inDataRGBA, int inWidth, int inHeight,
+                       char inReplaceSafe = false );
 
 
 

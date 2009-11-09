@@ -709,8 +709,10 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
 
 void replaceSprite256( int inSpriteID, 
                        unsigned char *inDataBytes, 
-                       int inWidth, int inHeight ) {
+                       int inWidth, int inHeight, char inReplaceSafe ) {
     
+    // no need for safe replacement on SDL
+
     texturePalette p = *( spritePalettes.getElement( inSpriteID ) );
 
     int numPixels = inWidth * inHeight;

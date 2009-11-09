@@ -12,6 +12,7 @@
 
 #include "platform.h"
 #include "common.h"
+#include "minorGems/util/SimpleVector.h"
 
 // implement plaform functions
 
@@ -270,22 +271,35 @@ static void addPalette( textureInfo *inT,
 
 
 
+static void replaceTextureData( textureInfo *inT,
+                                unsigned short *inPackedTextureData,
+                                unsigned int inNumBytes,
+                                unsigned int inByteOffset = 0 ) {
+
+    unsigned char *dataPointer = (unsigned char*)inPackedTextureData;
+
+    // skip
+    dataPointer = &( dataPointer[ inByteOffset ] );
+    
+
+    DC_FlushRange( dataPointer, inNumBytes );
+
+    GX_BeginLoadTex();
+    
+    GX_LoadTex( dataPointer, 
+                inT->slotAddress + inByteOffset,
+                inNumBytes );
+    
+    GX_EndLoadTex(); 
+    }
+
+
+
 static void addTextureData( textureInfo *inT,
                             unsigned short *inPackedTextureData,
                             unsigned int inNumBytes ) {
     
-    DC_FlushRange( inPackedTextureData, inNumBytes );
-
-    GX_BeginLoadTex();
-    
-    GX_LoadTex( inPackedTextureData, 
-                inT->slotAddress,
-                inNumBytes );
-    
-    GX_EndLoadTex(); 
-
-    
-
+    replaceTextureData( inT, inPackedTextureData, inNumBytes );
     
     nextTextureSlotAddress += inNumBytes;
     
@@ -319,14 +333,60 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
     }
 
 
+typedef struct pendingReplacement {
+        int spriteID;
+        unsigned char *dataBytes;
+        unsigned int numBytes;
+        unsigned int numBytesDone;
+        unsigned int blockSize;
+    } pendingReplacement;
+
+SimpleVector<pendingReplacement> textureReplacements;
+
+static void textureReplacementStep() {
+    if( textureReplacements.size() > 0 ) {
+        pendingReplacement *p = textureReplacements.getElement( 0 );
+        
+        // send one block
+        replaceTextureData( &( textureInfoArray[ p->spriteID ] ), 
+                            (unsigned short*)p->dataBytes, p->blockSize,
+                            p->numBytesDone );
+        
+        p->numBytesDone += p->blockSize;
+        
+        if( p->numBytesDone == p->numBytes ) {
+            // finished
+            
+            delete [] p->dataBytes;
+            textureReplacements.deleteElement( 0 );
+            }        
+        }
+    }
+
+    
+
 void replaceSprite256( int inSpriteID, 
                        unsigned char *inDataBytes, 
-                       int inWidth, int inHeight ) {
-
+                       int inWidth, int inHeight, char inReplaceSafe ) {
+    
     unsigned int numPixels = (unsigned int)( inWidth * inHeight );
 
-    addTextureData( &( textureInfoArray[ inSpriteID ] ), 
-                    (unsigned short*)inDataBytes, numPixels );
+    if( inReplaceSafe ) {
+        
+        // copy the data
+        unsigned char *data = new unsigned char[ numPixels ];
+        memcpy( data, inDataBytes, numPixels );
+        
+        pendingReplacement p = 
+            { inSpriteID, data, numPixels, 0, (unsigned int)inWidth };
+        textureReplacements.push_back( p );
+        }
+    else {
+                
+        replaceTextureData( &( textureInfoArray[ inSpriteID ] ), 
+                            (unsigned short*)inDataBytes, numPixels );
+        }
+    
     }
 
 
@@ -2190,20 +2250,25 @@ static void VBlankCallback() {
             }
         else {
             drawBottomScreen();
-
+            
             //printOut( "Free bytes on heap after drawBottom=%d\n",
             //         OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
             }
         G3_PopMtx( 1 );
-
+        
         // swap buffers
         OSIntrMode oldMode = OS_DisableInterrupts();
         G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
         shouldSwap = true;
         OS_RestoreInterrupts( oldMode );
         
+        
         // interrupt will wake swapThread up
         OS_WaitVBlankIntr();
+
+
+        // do one step of texture replacement here
+        textureReplacementStep();
         }
     
 

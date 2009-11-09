@@ -25,6 +25,7 @@ static int minSteps = 30;
 
 
 static char takingPicture = false;
+static char pictureFrameReady = false;
 static char receivingPicture = true;
 
 
@@ -92,6 +93,26 @@ class SellDiamondsState : public GameState {
         //virtual ~GameState();
         
     };
+
+
+
+
+static unsigned char *expandImage( unsigned char *inSource,
+                                   int inSourceW, int inSourceH, 
+                                   int inDestW, int inDestH ) {
+    
+    unsigned char *dest = new unsigned char[ inDestW * inDestH ];
+    
+    memset( dest, 0, (unsigned int)( inDestW * inDestH ) );
+    
+    for( int y=0; y<inSourceH; y++ ) {
+        for( int x=0; x<inSourceW; x++ ) {
+            dest[ y * inDestW + x ] = inSource[ y * inSourceW + x ];
+            }
+        }
+    
+    return dest;
+    }
 
 
 
@@ -190,7 +211,7 @@ static int getMoveMessage() {
                 new unsigned char[ numPixels ];
             
             memset( pictureReceiveData, 0, (unsigned int)numPixels );
-            
+
 
             pictureNumBytesReceived = 0;            
             pictureReceiveTotalBytes = numPixels;
@@ -262,6 +283,9 @@ void SellDiamondsState::clickState( int inX, int inY ) {
                 // accessing vault and camera active
                 // start picture taking process
                 takingPicture = true;
+                // avoid drawing sprite until we add first new data to it
+                pictureFrameReady = false;
+
                 pictureDisplayData = 
                     new unsigned char[ pictureDisplayW * pictureDisplayH ];
                 startCamera();
@@ -291,22 +315,6 @@ void SellDiamondsState::clickState( int inX, int inY ) {
 
 
 
-static unsigned char *expandImage( unsigned char *inSource,
-                                   int inSourceW, int inSourceH, 
-                                   int inDestW, int inDestH ) {
-    
-    unsigned char *dest = new unsigned char[ inDestW * inDestH ];
-    
-    memset( dest, 0, (unsigned int)( inDestW * inDestH ) );
-    
-    for( int y=0; y<inSourceH; y++ ) {
-        for( int x=0; x<inSourceW; x++ ) {
-            dest[ y * inDestW + x ] = inSource[ y * inSourceW + x ];
-            }
-        }
-    
-    return dest;
-    }
 
 
 
@@ -377,6 +385,9 @@ void SellDiamondsState::stepState() {
                           pictureDisplaySpriteW, pictureDisplaySpriteH );
         
         delete [] newSpriteData;
+        
+        // first data added
+        pictureFrameReady = true;
         
 
         pictureStepsUntilTick--;
@@ -465,29 +476,30 @@ void SellDiamondsState::stepState() {
             
             delete [] message;
 
-            // try showing progress, message-by-message
-            unsigned char *newSpriteData = 
-                expandImage( pictureReceiveData,
-                             pictureSendW,
-                             pictureSendH,
-                             pictureSendSpriteW,
-                             pictureSendSpriteH );
-        
-            
-            replaceSprite256( pictureSendSpriteID, newSpriteData,
-                              pictureSendSpriteW, 
-                              pictureSendSpriteH );
-            
-            pictureSendSpriteSet = true;
-            
-            delete [] newSpriteData;
+
+            // DON't show progress, message-by-message, too much for DS
+            // platform (results in tears on other textures)
+
 
             if( pictureNumBytesReceived == pictureReceiveTotalBytes ) {
-                // done
-                /*
-                replaceSprite256( pictureSendSpriteID, pictureReceiveData,
-                                  pictureSendW, pictureSendH );
-                */
+                // done, replace sprite
+                unsigned char *newSpriteData = 
+                    expandImage( pictureReceiveData,
+                                 pictureSendW,
+                                 pictureSendH,
+                                 pictureSendSpriteW,
+                                 pictureSendSpriteH );
+
+                // use safe replacement
+                replaceSprite256( pictureSendSpriteID, newSpriteData,
+                                  pictureSendSpriteW, 
+                                  pictureSendSpriteH, true );
+            
+                pictureSendSpriteSet = true;
+            
+                delete [] newSpriteData;
+
+
                 delete [] pictureReceiveData;
                 pictureReceiveData = NULL;
 
@@ -630,28 +642,39 @@ void SellDiamondsState::stepState() {
 
 
 void SellDiamondsState::drawState() {
-
-    if( takingPicture ) {
+    // don't draw sprite until new data ready (or else 1 frame
+    //   from last picture-taking session is shown)
+    
+    if( takingPicture  && pictureFrameReady ) {
         // cover map with camera display
         int xOffset = (256 - 160)/2;
         int yOffset = (192 - 120)/2;
         
+
         drawSprite( pictureDisplaySpriteID, 
                     xOffset, yOffset, 
                     white );
-
+                
         startNewSpriteLayer();
         
         char *countString = autoSprintf( "%d", pictureCountDown );
     
         font16->drawString( countString, 
                             xOffset + pictureDisplayW / 2, 
-                            yOffset + pictureDisplayH + 16,
+                            yOffset + pictureDisplayH + 2,
                             white, 
                             alignCenter );
 
         delete [] countString;
 
+
+        char *headerString = translate( "camera_securityHeader" );
+            
+        font16->drawString( headerString,
+                            xOffset + pictureDisplayW / 2,
+                            yOffset - 32,
+                            white,
+                            alignCenter );
 
         // show a known breech at the last minute
         if( isPlayerHomeKnownBribed() &&
@@ -697,6 +720,7 @@ void SellDiamondsState::enterState() {
     gotMove = false;
 
     takingPicture = false;
+    pictureFrameReady = false;
     receivingPicture = false;
     pictureSendSpriteSet = false;
     pictureCountDown = 5;
@@ -729,6 +753,21 @@ void SellDiamondsState::enterState() {
         
         statusSubMessage = translate( "phaseSubStatus_sellDiamondsNone" );
         }
+
+
+
+    // clear the sprite to start
+    int numPixels =  pictureSendSpriteW * pictureSendSpriteH;
+    
+    unsigned char *newSpriteData = new unsigned char[ numPixels ];
+    memset( newSpriteData, 0, (unsigned int)numPixels );
+                            
+    // use safe replacement
+    replaceSprite256( pictureSendSpriteID, newSpriteData,
+                      pictureSendSpriteW, 
+                      pictureSendSpriteH, true );
+            
+    delete [] newSpriteData;
     }
 
 

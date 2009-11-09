@@ -31,8 +31,8 @@ stats_tripCost "Trip cost:"
 stats_inspectorBlocking "Will block sale of:"
 stats_inspectorConfiscating "Will confiscate:"
 
-
-camera_securityCompromised "SECURITY COMPROMISED"
+camera_securityHeader "Vault Security System"
+camera_securityCompromised "SYSTEM COMPROMISED"
 
 
 phaseStatus_connect  "Connect to opponent"
@@ -88,7 +88,7 @@ phaseSubStatus_sellDiamonds  "Pick number to sell on open market (or hit Done)"
 phaseSubStatus_sellDiamondsAdjust  "Adjust sale?  Pick new number to sell (or hit Done)"
 phaseSubStatus_sellDiamondsNone "You have none to sell (hit Done when ready)"
 
-phaseSubStatus_sellDiamondsPicture "Security access to vault"
+phaseSubStatus_sellDiamondsPicture "Enter vault to remove diamonds"
 
 
 phaseStatus_flyHome   "Final trip home"
