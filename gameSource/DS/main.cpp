@@ -1661,8 +1661,8 @@ char isCameraSupported() {
 
 
 
-static unsigned short *cameraFrameBuffer = NULL;
-static unsigned short *cameraBackBuffer = NULL;
+static unsigned short *cameraFrameBuffer[2] = { NULL, NULL };
+int writingToBuffer = 0;
 #define CAM_DMA_NO 1
 
 
@@ -1675,10 +1675,13 @@ static void CameraIntrVsync( CAMERAResult inResult ){
     memcpy( cameraBackBuffer, cameraFrameBuffer, 
             CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
     */
-    MI_CpuCopyFast( cameraFrameBuffer, cameraBackBuffer, 
-                    CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
-    DC_InvalidateRange( cameraBackBuffer, 
-                        CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ));
+
+    /*
+      MI_CpuCopyFast( cameraFrameBuffer, cameraBackBuffer, 
+         CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
+      DC_InvalidateRange( cameraBackBuffer, 
+         CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
+    */
     }
 
 
@@ -1699,11 +1702,14 @@ static void CameraDmaRecvCallback( void* inArg) {
             //OS_TPrintf("DMA was not done until VBlank.\n");
             MI_StopNDma( CAM_DMA_NO );
             }
+
+        writingToBuffer = ( writingToBuffer + 1 ) % 2;
         
-        CAMERA_DmaRecvAsync( CAM_DMA_NO, cameraFrameBuffer, 
-                             CAMERA_GetBytesAtOnce( CAM_W), 
+        CAMERA_DmaRecvAsync( CAM_DMA_NO, cameraFrameBuffer[ writingToBuffer ], 
+                             CAMERA_GetBytesAtOnce( CAM_W ), 
                              CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H), 
-                             CameraDmaRecvCallback, NULL );
+                                 CameraDmaRecvCallback, NULL );
+        
         }
     }
 
@@ -1740,12 +1746,17 @@ void startCamera() {
         return;
         }
 
-    cameraFrameBuffer = 
-        new unsigned short[ CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) / 2 ];
-    cameraBackBuffer = 
-        new unsigned short[ CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) / 2 ];
+    for( int b=0; b<2; b++ ) {
 
-    CAMERA_DmaRecvAsync( CAM_DMA_NO, cameraFrameBuffer, 
+        cameraFrameBuffer[b] = 
+            new unsigned short[ CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) / 2 ];
+        memset( cameraFrameBuffer[b], 0, 
+                CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H ) );
+        }
+    
+    writingToBuffer = 0;
+
+    CAMERA_DmaRecvAsync( CAM_DMA_NO, cameraFrameBuffer[writingToBuffer], 
                          CAMERA_GetBytesAtOnce( CAM_W), 
                          CAMERA_GET_FRAME_BYTES( CAM_W, CAM_H), 
                          CameraDmaRecvCallback, NULL );
@@ -1757,16 +1768,14 @@ void stopCamera() {
 
     CAMERAResult result;
     result = CAMERA_Stop();
-    
-    if( cameraFrameBuffer != NULL ) {
-        delete [] cameraFrameBuffer;
-        cameraFrameBuffer = NULL;
-        }
-    if( cameraBackBuffer != NULL ) {
-        delete [] cameraBackBuffer;
-        cameraBackBuffer = NULL;
-        }
 
+    for( int b=0; b<2; b++ ) {
+        if( cameraFrameBuffer[b] != NULL ) {
+            delete [] cameraFrameBuffer[b];
+            cameraFrameBuffer[b] = NULL;
+            }
+        }
+    
     if( result != CAMERA_RESULT_SUCCESS ) {
         printOut( "Stopping camera failed.\n" );
         return;
@@ -1789,8 +1798,14 @@ void getFrame( unsigned char *inBuffer ) {
 
     unsigned short sumMax = 31 * 3;
 
+    // read from buffer not being written to
+    int readFromBuffer = ( writingToBuffer + 1 ) % 2;
+    
+    unsigned short *readBuffer = cameraFrameBuffer[ readFromBuffer ];
+    
+    
     for( int i=0; i<numPixels; i ++ ) {
-        unsigned short pixel = cameraBackBuffer[ i ];
+        unsigned short pixel = readBuffer[ i ];
                 
         int r = ( pixel & 0x001F );
         int g = ( (pixel >>  5) & 0x001F );
@@ -2017,7 +2032,7 @@ static void VBlankCallback() {
     GX_Init();
 
     // DMA is not used in GX (the old DMA conflicts with camera DMA)
-    (void)GX_SetDefaultDMA( GX_DMA_NOT_USE );
+    //(void)GX_SetDefaultDMA( GX_DMA_NOT_USE );
 
     
     GX_DispOff();
@@ -2058,11 +2073,17 @@ static void VBlankCallback() {
                      SWAP_THREAD_PRIORITY );
     OS_WakeupThreadDirect( &swapThread );
 
+
+#ifdef SDK_TWL
     // needed by camera
-    OS_InitTick();
-    OS_InitAlarm();
-    MI_InitNDmaConfig();
-    OS_EnableIrqMask( OS_IE_NDMA1 );
+    if( isCameraSupported() ) {    
+        OS_InitTick();
+        OS_InitAlarm();
+        MI_InitNDmaConfig();
+        OS_EnableIrqMask( OS_IE_NDMA1 );
+        }
+#endif
+
     
     G3X_Init();
     G3X_InitTable();
@@ -2157,9 +2178,9 @@ static void VBlankCallback() {
     
 
     OS_Printf( "Init file system\n" );
-    //FS_Init( 3 );
+    FS_Init( 3 );
     // DMA conflicting with camera?
-    FS_Init( FS_DMA_NOT_USE );
+    //FS_Init( FS_DMA_NOT_USE );
 
 
 
