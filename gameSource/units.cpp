@@ -343,7 +343,12 @@ void initUnits() {
 
 
     printOut( "Initing unit vehicle sprites\n" );
-    
+
+    // add them all to the same set to conserve RAM
+    // only one vehicle sprite is on the screen at a time
+    int vehicleSpriteSet = createSpriteSet();
+
+
     // construct vehicle sprites
     for( int t=0; t<3; t++ ) {
         printOut( "Loading from file %s\n", vehicleSpriteFileNames[t] );
@@ -391,7 +396,8 @@ void initUnits() {
 
             // first quadrant
             vehicleSpriteIDs[t][r] = 
-                addSprite( vehicleSubImage, vehicleSpriteW, vehicleSpriteH );
+                addSprite( vehicleSubImage, vehicleSpriteW, vehicleSpriteH,
+                           vehicleSpriteSet );
 
             // accumulate rotations here
             rgbaColor *vehicleAccumRotated = new rgbaColor[ numVehiclePixels ];
@@ -432,7 +438,8 @@ void initUnits() {
 
                 vehicleSpriteIDs[t][ spriteIndex ] = 
                     addSprite( vehicleAccumRotated, 
-                               vehicleSpriteW, vehicleSpriteH );
+                               vehicleSpriteW, vehicleSpriteH, 
+                               vehicleSpriteSet );
                 }
         
             delete [] vehicleAccumRotated;

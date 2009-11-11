@@ -122,6 +122,8 @@ unsigned int getRandom( unsigned int inMax ) {
 #define MAX_TEXTURES  1024
 
 struct textureInfoStruct {
+        int spriteHandle;
+
         unsigned int slotAddress;
         GXTexFmt texFormat;
         // if format is DIRECT, this is not set:
@@ -130,14 +132,12 @@ struct textureInfoStruct {
         int w;
         int h;
         int numTextureDataBytes;
-        int numPaletteDataBytes;
   
         // -1 if not in a set
         int textureSetID;
         char activeInSet;
-        // these are NULL if not in a set
+        // this is NULL if not in a set
         unsigned char *textureDataCopy;
-        unsigned char *paletteDataCopy;
         
         GXTexSizeS sizeS;
         GXTexSizeT sizeT;
@@ -172,10 +172,34 @@ unsigned short textureColors[ 256 ] ATTRIBUTE_ALIGN(4);
 
 
 
-static textureInfo makeTextureInfo( int inWidth, int inHeight ) {
+static textureInfo makeTextureInfo( int inWidth, int inHeight, 
+                                    int inSetID = -1 ) {
     textureInfo t;
+    t.textureSetID = inSetID;
     
-    t.slotAddress = nextTextureSlotAddress;
+
+    // existing base to use from set?
+    textureInfo *baseT = NULL;
+    
+    if( t.textureSetID != -1 ) {
+        textureSet *s = textureSetVector.getElement( t.textureSetID );
+    
+        if( s->activeMember != -1 ) {
+            // members of set already exist
+            baseT = &textureInfoArray[ s->activeMember ];
+            }
+        }
+
+    if( baseT != NULL ) {
+        // reuse slot address
+        t.slotAddress = baseT->slotAddress;
+        }
+    else {
+        // new slot address
+        t.slotAddress = nextTextureSlotAddress;
+        }
+    
+
     t.w = inWidth;
     t.h = inHeight;
     
@@ -247,14 +271,12 @@ static textureInfo makeTextureInfo( int inWidth, int inHeight ) {
                                   inHeight << FX32_SHIFT );
 
     t.numTextureDataBytes = 0;
-    t.numPaletteDataBytes = 0;  
-    t.textureSetID = -1;
     t.activeInSet = false;
     t.textureDataCopy = NULL;
-    t.paletteDataCopy = NULL;
 
     return t;
     }
+
 
 
 
@@ -262,40 +284,13 @@ static void addPalette( textureInfo *inT,
                         unsigned short *inPalette, 
                         unsigned int inPaletteEntries ) {
     
-    // existing base to use from set?
-    textureInfo *baseT = NULL;
-    
-    if( inT->textureSetID != -1 ) {
-        textureSet *s = textureSetVector.getElement( inT->textureSetID );
-    
-        if( s->activeMember != -1 ) {
-            // members of set already exist
-            baseT = &textureInfoArray[ s->activeMember ];
-            }
-        }
-    
-    if( baseT == NULL ) {    
-        inT->paletteSlotAddress = nextTexturePaletteAddress;
-        }
-    else {
-        inT->paletteSlotAddress = baseT->paletteSlotAddress;
-        }
-    
+    inT->paletteSlotAddress = nextTexturePaletteAddress;
 
     // copy into aligned memory
     unsigned int paletteBytes = inPaletteEntries * sizeof( short );
     
     memcpy( (void *)textureColors, (void *)inPalette, paletteBytes );
 
-
-    inT->numPaletteDataBytes = (int)paletteBytes;
-
-    if( inT->textureSetID != -1 ) {
-        // save the palette data
-        inT->paletteDataCopy = new unsigned char[ paletteBytes ];
-        memcpy( inT->paletteDataCopy, (void *)inPalette, paletteBytes );
-        }
-    
     
 
     DC_FlushRange( textureColors, paletteBytes );
@@ -307,25 +302,21 @@ static void addPalette( textureInfo *inT,
     GX_EndLoadTexPltt();
 
 
-    if( baseT == NULL ) {
-        // new addition
-
-        unsigned int offset = paletteBytes;
-        
-        if( offset < 16 ) {
-            // offset to next palette must be 16 bytes for 
-            //   16- and 256-color palettes
-            // so our 8-byte offset (for this 4-color palette) is
-            // not enough.
-            offset = 16;
-            }
-        
-        nextTexturePaletteAddress += offset;
-        
-        numTexturePaletteBytesAdded += offset;
-        printOut( "Added %d paletteBytes bytes so far.\n", 
-                  numTexturePaletteBytesAdded );
+    unsigned int offset = paletteBytes;
+    
+    if( offset < 16 ) {
+        // offset to next palette must be 16 bytes for 
+        //   16- and 256-color palettes
+        // so our 8-byte offset (for this 4-color palette) is
+        // not enough.
+        offset = 16;
         }
+    
+    nextTexturePaletteAddress += offset;
+    
+    numTexturePaletteBytesAdded += offset;
+    printOut( "Added %d paletteBytes bytes so far.\n", 
+              numTexturePaletteBytesAdded );
     }
 
 
@@ -397,13 +388,36 @@ static void addTextureData( textureInfo *inT,
 
 
 
+static void addToSet( textureInfo *t ) {
+    if( t->textureSetID != -1 ) {
+        printOut( "Adding sprite to set %d\n", t->textureSetID );
+        
+        // add to set
+        textureSet *s = textureSetVector.getElement( t->textureSetID );
+
+        s->setMembers->push_back( t->spriteHandle );
+        
+
+        // make latest active in set
+        if( s->activeMember != -1 ) {
+            textureInfoArray[ s->activeMember ].activeInSet = false;
+            }
+        
+        s->activeMember = t->spriteHandle;
+        
+        t->activeInSet = true;
+        }
+    }
+
+
 
 int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
-                  unsigned short inPalette[256], char inZeroTransparent ) {
+                  unsigned short inPalette[256], char inZeroTransparent, 
+                  int inSetID ) {
     
     unsigned int numPixels = (unsigned int)( inWidth * inHeight );
     
-    textureInfo t = makeTextureInfo( inWidth, inHeight );
+    textureInfo t = makeTextureInfo( inWidth, inHeight, inSetID );
 
     t.texFormat = GX_TEXFMT_PLTT256;
     
@@ -413,10 +427,13 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
     
     t.colorZeroTransparent = inZeroTransparent;
 
+    t.spriteHandle = nextTextureInfoIndex;
     textureInfoArray[ nextTextureInfoIndex ] = t;
     int returnIndex = nextTextureInfoIndex;
     
     nextTextureInfoIndex++;
+
+    addToSet( & textureInfoArray[ returnIndex ] );
     
     return returnIndex;
     }
@@ -458,6 +475,8 @@ void replaceSprite256( int inSpriteID,
                        unsigned char *inDataBytes, 
                        int inWidth, int inHeight, char inReplaceSafe ) {
     
+    makeSpriteActive( inSpriteID );
+
     unsigned int numPixels = (unsigned int)( inWidth * inHeight );
 
     if( inReplaceSafe ) {
@@ -510,18 +529,7 @@ void makeSpriteActive( int inSpriteID ) {
                     t->slotAddress,
                     (unsigned int)t->numTextureDataBytes );
     
-        GX_EndLoadTex(); 
-
-
-        DC_FlushRange( t->paletteDataCopy, 
-                       (unsigned int)t->numPaletteDataBytes );
-    
-        GX_BeginLoadTexPltt();
-        GX_LoadTexPltt( t->paletteDataCopy,
-                        t->paletteSlotAddress,
-                        (unsigned int)t->numPaletteDataBytes );
-        GX_EndLoadTexPltt();
-
+        GX_EndLoadTex();
 
 
         t->activeInSet = true;
@@ -531,9 +539,7 @@ void makeSpriteActive( int inSpriteID ) {
         textureSet *s = textureSetVector.getElement( setID );
         
         if( s->activeMember != -1 ) {
-            t = &( textureInfoArray[ s->activeMember ] );
-            
-            t->activeInSet = false;
+            textureInfoArray[ s->activeMember ].activeInSet = false;
             }
         
         s->activeMember = inSpriteID;
@@ -548,27 +554,8 @@ void makeSpriteActive( int inSpriteID ) {
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
                int inSetID ) {
     
-    textureInfo t = makeTextureInfo( inWidth, inHeight );
-    t.textureSetID = inSetID;
-    
-
-    // existing base to use from set?
-    textureInfo *baseT = NULL;
-    
-    if( t.textureSetID != -1 ) {
-        textureSet *s = textureSetVector.getElement( t.textureSetID );
-    
-        if( s->activeMember != -1 ) {
-            // members of set already exist
-            baseT = &textureInfoArray[ s->activeMember ];
-            }
-        }
-
-    if( baseT != NULL ) {
-        // reuse slot address
-        t.slotAddress = baseT->slotAddress;
-        }
-    
+    textureInfo t = makeTextureInfo( inWidth, inHeight, inSetID );
+        
 
 
 
@@ -782,27 +769,15 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
 
 
 
-        
-
+    
+    t.spriteHandle = nextTextureInfoIndex;
     textureInfoArray[ nextTextureInfoIndex ] = t;
     int returnIndex = nextTextureInfoIndex;
     
     nextTextureInfoIndex++;
     
 
-    if( t.textureSetID != -1 ) {
-        // add to set
-        textureSet *s = textureSetVector.getElement( t.textureSetID );
-
-        s->setMembers->push_back( returnIndex );
-        
-
-        // make latest active in set
-        s->activeMember = returnIndex;
-        
-        textureInfoArray[ returnIndex ].activeInSet = true;
-        }
-        
+    addToSet( & textureInfoArray[ returnIndex ] );        
 
     
     printOut( "Added %d texture bytes so far (last texture had %d colors).\n",

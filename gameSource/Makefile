@@ -31,7 +31,7 @@ paper16.tga \
 jet_rotated16.tga \
 piper_rotated16.tga \
 puma_rotated16.tga \
-angola_satellite16.tga \
+angola_satellite.tga \
 title16.tga \
 rolodex_manilla4.tga \
 playerPictures16.tga \

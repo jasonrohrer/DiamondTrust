@@ -100,7 +100,7 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
 // palette (ABGR 1555)
 int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
                   unsigned short inPalette[256], 
-                  char inZeroTransparent = false );
+                  char inZeroTransparent = false, int inSetID = -1 );
 
 
 // replaces sprite with new image data

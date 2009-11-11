@@ -114,11 +114,15 @@ void gameInit() {
         }
 
 
+    // satellite top image and camera picture share a sprite set
+    // because they are never on the screen at the same time
+    int satelliteAndPictureSet = createSpriteSet();
+    
     
     printOut( "Loading satellite map\n" );
     satelliteFade = 255;
     int satelliteW, satelliteH;
-    rgbaColor *satelliteRGBA = readTGAFile( "angola_satellite16.tga",
+    rgbaColor *satelliteRGBA = readTGAFile( "angola_satellite.tga",
                                             &satelliteW, &satelliteH );
 
     if( satelliteRGBA == NULL
@@ -131,7 +135,8 @@ void gameInit() {
     satelliteBottomHalfOffset = 128;
     
     satelliteTopSpriteID = 
-        addSprite( satelliteRGBA, satelliteW, satelliteBottomHalfOffset );
+        addSprite( satelliteRGBA, satelliteW, satelliteBottomHalfOffset,
+                   satelliteAndPictureSet );
     
     rgbaColor *bottomHalfPointer = 
         &( satelliteRGBA[ satelliteBottomHalfOffset * satelliteW ] );
@@ -201,10 +206,13 @@ void gameInit() {
     memset( data, 0, 
             (unsigned int)( pictureDisplaySpriteW * pictureDisplaySpriteH ) );
 
+    // share set with top half of satellite
     pictureDisplaySpriteID = 
         addSprite256( data, 
                       pictureDisplaySpriteW, pictureDisplaySpriteH,
-                      picturePalette );
+                      picturePalette,
+                      false, 
+                      satelliteAndPictureSet );
     delete [] data;
     
     data = 
