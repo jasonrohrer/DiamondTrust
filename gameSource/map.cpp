@@ -624,7 +624,6 @@ void drawMap() {
     rgbaColor backgroundColor = white;
     // map image gets more and more faint as game wears on
     // starts at 75% (192), fades down to 37% (96)
-    //backgroundColor.a = (unsigned char)( 128 + ( 64 * getMonthsLeft() ) / 8 );
     backgroundColor.a = (unsigned char)( 96 + ( 96 * getMonthsLeft() ) / 8 );
     
 
@@ -648,25 +647,18 @@ void drawMap() {
     int i;
     for( i=0; i<numMapRegions; i++ ) {
 
+        // transparent so border shows when not flashing
+        // fades out following background
+        
+        // image gets more and more faint as game wears on
+        // starts at 50% (128), fades down to 25% (64)
+        regionColor.a = 
+            (unsigned char)( 64 + ( 64 * getMonthsLeft() ) / 8 );
+
+
         if( mapRegionSelectable[i] ) {
             // darker so flashing more visible
-            regionColor.a = 224;
-            }
-        else {
-            // transparent so border shows when not flashing
-            //regionColor.a = 160;
-            // regionColor.a = 128;
-
-            // fades out following background
-            // regionColor.a = backgroundColor.a;
-
-            // image gets more and more faint as game wears on
-            // starts at 50% (128), fades down to 25% (64)
-            //regionColor.a = 
-            //    (unsigned char)( 86 + ( 42 * getMonthsLeft() ) / 8 );
-            regionColor.a = 
-                (unsigned char)( 64 + ( 64 * getMonthsLeft() ) / 8 );
-
+            regionColor.a = 192;
             }
         
         
@@ -683,9 +675,8 @@ void drawMap() {
     rgbaColor nameColor = white;
     // starts at 64, fades down to 32 (50% of orignal value, just like
     // background)... can barely read it at end
-    //nameColor.a = (unsigned char)( 42 + ( 22 * getMonthsLeft() ) / 8 );
     nameColor.a = (unsigned char)( 32 + ( 32 * getMonthsLeft() ) / 8 );
-    // nameColor.a = 64;
+ 
     drawSprite( mapNamesTopSpriteID, 0, 0, nameColor );
     drawSprite( mapNamesBottomSpriteID, 0, bottomHalfOffset, nameColor );
 
