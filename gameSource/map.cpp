@@ -623,8 +623,9 @@ void drawMap() {
     
     rgbaColor backgroundColor = white;
     // map image gets more and more faint as game wears on
-    // starts at 75% (192), fades down to 50% (128)
-    backgroundColor.a = (unsigned char)( 128 + ( 64 * getMonthsLeft() ) / 8 );
+    // starts at 75% (192), fades down to 37% (96)
+    //backgroundColor.a = (unsigned char)( 128 + ( 64 * getMonthsLeft() ) / 8 );
+    backgroundColor.a = (unsigned char)( 96 + ( 96 * getMonthsLeft() ) / 8 );
     
 
     for( int c=0; c<numChunks; c++ ) {
@@ -660,9 +661,11 @@ void drawMap() {
             // regionColor.a = backgroundColor.a;
 
             // image gets more and more faint as game wears on
-            // starts at 50% (128), fades down to 33% (86)
+            // starts at 50% (128), fades down to 25% (64)
+            //regionColor.a = 
+            //    (unsigned char)( 86 + ( 42 * getMonthsLeft() ) / 8 );
             regionColor.a = 
-                (unsigned char)( 86 + ( 42 * getMonthsLeft() ) / 8 );
+                (unsigned char)( 64 + ( 64 * getMonthsLeft() ) / 8 );
 
             }
         
@@ -678,9 +681,10 @@ void drawMap() {
     
     // names, transparent
     rgbaColor nameColor = white;
-    // starts at 64, fades down to 32 (66% of orignal value, just like
+    // starts at 64, fades down to 32 (50% of orignal value, just like
     // background)... can barely read it at end
-    nameColor.a = (unsigned char)( 42 + ( 22 * getMonthsLeft() ) / 8 );
+    //nameColor.a = (unsigned char)( 42 + ( 22 * getMonthsLeft() ) / 8 );
+    nameColor.a = (unsigned char)( 32 + ( 32 * getMonthsLeft() ) / 8 );
     // nameColor.a = 64;
     drawSprite( mapNamesTopSpriteID, 0, 0, nameColor );
     drawSprite( mapNamesBottomSpriteID, 0, bottomHalfOffset, nameColor );
