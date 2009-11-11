@@ -318,8 +318,21 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
             char affordable[ numMapRegions ];
             
+
+            // take current move cost, which will be refunded, into
+            // account when figuring out where player can afford to switch
+            // move to
             int currentRegion = getUnitRegion( activeUnit );
+            int currentDestination = getUnitDestination( activeUnit );
+
+            int currentBid = getUnitBid( activeUnit );
+            int currentBribe = getUnitInspectorBribe( activeUnit );
             
+            int currentTotalMoveCost = 
+                getMoveCost( currentRegion, currentDestination )
+                + currentBid + currentBribe;
+            
+
 
             int r;
             for( r=0; r<numMapRegions; r++ ) {
@@ -330,13 +343,10 @@ void MoveUnitsState::clickState( int inX, int inY ) {
                     }
                 else {
                     if( getMoveCost( currentRegion, r ) 
-                        <= getPlayerMoney( 0 ) 
-                        || 
-                        getUnitDestination( activeUnit ) == r ) {
+                        <= getPlayerMoney( 0 ) + currentTotalMoveCost ) {
                         
-                        // we have enough money to move there, OR
-                        // it is already this unit's dest, so it's already
-                        // paid for
+                        // we have enough money to move there, if the cost
+                        // of our currently-pending move is refunded
                         affordable[r] = true;
                         }
                     else {
