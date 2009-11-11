@@ -50,10 +50,7 @@ typedef struct rgbaColor {
     } rgbaColor;
 
 
-// creates sprite from 32-bit image data
-// returns handle to sprite
-// data destroyed by caller
-int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
+
 
 
 // a sprite set is a group of sprites that shares the same space in
@@ -64,23 +61,35 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 // returns the ID of the new, empty set
 int createSpriteSet();
 
+// sprite in set becomes active (transfered into texture RAM) whenever it 
+// is drawn
+// can also be made active manually
+void makeSpriteActive( int inHandle );
+
+// platforms that do not have tight limits on texture RAM can ignore sprite
+// sets entirely
+
+
+
+
+// creates sprite from 32-bit image data
+// passing set of -1 (default) for setID puts sprite in no set
+//
+//
+// If in a set:
 // must have same WxH as rest of sprites in set and same number of colors
 // if this is the first sprite added, then it defines the WxH and number
 // of colors for the rest of the set
 //
 // this added sprite becomes the active one
 //
-// returns spriteID
-int addSpriteToSet( int inSetID, rgbaColor *inDataRGBA, 
-                    int inWidth, int inHeight );
+//
+// returns handle to sprite
+// data destroyed by caller
+int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
+               int inSetID = -1 );
 
-// sprite in set becomes active (transfered into texture RAM) whenever it 
-// is drawn
-// can be made active manually
-void makeSpriteActive( int inSetID, int inSpriteID );
 
-// platforms that do not have tight limits on texture RAM can ignore sprite
-// sets entirely
 
 
 
