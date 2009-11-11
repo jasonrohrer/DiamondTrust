@@ -33,7 +33,7 @@ piper_rotated16.tga \
 puma_rotated16.tga \
 angola_satellite.tga \
 title16.tga \
-rolodex_manilla4.tga \
+rolodex_manilla16.tga \
 playerPictures16.tga \
 enemyPictures16.tga \
 sellingPanel.tga \

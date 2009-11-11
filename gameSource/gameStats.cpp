@@ -186,10 +186,6 @@ static void loadTiledSprites( char *inFileName, int inNumParts,
         applyCornerTransparency( spriteRGBA, w * h );
         }
     
-    /*
-    unitInfoPanelSprite = loadSprite( "rolodex_manilla4.tga", 
-                                      &unitPanelW, &unitPanelH, true );
-    */
 
     for( int p=0; p<inNumParts; p++ ) {
         intPair offset = inOffsets[p];
@@ -230,7 +226,7 @@ void initStats() {
     */
 
     
-    loadTiledSprites( "rolodex_manilla4.tga", 5,
+    loadTiledSprites( "rolodex_manilla16.tga", 5,
                       unitInfoPanelSprite, 
                       unitInfoPanelPartOffsets, unitInfoPanelPartSizes, true );
     /*
