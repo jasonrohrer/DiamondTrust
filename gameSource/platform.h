@@ -56,6 +56,36 @@ typedef struct rgbaColor {
 int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight );
 
 
+// a sprite set is a group of sprites that shares the same space in
+// texture and palette RAM.
+// The entire set is stored in main RAM, and only the active sprite from
+// the set is placed in texture RAM.
+
+// returns the ID of the new, empty set
+int createSpriteSet();
+
+// must have same WxH as rest of sprites in set and same number of colors
+// if this is the first sprite added, then it defines the WxH and number
+// of colors for the rest of the set
+//
+// this added sprite becomes the active one
+//
+// returns spriteID
+int addSpriteToSet( int inSetID, rgbaColor *inDataRGBA, 
+                    int inWidth, int inHeight );
+
+// sprite in set becomes active (transfered into texture RAM) whenever it 
+// is drawn
+// can be made active manually
+void makeSpriteActive( int inSetID, int inSpriteID );
+
+// platforms that do not have tight limits on texture RAM can ignore sprite
+// sets entirely
+
+
+
+
+
 
 // add a 256-color sprite (1 byte per pixel) that indexes into a 16-bit
 // palette (ABGR 1555)
