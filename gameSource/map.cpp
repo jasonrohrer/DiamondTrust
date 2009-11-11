@@ -610,6 +610,7 @@ extern Font *font16;
 
 unsigned char diamondBorderAlpha = 255;
 
+    
 
 void drawMap() {
     // paper under it all
@@ -622,7 +623,7 @@ void drawMap() {
     
     rgbaColor backgroundColor = white;
     // map image gets more and more faint as game wears on
-    // starts at 75%, fades down to 50%
+    // starts at 75% (192), fades down to 50% (128)
     backgroundColor.a = (unsigned char)( 128 + ( 64 * getMonthsLeft() ) / 8 );
     
 
@@ -652,8 +653,17 @@ void drawMap() {
             }
         else {
             // transparent so border shows when not flashing
-            regionColor.a = 160;
-            //regionColor.a = 128;
+            //regionColor.a = 160;
+            // regionColor.a = 128;
+
+            // fades out following background
+            // regionColor.a = backgroundColor.a;
+
+            // image gets more and more faint as game wears on
+            // starts at 50% (128), fades down to 33% (86)
+            regionColor.a = 
+                (unsigned char)( 86 + ( 42 * getMonthsLeft() ) / 8 );
+
             }
         
         
@@ -668,7 +678,10 @@ void drawMap() {
     
     // names, transparent
     rgbaColor nameColor = white;
-    nameColor.a = 64;
+    // starts at 64, fades down to 32 (66% of orignal value, just like
+    // background)... can barely read it at end
+    nameColor.a = (unsigned char)( 42 + ( 22 * getMonthsLeft() ) / 8 );
+    // nameColor.a = 64;
     drawSprite( mapNamesTopSpriteID, 0, 0, nameColor );
     drawSprite( mapNamesBottomSpriteID, 0, bottomHalfOffset, nameColor );
 
