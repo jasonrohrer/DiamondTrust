@@ -545,7 +545,7 @@ void initMap() {
 
     int paperW, paperH;
     
-    rgbaColor *paperRGBA = readTGAFile( "paper16.tga",
+    rgbaColor *paperRGBA = readTGAFile( "paper.tga",
                                         &paperW, &paperH );
 
     if( paperRGBA == NULL

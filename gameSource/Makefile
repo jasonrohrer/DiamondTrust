@@ -27,7 +27,7 @@ miniDiamond.tga \
 vault.tga \
 salePicker.tga \
 map_names.tga \
-paper16.tga \
+paper.tga \
 jet_rotated16.tga \
 piper_rotated16.tga \
 puma_rotated16.tga \

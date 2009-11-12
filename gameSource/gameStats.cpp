@@ -128,7 +128,8 @@ static int pictureSpriteW, pictureSpriteH;
 
 
 static void loadMultiSprite( char *inFileName, int inNumFrames,
-                             int *outSpriteIDs, int *outW, int *outH ) {
+                             int *outSpriteIDs, int *outW, int *outH,
+                             int inSetID = -1 ) {
 
     int w, h;
     
@@ -154,9 +155,8 @@ static void loadMultiSprite( char *inFileName, int inNumFrames,
         
         applyCornerTransparency( frameSubImage, numPixels );
 
-        // first quadrant
         outSpriteIDs[f] = 
-            addSprite( frameSubImage, w, spriteH );
+            addSprite( frameSubImage, w, spriteH, inSetID );
         }
 
     delete [] spriteRGBA;
@@ -261,11 +261,14 @@ void initStats() {
     delete [] unitInfoPanelRGBA;
     */
 
+    int pictureSpriteSet = createSpriteSet();
 
     loadMultiSprite( "playerPictures.tga", 3,
-                     pictureSprites[0], &pictureSpriteW, &pictureSpriteH );
+                     pictureSprites[0], &pictureSpriteW, &pictureSpriteH,
+                     pictureSpriteSet );
     loadMultiSprite( "enemyPictures.tga", 3,
-                     pictureSprites[1], &pictureSpriteW, &pictureSpriteH );
+                     pictureSprites[1], &pictureSpriteW, &pictureSpriteH,
+                     pictureSpriteSet );
 
     sellZeroNote = autoSprintf( translate( "stats_sellZeroNote" ),
                                 noSaleFlatRate );
