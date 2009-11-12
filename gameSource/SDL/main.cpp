@@ -669,9 +669,15 @@ int createSpriteSet() {
     }
 
 
-void makeSpriteActive( int inHandle ) {
+void makeSpriteActive( int inHandle, char inReplaceSafe ) {
     // ignore sprite sets on SDL
     }
+
+char isSpriteReady( int inHandle ) {
+    // ignore sprite sets on SDL
+    return true;
+    }
+
 
 
 

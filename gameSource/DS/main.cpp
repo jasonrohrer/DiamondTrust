@@ -132,10 +132,15 @@ struct textureInfoStruct {
         int w;
         int h;
         int numTextureDataBytes;
+        // number of bytes in w pixels
+        int numTextureBytesPerLine;
+        
   
         // -1 if not in a set
         int textureSetID;
         char activeInSet;
+        char dataInTextureRAM;
+        
         // this is NULL if not in a set
         unsigned char *textureDataCopy;
         
@@ -272,6 +277,7 @@ static textureInfo makeTextureInfo( int inWidth, int inHeight,
 
     t.numTextureDataBytes = 0;
     t.activeInSet = false;
+    t.dataInTextureRAM = false;
     t.textureDataCopy = NULL;
 
     return t;
@@ -341,7 +347,7 @@ static void replaceTextureData( textureInfo *inT,
                 inT->slotAddress + inByteOffset,
                 inNumBytes );
     
-    GX_EndLoadTex(); 
+    GX_EndLoadTex();
     }
 
 
@@ -351,6 +357,7 @@ static void addTextureData( textureInfo *inT,
                             unsigned int inNumBytes ) {
     
     replaceTextureData( inT, inPackedTextureData, inNumBytes );
+    inT->dataInTextureRAM = true;
 
     
     inT->numTextureDataBytes = (int)inNumBytes;
@@ -420,6 +427,7 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
     textureInfo t = makeTextureInfo( inWidth, inHeight, inSetID );
 
     t.texFormat = GX_TEXFMT_PLTT256;
+    t.numTextureBytesPerLine = inWidth;
     
     addPalette( &t, inPalette, 256 );
     
@@ -442,6 +450,7 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
 typedef struct pendingReplacement {
         int spriteID;
         unsigned char *dataBytes;
+        char deleteDataWhenDone;
         unsigned int numBytes;
         unsigned int numBytesDone;
         unsigned int blockSize;
@@ -462,8 +471,12 @@ static void textureReplacementStep() {
         
         if( p->numBytesDone == p->numBytes ) {
             // finished
+            textureInfoArray[ p->spriteID ].dataInTextureRAM = true;
             
-            delete [] p->dataBytes;
+            if( p->deleteDataWhenDone ) {
+                delete [] p->dataBytes;
+                }
+            
             textureReplacements.deleteElement( 0 );
             }        
         }
@@ -486,13 +499,14 @@ void replaceSprite256( int inSpriteID,
         memcpy( data, inDataBytes, numPixels );
         
         pendingReplacement p = 
-            { inSpriteID, data, numPixels, 0, (unsigned int)inWidth };
+            { inSpriteID, data, true, numPixels, 0, (unsigned int)inWidth };
         textureReplacements.push_back( p );
         }
-    else {
-                
+    else {    
         replaceTextureData( &( textureInfoArray[ inSpriteID ] ), 
                             (unsigned short*)inDataBytes, numPixels );
+
+        textureInfoArray[ inSpriteID ].dataInTextureRAM = true;
         }
     
     }
@@ -510,40 +524,72 @@ int createSpriteSet() {
 
 
 
-void makeSpriteActive( int inSpriteID ) {
+void makeSpriteActive( int inSpriteID, char inReplaceSafe ) {
     textureInfo *t = &( textureInfoArray[ inSpriteID ] );
 
     int setID = t->textureSetID;
     
 
     if( setID != -1 && ! t->activeInSet ) {
+
+        if( !inReplaceSafe ) {
+            
+            // load into texture RAM right now
+            replaceTextureData( t, (unsigned short *)( t->textureDataCopy ), 
+                                (unsigned int)t->numTextureDataBytes );
+            t->dataInTextureRAM = true;
+            }
+        else {
+            t->dataInTextureRAM = false;
+
+            // put in queue for safe copy into texture RAM
+            
+            // 8 lines at a time (all images have H that is multiple of 8)
+            unsigned int blockSize = 
+                (unsigned int)( t->numTextureBytesPerLine * 8 );
+            if( t->h >8 ) {
+                // multiples of 16 lines
+                blockSize *= 2;
+                }
+            if( t->h > 16 ) {
+                // multiples of 32 lines
+                blockSize *=2;
+                }
+            if( t->h > 32 ) {
+                // multiples of 64 lines
+                blockSize *= 2;
+                }
+            
+            // cap at 2048 bytes to avoid potential screen artifacts
+            while( blockSize > 2048 ) {
+                blockSize /= 2;
+                }
+            
+
+            pendingReplacement p = 
+            { inSpriteID, t->textureDataCopy, false, 
+              (unsigned int)t->numTextureDataBytes, 0, blockSize };
+            textureReplacements.push_back( p );
+            }
         
-        // load into texture/palette RAM
-
-        DC_FlushRange( t->textureDataCopy, 
-                       (unsigned int)t->numTextureDataBytes );
-
-        GX_BeginLoadTex();
-    
-        GX_LoadTex( t->textureDataCopy, 
-                    t->slotAddress,
-                    (unsigned int)t->numTextureDataBytes );
-    
-        GX_EndLoadTex();
-
-
         t->activeInSet = true;
         
-
+        
         // mark last active no longer active
         textureSet *s = textureSetVector.getElement( setID );
         
         if( s->activeMember != -1 ) {
             textureInfoArray[ s->activeMember ].activeInSet = false;
+            textureInfoArray[ s->activeMember ].dataInTextureRAM = false;
             }
         
         s->activeMember = inSpriteID;
         }
+    }
+
+
+char isSpriteReady( int inHandle ) {
+    return textureInfoArray[ inHandle ].dataInTextureRAM;
     }
 
     
@@ -664,7 +710,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
         //printOut( "Texture requires direct color\n" );
 
         t.texFormat = GX_TEXFMT_DIRECT;
-        
+        t.numTextureBytesPerLine = 2 * inWidth;
+
         numTextureShorts = numPixels;
         packedTextureData = textureData;
 
@@ -691,6 +738,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
         
         if( numUniqueColors <= 4 ) {
             t.texFormat = GX_TEXFMT_PLTT4;
+            t.numTextureBytesPerLine = inWidth / 4;
+
             paletteSize = 4;
             
             // pack into 2 bits per pixel (8 pixels per short)
@@ -712,6 +761,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
             }
         else if( numUniqueColors <= 16 ) {
             t.texFormat = GX_TEXFMT_PLTT16;
+            t.numTextureBytesPerLine = inWidth / 2;
+
             paletteSize = 16;
             
             // pack into 4 bits per pixel (4 pixels per short)
@@ -733,6 +784,8 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
             }
         else if( numUniqueColors <= 256 ) {
             t.texFormat = GX_TEXFMT_PLTT256;
+            t.numTextureBytesPerLine = inWidth;
+
             paletteSize = 256;
             
             // pack into 8 bits per pixel (2 pixel per short)
