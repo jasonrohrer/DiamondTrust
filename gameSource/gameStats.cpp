@@ -681,8 +681,30 @@ void drawStats() {
 
     int activeUnit = getActiveUnit();
     
-    // don't show panel for inspector
+    int pictureSpriteID = -1;
+    char pictureSpriteReady = false;
+
     if( activeUnit >= 0 && activeUnit < numUnits - 1 ) {
+
+        if( activeUnit < numPlayerUnits ) {
+            pictureSpriteID = pictureSprites[0][ activeUnit ];    
+            }
+        else {
+            pictureSpriteID = pictureSprites[1][ activeUnit - numPlayerUnits ];
+            }
+    
+    
+        // use safe replacement to avoid graphical glitches on DS platform
+        makeSpriteActive( pictureSpriteID, true );
+        
+    
+        pictureSpriteReady = isSpriteReady( pictureSpriteID );
+        }
+    
+
+    // don't show panel for inspector
+    // delay showing panel until picture sprite loaded into RAM
+    if( activeUnit >= 0 && activeUnit < numUnits - 1 && pictureSpriteReady ) {
         
         Unit *u = getUnit( activeUnit );
         

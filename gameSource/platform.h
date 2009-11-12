@@ -64,7 +64,12 @@ int createSpriteSet();
 // sprite in set becomes active (transfered into texture RAM) whenever it 
 // is drawn
 // can also be made active manually
-void makeSpriteActive( int inHandle );
+void makeSpriteActive( int inHandle, char inReplaceSafe=false );
+
+// has sprite that has been set with makeSpriteActive been transfered fully
+// into RAM yet?
+char isSpriteReady( int inHandle );
+
 
 // platforms that do not have tight limits on texture RAM can ignore sprite
 // sets entirely
