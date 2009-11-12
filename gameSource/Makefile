@@ -34,8 +34,8 @@ puma_rotated16.tga \
 angola_satellite.tga \
 title16.tga \
 rolodex_manilla16.tga \
-playerPictures16.tga \
-enemyPictures16.tga \
+playerPictures.tga \
+enemyPictures.tga \
 sellingPanel.tga \
 
 

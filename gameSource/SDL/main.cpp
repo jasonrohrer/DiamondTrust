@@ -663,7 +663,22 @@ static int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
     }
 
 
-int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
+
+int createSpriteSet() {
+    return -1;
+    }
+
+
+void makeSpriteActive( int inHandle ) {
+    // ignore sprite sets on SDL
+    }
+
+
+
+int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight, 
+               int inSetID ) {
+    // ignore sprite sets on SDL
+
     // placeholder
     texturePalette p;
 
@@ -672,7 +687,9 @@ int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight ) {
 
 
 int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
-                  unsigned short inPalette[256], char inZeroTransparent ) {
+                  unsigned short inPalette[256], char inZeroTransparent,
+                  int inSetID ) {
+    // ignore sprite sets on SDL
     
     // map palette to RGBA colors
     texturePalette p;

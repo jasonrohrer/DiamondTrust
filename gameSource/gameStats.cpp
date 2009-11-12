@@ -262,9 +262,9 @@ void initStats() {
     */
 
 
-    loadMultiSprite( "playerPictures16.tga", 3,
+    loadMultiSprite( "playerPictures.tga", 3,
                      pictureSprites[0], &pictureSpriteW, &pictureSpriteH );
-    loadMultiSprite( "enemyPictures16.tga", 3,
+    loadMultiSprite( "enemyPictures.tga", 3,
                      pictureSprites[1], &pictureSpriteW, &pictureSpriteH );
 
     sellZeroNote = autoSprintf( translate( "stats_sellZeroNote" ),
