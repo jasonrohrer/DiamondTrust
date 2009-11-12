@@ -154,7 +154,7 @@ void gameInit() {
     titleFade = 255;
 
     int titleW, titleH;
-    rgbaColor *titleRGBA = readTGAFile( "title16.tga",
+    rgbaColor *titleRGBA = readTGAFile( "title256.tga",
                                         &titleW, &titleH );
 
     applyCornerTransparency( titleRGBA, titleW * titleH );
