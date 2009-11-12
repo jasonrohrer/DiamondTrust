@@ -83,6 +83,11 @@ Button *nextButton;
 Button *parentButton;
 Button *childButton;
 
+Button *aiButton;
+Button *wifiButton;
+
+Button *backButton;
+
 
 
 static char isInside( int inX, int inY, 
@@ -249,6 +254,16 @@ void gameInit() {
     childButton = new Button( font16, translate( "button_child" ),
                                                  128,
                                                  146 );
+
+
+    aiButton = new Button( font16, translate( "button_ai" ),
+                           128,
+                           106 );
+
+    wifiButton = new Button( font16, translate( "button_wifi" ),
+                             128,
+                             146 );
+
 
     printOut( "  ++++++  Init map\n" );
     initMap();

@@ -5,6 +5,13 @@ subStatus_moveOn "Press Next to continue"
 
 button_done "Done"
 button_next "Next"
+
+button_back "Back"
+
+button_ai "1 Player Game"
+button_wifi "2 Player WiFi"
+
+
 button_parent "Host Game"
 button_child "Join Game"
 
