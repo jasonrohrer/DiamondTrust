@@ -124,4 +124,20 @@ int playRandomGameUntilEnd( gameState inState );
 
 
 
+typedef struct possibleMove {
+        unsigned char moveChars[12];
+
+        // num chars used varies depending on game phase
+        int numCharsUsed;
+    } possibleMove;
+
+
+// gets a possible move for player
+// (use getMirrorState to extract move for enemy)
+possibleMove getPossibleMove( gameState inState );
+
+
+
+// returns a mirror of the state, swapping player for enemy
+gameState getMirrorState( gameState inState );
 

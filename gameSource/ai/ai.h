@@ -21,6 +21,9 @@ unsigned char *getAIMove( int *outMoveLength );
 
 usage pattern:
 
+while( enemy move not ready )
+   stepAI
+
 setEnemyMove
 
 while( getAIMove == NULL )

@@ -1,6 +1,8 @@
 #include "ai/gameState.h"
 
 #include "units.h"
+#include "platform.h"
+
 
 static gameState currentState;
 
@@ -10,51 +12,34 @@ static int enemyMoveLength;
 static char moveDone;
 
 
+
+
 // scores for all possible moves at the current step
-int numPossibleMoves;
-int moveScores[200];
+#define numPossibleMoves 100
+int moveScores[ numPossibleMoves ];
+
+possibleMove moves[ numPossibleMoves ];
+
+int numStepsTaken = 0;
+int maxNumSteps = 1000;
 
 
 
-typdef struct salaryBribeMove {
-        // -1 if not set yet
-        int newSalaryOrBribePayment[6];
-        // -1 if not set yet
-        int lastBribingUnit[6];
-        int nextToSet;
-    } salaryBribeMove;
 
 
 
-salaryBribeMove nextSalaryBribeMove;
+
 
 
 
 
 void clearNextMove() {
-    // clear out our next move to accumulate our chosen move
-    switch( currentState.nextMove ) {
-
-        case salaryBribe: {
-            for( int u=0; u<6; u++ ) {    
-                nextSalaryBribeMove.newSalaryOrBribePayment[u] = -1;
-                }
-            nextSalaryBribeMove.nextToSet = 0;
-
-            // number of moves based on money
-            numPossibleMoves = currentState.ourMoney + 1;
-            for( int m=0; m<numPossibleMoves; m++ ) {
-                moveScores[m] = 0;
-                }
-            }
-            break;
-            case moveUnits:
-                break;
-            case moveInspector:
-                break;
-            case sellDiamonds:
-                break;
-            }
+    for( int m=0; m<numPossibleMoves; m++ ) {
+        moveScores[m] = 0;
+        moves[m] = getPossibleMove( currentState );
+        }
+    numStepsTaken = 0;
+    }
 
 
 /*
@@ -116,6 +101,8 @@ void initAI() {
     enemyMove = NULL;
 
     moveDone = false;
+
+    clearNextMove();
     }
 
 
@@ -141,24 +128,34 @@ void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength ) {
 
 void stepAI() {
     if( !moveDone ) {
+        
+        // simulate one game for one of our moves
+        
+        int chosenMove = getRandom( 0, numPossibleMoves );
+        
+        // pick a possible starting state (collapsing hidden
+        // information)
+        gameState startState = collapseState( currentState );
+        
+        // pick a possible co-move for opponent
+        gameState mirror = getMirrorState( startState );
+        possibleMove enemyMove = getPossibleMove( mirror );
+        
+        gameState nextState = 
+            stateTransition( startState,
+                             moves[chosenMove].moveChars
+                             moves[chosenMove].numCharsUsed,
+                             enemyMove.moveChars,
+                             enemyMove.numCharsUsed,
+                             false );
+        int result = playRandomGameUntilEnd( nextState );
+        
+        moveScores[ chosenMove ] += result;
 
-
-        switch( currentState.nextMove ) {
-
-            case salaryBribe:
-                
-                
-                
-
-
-
-                break;
-            case moveUnits:
-                break;
-            case moveInspector:
-                break;
-            case sellDiamonds:
-                break;
+        numStepsTaken ++;
+        
+        if( numStepsTaken >= maxNumSteps ) {
+            moveDone = true;
             }
         }
     }
@@ -171,16 +168,31 @@ unsigned char *getAIMove( int *outMoveLength ) {
         return NULL;
         }
     
+    
+    // pick move with highest score
+    int highScore = -10000;
+    int chosenMove = -1;
+    for( int m=0; m<numPossibleMoves; m++ ) {
+        if( moveScores[m] > highScore ) {
+            chosenMove = m;
+            highScore = moveScores[m];
+            }
+        }
+    
+
     // compose our move into a string
-    unsigned char *ourMove = FIXME;
-    *outMoveLength = FIXME;
+    *outMoveLength = moves[chosenMove].numCharsUsed;
+
+    unsigned char *ourMove = 
+        new unsigned char[ *outMoveLength ];
+    memcpy( ourMove, moves[chosenMove].moveChars, *outMoveLength );
     
 
 
     // apply both moves to our game state, preserving hidden info
     currentState = stateTransition( currentState, 
                                     ourMove,
-                                    ourLength,
+                                    *outMoveLength,
                                     enemyMove,
                                     enemyMoveLength,
                                     true );
