@@ -10,6 +10,53 @@ static int enemyMoveLength;
 static char moveDone;
 
 
+// scores for all possible moves at the current step
+int numPossibleMoves;
+int moveScores[200];
+
+
+
+typdef struct salaryBribeMove {
+        // -1 if not set yet
+        int newSalaryOrBribePayment[6];
+        // -1 if not set yet
+        int lastBribingUnit[6];
+        int nextToSet;
+    } salaryBribeMove;
+
+
+
+salaryBribeMove nextSalaryBribeMove;
+
+
+
+
+void clearNextMove() {
+    // clear out our next move to accumulate our chosen move
+    switch( currentState.nextMove ) {
+
+        case salaryBribe: {
+            for( int u=0; u<6; u++ ) {    
+                nextSalaryBribeMove.newSalaryOrBribePayment[u] = -1;
+                }
+            nextSalaryBribeMove.nextToSet = 0;
+
+            // number of moves based on money
+            numPossibleMoves = currentState.ourMoney + 1;
+            for( int m=0; m<numPossibleMoves; m++ ) {
+                moveScores[m] = 0;
+                }
+            }
+            break;
+            case moveUnits:
+                break;
+            case moveInspector:
+                break;
+            case sellDiamonds:
+                break;
+            }
+
+
 /*
 int monthsLeft;
         
@@ -87,10 +134,32 @@ void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength ) {
 
 
 
+
+
+
+
+
 void stepAI() {
     if( !moveDone ) {
-        // FIXME
-        
+
+
+        switch( currentState.nextMove ) {
+
+            case salaryBribe:
+                
+                
+                
+
+
+
+                break;
+            case moveUnits:
+                break;
+            case moveInspector:
+                break;
+            case sellDiamonds:
+                break;
+            }
         }
     }
 
@@ -119,7 +188,10 @@ unsigned char *getAIMove( int *outMoveLength ) {
     delete [] enemyMove;
     enemyMove = NULL;
     moveDone = false;
+    
 
+    clearNextMove();
+    
 
     return ourMove;
     }
