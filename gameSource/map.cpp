@@ -813,7 +813,7 @@ intPair getVaultPositionInRegion( int inRegion ) {
 int getRegionDiamondRate( int inRegion, int inMonthsLeft ) {
     if( inRegion < 7 ) {
         // constant
-        return mapRegionDiamondRate[i];
+        return mapRegionDiamondRate[ inRegion ];
         }
     else {
         // flips every-other month (starts at 1)
