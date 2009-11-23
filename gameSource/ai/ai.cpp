@@ -72,26 +72,33 @@ void initAI() {
     currentState.nextMove = salaryBribe;
     currentState.ourMoney = 18;
     currentState.ourDiamonds = 2;
-    currentState.enemyMoney = { 18, 18 };
+    currentState.enemyMoney.hi = 18;
+    currentState.enemyMoney.lo = 18;
+    currentState.knownEnemyTotalMoneyReceived = 18;
+    currentState.knownEnemyTotalMoneySpent = 0;
+    
     currentState.enemyDiamonds = 2; 
     for( int p=0; p<2; p++ ) {
         for( int u=0; u<3; u++ ) {
             unit *thisUnit = &( currentState.agentUnits[p][u] );
             
-            thisUnit->totalSalary = { 0, 0 };
-            thisUnit->totalSalary = { 0, 0 };
+            intRange zeroRange = { 0, 0 };
+            
+
+            thisUnit->totalSalary = zeroRange;
+            thisUnit->totalBribe = zeroRange;
             thisUnit->diamonds = 0;
             thisUnit->region = p;
             thisUnit->destination = p;
-            thisUnit->diamondBid = { 0, 0 };
-            thisUnit->inspectorBribe = { 0, 0 };
+            //thisUnit->diamondBid = zeroRange;
+            //thisUnit->inspectorBribe = zeroRange;
             thisUnit->opponentBribingUnit = 3;
             }
         }
     
     currentState.inspectorRegion = getUnitRegion( numUnits - 1 );
     currentState.inspectorDestination = currentState.inspectorRegion;
-    for( int p=0; p<2; p++ ) {
+    for( int r=0; r<8; r++ ) {
         currentState.regionDiamondCounts[r] = 0;
         }
 
@@ -115,7 +122,8 @@ void freeAI() {
 void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength ) {
     enemyMove = new unsigned char[ inEnemyLength ];
     memcpy( enemyMove, inEnemyMove, inEnemyLength );
-
+    enemyMoveLength = inEnemyLength;
+    
     moveDone = false;
     }
 
@@ -131,7 +139,7 @@ void stepAI() {
         
         // simulate one game for one of our moves
         
-        int chosenMove = getRandom( 0, numPossibleMoves );
+        int chosenMove = getRandom( numPossibleMoves );
         
         // pick a possible starting state (collapsing hidden
         // information)
@@ -143,7 +151,7 @@ void stepAI() {
         
         gameState nextState = 
             stateTransition( startState,
-                             moves[chosenMove].moveChars
+                             moves[chosenMove].moveChars,
                              moves[chosenMove].numCharsUsed,
                              enemyMove.moveChars,
                              enemyMove.numCharsUsed,

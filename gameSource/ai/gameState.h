@@ -10,6 +10,14 @@ typedef struct intRange {
     } intRange;
 
 
+inline intRange makeRange( int inHi, int inLo ) {
+    intRange returnValue = { inHi, inLo };
+    return returnValue;
+    }
+
+    
+
+
 
 typedef struct unit {
         intRange totalSalary;
@@ -22,8 +30,8 @@ typedef struct unit {
         // -1 if unknown (or unset)
         int destination;
 
-        intRange diamondBid;
-        intRange inspectorBribe;
+        //intRange diamondBid;
+        //intRange inspectorBribe;
 
         // -1 if uknown
         // or [0..2] to indicate the opponent unit
@@ -67,7 +75,7 @@ enum NextMove {
 
 
 
-typdef struct gameState {
+typedef struct gameState {
         
         int monthsLeft;
         
@@ -79,6 +87,10 @@ typdef struct gameState {
         int ourDiamonds;
         
         intRange enemyMoney;
+        int knownEnemyTotalMoneyReceived;
+        // money spent publicly (NOT including salaries and bribes)
+        int knownEnemyTotalMoneySpent;
+        
         int enemyDiamonds;
 
         // 0 for player, 1 for enemy, 3 units each
@@ -119,7 +131,9 @@ gameState collapseState( gameState inState );
 
 
 // takes a collapsed state as input
-// returns 1 if we win, 0 for tie, -1 for enemy win
+// returns positive number if we win (number of points in lead), 
+//         0 for tie, 
+//         negative number for enemy win (number of poitns trailing
 int playRandomGameUntilEnd( gameState inState );
 
 
