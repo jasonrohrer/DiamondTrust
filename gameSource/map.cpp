@@ -810,20 +810,34 @@ intPair getVaultPositionInRegion( int inRegion ) {
 
 
 
+int getRegionDiamondRate( int inRegion, int inMonthsLeft ) {
+    if( inRegion < 7 ) {
+        // constant
+        return mapRegionDiamondRate[i];
+        }
+    else {
+        // flips every-other month (starts at 1)
+        
+        if( inMonthsLeft % 2 == 0 ) {
+            return 1;
+            }
+        else {
+            return 2;
+            }
+        }
+    }
+
+
 static int numToAccumulate[numMapRegions];
 static int numAccumulated[numMapRegions];
 
 
 void accumulateDiamondsStart() {
     for( int i=0; i<numMapRegions; i++ ) {
-        numToAccumulate[i] = mapRegionDiamondRate[i];
+        numToAccumulate[i] = getRegionDiamondRate( i, getMonthsLeft() );
         numAccumulated[i] = 0;
         mapRegionDiamondAccumulating[i] = false;
         }    
-
-    // toggle between 1 and 2 (used for next Start)
-    mapRegionDiamondRate[ 7 ] %= 2;
-    mapRegionDiamondRate[ 7 ] ++;
     }
 
 

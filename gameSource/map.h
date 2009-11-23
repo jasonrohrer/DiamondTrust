@@ -30,6 +30,11 @@ intPair getVaultPositionInRegion( int inRegion );
 
 
 
+// gets diamond rate in a given month
+int getRegionDiamondRate( int inRegion, int inMonthsLeft );
+
+
+
 void accumulateDiamondsStart();
 // returns true when done
 char accumulateDiamondsStep();
