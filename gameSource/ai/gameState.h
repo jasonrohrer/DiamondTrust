@@ -7,14 +7,19 @@
 typedef struct intRange {
         int hi;
         int lo;
+        int t;  // true value
     } intRange;
 
 
-inline intRange makeRange( int inHi, int inLo ) {
-    intRange returnValue = { inHi, inLo };
+inline intRange makeRange( int inHi, int inLo, int inT ) {
+    intRange returnValue = { inHi, inLo, inT };
     return returnValue;
     }
 
+inline intRange makeRange( int inHi ) {
+    intRange returnValue = { inHi, inHi, inHi };
+    return returnValue;
+    }
     
 
 
@@ -28,10 +33,10 @@ typedef struct unit {
         int region;
 
         // -1 if unknown (or unset)
-        int destination;
+        //int destination;
 
-        //intRange diamondBid;
-        //intRange inspectorBribe;
+        intRange diamondBid;
+        intRange inspectorBribe;
 
         // -1 if uknown
         // or [0..2] to indicate the opponent unit
@@ -84,8 +89,15 @@ typedef struct gameState {
 
 
         int ourMoney;
+        int knownOurTotalMoneyReceived;
+        // money spent publicly (NOT including salaries and bribes)
+        int knownOurTotalMoneySpent;
+        
         int ourDiamonds;
         
+        
+
+
         intRange enemyMoney;
         int knownEnemyTotalMoneyReceived;
         // money spent publicly (NOT including salaries and bribes)
@@ -153,5 +165,6 @@ possibleMove getPossibleMove( gameState inState );
 
 
 // returns a mirror of the state, swapping player for enemy
+// only works on collapsed states
 gameState getMirrorState( gameState inState );
 

@@ -6,8 +6,8 @@
 
 static gameState currentState;
 
-static unsigned char *enemyMove;
-static int enemyMoveLength;
+static unsigned char *externalEnemyMove;
+static int externalEnemyMoveLength;
 
 static char moveDone;
 
@@ -70,14 +70,17 @@ int monthsLeft;
 void initAI() {
     currentState.monthsLeft = 8;
     currentState.nextMove = salaryBribe;
-    currentState.ourMoney = 18;
+
+    currentState.ourMoney = makeRange( 18 );
+    currentState.knownOurTotalMoneyReceived = 18;
+    currentState.knownOurTotalMoneySpent = 0;
     currentState.ourDiamonds = 2;
-    currentState.enemyMoney.hi = 18;
-    currentState.enemyMoney.lo = 18;
+    
+    currentState.enemyMoney = makeRange( 18 );
     currentState.knownEnemyTotalMoneyReceived = 18;
     currentState.knownEnemyTotalMoneySpent = 0;
-    
     currentState.enemyDiamonds = 2; 
+    
     for( int p=0; p<2; p++ ) {
         for( int u=0; u<3; u++ ) {
             unit *thisUnit = &( currentState.agentUnits[p][u] );
@@ -89,9 +92,9 @@ void initAI() {
             thisUnit->totalBribe = zeroRange;
             thisUnit->diamonds = 0;
             thisUnit->region = p;
-            thisUnit->destination = p;
-            //thisUnit->diamondBid = zeroRange;
-            //thisUnit->inspectorBribe = zeroRange;
+            //thisUnit->destination = p;
+            thisUnit->diamondBid = zeroRange;
+            thisUnit->inspectorBribe = zeroRange;
             thisUnit->opponentBribingUnit = 3;
             }
         }
@@ -105,7 +108,7 @@ void initAI() {
     // accumulate to prepare for first move
     accumulateDiamonds( &currentState );
 
-    enemyMove = NULL;
+    externalEnemyMove = NULL;
 
     moveDone = false;
 
@@ -120,9 +123,9 @@ void freeAI() {
 
 
 void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength ) {
-    enemyMove = new unsigned char[ inEnemyLength ];
-    memcpy( enemyMove, inEnemyMove, inEnemyLength );
-    enemyMoveLength = inEnemyLength;
+    externalEnemyMove = new unsigned char[ inEnemyLength ];
+    memcpy( externalEnemyMove, inEnemyMove, inEnemyLength );
+    externalEnemyMoveLength = inEnemyLength;
     
     moveDone = false;
     }
@@ -201,12 +204,12 @@ unsigned char *getAIMove( int *outMoveLength ) {
     currentState = stateTransition( currentState, 
                                     ourMove,
                                     *outMoveLength,
-                                    enemyMove,
-                                    enemyMoveLength,
+                                    externalEnemyMove,
+                                    externalEnemyMoveLength,
                                     true );
 
-    delete [] enemyMove;
-    enemyMove = NULL;
+    delete [] externalEnemyMove;
+    externalEnemyMove = NULL;
     moveDone = false;
     
 
