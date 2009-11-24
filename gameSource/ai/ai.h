@@ -20,8 +20,6 @@ unsigned char *getAIMove( int *outMoveLength );
 /*
 
 
-FIXME:  what happens when we only need move from one player?
-( like in case of moving inspector )
 
 usage pattern:
 
@@ -32,5 +30,9 @@ setEnemyMove
 
 while( getAIMove == NULL )
    stepAI
+
+
+   EXCEPTION:  When moving the inspector, usage pattern skips setEnemyMove
+               or getAIMove, depending on who is moving the inspector
 
 */

@@ -41,14 +41,14 @@ possibleMove getPossibleMove( gameState inState ) {
                     }
                 else {
                     salaryBribeAmounts[ u + 3 ] = 
-                        getRandom( inState.ourMoney + 1 );
+                        getRandom( inState.ourMoney.t + 1 );
                     }
 
                 // player units
                 if( inState.agentUnits[0][u].region == 0 ) {
                     
                     salaryBribeAmounts[u] = 
-                        getRandom( inState.ourMoney + 1 );
+                        getRandom( inState.ourMoney.t + 1 );
                     }
                 else {
                     // away from home
@@ -64,7 +64,7 @@ possibleMove getPossibleMove( gameState inState ) {
                 amountSum += salaryBribeAmounts[6];
                 }
             
-            while( amountSum > inState.ourMoney ) {    
+            while( amountSum > inState.ourMoney.t ) {    
                 // pick one
                 int pick = getRandom( 6 );
                 
@@ -136,7 +136,8 @@ possibleMove getPossibleMove( gameState inState ) {
 
 
 
-        case moveUnits: {
+        case moveUnits:
+        case moveUnitsCommit: {
             // 3 chars per player unit
             // dest, bid, bribe
             m.numCharsUsed = 9;
@@ -158,13 +159,13 @@ possibleMove getPossibleMove( gameState inState ) {
                 bid[u] = 0;
                 if( dest[u] > 1 ) {
                     // can bid here
-                    bid[u] = getRandom( inState.ourMoney + 1 );
+                    bid[u] = getRandom( inState.ourMoney.t + 1 );
                     totalSpent += bid[u];
                     }
 
                 bribe[u] = 0;
                 if( dest[u] == inState.inspectorRegion ) {
-                    bribe[u] = getRandom( inState.ourMoney + 1 );
+                    bribe[u] = getRandom( inState.ourMoney.t + 1 );
                     totalSpent += bribe[u];
                     }
 
@@ -180,7 +181,7 @@ possibleMove getPossibleMove( gameState inState ) {
                 }
             
 
-            while( totalSpent > inState.ourMoney ) {
+            while( totalSpent > inState.ourMoney.t ) {
                 // spending too much
                 
                 // pick one to reduce
@@ -237,6 +238,7 @@ possibleMove getPossibleMove( gameState inState ) {
 
 
         case sellDiamonds:
+        case sellDiamondsCommit:
             // 3 chars
             // 0 = number sold
             // 1 = image present in subsequent messages?
@@ -268,11 +270,118 @@ void accumulateDiamonds( gameState *inState ) {
     }
 
 
+
+
+int whoMovesInspector( gameState inState ) {
+    int inspectorRegion = inState.inspectorRegion;
+    
+    int winner = -1;
+    int winningBribe = 0;
+    
+    for( int p=0; p<2; p++ ) {
+        for( int u=0; u<3; u++ ) {
+            if( inState.agentUnits[p][u].region == inspectorRegion ) {
+                if( inState.agentUnits[p][u].inspectorBribe > 
+                    winningBribe ) {
+                    
+                    winner = p;
+                    winningBribe = 
+                        inState.agentUnits[p][u].inspectorBribe;
+                    }
+                }
+            }
+        }
+    return winner;
+    }
+
+
+
+// process inspector confiscation and unit diamond collection
+static void collectDiamonds( gameState *inState ) {
+
+    int inspectorRegion = inState->inspectorRegion;
+    
+    // first, have him confiscate and cancel bids in his region
+    for( int p=0; p<2; p++ ) {
+        for( int u=0; u<3; u++ ) {
+            if( inState->agentUnits[p][u].region == inspectorRegion ) {
+                // confiscate
+                inState->agentUnits[p][u].diamonds = 0;
+                
+                // cancel bid
+                inState->agentUnits[p][u].diamondBid = 0;
+                }
+            }
+        }
+    
+
+    // now process remaining diamond bids
+    for( int r=2; r<8; r++ ) {
+        
+        for( int p=0; p<2; p++ ) {
+            int e = (p+1) % 2;
+            
+            for( int u=0; u<3; u++ ) {
+                if( inState->agentUnits[p][u].region == r ) {
+                    int bid = inState->agentUnits[p][u].diamondBid;
+                    
+                    if( bid > 0 ) {
+                        int highBid = true;
+                        
+                        for( int i=0; i<3; i++ ) {
+                            if( inState->agentUnits[e][i].region == r ) {
+                                int eBid = 
+                                    inState->agentUnits[e][i].diamondBid;
+                                
+                                if( eBid > bid ) {
+                                    highBid = false;
+                                    
+                                    // e is winner
+                            
+                                    
+                                    inState->agentUnits[e][i].diamonds +=
+                                        inState->regionDiamondCounts[r];
+                                    
+                                    inState->regionDiamondCounts[r] = 0;
+                                    }
+
+                                // regardless, bid spent
+                                inState->agentUnits[e][i].diamondBid = 0;
+                                }
+                            }
+                        
+                        if( highBid ) {
+                            // p is winner
+                            inState->agentUnits[p][u].diamonds +=
+                                inState->regionDiamondCounts[r];
+                            
+                            inState->regionDiamondCounts[r] = 0;
+                            }
+
+                        // regardless, bid spent
+                        inState->agentUnits[p][u].diamondBid = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    
+
+
+
+
 // pick a random value in range
 static intRange collapseRange( intRange inRange ) {
     int point = inRange.lo + getRandom( ( inRange.hi - inRange.lo ) + 1 );
     
     return makeRange( point );
+    }
+
+
+static intRange collapseRangeToTrue( intRange inRange ) {
+    return makeRange( inRange.t );
     }
 
 
@@ -442,78 +551,6 @@ int playRandomGameUntilEnd( gameState inState ) {
 
 
 
-
-
-static intRange processBribe( intRange inOldBribeTotal,
-                              int inOurRegion,
-                              unit inOpponentUnits[3],
-                              int inNewBribe,
-                              intRange inOpponentMoney,
-                              char inPreserveHiddenInfo ) {
-
-    intRange totalBribe = inOldBribeTotal;
-    
-    totalBribe.t += inNewBribe;
-    
-    if( ! inPreserveHiddenInfo ) {
-        totalBribe.hi += inNewBribe;
-        totalBribe.lo = totalBribe.hi;
-        }
-    else {
-        // how much did they bribe us?
-        
-        // upper limit goes up if we're in a region with
-        // enemy
-        char sharedRegion = false;
-        for( int e=0; e<3; e++ ) {
-            if( inOpponentUnits[e].region == inOurRegion ) {
-                sharedRegion = true;
-                }
-            }
-        
-        if( sharedRegion ) {
-            // enemy might have spent all its money bribing us
-            totalBribe.hi += inOpponentMoney.hi;
-            }
-        }
-
-    return totalBribe;
-    }
-
-
-
-static intRange processSalary( intRange inOldSalaryTotal,
-                               int inUnitRegion,
-                               int inPaymentRegion,
-                               int inNewSalary,
-                               intRange inOpponentMoney,
-                               char inPreserveHiddenInfo ) {
-
-    intRange totalSalary = inOldSalaryTotal;
-    
-    totalSalary.t += inNewSalary;
-    
-    if( ! inPreserveHiddenInfo ) {
-        totalSalary.hi += inNewSalary;
-        totalSalary.lo = totalSalary.hi;
-        }
-    else {
-        // how much did they pay unit?
-        
-        // upper limit goes up if unit is in payment region
-        if( inUnitRegion == inPaymentRegion ) {
-            // enemy might have spent all its money bribing us
-            totalSalary.hi += inOpponentMoney.hi;
-            }
-        }
-
-    return totalSalary;
-    }
-
-
-
-
-
 gameState stateTransition( gameState inState, 
                            unsigned char *ourMove,
                            int ourLength,
@@ -530,92 +567,110 @@ gameState stateTransition( gameState inState,
         case salaryBribe: {
             if( ourLength != 12 && enemyLength != 12 ) {
                 printOut( "Bad move lengths passed to AI\n" );
-                return;
+                return result;
+                }
+
+            int moneySpent[2] = { 0, 0 };
+            int hiMoneyGuesses[2] = { result.ourMoney.hi, 
+                                      result.enemyMoney.hi };
+            int homeRegions[2] = { 0, 1 };
+            
+            
+                    
+            for( int p=0; p<2; p++ ) {
+                unsigned char *pMove = ourMove;
+                unsigned char *eMove = enemyMove;
+                if( p == 1 ) {
+                    // reversed
+                    pMove = enemyMove;
+                    eMove = ourMove;
+                    }
+                
+                int e = (p+1) % 2;
+
+                for( int u=0; u<3; u++ ) {
+                    
+                    // adjust true values based on actual moves
+
+                    result.agentUnits[p][u].totalSalary.t += pMove[ u * 2 ];
+                    
+                    moneySpent[p] += pMove[ u * 2 ];
+
+                    // opponent sees u unit as u+3, and describes bribe in
+                    // its move there
+                    result.agentUnits[p][u].totalBribe.t += eMove[ (u+3) * 2 ];
+                    
+                    moneySpent[e] += eMove[ (u+3) * 2 ];
+
+                    
+
+                    if( !inPreserveHiddenInfo ) {
+                        result.agentUnits[p][u].totalSalary = 
+                            collapseRangeToTrue( 
+                                result.agentUnits[p][u].totalSalary );
+                    
+                        result.agentUnits[p][u].totalBribe = 
+                            collapseRangeToTrue( 
+                                result.agentUnits[p][u].totalBribe );
+                        }
+                    else {
+                        // increase hi estimate of range based on hi estimate
+                        // of money available
+                        
+                        // but only if salary/bribe possible
+                        int unitRegion = result.agentUnits[p][u].region;
+                        
+                        if( unitRegion == homeRegions[p] ) {
+                            // unit at home
+                            
+                            // might be paid full amount of money that owner
+                            // has
+                            result.agentUnits[p][u].totalSalary.hi += 
+                                hiMoneyGuesses[p];
+                            }
+                        else {
+                            // unit out
+
+                            // could be bribed?
+
+                            // does it share a region with an enemy unit?
+                            char shared = false;
+                            
+                            for( int i=0; i<3; i++ ) {
+                                if( unitRegion == 
+                                    result.agentUnits[e][i].region ) {
+                                    shared = true;
+                                    }
+                                }
+                            
+                            if( shared ) {
+                                // might be bribed full amount of money that
+                                // opponent has
+
+                                result.agentUnits[p][u].totalBribe.hi += 
+                                    hiMoneyGuesses[e];
+                                }
+                            }                            
+                        }
+                    }
                 }
             
-            for( int u=0; u<3; u++ ) {
+
+            // track true values
+            result.ourMoney.t += moneySpent[0];
+            result.enemyMoney.t += moneySpent[0];
+            
+            if( ! inPreserveHiddenInfo ) {            
+                result.ourMoney = collapseRangeToTrue( result.ourMoney );
+                result.enemyMoney = collapseRangeToTrue( result.enemyMoney );
+                }
+            else {
+                // could have spent no money (hi remains the same)
+                // or all money
                 
-                // FIXME:  need to take intRange.t into account here
-                // to track true values
-                // this will also help to make code symmetrical for both
-                // sides (use hi and lo to track knowledge that opponent
-                // has about these units, in either case
-
-                // we KNOW how much we've paid our own units
-                result.agentUnits[0][u].totalSalary.hi += 
-                    ourMove[u * 2];
-                result.agentUnits[0][u].totalSalary.lo =
-                    result.agentUnits[0][u].totalSalary.hi;
-                
-                // spend our money
-                result.ourMoney -= ourMove[u * 2];
-                
-                    
-                // we might not be sure about how much we've been
-                // bribed by enemy units
-                result.agentUnits[0][u].totalBribe =
-                    processBribe( result.agentUnits[0][u].totalBribe,
-                                  result.agentUnits[0][u].region,
-                                  result.agentUnits[1],
-                                  enemyMove[ (u+3) * 2 ],
-                                  result.enemyMoney,
-                                  inPreserveHiddenInfo );
-                    
-                if( !inPreserveHiddenInfo ) {
-                    // spend enemy money
-                    result.enemyMoney.hi -= enemyMove[ (u+3) * 2 ];
-                    result.enemyMoney.lo = result.enemyMoney.hi;
-
-                    // remember who bribed this unit
-                    if( result.agentUnits[0][u].totalBribe.lo > 0 ) {
-                            
-                        result.agentUnits[0][u].opponentBribingUnit =
-                            enemyMove[ (u+3) * 2  + 1 ];
-                        }
-                    }
-                    
-                    
-                // we might not be sure how much enemy unit is
-                // paying in salary
-                if( !inPreserveHiddenInfo ) {
-                    result.agentUnits[1][u].totalSalary.hi += 
-                        enemyMove[u * 2];
-                    result.agentUnits[1][u].totalSalary.lo =
-                        result.agentUnits[1][u].totalSalary.hi;
-
-                    // spend enemy money
-                    result.enemyMoney.hi -= enemyMove[u * 2];
-                    result.enemyMoney.lo = result.enemyMoney.hi;
-                    }
-                else {
-                    // how much did they pay unit?
-        
-                    // upper limit goes up if unit is in payment region
-
-                    if( result.agentUnits[1][u].region == 1 ) {
-                        // at home
-
-                        // enemy might have spent all its money on salary
-                        result.agentUnits[1][u].totalSalary.hi += 
-                            inOpponentMoney.hi;
-                        }
-                    }
-
-                    
-
-                // we KNOW how much we've bribed their units
-                result.agentUnits[1][u].totalBribe.hi += 
-                    ourMove[(u+3) * 2];
-                result.agentUnits[1][u].totalBribe.lo =
-                    result.agentUnits[1][u].totalBribe.hi;
-                
-                // spend our money
-                result.ourMoney -= ourMove[(u+3) * 2];
-                
-                if( result.agentUnits[1][u].totalBribe.hi > 0 ) {
-                    result.agentUnits[1][u].opponentBribingUnit = 
-                        ourMove[(u+3) * 2 + 1];
-                    }
+                // lo drops to 0
+                result.ourMoney.lo = 0;
+                result.enemyMoney.lo = 0;
                 }
             
 
@@ -628,18 +683,83 @@ gameState stateTransition( gameState inState,
 
 
         case moveUnits: {
+            if( ourLength != 9 && enemyLength != 9 ) {
+                printOut( "Bad move lengths passed to AI\n" );
+                return result;
+                }
+            result.nextMove = moveUnitsCommit;
+            }
+            break;
 
-            // FIXME:  process unit moves here (switch their regions_
 
 
-            // FIXME:  spend unit bids/bribes here
+
+        case moveUnitsCommit: {
+            if( ourLength != 9 && enemyLength != 9 ) {
+                printOut( "Bad move lengths passed to AI\n" );
+                return result;
+                }
+
+            // process unit moves here (switch their regions)
+
+            unsigned char *moves[2] = { ourMove, enemyMove };
+            int moneySpent[2] = { 0, 0 };
+            int homeRegions[2] = { 0, 1 };
+
+            for( int p=0; p<2; p++ ) {
+                for( int u=0; u<3; u++ ) {
+                    
+                    // dest
+                    int dest = moves[p][ u * 3 ];
+                    result.agentUnits[p][u].region = dest;
 
 
-            // FIXME:  save unit bids/bribes to be used in moveInspector
-            //         state (to determine who moves inspector and who
-            //         collects diamonds
+                    
+                    // save the resulting bid/bribe for use in inspector state
 
-            result.nextMove = moveInspector;
+                    // bid
+                    int bid = moves[p][ u * 3 + 1 ];
+                    result.agentUnits[p][u].diamondBid = bid;
+                    moneySpent[p] += bid;
+                    
+                    // bribe
+                    int bribe = moves[p][ u * 3 + 2 ];
+                    result.agentUnits[p][u].inspectorBribe = bribe;
+                    moneySpent[p] += bribe;
+
+
+                    if( dest == homeRegions[p] ) {
+                        // deposite any diamonds that unit is carrying
+                        int diamondsCarried = result.agentUnits[p][u].diamonds;
+                    
+                        switch( p ) {
+                            case 0:
+                                result.ourDiamonds += diamondsCarried;
+                                break;
+                            case 1:
+                                result.enemyDiamonds += diamondsCarried;
+                                break;
+                            }
+                        result.agentUnits[p][u].diamonds = 0;
+                        }
+                    }
+                }
+            
+            // spend the money that was spent
+            addToRange( &( result.ourMoney ), - moneySpent[0] );
+            addToRange( &( result.enemyMoney ), - moneySpent[1] );
+
+            
+            // sometimes, we skip move inspector state (if no one bribed him)
+            
+            if( whoMovesInspector( result ) == -1 ) {
+                
+                collectDiamonds( &result );
+                }
+            else {
+                result.nextMove = moveInspector;
+                }
+            
             }
             break;
 
@@ -649,26 +769,65 @@ gameState stateTransition( gameState inState,
         case moveInspector: {
             if( ourLength != 1 && enemyLength != 1 ) {
                 printOut( "Bad move lengths passed to AI\n" );
-                return;
+                return result;
                 }
             
-            // FIXME:  only pay attention to move from player that
+            
+            // only pay attention to move from player that
             // actually won
+            int dest = result.inspectorRegion;
+            
+            switch( whoMovesInspector( result ) ) {
+                case -1:
+                    printOut( "Error:  AI entered moveInspector state when"
+                              " no one needs to move him\n" );
+                    return result;
+                    break;
+                case 0:
+                    dest = ourMove[0];
+                    break;
+                case 1:
+                    dest = enemyMove[0];
+                    break;
+                }
+                    
+            result.inspectorRegion = dest;
+            
+            // reset all bribes
+            for( int p=0; p<2; p++ ) {
+                for( int u=0; u<3; u++ ) {
+                    result.agentUnits[p][u].inspectorBribe = 0;
+                    }
+                }
             
 
-            // FIXME:  process diamond bids/collection here
+            // confiscate happens automatically in collectDiamonds
+                        
+                    
 
+            // process diamond bids/collection here
+            collectDiamonds( &result );
+            
             result.nextMove = sellDiamonds;
             }
             break;
 
 
 
-
         case sellDiamonds: {
             if( ourLength != 3 && enemyLength != 3 ) {
                 printOut( "Bad move lengths passed to AI\n" );
-                return;
+                return result;
+                }
+            result.nextMove = sellDiamondsCommit;
+            }
+            break;
+
+
+        case sellDiamondsCommit: {
+            if( ourLength != 3 && enemyLength != 3 ) {
+                printOut( "Bad move lengths passed to AI\n" );
+                return result;
                 }
             
             result.ourDiamonds -= ourMove[0];
@@ -677,25 +836,31 @@ gameState stateTransition( gameState inState,
             int totalSold = ourMove[0] + enemyMove[0];
 
             int ourIncrease = 18;
-            if( ourMove[0] > ) {
-                ourIncrease= ( ourMove[0] * 24 ) / totalSold;
+            if( ourMove[0] > 0 ) {
+                ourIncrease = ( ourMove[0] * 24 ) / totalSold;
                 }
-            ourMoney += ourIncrease;
-            knownOurTotalMoneyReceived += ourIncrease;
+            addToRange( &( result.ourMoney ), ourIncrease );
+            result.knownOurTotalMoneyReceived += ourIncrease;
             
 
             int enemyIncrease = 18;
-            if( enemyMove[0] > ) {
-                enemyIncrease= ( enemyMove[0] * 24 ) / totalSold;
+            if( enemyMove[0] > 0 ) {
+                enemyIncrease = ( enemyMove[0] * 24 ) / totalSold;
                 }
-            enemyMoney.hi += enemyIncrease;
-            enemyMoney.lo += enemyIncrease;
-            knownEnemyTotalMoneyReceived += enemyIncrease;
+            addToRange( &( result.enemyMoney ), enemyIncrease );
+            result.knownEnemyTotalMoneyReceived += enemyIncrease;
             
+            if( ! inPreserveHiddenInfo ) {
+                result.ourMoney = collapseRangeToTrue( result.ourMoney );
+                result.enemyMoney = collapseRangeToTrue( result.enemyMoney );
+                }
+            
+
+
             // next month
             result.monthsLeft --;
             
-            result = accumulateDiamonds( result );
+            accumulateDiamonds( &result );
             
             result.nextMove = salaryBribe;
             }

@@ -93,8 +93,8 @@ void initAI() {
             thisUnit->diamonds = 0;
             thisUnit->region = p;
             //thisUnit->destination = p;
-            thisUnit->diamondBid = zeroRange;
-            thisUnit->inspectorBribe = zeroRange;
+            thisUnit->diamondBid = 0;
+            thisUnit->inspectorBribe = 0;
             thisUnit->opponentBribingUnit = 3;
             }
         }
@@ -122,12 +122,80 @@ void freeAI() {
 
 
 
+
+
+
+
+// assumes that externalEnemyMove has been set
+static unsigned char *pickAndApplyMove( int *outMoveLength ) {
+    
+    // pick move with highest score
+    int highScore = -10000;
+    int chosenMove = -1;
+    for( int m=0; m<numPossibleMoves; m++ ) {
+        if( moveScores[m] > highScore ) {
+            chosenMove = m;
+            highScore = moveScores[m];
+            }
+        }
+    
+
+    // compose our move into a string
+    *outMoveLength = moves[chosenMove].numCharsUsed;
+
+    unsigned char *ourMove = 
+        new unsigned char[ *outMoveLength ];
+    memcpy( ourMove, moves[chosenMove].moveChars, *outMoveLength );
+    
+    
+
+    
+        
+
+    // apply both moves to our game state, preserving hidden info
+    currentState = stateTransition( currentState, 
+                                    ourMove,
+                                    *outMoveLength,
+                                    externalEnemyMove,
+                                    externalEnemyMoveLength,
+                                    true );
+
+    delete [] externalEnemyMove;
+    externalEnemyMove = NULL;
+    moveDone = false;
+    
+
+    clearNextMove();
+    
+
+    return ourMove;
+    }
+
+
+
+
 void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength ) {
     externalEnemyMove = new unsigned char[ inEnemyLength ];
     memcpy( externalEnemyMove, inEnemyMove, inEnemyLength );
     externalEnemyMoveLength = inEnemyLength;
-    
-    moveDone = false;
+
+
+    // in case of moveInspector state, we may not be making a move ourself
+
+    if( currentState.nextMove == moveInspector &&
+        whoMovesInspector( currentState ) == 1 ) {
+        
+        // we've got all we need for state transition
+
+        // doesn't matter that our move selection is not done, because it
+        // won't be used by state transition anyway (treated as a dummy move)
+        int ourMoveLength;
+        
+        unsigned char *ourMove = pickAndApplyMove( &ourMoveLength );
+        
+        // discard our move, because it's not needed by opponent
+        delete [] ourMove;
+        }
     }
 
 
@@ -178,44 +246,48 @@ unsigned char *getAIMove( int *outMoveLength ) {
     if( !moveDone ) {
         return NULL;
         }
-    
-    
-    // pick move with highest score
-    int highScore = -10000;
-    int chosenMove = -1;
-    for( int m=0; m<numPossibleMoves; m++ ) {
-        if( moveScores[m] > highScore ) {
-            chosenMove = m;
-            highScore = moveScores[m];
+
+
+    if( externalEnemyMove == NULL ) {
+        // they didn't pass a move in.
+        
+        // is this the moveInspector state?
+        if( currentState.nextMove != moveInspector ) {
+            printOut( "Error:  no opponent move passed to ai before "
+                      "getAIMove, and not moveInspector state\n" );
+            
+            return NULL;
             }
+        
+        if( whoMovesInspector( currentState ) != 0 ) {
+            printOut( "Error:  no opponent move passed to ai before "
+                      "getAIMove, and AI is not moving the inspector\n" );
+            return NULL;
+            }
+        
+
+        // otherwise, we don't need their move (we're moving the inspector)
+
+        // SO...
+        // pick a fake move for them
+
+        // pick a possible starting state (collapsing hidden
+        // information)
+        gameState startState = collapseState( currentState );
+        
+        // pick a possible co-move for opponent
+        gameState mirror = getMirrorState( startState );
+        possibleMove enemyMove = getPossibleMove( mirror );
+
+
+        externalEnemyMove = new unsigned char[ enemyMove.numCharsUsed ];
+        memcpy( externalEnemyMove, enemyMove.moveChars, 
+                enemyMove.numCharsUsed );
+        externalEnemyMoveLength = enemyMove.numCharsUsed;
         }
+
+
     
-
-    // compose our move into a string
-    *outMoveLength = moves[chosenMove].numCharsUsed;
-
-    unsigned char *ourMove = 
-        new unsigned char[ *outMoveLength ];
-    memcpy( ourMove, moves[chosenMove].moveChars, *outMoveLength );
-    
-
-
-    // apply both moves to our game state, preserving hidden info
-    currentState = stateTransition( currentState, 
-                                    ourMove,
-                                    *outMoveLength,
-                                    externalEnemyMove,
-                                    externalEnemyMoveLength,
-                                    true );
-
-    delete [] externalEnemyMove;
-    externalEnemyMove = NULL;
-    moveDone = false;
-    
-
-    clearNextMove();
-    
-
-    return ourMove;
+    return pickAndApplyMove( outMoveLength );
     }
 

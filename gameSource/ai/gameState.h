@@ -20,7 +20,13 @@ inline intRange makeRange( int inHi ) {
     intRange returnValue = { inHi, inHi, inHi };
     return returnValue;
     }
-    
+
+inline void addToRange( intRange *inRange, int inValue ) {
+    inRange->hi += inValue;
+    inRange->lo += inValue;
+    inRange->t += inValue;
+    }
+
 
 
 
@@ -35,8 +41,10 @@ typedef struct unit {
         // -1 if unknown (or unset)
         //int destination;
 
-        intRange diamondBid;
-        intRange inspectorBribe;
+        //intRange diamondBid;
+        //intRange inspectorBribe;
+        int diamondBid;
+        int inspectorBribe;
 
         // -1 if uknown
         // or [0..2] to indicate the opponent unit
@@ -74,8 +82,10 @@ sellDiamondsState.cpp:
 enum NextMove { 
     salaryBribe,
     moveUnits,
+    moveUnitsCommit,
     moveInspector,
-    sellDiamonds 
+    sellDiamonds,
+    sellDiamondsCommit
     };
 
 
@@ -88,7 +98,7 @@ typedef struct gameState {
 
 
 
-        int ourMoney;
+        intRange ourMoney;
         int knownOurTotalMoneyReceived;
         // money spent publicly (NOT including salaries and bribes)
         int knownOurTotalMoneySpent;
@@ -123,6 +133,12 @@ typedef struct gameState {
 
 
 void accumulateDiamonds( gameState *inState );
+
+
+
+// -1 for no one, 0 for us, 1 for opponent
+int whoMovesInspector( gameState inState );
+
 
 
 
