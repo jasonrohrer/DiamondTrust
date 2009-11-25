@@ -208,35 +208,42 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
 void stepAI() {
     if( !moveDone ) {
         
-        // simulate one game for one of our moves
+        int gamesThisStep = 0;
         
-        int chosenMove = getRandom( numPossibleMoves );
-        
-        // pick a possible starting state (collapsing hidden
-        // information)
-        gameState startState = collapseState( currentState );
-        
-        // pick a possible co-move for opponent
-        gameState mirror = getMirrorState( startState );
-        possibleMove enemyMove = getPossibleMove( mirror );
-        
-        gameState nextState = 
-            stateTransition( startState,
-                             moves[chosenMove].moveChars,
-                             moves[chosenMove].numCharsUsed,
-                             enemyMove.moveChars,
-                             enemyMove.numCharsUsed,
-                             false );
-        int result = playRandomGameUntilEnd( nextState );
-        
-        moveScores[ chosenMove ] += result;
+        while( !moveDone && gamesThisStep < 10 ) {
+            gamesThisStep++;
 
-        numStepsTaken ++;
+            // simulate one game for one of our moves
         
-        if( numStepsTaken >= maxNumSteps ) {
-            moveDone = true;
+            int chosenMove = getRandom( numPossibleMoves );
+        
+            // pick a possible starting state (collapsing hidden
+            // information)
+            gameState startState = collapseState( currentState );
+        
+            // pick a possible co-move for opponent
+            gameState mirror = getMirrorState( startState );
+            possibleMove enemyMove = getPossibleMove( mirror );
+        
+            gameState nextState = 
+                stateTransition( startState,
+                                 moves[chosenMove].moveChars,
+                                 moves[chosenMove].numCharsUsed,
+                                 enemyMove.moveChars,
+                                 enemyMove.numCharsUsed,
+                                 false );
+            int result = playRandomGameUntilEnd( nextState );
+        
+            moveScores[ chosenMove ] += result;
+
+            numStepsTaken ++;
+        
+            if( numStepsTaken >= maxNumSteps ) {
+                moveDone = true;
+                }
             }
         }
+    
     }
 
 
@@ -286,8 +293,34 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
         externalEnemyMoveLength = enemyMove.numCharsUsed;
         }
 
-
+    char isMoveUnitsState = false;
+    if( currentState.nextMove == moveUnits || 
+        currentState.nextMove == moveUnitsCommit ) {
     
-    return pickAndApplyMove( outMoveLength );
+        isMoveUnitsState = true;
+        }
+    
+    
+    unsigned char *ourMove = pickAndApplyMove( outMoveLength );
+    
+    if( isMoveUnitsState ) {
+        // swap home regions before giving move to opponent
+        for( int u=0; u<3; u++ ) {
+            unsigned char oldDest = ourMove[ u * 3 ];
+            unsigned char newDest = oldDest;
+            if( oldDest == 0 ) {
+                newDest = 1;
+                }
+            else if( oldDest == 1 ) {
+                newDest = 0;
+                }
+
+            ourMove[ u * 3 ] = newDest;
+            }
+        
+        }
+    
+
+    return ourMove;
     }
 
