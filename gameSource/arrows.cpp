@@ -4,7 +4,7 @@
 
 
 // linger on each pip for 10 frames
-static int chaseSpeedFactor = 10;
+//static int chaseSpeedFactor = 10;
 //static int chaseSpeedFactor = 100;
 
 
@@ -50,11 +50,9 @@ static void swap( int *inA, int *inB ) {
 
 // Bresenham's integer line algorithm
 // found in wikipedia
-static void drawLine( rgbaColor *inImage, int inImageW, int inImageH,
+static void drawLine( rgbaColor *inImage, int inImageW,
                       intPair inStart, intPair inEnd,
                       rgbaColor inLineColor ) {
-    // suppress warnings
-    int h = inImageH;
     
     int x0 = inStart.x;
     int y0 = inStart.y;
@@ -467,11 +465,11 @@ void buildArrow( intPair inStart, intPair inEnd ) {
         }
     
 
-    drawLine( bodyRGBA, w, h, edgeAStart, edgeAEnd, black );
-    drawLine( bodyRGBA, w, h, edgeBStart, edgeBEnd, black );
+    drawLine( bodyRGBA, w, edgeAStart, edgeAEnd, black );
+    drawLine( bodyRGBA, w, edgeBStart, edgeBEnd, black );
     
-    drawLine( bodyRGBA, w, h, edgeAStart, edgeBStart, black );
-    drawLine( bodyRGBA, w, h, edgeAEnd, edgeBEnd, black );
+    drawLine( bodyRGBA, w, edgeAStart, edgeBStart, black );
+    drawLine( bodyRGBA, w, edgeAEnd, edgeBEnd, black );
 
 
     // now fill with white

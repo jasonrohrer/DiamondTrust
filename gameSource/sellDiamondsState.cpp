@@ -149,7 +149,7 @@ static void sendMoveMessage() {
         }
     printOut( "\n" );
             
-    sendMessage( message, (unsigned int)messageLength );
+    sendOpponentMessage( message, (unsigned int)messageLength );
 
 
     // now pack image into messages and send them
@@ -159,7 +159,7 @@ static void sendMoveMessage() {
             
             unsigned char *pointer = &( pictureSendData[offset] );
             
-            sendMessage( pointer, 300 );
+            sendOpponentMessage( pointer, 300 );
             }
 
         delete [] pictureSendData;
@@ -171,7 +171,7 @@ static void sendMoveMessage() {
 // returns total sold by opponent, or -1 if message not received
 static int getMoveMessage() {
     unsigned int messageLength;
-    unsigned char *message = getMessage( &messageLength );
+    unsigned char *message = getOpponentMessage( &messageLength );
     //printOut( "trying to receive message\n" );
         
     if( message != NULL ) {
@@ -457,7 +457,7 @@ void SellDiamondsState::stepState() {
     if( gotInitialMove && pictureReceiveData != NULL ) {
         
         unsigned int messageLength;
-        unsigned char *message = getMessage( &messageLength );
+        unsigned char *message = getOpponentMessage( &messageLength );
         
         if( message != NULL ) {
             

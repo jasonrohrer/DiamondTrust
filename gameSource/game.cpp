@@ -17,6 +17,8 @@
 #include "flyingDiamonds.h"
 #include "salePicker.h"
 
+#include "opponent.h"
+
 
 
 int satelliteTopSpriteID;
@@ -55,16 +57,22 @@ Font *font16;
 
 
 
-//enum gamePhase{ moveUnits };
 
 
 char *statusMessage = NULL;
 char *statusSubMessage = NULL;
-//gamePhase currentPhase;
+
+
+// false for local AI opponent
+char networkOpponent;
+
+
+
 
 
 GameState *currentGameState;
 
+extern GameState *pickGameTypeState;
 extern GameState *connectState;
 extern GameState *accumulateDiamondsState;
 extern GameState *salaryBribeState;
@@ -307,7 +315,8 @@ void gameInit() {
     setMonthsLeft( 8 );
     
 
-    currentGameState = connectState;
+    currentGameState = pickGameTypeState;
+    //currentGameState = connectState;
     //currentGameState = sellDiamondsState;
     currentGameState->enterState();
     }
@@ -468,7 +477,19 @@ int lastTouchX, lastTouchY;
 
 static void goToNextGameState() {
     // state transition
-    if( currentGameState == connectState ) {
+    if( currentGameState == pickGameTypeState ) {
+
+        if( networkOpponent ) {    
+            currentGameState = connectState;
+            }
+        else {
+            // FIXME:  set AI level here
+
+            // for now, just start game
+            currentGameState = accumulateDiamondsState;
+            }
+        }
+    else if( currentGameState == connectState ) {
         currentGameState = accumulateDiamondsState;
         // FIXME  for testing
         //currentGameState = sellDiamondsState;
@@ -509,7 +530,8 @@ static void goToNextGameState() {
 
 void gameLoopTick() {
     stepSprites();
-
+    stepOpponent();
+    
     
     
     if( currentGameState->isStateDone() ) {

@@ -232,7 +232,7 @@ void SalaryBribeState::clickState( int inX, int inY ) {
                 }
             printOut( "\n" );
             
-            sendMessage( message, (unsigned int)messageLength );
+            sendOpponentMessage( message, (unsigned int)messageLength );
             sentMove = true;
             stepsSinceSentMove = 0;
             }
@@ -262,7 +262,7 @@ void SalaryBribeState::stepState() {
 
         
         unsigned int messageLength;
-        unsigned char *message = getMessage( &messageLength );
+        unsigned char *message = getOpponentMessage( &messageLength );
         //printOut( "trying to receive message\n" );
         
         if( message != NULL ) {

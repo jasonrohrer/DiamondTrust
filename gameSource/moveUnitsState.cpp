@@ -101,14 +101,14 @@ static void sendMoveMessage() {
         }
     printOut( "\n" );
             
-    sendMessage( message, (unsigned int)messageLength );
+    sendOpponentMessage( message, (unsigned int)messageLength );
     }
 
 
 // returns total spent by opponent, or -1 if message not received
 static int getMoveMessage() {
     unsigned int messageLength;
-    unsigned char *message = getMessage( &messageLength );
+    unsigned char *message = getOpponentMessage( &messageLength );
     //printOut( "trying to receive message\n" );
         
     if( message != NULL ) {

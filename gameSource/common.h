@@ -3,6 +3,7 @@
 
 
 #include "platform.h"
+#include "opponent.h"
 #include "minorGems/util/TranslationManager.h"
 
 
