@@ -7,7 +7,7 @@
 static gameState currentState;
 
 static unsigned char *externalEnemyMove;
-static int externalEnemyMoveLength;
+static unsigned int externalEnemyMoveLength;
 
 static char moveDone;
 
@@ -127,7 +127,7 @@ void freeAI() {
 
 
 // assumes that externalEnemyMove has been set
-static unsigned char *pickAndApplyMove( int *outMoveLength ) {
+static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
     
     // pick move with highest score
     int highScore = -10000;
@@ -174,7 +174,7 @@ static unsigned char *pickAndApplyMove( int *outMoveLength ) {
 
 
 
-void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength ) {
+void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
     externalEnemyMove = new unsigned char[ inEnemyLength ];
     memcpy( externalEnemyMove, inEnemyMove, inEnemyLength );
     externalEnemyMoveLength = inEnemyLength;
@@ -189,7 +189,7 @@ void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength ) {
 
         // doesn't matter that our move selection is not done, because it
         // won't be used by state transition anyway (treated as a dummy move)
-        int ourMoveLength;
+        unsigned int ourMoveLength;
         
         unsigned char *ourMove = pickAndApplyMove( &ourMoveLength );
         
@@ -242,7 +242,7 @@ void stepAI() {
 
 
 // returns NULL if move not ready yet
-unsigned char *getAIMove( int *outMoveLength ) {
+unsigned char *getAIMove( unsigned int *outMoveLength ) {
     if( !moveDone ) {
         return NULL;
         }

@@ -28,7 +28,7 @@ possibleMove getPossibleMove( gameState inState ) {
                 char sharedRegion = false;
 
                 for( int p=0; p<3; p++ ) {
-                    unit playerUnit = inState.agentUnits[0][p];
+                    unit playerUnit = inState.agentUnits[0][u];
             
                     if( playerUnit.region == enemyUnit.region ) {
                         sharedRegion = true;
@@ -61,7 +61,7 @@ possibleMove getPossibleMove( gameState inState ) {
             int amountSum = 0;
             int i;
             for( i=0; i<6; i++ ) {
-                amountSum += salaryBribeAmounts[6];
+                amountSum += salaryBribeAmounts[i];
                 }
             
             while( amountSum > inState.ourMoney.t ) {    
@@ -501,7 +501,18 @@ gameState getMirrorState( gameState inState ) {
     for( int u=0; u<3; u++ ) {
         result.agentUnits[0][u] = inState.agentUnits[1][u];
         result.agentUnits[1][u] = inState.agentUnits[0][u];
+
+        // swap home regions (both sides see 0 as their home
+        for( int p=0; p<2; p++ ) {
+            if( result.agentUnits[p][u].region == 0 ) {
+                result.agentUnits[p][u].region = 1;
+                }
+            else if( result.agentUnits[p][u].region == 1 ) {
+                result.agentUnits[p][u].region = 0;
+                }
+            }
         }
+    
 
     return result;
     }
@@ -519,6 +530,12 @@ int playRandomGameUntilEnd( gameState inState ) {
         gameState mirror = getMirrorState( inState );
         possibleMove enemyMove = getPossibleMove( mirror );
         
+        if( inState.ourMoney.t < 0 || inState.enemyMoney.t < 0 ) {
+            
+            printOut( "Money has gone negative!\n" );
+            }
+        
+
         inState = 
             stateTransition( inState,
                              ourMove.moveChars,
@@ -657,9 +674,15 @@ gameState stateTransition( gameState inState,
             
 
             // track true values
-            result.ourMoney.t += moneySpent[0];
-            result.enemyMoney.t += moneySpent[0];
+            result.ourMoney.t -= moneySpent[0];
+            result.enemyMoney.t -= moneySpent[1];
             
+            if( result.ourMoney.t < 0 || result.enemyMoney.t < 0 ) {
+                
+                printOut( "Money has gone negative!\n" );
+                }
+
+
             if( ! inPreserveHiddenInfo ) {            
                 result.ourMoney = collapseRangeToTrue( result.ourMoney );
                 result.enemyMoney = collapseRangeToTrue( result.enemyMoney );
@@ -748,6 +771,19 @@ gameState stateTransition( gameState inState,
             // spend the money that was spent
             addToRange( &( result.ourMoney ), - moneySpent[0] );
             addToRange( &( result.enemyMoney ), - moneySpent[1] );
+            
+            if( result.ourMoney.lo < 0 ) {
+                result.ourMoney.lo = 0;
+                }
+            if( result.enemyMoney.lo < 0 ) {
+                result.enemyMoney.lo = 0;
+                }
+            
+
+            if( result.ourMoney.t < 0 || result.enemyMoney.t < 0 ) {
+                
+                printOut( "Money has gone negative!\n" );
+                }
 
             
             // sometimes, we skip move inspector state (if no one bribed him)
@@ -755,6 +791,8 @@ gameState stateTransition( gameState inState,
             if( whoMovesInspector( result ) == -1 ) {
                 
                 collectDiamonds( &result );
+
+                result.nextMove = sellDiamonds;
                 }
             else {
                 result.nextMove = moveInspector;

@@ -7,14 +7,14 @@ void freeAI();
 
 
 
-void setEnemyMove( unsigned char *inEnemyMove, int inEnemyLength );
+void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength );
 
 
 void stepAI();
 
 
 // returns NULL if move not ready yet
-unsigned char *getAIMove( int *outMoveLength );
+unsigned char *getAIMove( unsigned int *outMoveLength );
 
 
 /*

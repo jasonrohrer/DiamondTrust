@@ -8,8 +8,8 @@ button_next "Next"
 
 button_back "Back"
 
-button_ai "1 Player Game"
-button_wifi "2 Player WiFi"
+button_ai "Single Player"
+button_wifi "WiFi Game"
 
 
 button_parent "Host Game"
@@ -40,6 +40,10 @@ stats_inspectorConfiscating "Will confiscate:"
 
 camera_securityHeader "Vault Security System"
 camera_securityCompromised "SYSTEM COMPROMISED"
+
+
+phaseStatus_gameType  "Select game type"
+phaseSubStatus_gameType  "Play against AI or over local WiFi"
 
 
 phaseStatus_connect  "Connect to opponent"
