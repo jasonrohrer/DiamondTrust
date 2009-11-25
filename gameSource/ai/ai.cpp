@@ -175,6 +175,18 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
 
 
 void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
+
+    if( externalEnemyMove != NULL ) {
+        // existing, unused move message waiting
+        delete [] externalEnemyMove;
+        externalEnemyMove = NULL;
+        
+
+        // NOTE:  this will happen when camera messages are passed as part
+        // of the sellDiamondsState, and we'll simply discard them        
+        }
+    
+
     externalEnemyMove = new unsigned char[ inEnemyLength ];
     memcpy( externalEnemyMove, inEnemyMove, inEnemyLength );
     externalEnemyMoveLength = inEnemyLength;
@@ -210,7 +222,7 @@ void stepAI() {
         
         int gamesThisStep = 0;
         
-        while( !moveDone && gamesThisStep < 10 ) {
+        while( !moveDone && gamesThisStep < 20 ) {
             gamesThisStep++;
 
             // simulate one game for one of our moves

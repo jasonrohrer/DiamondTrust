@@ -328,6 +328,10 @@ void gameFree() {
     delete font16;
     delete doneButton;
     delete nextButton;
+
+    delete aiButton;
+    delete wifiButton;
+    
     delete parentButton;
     delete childButton;
     
@@ -337,6 +341,8 @@ void gameFree() {
     freeStats();
     freeFlyingDiamonds();
     freeSalePicker();
+
+    freeOpponent();
     }
 
 
