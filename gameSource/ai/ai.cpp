@@ -246,7 +246,18 @@ void stepAI() {
                                  false );
             int result = playRandomGameUntilEnd( nextState );
         
+            // old, track total score
+            // moveScores[ chosenMove ] += result;
+
+            // new:  track (wins - losses)
+            if( result < 0 ) {
+                result = -1;
+                }
+            if( result > 0 ) {
+                result = 1;
+                }
             moveScores[ chosenMove ] += result;
+
 
             numStepsTaken ++;
         

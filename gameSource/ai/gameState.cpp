@@ -4,10 +4,45 @@
 #include "map.h"
 
 
+#include <assert.h>
+
+
+static void checkStateValid( gameState inState ) {
+    for( int p=0; p<2; p++ ) {
+        
+        for( int u=0; u<3; u++ ) {
+            if( inState.agentUnits[p][u].region != 0 && 
+                inState.agentUnits[p][u].region != 1 ) {
+                for( int o=0; o<3; o++ ) {
+                    if( o != u ) {
+                        if( inState.agentUnits[p][o].region == 
+                            inState.agentUnits[p][u].region ) {
+                            printOut( "Units collide in state!\n" );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    for( int u=0; u<3; u++ ) {
+        if( inState.agentUnits[0][u].region == 1
+            ||
+            inState.agentUnits[1][u].region == 0 ) {
+            
+            printOut( "Units in opposite home regions in state!\n" );
+            }
+        }
+    
+    }
+
 
 
 
 possibleMove getPossibleMove( gameState inState ) {
+    checkStateValid( inState );
+    
+
     possibleMove m;
     
     switch( inState.nextMove ) {
@@ -161,11 +196,32 @@ possibleMove getPossibleMove( gameState inState ) {
                 dest[u] = inState.agentUnits[0][u].region;
                 }
             
+            // check for collisions to be safe
+            for( u=0; u<3; u++ ) {
+                if( dest[u] != 0 ) {
+                    for( int o=0; o<3; o++ ) {
+                        if( o != u ) {
+                            if( dest[o] == dest[u] ) {
+                                printOut( "Units collide in chosen move!\n" );
+                                }
+                            }
+                        }
+                    }
+                }
+
+
 
             for( u=0; u<3; u++ ) {
                 
                 char uniqueDestFound = false;
                 
+                // pick "home" half of the time for variety
+                if( getRandom( 10 ) < 5 ) {
+                    dest[u] = 0;
+                    uniqueDestFound = true;
+                    }
+                
+
                 while( !uniqueDestFound ) {    
                     dest[u] = getRandom( 7 );
                     if( dest[u] > 0 ) {
@@ -211,13 +267,27 @@ possibleMove getPossibleMove( gameState inState ) {
                 if( dest[u] != inState.agentUnits[0][u].region ) {
                     totalSpent++;
 
-                    if( dest[u] == 0 ) {
-                        // flying home costs double
+                    if( dest[u] == 0 ||
+                        inState.agentUnits[0][u].region == 0 ) {
+                        // flying to/from home costs double
                         totalSpent++;
                         }
                     }
                 }
             
+            // check for collisions to be safe
+            for( u=0; u<3; u++ ) {
+                if( dest[u] != 0 ) {
+                    for( int o=0; o<3; o++ ) {
+                        if( o != u ) {
+                            if( dest[o] == dest[u] ) {
+                                printOut( "Units collide in chosen move!\n" );
+                                }
+                            }
+                        }
+                    }
+                }
+
             
             // pick a random spending cap
             // (otherwise, all the random choices almost always add
@@ -247,15 +317,80 @@ possibleMove getPossibleMove( gameState inState ) {
                     if( dest[u] != inState.agentUnits[0][u].region ) {
                         totalSpent --;
                         
-                        if( dest[u] == 0 ) {
-                            // flying home costs double
+                        if( dest[u] == 0 || 
+                            inState.agentUnits[0][u].region == 0 ) {
+
+                            // flying to/from home costs double
                             totalSpent --;
                             }
 
                         // stay where it is
                         dest[u] = inState.agentUnits[0][u].region;
                         }
-                    }                    
+                    } 
+
+                
+                // check for collisions that have been created by
+                // this roll-back process
+
+                char collisionFound = true;
+                while( collisionFound ) {
+
+                    collisionFound = false;
+                    
+                    if( dest[u] != 0 ) {
+
+                        for( int o=0; o<3 && !collisionFound; o++ ) {
+                            if( o != u ) {
+                                if( dest[o] == dest[u] ) {
+                                    // collision
+                                    collisionFound = true;
+                                    
+                                    // u's dest already it's current region
+                                    
+                                    // roll back o to current region
+                                    totalSpent--;
+
+                                    if( dest[o] == 0 || 
+                                        inState.agentUnits[0][o].region 
+                                        == 0 ) {
+                                        
+                                        // flying to/from home costs double
+                                        totalSpent --;
+                                        }
+
+                                    dest[o] = inState.agentUnits[0][o].region;
+                                    
+                                    
+                                    // roll back bids and bribes, since
+                                    // they no longer make sense w/o move
+                                    totalSpent -= bid[o];
+                                    totalSpent -= bribe[o];
+                                    bid[o] = 0;
+                                    bribe[o] = 0;
+                                    
+                                    // let o be the new "u", the 
+                                    // just-rolled-back unit
+                                    u = o;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+            // check for collisions to be safe
+            for( u=0; u<3; u++ ) {
+                if( dest[u] != 0 ) {
+                    for( int o=0; o<3; o++ ) {
+                        if( o != u ) {
+                            if( dest[o] == dest[u] ) {
+                                printOut( "Units collide in chosen move!\n" );
+                                }
+                            }
+                        }
+                    }
                 }
             
             
@@ -579,16 +714,19 @@ int playRandomGameUntilEnd( gameState inState ) {
         if( inState.ourMoney.t < 0 || inState.enemyMoney.t < 0 ) {
             
             printOut( "Money has gone negative!\n" );
+            assert( 0 );
             }
         
-
+        checkStateValid( inState );
+        
         inState = 
             stateTransition( inState,
                              ourMove.moveChars,
                              ourMove.numCharsUsed,
                              enemyMove.moveChars,
                              enemyMove.numCharsUsed,
-                             false );        
+                             false );
+        checkStateValid( inState );
         }
     
     // on sell diamonds state in month zero
@@ -726,6 +864,7 @@ gameState stateTransition( gameState inState,
             if( result.ourMoney.t < 0 || result.enemyMoney.t < 0 ) {
                 
                 printOut( "Money has gone negative!\n" );
+                assert( 0 );
                 }
 
 
@@ -780,9 +919,29 @@ gameState stateTransition( gameState inState,
                     
                     // dest
                     int dest = moves[p][ u * 3 ];
+                    
+                    // swap home regions if this is enemy move
+                    if( p == 1 && dest == 0 ) {
+                        dest = 1;
+                        }
+                    
+
+                    // spending on travel
+                    if( dest != result.agentUnits[p][u].region ) {
+                        moneySpent[p]++;
+
+                        if( dest == homeRegions[p] ||
+                            result.agentUnits[p][u].region == 
+                            homeRegions[p] ) {
+                            // travel to/from home costs double
+                            moneySpent[p]++;
+                            }
+                        }
+                    
+
                     result.agentUnits[p][u].region = dest;
 
-
+                        
                     
                     // save the resulting bid/bribe for use in inspector state
 
@@ -829,6 +988,7 @@ gameState stateTransition( gameState inState,
             if( result.ourMoney.t < 0 || result.enemyMoney.t < 0 ) {
                 
                 printOut( "Money has gone negative!\n" );
+                assert( 0 );
                 }
 
             
