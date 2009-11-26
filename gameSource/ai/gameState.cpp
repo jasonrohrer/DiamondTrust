@@ -57,14 +57,21 @@ possibleMove getPossibleMove( gameState inState ) {
                 }
             
             
-            // make sure amount sum is not greater than our money
+            // pick a random spending cap
+            // (otherwise, all the random choices almost always add
+            //  up to equal our total money---i.e., we spend everything
+            //  we have!)
+            int maxTotalToSpend = getRandom( inState.ourMoney.t + 1 );
+
+
+            // make sure amount sum is not greater than our max total
             int amountSum = 0;
             int i;
             for( i=0; i<6; i++ ) {
                 amountSum += salaryBribeAmounts[i];
                 }
             
-            while( amountSum > inState.ourMoney.t ) {    
+            while( amountSum > maxTotalToSpend ) {    
                 // pick one
                 int pick = getRandom( 6 );
                 
@@ -180,8 +187,16 @@ possibleMove getPossibleMove( gameState inState ) {
                     }
                 }
             
+            
+            // pick a random spending cap
+            // (otherwise, all the random choices almost always add
+            //  up to equal our total money---i.e., we spend everything
+            //  we have!)
+            int maxTotalToSpend = getRandom( inState.ourMoney.t + 1 );
 
-            while( totalSpent > inState.ourMoney.t ) {
+
+
+            while( totalSpent > maxTotalToSpend ) {
                 // spending too much
                 
                 // pick one to reduce

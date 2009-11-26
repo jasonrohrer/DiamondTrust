@@ -21,7 +21,7 @@ int moveScores[ numPossibleMoves ];
 possibleMove moves[ numPossibleMoves ];
 
 int numStepsTaken = 0;
-int maxNumSteps = 1000;
+int maxNumSteps = 2000;
 
 
 
@@ -222,7 +222,7 @@ void stepAI() {
         
         int gamesThisStep = 0;
         
-        while( !moveDone && gamesThisStep < 20 ) {
+        while( !moveDone && gamesThisStep < 40 ) {
             gamesThisStep++;
 
             // simulate one game for one of our moves
