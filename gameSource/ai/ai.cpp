@@ -15,13 +15,13 @@ static char moveDone;
 
 
 // scores for all possible moves at the current step
-#define numPossibleMoves 100
+#define numPossibleMoves 50
 int moveScores[ numPossibleMoves ];
 
 possibleMove moves[ numPossibleMoves ];
 
 int numStepsTaken = 0;
-int maxNumSteps = 2000;
+int maxNumSteps = 1000;
 
 
 
@@ -222,7 +222,7 @@ void stepAI() {
         
         int gamesThisStep = 0;
         
-        while( !moveDone && gamesThisStep < 40 ) {
+        while( !moveDone && gamesThisStep < 20 ) {
             gamesThisStep++;
 
             // simulate one game for one of our moves

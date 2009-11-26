@@ -157,11 +157,42 @@ possibleMove getPossibleMove( gameState inState ) {
 
             int u;
             for( u=0; u<3; u++ ) {
-                dest[u] = getRandom( 7 );
-                if( dest[u] > 0 ) {
-                    // add 1 to make total range [0, 2..7]
-                    dest[u]++;
+                // start with all dests to current unit regions
+                dest[u] = inState.agentUnits[0][u].region;
+                }
+            
+
+            for( u=0; u<3; u++ ) {
+                
+                char uniqueDestFound = false;
+                
+                while( !uniqueDestFound ) {    
+                    dest[u] = getRandom( 7 );
+                    if( dest[u] > 0 ) {
+                        // add 1 to make total range [0, 2..7]
+                        dest[u]++;
+                        }
+                    
+                    if( dest == 0 ) {
+                        // more than one unit can occupy home
+                        uniqueDestFound = true;
+                        }
+                    else {
+                        uniqueDestFound = true;
+                        
+                        // make sure this isn't same as existing dest of
+                        // another unit
+                        for( int o=0; o<3; o++ ) {
+                            if( o != u ) {
+                                if( dest[o] == dest[u] ) {
+                                    // collision
+                                    uniqueDestFound = false;
+                                    }
+                                }
+                            }
+                        }                    
                     }
+                
 
                 bid[u] = 0;
                 if( dest[u] > 1 ) {
