@@ -109,8 +109,39 @@ static char isInside( int inX, int inY,
     }
 
 
+#include <stdlib.h>
 
 void gameInit() {
+
+    
+
+    // FIXME:  for testing only
+    printOut( "Testing AI...\n" );
+    
+    initOpponent( true );
+    unsigned char message[12];
+    for( int i=0; i<6; i++ ) {
+        message[ i * 2 ] = 0;
+        message[ i * 2 + 1] = (unsigned char)( -1 );
+        }
+            
+    sendOpponentMessage( message, 12 );
+    
+    unsigned int resultLength;
+    
+    unsigned char *result = NULL;
+    while( result == NULL ) {
+        stepOpponent();
+                result = getOpponentMessage( &resultLength );
+        }
+    // got move!
+    // bail here to get a good profile of just this part of AI
+    
+    delete [] result;
+    printOut( "...done\n" );
+    exit( 0 );
+    
+
     
     int dataSize;
     unsigned char *languageData = readFile( "English.txt", &dataSize );
