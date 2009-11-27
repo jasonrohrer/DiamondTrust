@@ -313,13 +313,21 @@ int mainFunction( int inNumArgs, char **inArgs ) {
         
         if( extraMS > 0 ) {
             SDL_Delay( extraMS );
+            // set to ideal frame done time (even though SDL_Delay might
+            // be slightly longer or shorter
+            
+            // this way, we don't fall gradually out of time
+            lastFrameDoneTime = thisFrameDoneTime + extraMS;
             }
+        else {
+            // frame took too long
+            // allow this slow-down now so we don't have a jarring speedup
+            // to catch up later
+            lastFrameDoneTime = thisFrameDoneTime;
+            }
+        
 
-        // set to ideal frame done time (even though SDL_Delay might
-        // be slightly longer or shorter
 
-        // this way, we don't fall gradually out of time
-        lastFrameDoneTime = thisFrameDoneTime + extraMS;
 
 
         frameBatchCount ++;
