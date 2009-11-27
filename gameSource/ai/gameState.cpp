@@ -759,7 +759,6 @@ gameState stateTransition( gameState inState,
 
 
 
-
         case salaryBribe: {
             if( ourLength != 12 && enemyLength != 12 ) {
                 printOut( "Bad move lengths passed to AI\n" );

@@ -71,7 +71,7 @@ s/^gameStats\.o/\.\.\/gameStats\.o/; \
 s/^colors\.o/\.\.\/colors\.o/; \
 s/^flyingDiamonds\.o/\.\.\/flyingDiamonds\.o/; \
 s/^arrows\.o/\.\.\/arrows\.o/; \
-s/^ai\/ai\.o/\.\.\/ai\/ai\.o/; \
-s/^ai\/gameState\.o/\.\.\/ai\/gameState\.o/; \
+s/^ai\.o/\.\.\/ai\/ai\.o/; \
+s/^gameState\.o/\.\.\/ai\/gameState\.o/; \
 s/^opponent\.o/\.\.\/opponent\.o/; \
 '

@@ -1,7 +1,11 @@
 #include "ai/gameState.h"
 
 #include "units.h"
+#include "map.h"
+#include "gameStats.h"
 #include "platform.h"
+
+#include <assert.h>
 
 
 static gameState currentState;
@@ -28,7 +32,7 @@ int maxNumSteps = 1000;
 
 
 
-
+char stateChecked = true;
 
 
 
@@ -42,31 +46,106 @@ void clearNextMove() {
     }
 
 
-/*
-int monthsLeft;
+
+static void checkEqual( int inA, int inB ) {
+    assert( inA == inB );
+    
+    }
+
+
+
+static void checkCurrentStateMatches() {
+    printOut( "AI checking internal state against true game state...\n" );
+    
+
+    checkEqual( currentState.monthsLeft, getMonthsLeft() );
+    
+    // NextMove nextMove;
+
+    
+    // everything reversed (player is enemy in our local state)
+
+    checkEqual( currentState.ourMoney.t, getPlayerMoney( 1 ) );
+    
+    //int knownOurTotalMoneyReceived;
+    //int knownOurTotalMoneySpent;
         
-        NextMove nextMove;
+    checkEqual( currentState.ourDiamonds, getPlayerDiamonds( 1 ) );
 
 
-
-        int ourMoney;
-        int ourDiamonds;
+    checkEqual( currentState.enemyMoney.t, getPlayerMoney( 0 ) );
+    
+    //int knownEnemyTotalMoneyReceived;
+    //int knownEnemyTotalMoneySpent;
         
-        intRange enemyMoney;
-        int enemyDiamonds;
+    checkEqual( currentState.enemyDiamonds, getPlayerDiamonds( 0 ) );
 
+    
         // 0 for player, 1 for enemy, 3 units each
-        unit agentUnits[2][3];
+    for( int p=0; p<2; p++ ) {
+        for( int u=0; u<3; u++ ) {
+            
+
+            unit thisUnit =
+                currentState.agentUnits[p][u];
+
+            // swapped, enemy is us
+            int swappedP = (p + 1) % 2;
+            
+            Unit *matchingUnit = getUnit( swappedP * numPlayerUnits + u );
+            
+
+            checkEqual( thisUnit.totalSalary.t, matchingUnit->mTotalSalary );
+            checkEqual( thisUnit.totalBribe.t, matchingUnit->mTotalBribe );
+            checkEqual( thisUnit.diamonds, matchingUnit->mNumDiamondsHeld );
+            
+            int swappedRegion = thisUnit.region;
+            if( swappedRegion == 0 ) {
+                swappedRegion = 1;
+                }
+            else if( swappedRegion == 1 ) {
+                swappedRegion = 0;
+                }
+            
+            checkEqual( swappedRegion, matchingUnit->mRegion );
+
+            if( thisUnit.opponentBribingUnit == -1 ) {
+                checkEqual( thisUnit.opponentBribingUnit, 
+                            matchingUnit->mLastBribingUnit );
+                }
+            else {
+                if( p == 0 ) {    
+                    checkEqual( thisUnit.opponentBribingUnit, 
+                                matchingUnit->mLastBribingUnit );
+                    }
+                else {
+                    checkEqual( thisUnit.opponentBribingUnit + numPlayerUnits, 
+                                matchingUnit->mLastBribingUnit );
+                    }
+                
+                }
+            }
+        }
+    
         
-        int inspectorRegion;
+    checkEqual( currentState.inspectorRegion, getUnitRegion( numUnits - 1 ) );
 
-        // -1 if unknown
-        int inspectorDestination;
+    
+
+    for( int r=0; r<8; r++ ) {
+        checkEqual( currentState.regionDiamondCounts[r], 
+                    getDiamondsInRegion(r) );
+        }
+    
+    printOut( "...check passed\n" );
+        
+    }
 
 
-        // first two always have 0
-        int regionDiamondCounts[8];
-*/
+
+
+
+
 void initAI() {
     currentState.monthsLeft = 8;
     currentState.nextMove = salaryBribe;
@@ -100,7 +179,7 @@ void initAI() {
         }
     
     currentState.inspectorRegion = getUnitRegion( numUnits - 1 );
-    currentState.inspectorDestination = currentState.inspectorRegion;
+    //currentState.inspectorDestination = currentState.inspectorRegion;
     for( int r=0; r<8; r++ ) {
         currentState.regionDiamondCounts[r] = 0;
         }
@@ -167,6 +246,8 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
 
     clearNextMove();
     
+    stateChecked = false;
+    
 
     return ourMove;
     }
@@ -218,6 +299,13 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
 
 
 void stepAI() {
+    // check state once per month
+    if( !stateChecked && currentState.nextMove == moveUnits ) {
+        checkCurrentStateMatches();
+        stateChecked = true;
+        }
+    
+
     if( !moveDone ) {
         
         int gamesThisStep = 0;
@@ -323,6 +411,10 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
         isMoveUnitsState = true;
         }
     
+
+    // make sure our current state matches actual game
+    // checkCurrentStateMatches();
+    
     
     unsigned char *ourMove = pickAndApplyMove( outMoveLength );
     
@@ -345,7 +437,7 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
     
     
     printOut( "AI's chosen move: " );
-    for( int i=0; i<*outMoveLength; i++ ) {
+    for( unsigned int i=0; i<*outMoveLength; i++ ) {
         printOut( "%d, ", (int)(char)ourMove[i] );
         }
     printOut( "\n" );

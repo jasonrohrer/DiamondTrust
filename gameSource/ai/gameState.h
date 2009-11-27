@@ -119,7 +119,7 @@ typedef struct gameState {
         int inspectorRegion;
 
         // -1 if unknown
-        int inspectorDestination;
+        // int inspectorDestination;
 
 
         // first two always have 0
