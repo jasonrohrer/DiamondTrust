@@ -131,14 +131,15 @@ possibleMove getPossibleMove( gameState inState ) {
                     
                     unit enemyUnit = inState.agentUnits[1][i-3];
                 
-                    for( int p=0; p<3; p++ ) {
-                        unit playerUnit = inState.agentUnits[0][p];
+                    for( int pu=0; pu<3; pu++ ) {
+                        unit playerUnit = inState.agentUnits[0][pu];
             
                         if( playerUnit.region == enemyUnit.region ) {
-                            sharingUnit = p;
+                            sharingUnit = pu;
                             }
                         }
 
+                    // [0..2] range fine for this
                     m.moveChars[ index++ ] = sharingUnit;
                     }
                 else {
@@ -146,22 +147,13 @@ possibleMove getPossibleMove( gameState inState ) {
                     int knownValue =
                         inState.agentUnits[ i/3 ][ i%3 ].opponentBribingUnit;
                     
-                    if( knownValue == -1 ) {
-                        // unknown
-
-                        // use value from current game
-                        knownValue = getUnit( i )->mLastBribingUnit;
-                        }
-                    else if( knownValue == 3 ) {
-                        // known to be no bribing unit
-                        knownValue = -1;
-                        }
-                    else {
+                    
+                    if( knownValue != -1 ) {
                         
-                        // else stick with known value, but turn it into [0..5]
-                        // range
+                        // turn it into [0..5] range
                         if( i < 3 ) {
-                            // value describes an enemy unit
+                            // value describes an enemy unit that is bribing
+                            // us
                             knownValue += 3;
                             }
                         }
@@ -638,6 +630,9 @@ gameState collapseState( gameState inState ) {
 
     result.enemyMoney = makeRange( netMoney );
     
+    
+    /*
+      // no longer need to do this
 
     // collapse our uncertainty about enemy units bribing player
     // units (do this AFTER we collapse bribe info, to avoid picking
@@ -659,7 +654,7 @@ gameState collapseState( gameState inState ) {
             }
         result.agentUnits[0][u].opponentBribingUnit = bribingUnit;
         }
-    
+    */
     
     return result;
     }
@@ -799,10 +794,20 @@ gameState stateTransition( gameState inState,
 
                     // opponent sees u unit as u+3, and describes bribe in
                     // its move there
-                    result.agentUnits[p][u].totalBribe.t += eMove[ (u+3) * 2 ];
+                    int bribeAmount = eMove[ (u+3) * 2 ];
                     
-                    moneySpent[e] += eMove[ (u+3) * 2 ];
-
+                    result.agentUnits[p][u].totalBribe.t += bribeAmount;
+                    
+                    moneySpent[e] += bribeAmount;
+                    
+                    if( bribeAmount > 0 ) {
+                        // change last bribing unit
+                        
+                        // can be -1
+                        result.agentUnits[p][u].opponentBribingUnit =
+                            (char)eMove[ (u+3) * 2 + 1 ];
+                        }
+                    
                     
 
                     if( !inPreserveHiddenInfo ) {

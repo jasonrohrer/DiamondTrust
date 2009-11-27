@@ -95,7 +95,7 @@ void initAI() {
             //thisUnit->destination = p;
             thisUnit->diamondBid = 0;
             thisUnit->inspectorBribe = 0;
-            thisUnit->opponentBribingUnit = 3;
+            thisUnit->opponentBribingUnit = -1;
             }
         }
     
@@ -343,7 +343,13 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
         
         }
     
-
+    
+    printOut( "AI's chosen move: " );
+    for( int i=0; i<*outMoveLength; i++ ) {
+        printOut( "%d, ", (int)(char)ourMove[i] );
+        }
+    printOut( "\n" );
+    
     return ourMove;
     }
 

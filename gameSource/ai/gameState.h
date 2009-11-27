@@ -46,10 +46,8 @@ typedef struct unit {
         int diamondBid;
         int inspectorBribe;
 
-        // -1 if uknown
+        // -1 if none
         // or [0..2] to indicate the opponent unit
-        // that is bribing this unit
-        // 3 if known and unbribed
         int opponentBribingUnit;
         
     } unit;
