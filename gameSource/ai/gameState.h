@@ -135,7 +135,7 @@ void accumulateDiamonds( gameState *inState );
 
 
 // -1 for no one, 0 for us, 1 for opponent
-int whoMovesInspector( gameState inState );
+int whoMovesInspector( gameState *inState );
 
 
 
@@ -143,7 +143,7 @@ int whoMovesInspector( gameState inState );
 // transforms a state given two moves
 // if preserve hidden info is true, then we ignore hidden effects of enemy
 // move and build possibility spaces around them instead
-gameState stateTransition( gameState inState, 
+gameState stateTransition( gameState *inState, 
                            unsigned char *ourMove,
                            int ourLength,
                            unsigned char *enemyMove,
@@ -153,7 +153,7 @@ gameState stateTransition( gameState inState,
 
 // collapses a state into a single, randomly selected state within
 // the possibility space of inState
-gameState collapseState( gameState inState );
+gameState collapseState( gameState *inState );
 
 
 // takes a collapsed state as input
@@ -174,11 +174,11 @@ typedef struct possibleMove {
 
 // gets a possible move for player
 // (use getMirrorState to extract move for enemy)
-possibleMove getPossibleMove( gameState inState );
+possibleMove getPossibleMove( gameState *inState );
 
 
 
 // returns a mirror of the state, swapping player for enemy
 // only works on collapsed states
-gameState getMirrorState( gameState inState );
+gameState getMirrorState( gameState *inState );
 

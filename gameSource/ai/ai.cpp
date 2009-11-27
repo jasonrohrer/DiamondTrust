@@ -40,7 +40,7 @@ char stateChecked = true;
 void clearNextMove() {
     for( int m=0; m<numPossibleMoves; m++ ) {
         moveScores[m] = 0;
-        moves[m] = getPossibleMove( currentState );
+        moves[m] = getPossibleMove( &currentState );
         }
     numStepsTaken = 0;
     }
@@ -232,7 +232,7 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
         
 
     // apply both moves to our game state, preserving hidden info
-    currentState = stateTransition( currentState, 
+    currentState = stateTransition( &currentState, 
                                     ourMove,
                                     *outMoveLength,
                                     externalEnemyMove,
@@ -276,7 +276,7 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
     // in case of moveInspector state, we may not be making a move ourself
 
     if( currentState.nextMove == moveInspector &&
-        whoMovesInspector( currentState ) == 1 ) {
+        whoMovesInspector( &currentState ) == 1 ) {
         
         // we've got all we need for state transition
 
@@ -319,14 +319,14 @@ void stepAI() {
         
             // pick a possible starting state (collapsing hidden
             // information)
-            gameState startState = collapseState( currentState );
+            gameState startState = collapseState( &currentState );
         
             // pick a possible co-move for opponent
-            gameState mirror = getMirrorState( startState );
-            possibleMove enemyMove = getPossibleMove( mirror );
+            gameState mirror = getMirrorState( &startState );
+            possibleMove enemyMove = getPossibleMove( &mirror );
         
             gameState nextState = 
-                stateTransition( startState,
+                stateTransition( &startState,
                                  moves[chosenMove].moveChars,
                                  moves[chosenMove].numCharsUsed,
                                  enemyMove.moveChars,
@@ -377,7 +377,7 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
             return NULL;
             }
         
-        if( whoMovesInspector( currentState ) != 0 ) {
+        if( whoMovesInspector( &currentState ) != 0 ) {
             printOut( "Error:  no opponent move passed to ai before "
                       "getAIMove, and AI is not moving the inspector\n" );
             return NULL;
@@ -391,11 +391,11 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
 
         // pick a possible starting state (collapsing hidden
         // information)
-        gameState startState = collapseState( currentState );
+        gameState startState = collapseState( &currentState );
         
         // pick a possible co-move for opponent
-        gameState mirror = getMirrorState( startState );
-        possibleMove enemyMove = getPossibleMove( mirror );
+        gameState mirror = getMirrorState( &startState );
+        possibleMove enemyMove = getPossibleMove( &mirror );
 
 
         externalEnemyMove = new unsigned char[ enemyMove.numCharsUsed ];

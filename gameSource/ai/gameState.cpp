@@ -39,13 +39,13 @@ static void checkStateValid( gameState inState ) {
 
 
 
-possibleMove getPossibleMove( gameState inState ) {
-    checkStateValid( inState );
+possibleMove getPossibleMove( gameState *inState ) {
+    // checkStateValid( inState );
     
 
     possibleMove m;
     
-    switch( inState.nextMove ) {
+    switch( inState->nextMove ) {
 
 
 
@@ -58,12 +58,12 @@ possibleMove getPossibleMove( gameState inState ) {
             int salaryBribeAmounts[6];
             
             for( int u=0; u<3; u++ ) {
-                unit enemyUnit = inState.agentUnits[1][u];
+                unit enemyUnit = inState->agentUnits[1][u];
                 
                 char sharedRegion = false;
 
                 for( int p=0; p<3; p++ ) {
-                    unit playerUnit = inState.agentUnits[0][u];
+                    unit playerUnit = inState->agentUnits[0][u];
             
                     if( playerUnit.region == enemyUnit.region ) {
                         sharedRegion = true;
@@ -76,14 +76,14 @@ possibleMove getPossibleMove( gameState inState ) {
                     }
                 else {
                     salaryBribeAmounts[ u + 3 ] = 
-                        getRandom( inState.ourMoney.t + 1 );
+                        getRandom( inState->ourMoney.t + 1 );
                     }
 
                 // player units
-                if( inState.agentUnits[0][u].region == 0 ) {
+                if( inState->agentUnits[0][u].region == 0 ) {
                     
                     salaryBribeAmounts[u] = 
-                        getRandom( inState.ourMoney.t + 1 );
+                        getRandom( inState->ourMoney.t + 1 );
                     }
                 else {
                     // away from home
@@ -96,7 +96,7 @@ possibleMove getPossibleMove( gameState inState ) {
             // (otherwise, all the random choices almost always add
             //  up to equal our total money---i.e., we spend everything
             //  we have!)
-            int maxTotalToSpend = getRandom( inState.ourMoney.t + 1 );
+            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
 
 
             // make sure amount sum is not greater than our max total
@@ -129,10 +129,10 @@ possibleMove getPossibleMove( gameState inState ) {
                     // find region-sharing unit
                     int sharingUnit = 0;
                     
-                    unit enemyUnit = inState.agentUnits[1][i-3];
+                    unit enemyUnit = inState->agentUnits[1][i-3];
                 
                     for( int pu=0; pu<3; pu++ ) {
-                        unit playerUnit = inState.agentUnits[0][pu];
+                        unit playerUnit = inState->agentUnits[0][pu];
             
                         if( playerUnit.region == enemyUnit.region ) {
                             sharingUnit = pu;
@@ -145,7 +145,7 @@ possibleMove getPossibleMove( gameState inState ) {
                 else {
                     // keep old value
                     int knownValue =
-                        inState.agentUnits[ i/3 ][ i%3 ].opponentBribingUnit;
+                        inState->agentUnits[ i/3 ][ i%3 ].opponentBribingUnit;
                     
                     
                     if( knownValue != -1 ) {
@@ -185,7 +185,7 @@ possibleMove getPossibleMove( gameState inState ) {
             int u;
             for( u=0; u<3; u++ ) {
                 // start with all dests to current unit regions
-                dest[u] = inState.agentUnits[0][u].region;
+                dest[u] = inState->agentUnits[0][u].region;
                 }
             
             // check for collisions to be safe
@@ -245,22 +245,22 @@ possibleMove getPossibleMove( gameState inState ) {
                 bid[u] = 0;
                 if( dest[u] > 1 ) {
                     // can bid here
-                    bid[u] = getRandom( inState.ourMoney.t + 1 );
+                    bid[u] = getRandom( inState->ourMoney.t + 1 );
                     totalSpent += bid[u];
                     }
 
                 bribe[u] = 0;
-                if( dest[u] == inState.inspectorRegion ) {
-                    bribe[u] = getRandom( inState.ourMoney.t + 1 );
+                if( dest[u] == inState->inspectorRegion ) {
+                    bribe[u] = getRandom( inState->ourMoney.t + 1 );
                     totalSpent += bribe[u];
                     }
 
                 // cost of trip
-                if( dest[u] != inState.agentUnits[0][u].region ) {
+                if( dest[u] != inState->agentUnits[0][u].region ) {
                     totalSpent++;
 
                     if( dest[u] == 0 ||
-                        inState.agentUnits[0][u].region == 0 ) {
+                        inState->agentUnits[0][u].region == 0 ) {
                         // flying to/from home costs double
                         totalSpent++;
                         }
@@ -285,7 +285,7 @@ possibleMove getPossibleMove( gameState inState ) {
             // (otherwise, all the random choices almost always add
             //  up to equal our total money---i.e., we spend everything
             //  we have!)
-            int maxTotalToSpend = getRandom( inState.ourMoney.t + 1 );
+            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
 
 
 
@@ -306,18 +306,18 @@ possibleMove getPossibleMove( gameState inState ) {
                     }
                 else {
                     // cancel trip?
-                    if( dest[u] != inState.agentUnits[0][u].region ) {
+                    if( dest[u] != inState->agentUnits[0][u].region ) {
                         totalSpent --;
                         
                         if( dest[u] == 0 || 
-                            inState.agentUnits[0][u].region == 0 ) {
+                            inState->agentUnits[0][u].region == 0 ) {
 
                             // flying to/from home costs double
                             totalSpent --;
                             }
 
                         // stay where it is
-                        dest[u] = inState.agentUnits[0][u].region;
+                        dest[u] = inState->agentUnits[0][u].region;
                         }
                     } 
 
@@ -344,14 +344,14 @@ possibleMove getPossibleMove( gameState inState ) {
                                     totalSpent--;
 
                                     if( dest[o] == 0 || 
-                                        inState.agentUnits[0][o].region 
+                                        inState->agentUnits[0][o].region 
                                         == 0 ) {
                                         
                                         // flying to/from home costs double
                                         totalSpent --;
                                         }
 
-                                    dest[o] = inState.agentUnits[0][o].region;
+                                    dest[o] = inState->agentUnits[0][o].region;
                                     
                                     
                                     // roll back bids and bribes, since
@@ -420,7 +420,7 @@ possibleMove getPossibleMove( gameState inState ) {
             // always skip sending image
             m.numCharsUsed = 3;
             m.moveChars[0] = 
-                (unsigned char)getRandom( inState.ourDiamonds + 1 );
+                (unsigned char)getRandom( inState->ourDiamonds + 1 );
             m.moveChars[1] = 0;
             m.moveChars[2] = 0;
             break;
@@ -445,21 +445,21 @@ void accumulateDiamonds( gameState *inState ) {
 
 
 
-int whoMovesInspector( gameState inState ) {
-    int inspectorRegion = inState.inspectorRegion;
+int whoMovesInspector( gameState *inState ) {
+    int inspectorRegion = inState->inspectorRegion;
     
     int winner = -1;
     int winningBribe = 0;
     
     for( int p=0; p<2; p++ ) {
         for( int u=0; u<3; u++ ) {
-            if( inState.agentUnits[p][u].region == inspectorRegion ) {
-                if( inState.agentUnits[p][u].inspectorBribe > 
+            if( inState->agentUnits[p][u].region == inspectorRegion ) {
+                if( inState->agentUnits[p][u].inspectorBribe > 
                     winningBribe ) {
                     
                     winner = p;
                     winningBribe = 
-                        inState.agentUnits[p][u].inspectorBribe;
+                        inState->agentUnits[p][u].inspectorBribe;
                     }
                 }
             }
@@ -559,8 +559,8 @@ static intRange collapseRangeToTrue( intRange inRange ) {
 
 
 
-gameState collapseState( gameState inState ) {
-    gameState result = inState;
+gameState collapseState( gameState *inState ) {
+    gameState result = *inState;
     
     // collapse each enemy unit salary and each player unit bribe
     
@@ -600,7 +600,7 @@ gameState collapseState( gameState inState ) {
         if( p == 0 ) {
             
             if( result.agentUnits[p][u].totalBribe.lo > 
-                inState.agentUnits[p][u].totalBribe.lo ) {
+                inState->agentUnits[p][u].totalBribe.lo ) {
             
                 result.agentUnits[p][u].totalBribe.hi --;
                 result.agentUnits[p][u].totalBribe.lo --;
@@ -609,7 +609,7 @@ gameState collapseState( gameState inState ) {
             }
         else {
             if( result.agentUnits[p][u].totalSalary.lo > 
-                inState.agentUnits[p][u].totalSalary.lo ) {
+                inState->agentUnits[p][u].totalSalary.lo ) {
             
                 result.agentUnits[p][u].totalSalary.hi --;
                 result.agentUnits[p][u].totalSalary.lo --;
@@ -662,21 +662,20 @@ gameState collapseState( gameState inState ) {
 
 
 
-
-gameState getMirrorState( gameState inState ) {
-    gameState result = inState;
+gameState getMirrorState( gameState *inState ) {
+    gameState result = *inState;
     
-    result.ourMoney = inState.enemyMoney;
-    result.ourDiamonds = inState.enemyDiamonds;
-    result.enemyMoney = inState.ourMoney;
-    result.enemyDiamonds = inState.ourDiamonds;
+    result.ourMoney = inState->enemyMoney;
+    result.ourDiamonds = inState->enemyDiamonds;
+    result.enemyMoney = inState->ourMoney;
+    result.enemyDiamonds = inState->ourDiamonds;
 
-    result.knownEnemyTotalMoneyReceived = inState.knownOurTotalMoneyReceived;
-    result.knownEnemyTotalMoneySpent = inState.knownOurTotalMoneySpent;
+    result.knownEnemyTotalMoneyReceived = inState->knownOurTotalMoneyReceived;
+    result.knownEnemyTotalMoneySpent = inState->knownOurTotalMoneySpent;
 
     for( int u=0; u<3; u++ ) {
-        result.agentUnits[0][u] = inState.agentUnits[1][u];
-        result.agentUnits[1][u] = inState.agentUnits[0][u];
+        result.agentUnits[0][u] = inState->agentUnits[1][u];
+        result.agentUnits[1][u] = inState->agentUnits[0][u];
 
         // swap home regions (both sides see 0 as their home
         for( int p=0; p<2; p++ ) {
@@ -701,10 +700,10 @@ int playRandomGameUntilEnd( gameState inState ) {
     while( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) {
         
         
-        possibleMove ourMove = getPossibleMove( inState );
+        possibleMove ourMove = getPossibleMove( &inState );
         
-        gameState mirror = getMirrorState( inState );
-        possibleMove enemyMove = getPossibleMove( mirror );
+        gameState mirror = getMirrorState( &inState );
+        possibleMove enemyMove = getPossibleMove( &mirror );
         
         if( inState.ourMoney.t < 0 || inState.enemyMoney.t < 0 ) {
             
@@ -712,16 +711,16 @@ int playRandomGameUntilEnd( gameState inState ) {
             assert( 0 );
             }
         
-        checkStateValid( inState );
+        // checkStateValid( inState );
         
         inState = 
-            stateTransition( inState,
+            stateTransition( &inState,
                              ourMove.moveChars,
                              ourMove.numCharsUsed,
                              enemyMove.moveChars,
                              enemyMove.numCharsUsed,
                              false );
-        checkStateValid( inState );
+        //checkStateValid( inState );
         }
     
     // on sell diamonds state in month zero
@@ -747,15 +746,15 @@ int playRandomGameUntilEnd( gameState inState ) {
 
 
 
-gameState stateTransition( gameState inState, 
+gameState stateTransition( gameState *inState, 
                            unsigned char *ourMove,
                            int ourLength,
                            unsigned char *enemyMove,
                            int enemyLength,
                            char inPreserveHiddenInfo ) {
-    gameState result = inState;
+    gameState result = *inState;
     
-    switch( inState.nextMove ) {
+    switch( inState->nextMove ) {
 
 
 
@@ -998,7 +997,7 @@ gameState stateTransition( gameState inState,
             
             // sometimes, we skip move inspector state (if no one bribed him)
             
-            if( whoMovesInspector( result ) == -1 ) {
+            if( whoMovesInspector( &result ) == -1 ) {
                 
                 collectDiamonds( &result );
 
@@ -1025,7 +1024,7 @@ gameState stateTransition( gameState inState,
             // actually won
             int dest = result.inspectorRegion;
             
-            switch( whoMovesInspector( result ) ) {
+            switch( whoMovesInspector( &result ) ) {
                 case -1:
                     printOut( "Error:  AI entered moveInspector state when"
                               " no one needs to move him\n" );
