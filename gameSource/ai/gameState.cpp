@@ -696,8 +696,19 @@ gameState getMirrorState( gameState *inState ) {
 
 int playRandomGameUntilEnd( gameState inState ) {
     
+    int originalMonthsLeft = inState.monthsLeft;
+    NextMove originalNextMove = inState.nextMove;
+    
+    
     // skip sell diamonds during last month and fly everyone home
-    while( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) {
+    //while( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) {
+
+    // stop after playing 1 months deep if we return to the same state again
+    // or stop at end of game
+    while( !( inState.monthsLeft == originalMonthsLeft - 1 
+              && inState.nextMove == originalNextMove ) 
+           &&
+           ( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) ) {
         
         
         possibleMove ourMove = getPossibleMove( &inState );
@@ -738,7 +749,10 @@ int playRandomGameUntilEnd( gameState inState ) {
     
     if( diff == 0 ) {
         // diff money instead
-        diff = inState.ourMoney.t - inState.enemyMoney.t;
+        //printOut( "Tie at %d\n", ourTotal );
+        
+        // FIXME:  for testing, don't take money into account, only diamonds
+        // diff = inState.ourMoney.t - inState.enemyMoney.t;
         }
 
     return diff;

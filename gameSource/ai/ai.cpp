@@ -26,9 +26,9 @@ int moveVisits[ numPossibleMoves ];
 possibleMove moves[ numPossibleMoves ];
 
 int numStepsTaken = 0;
-int maxNumSteps = 10000;
+int maxNumSteps = 20000;
 
-
+int maxGamesPerStep = 400;
 
 
 
@@ -313,7 +313,7 @@ void stepAI() {
         
         int gamesThisStep = 0;
         
-        while( !moveDone && gamesThisStep < 20 ) {
+        while( !moveDone && gamesThisStep < maxGamesPerStep ) {
             gamesThisStep++;
 
             // simulate one game for one of our moves
@@ -382,8 +382,9 @@ void stepAI() {
             int result = playRandomGameUntilEnd( nextState );
         
             // old, track total score
-            // moveScores[ chosenMove ] += result;
+            moveScores[ chosenMove ] += result;
 
+            /*
             // new:  track (wins - losses)
             if( result < 0 ) {
                 result = -1;
@@ -392,6 +393,7 @@ void stepAI() {
                 result = 1;
                 }
             moveScores[ chosenMove ] += result;
+            */
             moveVisits[ chosenMove ] ++;
 
             numStepsTaken ++;

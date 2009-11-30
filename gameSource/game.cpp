@@ -116,6 +116,7 @@ void gameInit() {
     
 
     // FIXME:  for testing only
+    /*
     printOut( "Testing AI...\n" );
     
     initOpponent( true );
@@ -157,7 +158,7 @@ void gameInit() {
     delete [] result;
     printOut( "...done\n" );
     exit( 0 );
-    
+    */
 
     
     int dataSize;
