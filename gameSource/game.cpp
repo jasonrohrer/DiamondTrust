@@ -124,7 +124,7 @@ void gameInit() {
         message[ i * 2 ] = 0;
         message[ i * 2 + 1] = (unsigned char)( -1 );
         }
-            
+    
     sendOpponentMessage( message, 12 );
     
     unsigned int resultLength;
@@ -136,7 +136,24 @@ void gameInit() {
         }
     // got move!
     // bail here to get a good profile of just this part of AI
+    delete [] result;
+    result = NULL;
     
+    // actually, play one more move, to test moveUnits
+    for( int i=0; i<12; i++ ) {
+        // moving nowhere, no bids, no bribes
+        message[ i ] = 0;
+        }
+    
+
+    sendOpponentMessage( message, 9 );
+    
+    while( result == NULL ) {
+        stepOpponent();
+        result = getOpponentMessage( &resultLength );
+        }
+        
+
     delete [] result;
     printOut( "...done\n" );
     exit( 0 );
