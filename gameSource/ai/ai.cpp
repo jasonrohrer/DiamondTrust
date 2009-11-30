@@ -19,8 +19,9 @@ static char moveDone;
 
 
 // scores for all possible moves at the current step
-#define numPossibleMoves 200
+#define numPossibleMoves 16
 int moveScores[ numPossibleMoves ];
+int moveVisits[ numPossibleMoves ];
 
 possibleMove moves[ numPossibleMoves ];
 
@@ -40,6 +41,7 @@ char stateChecked = true;
 void clearNextMove() {
     for( int m=0; m<numPossibleMoves; m++ ) {
         moveScores[m] = 0;
+        moveVisits[m] = 0;
         moves[m] = getPossibleMove( &currentState );
         }
     numStepsTaken = 0;
@@ -316,7 +318,51 @@ void stepAI() {
 
             // simulate one game for one of our moves
         
-            int chosenMove = getRandom( numPossibleMoves );
+            
+            // pick moves by weighting them according to their win scores
+            // so far
+            
+            int normMoveScores[ numPossibleMoves ];
+            int minScore = 100000;
+            for( int m=0; m<numPossibleMoves; m++ ) {
+                if( moveScores[ m ] < minScore ) {
+                    minScore = moveScores[m];
+                    }
+                }
+            // subtract minScore from each score, and add 1 to put all scores
+            // in [1...) range (at start, before any scores known, all 
+            // normalized scores are 1
+            // use squares of scores to amplify effect
+            int totalNormScores = 0;
+            for( int m=0; m<numPossibleMoves; m++ ) {
+                normMoveScores[m] = ( moveScores[ m ] - minScore ) + 1;
+
+                normMoveScores[m] *= normMoveScores[m];
+                totalNormScores += normMoveScores[m];
+                }
+            
+            
+            int weightThreshold = getRandom( totalNormScores );
+            
+
+            int chosenMove = -1;
+            
+            int weightPassedSoFar = 0;
+            while( weightPassedSoFar <= weightThreshold ) {
+                chosenMove ++;
+                weightPassedSoFar += normMoveScores[chosenMove];
+                }
+            
+            // this picks a move m with probability of 
+            // normMoveScores[m] / totalNormScores
+            
+            // at start, this is a uniform distribution, but as wins/losses
+            // build up, probability of picking good moves for additional
+            // exploration grows
+            
+
+            // FIXME:  back to original uniform dist for testing
+            chosenMove = getRandom( numPossibleMoves );
         
             // pick a possible starting state (collapsing hidden
             // information)
@@ -346,12 +392,38 @@ void stepAI() {
                 result = 1;
                 }
             moveScores[ chosenMove ] += result;
-
+            moveVisits[ chosenMove ] ++;
 
             numStepsTaken ++;
         
             if( numStepsTaken >= maxNumSteps ) {
                 moveDone = true;
+                }
+            else if( numStepsTaken == maxNumSteps / 2 ) {
+                
+                // print out stats, then clear them out and start over
+
+                // do we settle on same choice again?
+                
+
+                printOut( "Move visit counts at halfway:\n" );
+    
+                for( int m=0; m<numPossibleMoves; m++ ) {
+                    printOut( "[%d : %d], ", m, moveVisits[ m ] );
+                    moveVisits[ m ] = 0;
+                    }
+                printOut( "\n\n" );
+
+                printOut( "Move score counts at halfway:\n" );
+    
+                for( int m=0; m<numPossibleMoves; m++ ) {
+                    printOut( "[%d : %d], ", m, moveScores[ m ] );
+                    moveScores[m] = 0;
+                    }
+                printOut( "\n\n" );
+
+                
+
                 }
             }
         }
@@ -416,7 +488,20 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
     // make sure our current state matches actual game
     // checkCurrentStateMatches();
     
+    printOut( "Move visit counts:\n" );
     
+    for( int m=0; m<numPossibleMoves; m++ ) {
+        printOut( "[%d : %d], ", m, moveVisits[ m ] );
+        }
+    printOut( "\n\n" );
+    printOut( "Move score counts:\n" );
+    
+    for( int m=0; m<numPossibleMoves; m++ ) {
+        printOut( "[%d : %d], ", m, moveScores[ m ] );
+        }
+    printOut( "\n\n" );
+    
+
     unsigned char *ourMove = pickAndApplyMove( outMoveLength );
     
     if( isMoveUnitsState ) {
