@@ -20,6 +20,7 @@ static char moveDone;
 
 // scores for all possible moves at the current step
 #define numPossibleMoves 32
+int numPossibleMovesFilled = numPossibleMoves;
 int moveScores[ numPossibleMoves ];
 int moveVisits[ numPossibleMoves ];
 
@@ -41,21 +42,43 @@ char stateChecked = true;
 void clearNextMove() {
     // printOut( "Clearing move\n" );
     
-    for( int m=0; m<numPossibleMoves; m++ ) {
+    int numTotalMoves = getNumTotalPossibleMoves( &currentState );
+    
+    if( numTotalMoves == -1 || numTotalMoves > numPossibleMoves ) {
+        // unpractical number of total moves, or too many to fit in our array
+
+        // default to a fixed number of randomly chosen moves
+        numPossibleMovesFilled = numPossibleMoves;
+        
+        for( int m=0; m<numPossibleMovesFilled; m++ ) {
+            moves[m] = getPossibleMove( &currentState );
+            
+            }    
+        }
+    else {
+        // fixed number of possible moves that is small enough for our array
+        // use it!
+        numPossibleMovesFilled = numTotalMoves;
+
+        getAllPossibleMoves( &currentState, moves );        
+        }
+    
+
+    for( int m=0; m<numPossibleMovesFilled; m++ ) {
         moveScores[m] = 0;
         moveVisits[m] = 0;
-        moves[m] = getPossibleMove( &currentState );
-
         /*
-        if( currentState.nextMove == salaryBribe ) {
-            printOut( "Possible SB move: " );
-            for( int i=0; i<moves[m].numCharsUsed; i++ ) {
-                printOut( "%d, ", (int)(char)moves[m].moveChars[i] );
-                }
-            printOut( "\n" );
-            }
-        */
+              if( currentState.nextMove == salaryBribe ) {
+              printOut( "Possible SB move: " );
+              for( int i=0; i<moves[m].numCharsUsed; i++ ) {
+              printOut( "%d, ", (int)(char)moves[m].moveChars[i] );
+              }
+              printOut( "\n" );
+              }
+            */
         }
+    
+
     numStepsTaken = 0;
     }
 
@@ -225,7 +248,7 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
     // pick move with highest score
     int highScore = -10000;
     int chosenMove = -1;
-    for( int m=0; m<numPossibleMoves; m++ ) {
+    for( int m=0; m<numPossibleMovesFilled; m++ ) {
         if( moveScores[m] > highScore ) {
             chosenMove = m;
             highScore = moveScores[m];
@@ -335,8 +358,8 @@ void stepAI() {
             // so far
             
             int normMoveScores[ numPossibleMoves ];
-            int minScore = 100000;
-            for( int m=0; m<numPossibleMoves; m++ ) {
+            int minScore = 2147483647;
+            for( int m=0; m<numPossibleMovesFilled; m++ ) {
                 if( moveScores[ m ] < minScore ) {
                     minScore = moveScores[m];
                     }
@@ -346,7 +369,7 @@ void stepAI() {
             // normalized scores are 1
             // use squares of scores to amplify effect
             int totalNormScores = 0;
-            for( int m=0; m<numPossibleMoves; m++ ) {
+            for( int m=0; m<numPossibleMovesFilled; m++ ) {
                 normMoveScores[m] = ( moveScores[ m ] - minScore ) + 1;
 
                 normMoveScores[m] *= normMoveScores[m];
@@ -374,7 +397,7 @@ void stepAI() {
             
 
             // FIXME:  back to original uniform dist for testing
-            chosenMove = getRandom( numPossibleMoves );
+            chosenMove = getRandom( numPossibleMovesFilled );
         
             // pick a possible starting state (collapsing hidden
             // information)
@@ -422,7 +445,7 @@ void stepAI() {
 
                 printOut( "Move visit counts at halfway:\n" );
     
-                for( int m=0; m<numPossibleMoves; m++ ) {
+                for( int m=0; m<numPossibleMovesFilled; m++ ) {
                     printOut( "[%d : %d], ", m, moveVisits[ m ] );
                     moveVisits[ m ] = 0;
                     }
@@ -430,7 +453,7 @@ void stepAI() {
 
                 printOut( "Move score counts at halfway:\n" );
     
-                for( int m=0; m<numPossibleMoves; m++ ) {
+                for( int m=0; m<numPossibleMovesFilled; m++ ) {
                     printOut( "[%d : %d], ", m, moveScores[ m ] );
                     moveScores[m] = 0;
                     }
@@ -504,13 +527,13 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
     
     printOut( "Move visit counts:\n" );
     
-    for( int m=0; m<numPossibleMoves; m++ ) {
+    for( int m=0; m<numPossibleMovesFilled; m++ ) {
         printOut( "[%d : %d], ", m, moveVisits[ m ] );
         }
     printOut( "\n\n" );
     printOut( "Move score counts:\n" );
     
-    for( int m=0; m<numPossibleMoves; m++ ) {
+    for( int m=0; m<numPossibleMovesFilled; m++ ) {
         printOut( "[%d : %d], ", m, moveScores[ m ] );
         }
     printOut( "\n\n" );

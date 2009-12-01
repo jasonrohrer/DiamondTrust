@@ -504,6 +504,105 @@ possibleMove getPossibleMove( gameState *inState ) {
 
 
 
+int getNumTotalPossibleMoves( gameState *inState ) {
+    switch( inState->nextMove ) {
+        case moveInspector:
+            
+            // in getPossibleMove, we return only the best one, if there
+            // is one, or else pick at random from the equal choices
+
+            
+            // here, we might as well represent all the choices and let the
+            // AIs game-run-playing algorithm pick the best one
+
+            // can move to one of 5 other regions, or stay in current one
+            return 6;
+            break;
+            
+            
+            
+        case sellDiamonds:
+        case sellDiamondsCommit:
+            
+            // can sell between 0 and ourDiamonds diamonds
+            return inState->ourDiamonds + 1;
+            break;    
+        
+        default:
+            break;
+        }
+    
+    // other states, not practical to count
+    return -1;
+    }
+
+
+
+// only call this if getNumTotalPossibleMoves did not return -1
+// out moves must point to a possibleMove array with enough space for
+//  getNumTotalPossibleMoves elements
+void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
+    int numMoves = getNumTotalPossibleMoves( inState );
+            
+    switch( inState->nextMove ) {
+        case moveInspector:
+            if( numMoves != 6 ) {
+                printOut( "Error:  num moves doesn't match expected count "
+                          " for moveInspector\n" );
+                return;
+                }
+            
+            for( int i=0; i<numMoves; i++ ) {
+                possibleMove m;
+                m.numCharsUsed = 1;
+
+                // one of the producing regions
+                m.moveChars[ 0 ] = i + 2;
+                
+                outMoves[i] = m;                
+                }
+            return;
+            break;
+
+        case sellDiamonds:
+        case sellDiamondsCommit:
+            if( numMoves != inState->ourDiamonds + 1 ) {
+                printOut( "Error:  num moves doesn't match expected count "
+                          " for sellDiamonds\n" );
+                return;
+                }
+            
+            for( int i=0; i<numMoves; i++ ) {
+                possibleMove m;
+
+                // 3 chars
+                // 0 = number sold
+                // 1 = image present in subsequent messages?
+                // 2 = number of 300-byte messages forthcoming to contain image
+                m.numCharsUsed = 3;
+
+                // sell this number of diamonds
+                m.moveChars[ 0 ] = i;
+                m.moveChars[1] = 0;
+                m.moveChars[2] = 0;
+                
+                outMoves[i] = m;                
+                }
+            return;
+            break;    
+                    
+        default:
+            break;
+
+        }
+
+    printOut( 
+        "Error:  getAllPossibleMoves called for an unsupported state\n" );
+    }
+            
+ 
+
+
 
 void accumulateDiamonds( gameState *inState ) {
     int monthsLeft = inState->monthsLeft;

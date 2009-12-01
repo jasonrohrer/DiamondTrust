@@ -172,9 +172,23 @@ typedef struct possibleMove {
     } possibleMove;
 
 
-// gets a possible move for player
+// gets a randomly-selected possible move for player
 // (use getMirrorState to extract move for enemy)
 possibleMove getPossibleMove( gameState *inState );
+
+
+
+// returns -1 if total number of possible moves is not practical to count
+//   (in move state an salary/bribe state)
+// returns number otherwise
+//   (in move inspector state and sell state)
+int getNumTotalPossibleMoves( gameState *inState );
+
+
+// only call this if getNumTotalPossibleMoves did not return -1
+// out moves must point to a possibleMove array with enough space for
+//  getNumTotalPossibleMoves elements
+void getAllPossibleMoves( gameState *inState, possibleMove *outMoves );
 
 
 
