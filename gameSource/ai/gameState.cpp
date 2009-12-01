@@ -189,6 +189,14 @@ possibleMove getPossibleMove( gameState *inState ) {
             int bribe[3];
 
             int totalSpent = 0;
+            
+
+            // pick a random spending cap
+            // (otherwise, all the random choices almost always add
+            //  up to equal our total money---i.e., we spend everything
+            //  we have!)
+            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
+
 
             int u;
             for( u=0; u<3; u++ ) {
@@ -253,13 +261,24 @@ possibleMove getPossibleMove( gameState *inState ) {
                 bid[u] = 0;
                 if( dest[u] > 1 ) {
                     // can bid here
-                    bid[u] = getRandom( inState->ourMoney.t + 1 );
+                    bid[u] = getRandom( maxTotalToSpend + 1 );
                     totalSpent += bid[u];
                     }
 
                 bribe[u] = 0;
                 if( dest[u] == inState->inspectorRegion ) {
-                    bribe[u] = getRandom( inState->ourMoney.t + 1 );
+                    bribe[u] = getRandom( maxTotalToSpend + 1 );
+
+                    if( bid[u] > 0 && bribe[u] == 0 ) {
+                        // illogical choice:
+                        // we're bidding in inspector's region, but
+                        // we're not bribing him to move him away, so
+                        // our bid will be lost
+                        
+                        // bribe at least 1
+                        bribe[u] = 1;
+                        }
+                    
                     totalSpent += bribe[u];
                     }
 
@@ -289,11 +308,7 @@ possibleMove getPossibleMove( gameState *inState ) {
                 }
 
             
-            // pick a random spending cap
-            // (otherwise, all the random choices almost always add
-            //  up to equal our total money---i.e., we spend everything
-            //  we have!)
-            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
+
 
 
 
@@ -677,19 +692,26 @@ static void collectDiamonds( gameState *inState ) {
                                 int eBid = 
                                     inState->agentUnits[e][i].diamondBid;
                                 
-                                if( eBid > bid ) {
+                                if( eBid >= bid ) {
+                                    // e is winner (or ties us, blocking
+                                    //   our bid)
+
                                     highBid = false;
                                     
-                                    // e is winner
                             
-                                    
-                                    inState->agentUnits[e][i].diamonds +=
-                                        inState->regionDiamondCounts[r];
-                                    
-                                    inState->regionDiamondCounts[r] = 0;
-                                    }
 
-                                // regardless, bid spent
+                                    if( eBid > bid ) {
+                                        // e wins diamonds
+
+                                        inState->agentUnits[e][i].diamonds +=
+                                            inState->regionDiamondCounts[r];
+                                        
+                                        inState->regionDiamondCounts[r] = 0;
+                                        }
+                                    }
+                                
+
+                                // regardless, e's bid spent
                                 inState->agentUnits[e][i].diamondBid = 0;
                                 }
                             }

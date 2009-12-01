@@ -118,7 +118,7 @@ static void checkCurrentStateMatches() {
     checkEqual( currentState.enemyDiamonds, getPlayerDiamonds( 0 ) );
 
     
-        // 0 for player, 1 for enemy, 3 units each
+    // 0 for player, 1 for enemy, 3 units each
     for( int p=0; p<2; p++ ) {
         for( int u=0; u<3; u++ ) {
             
