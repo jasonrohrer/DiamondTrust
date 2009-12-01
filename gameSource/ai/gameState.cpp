@@ -55,6 +55,14 @@ possibleMove getPossibleMove( gameState *inState ) {
             m.numCharsUsed = 12;
             
 
+            // pick a random spending cap
+            // (otherwise, all the random choices almost always add
+            //  up to equal our total money---i.e., we spend everything
+            //  we have!)
+            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
+
+
+
             int salaryBribeAmounts[6];
             
             for( int u=0; u<3; u++ ) {
@@ -76,14 +84,14 @@ possibleMove getPossibleMove( gameState *inState ) {
                     }
                 else {
                     salaryBribeAmounts[ u + 3 ] = 
-                        getRandom( inState->ourMoney.t + 1 );
+                        getRandom( maxTotalToSpend + 1 );
                     }
 
                 // player units
                 if( inState->agentUnits[0][u].region == 0 ) {
                     
                     salaryBribeAmounts[u] = 
-                        getRandom( inState->ourMoney.t + 1 );
+                        getRandom( maxTotalToSpend + 1 );
                     }
                 else {
                     // away from home
@@ -92,14 +100,9 @@ possibleMove getPossibleMove( gameState *inState ) {
                 }
             
             
-            // pick a random spending cap
-            // (otherwise, all the random choices almost always add
-            //  up to equal our total money---i.e., we spend everything
-            //  we have!)
-            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
+            
 
-
-            // make sure amount sum is not greater than our max total
+            // make sure amount sum is not greater than our spending cap
             int amountSum = 0;
             int i;
             for( i=0; i<6; i++ ) {
@@ -400,12 +403,76 @@ possibleMove getPossibleMove( gameState *inState ) {
 
 
 
-        case moveInspector:
+        case moveInspector: {
+            
             // 1 char, inspector dest
             m.numCharsUsed = 1;
             
+            /*
             // avoid player regions
             m.moveChars[ 0 ] = getRandom( 6 ) + 2;
+            */
+
+            // pick best move here
+
+            int maxEnemyUnit = -1;
+            int maxBuyingPlusCarrying = 0;
+            int maxBid = 0;
+            
+            for( int u=0; u<3; u++ ) {
+                int diamondTotal = inState->agentUnits[1][u].diamonds;
+                int bidTotal = 0;
+                
+                if( inState->agentUnits[1][u].diamondBid > 0 ) {
+                    
+                    diamondTotal += 
+                        inState->regionDiamondCounts[ 
+                            inState->agentUnits[1][u].region ];
+                    
+                    bidTotal += inState->agentUnits[1][u].diamondBid;
+                    }
+                
+                
+                if( diamondTotal >= maxBuyingPlusCarrying ) {
+                    maxBuyingPlusCarrying = diamondTotal;
+                    
+                    if( diamondTotal == maxBuyingPlusCarrying ) {    
+                        if( bidTotal > maxBid ) {
+                            maxBid = bidTotal;
+                            maxEnemyUnit = u;
+                            }
+                        }
+                    else {
+                        maxBid = bidTotal;
+                        maxEnemyUnit = u;
+                        }
+                    }
+                }
+
+            if( maxEnemyUnit != -1 ) {
+                // found best to attack with inspector
+                m.moveChars[ 0 ] = inState->agentUnits[1][maxEnemyUnit].region;
+                }
+            else {
+                // none to attack
+                
+                // find some region not occupied by us
+                char occupied = true;
+                int pick = -1;
+                while( occupied ) {
+                    occupied = false;
+                    // avoid regions 1 and 2
+                    pick = getRandom( 6 ) + 2;
+
+                    for( int u=0; u<3; u++ ) {
+                        if( inState->agentUnits[0][u].region == pick ) {
+                            occupied = true;
+                            }
+                        }
+                    }
+                m.moveChars[ 0 ] = pick;                    
+                }
+            }
             break;
 
 
@@ -703,9 +770,9 @@ int playRandomGameUntilEnd( gameState inState ) {
     // skip sell diamonds during last month and fly everyone home
     //while( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) {
 
-    // stop after playing 1 months deep if we return to the same state again
+    // stop after playing 2 months deep if we return to the same state again
     // or stop at end of game
-    while( !( inState.monthsLeft == originalMonthsLeft - 1 
+    while( !( inState.monthsLeft == originalMonthsLeft - 2 
               && inState.nextMove == originalNextMove ) 
            &&
            ( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) ) {
@@ -744,7 +811,14 @@ int playRandomGameUntilEnd( gameState inState ) {
         ourTotal += inState.agentUnits[0][u].diamonds;
         enemyTotal += inState.agentUnits[1][u].diamonds;
         }
+
+
+    // money unit worth 1/2 of a diamond
     
+    ourTotal += inState.ourMoney.t / 2;
+    enemyTotal += inState.enemyMoney.t / 2;
+    
+
     int diff = ourTotal - enemyTotal;
     
     if( diff == 0 ) {

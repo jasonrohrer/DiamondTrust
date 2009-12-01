@@ -19,7 +19,7 @@ static char moveDone;
 
 
 // scores for all possible moves at the current step
-#define numPossibleMoves 16
+#define numPossibleMoves 32
 int moveScores[ numPossibleMoves ];
 int moveVisits[ numPossibleMoves ];
 
@@ -28,7 +28,7 @@ possibleMove moves[ numPossibleMoves ];
 int numStepsTaken = 0;
 int maxNumSteps = 20000;
 
-int maxGamesPerStep = 400;
+int maxGamesPerStep = 100;
 
 
 
@@ -304,7 +304,7 @@ void stepAI() {
     // check state once per month
     if( !stateChecked && currentState.nextMove == moveUnits ) {
         // FIXME:  turn back on, testing so it's off
-        //checkCurrentStateMatches();
+        checkCurrentStateMatches();
         stateChecked = true;
         }
     
