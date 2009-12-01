@@ -39,10 +39,22 @@ char stateChecked = true;
 
 
 void clearNextMove() {
+    // printOut( "Clearing move\n" );
+    
     for( int m=0; m<numPossibleMoves; m++ ) {
         moveScores[m] = 0;
         moveVisits[m] = 0;
         moves[m] = getPossibleMove( &currentState );
+
+        /*
+        if( currentState.nextMove == salaryBribe ) {
+            printOut( "Possible SB move: " );
+            for( int i=0; i<moves[m].numCharsUsed; i++ ) {
+                printOut( "%d, ", (int)(char)moves[m].moveChars[i] );
+                }
+            printOut( "\n" );
+            }
+        */
         }
     numStepsTaken = 0;
     }

@@ -60,6 +60,9 @@ possibleMove getPossibleMove( gameState *inState ) {
             //  up to equal our total money---i.e., we spend everything
             //  we have!)
             int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
+            
+            // for testing
+            // int maxTotalToSpend = inState->ourMoney.t / 2;
 
 
 
@@ -71,7 +74,7 @@ possibleMove getPossibleMove( gameState *inState ) {
                 char sharedRegion = false;
 
                 for( int p=0; p<3; p++ ) {
-                    unit playerUnit = inState->agentUnits[0][u];
+                    unit playerUnit = inState->agentUnits[0][p];
             
                     if( playerUnit.region == enemyUnit.region ) {
                         sharedRegion = true;
@@ -85,6 +88,8 @@ possibleMove getPossibleMove( gameState *inState ) {
                 else {
                     salaryBribeAmounts[ u + 3 ] = 
                         getRandom( maxTotalToSpend + 1 );
+                        // force bribes for testing
+                        // inState->ourMoney.t;
                     }
 
                 // player units
@@ -126,7 +131,7 @@ possibleMove getPossibleMove( gameState *inState ) {
                 int index = i*2;
                 m.moveChars[ index++ ] = salaryBribeAmounts[i];
                 
-                if( i > 3 && salaryBribeAmounts[i] > 0 ) {
+                if( i > 2 && salaryBribeAmounts[i] > 0 ) {
                     // new payment to enemy
 
                     // find region-sharing unit
