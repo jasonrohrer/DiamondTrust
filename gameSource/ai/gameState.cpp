@@ -38,6 +38,86 @@ static void checkStateValid( gameState inState ) {
 
 
 
+possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
+    possibleMove m;
+
+    m.numCharsUsed = inMove.numCharsUsed;
+    
+    // first, copy it
+    memcpy( m.moveChars[c], inMove.moveChars[c], m.numCharsUsed );
+        
+
+    // perform a random number of mutations
+    int numMutations = getRandom( 5 ) + 1;
+    
+    for( int i=0; i<numMutations; i++ ) {
+        
+        switch( inState->nextMove ) {
+            case salaryBribe: {
+                
+                char anyLowerable = false;
+                
+                for( int u=0; u<6; u++ ) {
+                    if( (char)m.moveChars[u*2] > 1 ) {
+                        anyLowerable = true;
+                        }
+                    }
+                if( anyLowerable ) {
+                    
+                    int lowerablePick = getRandom( 6 );
+                    
+                    while( (char)m.moveChars[ lowerablePick * 2 ] <= 1 ) {
+                        lowerablePick = getRandom( 6 );
+                        }
+                    
+                    // lower it by 1
+                    m.moveChars[lowerablePick * 2] --;
+                    
+
+                    // can also raise another by 1 w/out increasing our total
+                    // money spent
+                    
+                    char anyRaisable = false;
+                
+                    for( int u=0; u<6; u++ ) {
+                        if( u != lowerablePick && 
+                            (char)m.moveChars[u*2] > 0 ) {
+                            
+                            anyRaisable = true;
+                            }
+                        }
+                    
+                    if( anyRaisable ) {
+                        int raisablePick = getRandom( 6 );
+                    
+                        while( (char)m.moveChars[ raisablePick * 2 ] <= 0 ) {
+                            raisablePick = getRandom( 6 );
+                            }
+                        
+                        // raisable it by 1
+                        m.moveChars[raisablePick * 2] --;
+                        }
+                    }
+                }
+                break;
+            case moveUnits:
+            case moveUnitsCommit: {
+                
+                // FIXME
+
+
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    
+
+    return m;
+    }
+
+
 
 possibleMove getPossibleMove( gameState *inState ) {
     // checkStateValid( inState );
