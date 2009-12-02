@@ -32,9 +32,10 @@ int moveSortMap[ numPossibleMoves ];
 
 
 
-int maxNumSimulationsPerMove = 3720;//600;
+//int maxNumSimulationsPerMove = 3720;//600;
+int maxNumSimulationsPerMove = 600;
 
-int batchSizeBeforeReplaceWorstMoves = 40;
+int batchSizeBeforeReplaceWorstMoves = 20;
 int finalBatchSize = 200;
 
 int maxSimulationsPerStepAI = 100;
@@ -132,12 +133,25 @@ void clearNextMove() {
         // default to a fixed number of randomly chosen moves
         numPossibleMovesFilled = numPossibleMoves;
         
+        
+        // but in some cases, there are only a small number of available moves
+
+        // if we detect too many collisions when trying to add a new move,
+        // we can assume that this is the case, and limit the possible
+        // move array there
+
+
         for( int m=0; m<numPossibleMovesFilled; m++ ) {
             
             // pick a unique move
             char collision = true;
             
-            while( collision ) {
+            // in some situations, picking a unique move is impossible
+            // (like if we're out of money, or there are no payable units)
+            int collisionCount = 0;
+            // bail after 100 collisions in a row
+            
+            while( collision && collisionCount < 100 ) {
                 
                 moves[m] = getPossibleMove( &currentState );
                 
@@ -148,10 +162,18 @@ void clearNextMove() {
                 for( int mm=0; mm < m && !collision; mm++ ) {
                     if( equal( moves[mm], moves[m] ) ) {
                         collision = true;
+                        collisionCount++;
                         }
                     }                    
                 }
-            }    
+            if( collision ) {
+                // we bailed w/out finding another unique move
+                // assume that this is it
+                numPossibleMovesFilled = m;
+                
+                printOut( "Only found %d unique moves\n", m );
+                }
+            }
         }
     else {
         // fixed number of possible moves that is small enough for our array

@@ -48,7 +48,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
         
 
     // perform a random number of mutations
-    int numMutations = getRandom( 5 ) + 1;
+    int numMutations = 1;//getRandom( 20 ) + 1;
     
     for( int i=0; i<numMutations; i++ ) {
         
@@ -175,11 +175,19 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
                     case 2: {
                         
                         // switch bid to a different, unoccupied region
+                        
+                        // don't do this to units that are bribing the insp
+                        // or units that aren't already switching regions
+                        //   (because having them switch would cost more
+                        //    money)
 
                         countBids = 0;
                         
                         for( int u=0; u<3; u++ ) {
                             if( m.moveChars[ u * 3 + 1 ] > 0
+                                &&
+                                m.moveChars[ u * 3 ] !=
+                                inState->agentUnits[0][u].region
                                 &&
                                 m.moveChars[ u * 3 ] != 
                                 inState->inspectorRegion ) {
@@ -206,6 +214,9 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
                                 int u = getRandom( 3 );
                                 
                                 if( m.moveChars[ u * 3 + 1 ] > 0
+                                    &&
+                                    m.moveChars[ u * 3 ] !=
+                                    inState->agentUnits[0][u].region
                                     &&
                                     m.moveChars[ u * 3 ] != 
                                     inState->inspectorRegion ) {
