@@ -19,7 +19,7 @@ static char moveDone;
 
 
 // scores for all possible moves at the current step
-#define numPossibleMoves 32
+#define numPossibleMoves 32 //256
 int numPossibleMovesFilled = numPossibleMoves;
 int moveScores[ numPossibleMoves ];
 int moveSimulations[ numPossibleMoves ];
@@ -28,9 +28,74 @@ int nextMoveToTest = 0;
 
 possibleMove moves[ numPossibleMoves ];
 
-int maxNumSimulationsPerMove = 600;
+int moveSortMap[ numPossibleMoves ];
+
+
+
+int maxNumSimulationsPerMove = 3720;//600;
+
+int batchSizeBeforeReplaceWorstMoves = 40;
+int finalBatchSize = 200;
 
 int maxSimulationsPerStepAI = 100;
+
+
+
+
+static void sortMovesByScore() {
+    
+    char beenPicked[ numPossibleMovesFilled ];
+
+    int nextScoreToPick = -1000000;
+
+    for( int i=0; i<numPossibleMovesFilled; i++ ) {
+        beenPicked[i] = false;
+        }
+    for( int i=0; i<numPossibleMovesFilled; i++ ) {
+        
+        int indexToPick = -1;
+        int scoreToPick = 10000000;
+        for( int m=0; m<numPossibleMovesFilled; m++ ) {
+            if( ! beenPicked[ m ] && 
+                moveScores[m] >= nextScoreToPick && 
+                moveScores[m] < scoreToPick ) {
+                
+                scoreToPick = moveScores[m];
+                indexToPick = m;
+                }
+            }
+
+        moveSortMap[i] = indexToPick;
+        
+        beenPicked[ indexToPick ] = true;
+        
+        nextScoreToPick = scoreToPick;
+        }
+    }
+
+
+
+static void printSortedMoves() {
+    printOut( "Moves sorted by score:\n" );
+    
+    sortMovesByScore();
+    
+    for( int i=0; i<numPossibleMovesFilled; i++ ) {
+        int indexToPrint = moveSortMap[ i ];
+
+        printOut( "[%d] Score: %d, Move: ", indexToPrint, 
+                  moveScores[indexToPrint] );
+        
+        for( int c=0; c<moves[indexToPrint].numCharsUsed; c++ ) {
+            printOut( "%d, ", (int)(char)moves[indexToPrint].moveChars[c] );
+            }
+        printOut( "\n" );
+        }
+    
+    }
+
+
+
 
 
 
@@ -184,7 +249,7 @@ static void checkCurrentStateMatches() {
 
 
 void initAI() {
-    currentState.monthsLeft = 8;
+    currentState.monthsLeft = 1;
     currentState.nextMove = salaryBribe;
 
     currentState.ourMoney = makeRange( 18 );
@@ -401,68 +466,108 @@ void stepAI() {
         
             
 
-            // new:  just walk through moves, running maxNumSimulationsPerMove games
-            //   for each move
+            // new:  just walk through moves, 
+            // running maxNumSimulationsPerMove games for each move
 
             int chosenMove = nextMoveToTest;
             
 
+            // stop as soon as we wrap back around
+            if( moveSimulations[ chosenMove ] + 1 > 
+                maxNumSimulationsPerMove ) {
+                
+                moveDone = true;
+                }
+            else {
 
 
-
-
-            // pick a possible starting state (collapsing hidden
-            // information)
-            gameState startState = collapseState( &currentState );
+                // pick a possible starting state (collapsing hidden
+                // information)
+                gameState startState = collapseState( &currentState );
+                
+                // pick a possible co-move for opponent
+                gameState mirror = getMirrorState( &startState );
+                possibleMove enemyMove = getPossibleMove( &mirror );
+                
+                gameState nextState = 
+                    stateTransition( &startState,
+                                     moves[chosenMove].moveChars,
+                                     moves[chosenMove].numCharsUsed,
+                                     enemyMove.moveChars,
+                                     enemyMove.numCharsUsed,
+                                     false );
+                int result = playRandomGameUntilEnd( nextState );
         
-            // pick a possible co-move for opponent
-            gameState mirror = getMirrorState( &startState );
-            possibleMove enemyMove = getPossibleMove( &mirror );
-        
-            gameState nextState = 
-                stateTransition( &startState,
-                                 moves[chosenMove].moveChars,
-                                 moves[chosenMove].numCharsUsed,
-                                 enemyMove.moveChars,
-                                 enemyMove.numCharsUsed,
-                                 false );
-            int result = playRandomGameUntilEnd( nextState );
-        
-            // old, track total score
-            moveScores[ chosenMove ] += result;
+                // old, track total score
+                moveScores[ chosenMove ] += result;
 
-            /*
-            // new:  track (wins - losses)
-            if( result < 0 ) {
+                /*
+                // new:  track (wins - losses)
+                if( result < 0 ) {
                 result = -1;
                 }
-            if( result > 0 ) {
+                if( result > 0 ) {
                 result = 1;
                 }
-            moveScores[ chosenMove ] += result;
-            */
-            moveSimulations[ chosenMove ] ++;
+                moveScores[ chosenMove ] += result;
+                */
+                moveSimulations[ chosenMove ] ++;
         
+                nextMoveToTest ++;
+                nextMoveToTest %= numPossibleMovesFilled;
+            
 
-            if( moveSimulations[ chosenMove ] >= maxNumSimulationsPerMove ) {
-                
-                // done testing this move
-                nextMoveToTest++;
-                
+                // after batches of a given size, throw out the bottom
+                // half of the moves, replace them with fresh random moves,
+                // and reset all move scores
 
+                // but save the last 1/4 of the simulations for deep
+                // simulation of the final set of moves (to really tease
+                // out the very best move)
 
-                if( nextMoveToTest >= numPossibleMovesFilled ) {
-                    moveDone = true;
-                    }
-                else if( false && 
-                         moveSimulations[ chosenMove ] == 
-                         maxNumSimulationsPerMove / 2 ) {
+                if( nextMoveToTest == 0 && 
+                    ( moveSimulations[ chosenMove ] % 
+                      batchSizeBeforeReplaceWorstMoves == 0
+                      &&
+                      moveSimulations[ chosenMove ] <
+                      maxNumSimulationsPerMove - finalBatchSize ) ) {
                 
+                    
+
+                    printOut( "\n\n**** Intermediary %d-sim point: ",
+                              moveSimulations[ chosenMove ] );
+                    //printSortedMoves();
+                    sortMovesByScore();
+                    printOut( "High score so far = %d\n",
+                              moveScores[ 
+                                  moveSortMap[ numPossibleMovesFilled - 1 ] ]
+                              );
+                    
+                    
+                    if( numPossibleMovesFilled == numPossibleMoves ) {
+                        
+                        printOut( 
+                            "Replacing bottom half of moves with fresh\n" );
+                    
+                        for( int i=0; i<numPossibleMovesFilled/2; i++ ) {
+                            moves[ moveSortMap[i] ] =
+                                getPossibleMove( &currentState );
+                            }
+                        // reset all scores
+                        for( int i=0; i<numPossibleMovesFilled; i++ ) {
+                            moveScores[i] = 0;
+                            }
+                        }
+                    
+
+                    
+
+                    
                     // print out stats, then clear them out and start over
                     
                     // do we settle on same choice again?
                     
-
+                    /*
                     printOut( "Move visit counts at halfway:\n" );
     
                     for( int m=0; m<numPossibleMovesFilled; m++ ) {
@@ -478,13 +583,13 @@ void stepAI() {
                         moveScores[m] = 0;
                         }
                     printOut( "\n\n" );
-
+                    */
                 
 
                     }
                 }
             
-
+            
             }
         }
     
@@ -560,7 +665,12 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
         printOut( "[%d : %d], ", m, moveScores[ m ] );
         }
     printOut( "\n\n" );
+
+    printSortedMoves();
     
+
+        
+
 
     unsigned char *ourMove = pickAndApplyMove( outMoveLength );
     
