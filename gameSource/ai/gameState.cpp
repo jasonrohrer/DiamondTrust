@@ -939,20 +939,41 @@ int playRandomGameUntilEnd( gameState inState ) {
         }
 
 
-    // money unit worth 1/2 of a diamond
+    // did we play until end, or stop short?
+    char gameOver = ( inState.monthsLeft == 0 && 
+                      inState.nextMove == sellDiamonds );
     
-    ourTotal += inState.ourMoney.t / 2;
-    enemyTotal += inState.enemyMoney.t / 2;
+
+    // only diamonds matter toward victory (unless there is a tie)
+
+    if( !gameOver ) {
+        // money can be used to purchase more diamonds in future rounds,
+        // so it has some value
+
+        // money unit worth (roughly) 1/4 of a diamond
+        
+        // according to design doc, each diamond is worth $3.2 to $5.6 
+        // (depending on the amount of money injected into the game).
+        // The midpoint is $4.4, which we can approximate as $4
+
+        ourTotal += inState.ourMoney.t / 4;
+        enemyTotal += inState.enemyMoney.t / 4;
+        }
     
 
     int diff = ourTotal - enemyTotal;
     
-    if( diff == 0 ) {
-        // diff money instead
-        //printOut( "Tie at %d\n", ourTotal );
+    if( gameOver && diff == 0 ) {
+        // tie at end of game
+
         
-        // FIXME:  for testing, don't take money into account, only diamonds
-        // diff = inState.ourMoney.t - inState.enemyMoney.t;
+        // winner is person with the most money
+
+        // keep the 1/4 conversion rate, because winning with diamonds
+        // is much "safer" than tying and relying on your money balance
+        // to put you over the top
+        
+        diff = (inState.ourMoney.t - inState.enemyMoney.t) / 4;
         }
 
     return diff;
