@@ -169,12 +169,18 @@ typedef struct possibleMove {
 
         // num chars used varies depending on game phase
         int numCharsUsed;
+
+        // flag used for marking moves during testing
+        int flag;
     } possibleMove;
 
 
 // gets a randomly-selected possible move for player
 // (use getMirrorState to extract move for enemy)
 possibleMove getPossibleMove( gameState *inState );
+
+
+possibleMove mutateMove( gameState *inState, possibleMove inMove );
 
 
 

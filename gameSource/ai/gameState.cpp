@@ -44,7 +44,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
     m.numCharsUsed = inMove.numCharsUsed;
     
     // first, copy it
-    memcpy( m.moveChars[c], inMove.moveChars[c], m.numCharsUsed );
+    memcpy( m.moveChars, inMove.moveChars, m.numCharsUsed );
         
 
     // perform a random number of mutations
@@ -103,7 +103,146 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
             case moveUnits:
             case moveUnitsCommit: {
                 
-                // FIXME
+                // common computations shared by more than one mut type
+
+                int countBids = 0;
+                int pickA = -1;
+                int pickB = -1;
+                
+                // pickC is unit that's bribing inspector, if any
+                int pickC = -1;
+                
+                for( int u=0; u<3; u++ ) {
+                    if( m.moveChars[ u * 3 + 1 ] > 0 ) {
+                        countBids++;
+                        }
+                    if( m.moveChars[ u * 3 + 2 ] > 0 ) {
+                        pickC = u;
+                        }
+                    }
+                if( countBids > 1 ) {
+                    // pick two to swap
+                    pickA = getRandom( 3 );
+                    while( m.moveChars[ pickA * 3 + 1 ] == 0 ) {
+                        pickA = getRandom( 3 );
+                        }
+                    
+                    pickB = getRandom( 3 );
+                    while( m.moveChars[ pickB * 3 + 1 ] == 0 || 
+                           pickB == pickA ) {
+                        pickB = getRandom( 3 );
+                        }
+                    }
+
+                
+                int mutType = getRandom( 4 );
+
+                switch( mutType ) {
+                    case 0: {
+                        if( countBids > 1 ) {
+                            // swap bids between two non-zero-bid moves
+                            // (total money spent the same)
+
+                            unsigned char temp = 
+                                m.moveChars[ pickA * 3 + 1 ];
+                    
+                            // swap
+                            m.moveChars[ pickA * 3 + 1 ] =
+                                m.moveChars[ pickB * 3 + 1 ];
+                            m.moveChars[ pickB * 3 + 1 ] = temp;
+                            }
+                        }
+                        
+                        break;
+
+
+                    case 1: {
+                        if( countBids > 1 ) {
+                            // raise A and lower B (total money spent the same)
+                            m.moveChars[ pickA * 3 + 1 ] ++;
+                            m.moveChars[ pickB * 3 + 1 ] --;
+                            }
+                        }
+                        break;
+
+                    case 2: {
+                        
+                        // switch bid to a different, unoccupied region
+
+                        countBids = 0;
+                        
+                        for( int u=0; u<3; u++ ) {
+                            if( m.moveChars[ u * 3 + 1 ] > 0
+                                &&
+                                m.moveChars[ u * 3 ] != 
+                                inState->inspectorRegion ) {
+                                
+                                countBids++;
+                                }
+                            }
+
+                        if( countBids > 0 ) {
+                            
+                            int regionPick = getRandom( 6 ) + 2;
+                            
+                            while( m.moveChars[ 0 ] == regionPick
+                                   ||
+                                   m.moveChars[ 3 ] == regionPick
+                                   ||
+                                   m.moveChars[ 6 ] == regionPick ) {
+                                // collision
+                                regionPick = getRandom( 6 ) + 2;
+                                }
+
+                            char done = false;
+                            while( ! done ) {
+                                int u = getRandom( 3 );
+                                
+                                if( m.moveChars[ u * 3 + 1 ] > 0
+                                    &&
+                                    m.moveChars[ u * 3 ] != 
+                                    inState->inspectorRegion ) {
+                                
+                                    // switch to new region
+                                    m.moveChars[ u * 3 ] = regionPick;
+                                    done = true;
+                                    }
+                                
+                                }
+                            }
+                        
+                        }
+                        break;
+                     
+                    case 3: {
+                        
+                        if( pickC > 1 && countBids > 1 ) {
+                        
+                            int otherPick = pickA;
+                            if( getRandom( 2 ) ) {
+                                otherPick = pickB;
+                                }
+                            
+                            if( getRandom( 2 ) ) {
+                                
+                                // raise other bid and lower C's bribe 
+                                // (total money spent the same)
+                                m.moveChars[ otherPick * 3 + 1 ] ++;
+                                m.moveChars[ pickC * 3 + 2 ] --;
+                                }
+                            else {
+                                // lower other and raise C's bribe 
+                                // (total money spent the same)
+                                m.moveChars[ otherPick * 3 + 1 ] --;
+                                m.moveChars[ pickC * 3 + 2 ] ++;
+                                }
+                            }
+                        
+                        }
+                        break;
+   
+                    }
+                        
 
 
                 }

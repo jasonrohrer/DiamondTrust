@@ -89,6 +89,11 @@ static void printSortedMoves() {
         for( int c=0; c<moves[indexToPrint].numCharsUsed; c++ ) {
             printOut( "%d, ", (int)(char)moves[indexToPrint].moveChars[c] );
             }
+
+        if( moves[ indexToPrint ].flag ) {
+            printOut( " (MUT)" );
+            }
+                    
         printOut( "\n" );
         }
     
@@ -101,6 +106,17 @@ static void printSortedMoves() {
 
 
 char stateChecked = true;
+
+
+char equal( possibleMove inA, possibleMove inB ) {
+    for( int c=0; c<inA.numCharsUsed; c++ ) {
+        if( inA.moveChars[c] != inB.moveChars[c] ) {
+            return false;
+            }
+        }
+
+    return true;
+    }
 
 
 
@@ -117,8 +133,24 @@ void clearNextMove() {
         numPossibleMovesFilled = numPossibleMoves;
         
         for( int m=0; m<numPossibleMovesFilled; m++ ) {
-            moves[m] = getPossibleMove( &currentState );
             
+            // pick a unique move
+            char collision = true;
+            
+            while( collision ) {
+                
+                moves[m] = getPossibleMove( &currentState );
+                
+            
+                // make sure this is not a collision with one already picked
+                collision = false;
+                
+                for( int mm=0; mm < m && !collision; mm++ ) {
+                    if( equal( moves[mm], moves[m] ) ) {
+                        collision = true;
+                        }
+                    }                    
+                }
             }    
         }
     else {
@@ -133,6 +165,8 @@ void clearNextMove() {
     for( int m=0; m<numPossibleMovesFilled; m++ ) {
         moveScores[m] = 0;
         moveSimulations[m] = 0;
+        moves[m].flag = 0;
+            
         /*
               if( currentState.nextMove == salaryBribe ) {
               printOut( "Possible SB move: " );
@@ -538,10 +572,16 @@ void stepAI() {
                               moveSimulations[ chosenMove ] );
                     //printSortedMoves();
                     sortMovesByScore();
-                    printOut( "High score so far = %d\n",
-                              moveScores[ 
-                                  moveSortMap[ numPossibleMovesFilled - 1 ] ]
-                              );
+
+                    int bestMoveIndex = 
+                        moveSortMap[ numPossibleMovesFilled - 1 ];
+                    
+                    printOut( "High score so far = %d", 
+                              moveScores[ bestMoveIndex ] );
+                    if( moves[ bestMoveIndex ].flag ) {
+                        printOut( " (MUT)" );
+                        }
+                    printOut( "\n" );
                     
                     
                     if( numPossibleMovesFilled == numPossibleMoves ) {
@@ -550,9 +590,68 @@ void stepAI() {
                             "Replacing bottom half of moves with fresh\n" );
                     
                         for( int i=0; i<numPossibleMovesFilled/2; i++ ) {
-                            moves[ moveSortMap[i] ] =
-                                getPossibleMove( &currentState );
+                            
+                            // pick a unique move (not same as already
+                            // picked or as remainder of top half)
+
+                            char collision = true;
+                            
+                            while( collision ) {
+                                
+                                if( getRandom( 2 ) ) {
+                                    // fresh move
+                                    moves[ moveSortMap[i] ] =
+                                        getPossibleMove( &currentState );
+                                    moves[ moveSortMap[i] ].flag = 0;
+                                    }
+                                else {
+                                    /*
+                                    // mutation of one of the top 1/4 moves
+                                    
+                                    int moveToMutate = 
+                                    getRandom( numPossibleMovesFilled / 4 )
+                                    + (3 * numPossibleMovesFilled) / 4;
+                                    */
+                                    // mutate one of top 5
+                                    int moveToMutate = 
+                                        ( numPossibleMovesFilled - 1 )
+                                        - getRandom( 5 );
+
+                                    moves[ moveSortMap[i] ] =
+                                        mutateMove( &currentState, 
+                                                    moves[ moveToMutate ] );
+                                    moves[ moveSortMap[i] ].flag = 1;
+                                    }
+
+                                // make sure this is not a collision with one 
+                                // already picked
+                                collision = false;
+                
+                                for( int ii=0; ii < i && !collision; ii++ ) {
+                                    if( equal( moves[ moveSortMap[ii] ], 
+                                               moves[ moveSortMap[i] ] ) ) {
+                                        collision = true;
+                                        }
+                                    } 
+                                
+                                if( !collision ) {
+                                    // make sure no collision with top 1/2
+                                    // moves
+                                    
+                                    for( int ii=numPossibleMovesFilled/2; 
+                                         ii < numPossibleMovesFilled && 
+                                             !collision; ii++ ) {
+
+                                        if( equal( moves[ moveSortMap[ii] ],
+                                              moves[ moveSortMap[i] ] ) ) {
+                                            collision = true;
+                                            }
+                                        } 
+                                    }
+                                }                            
+                            
                             }
+                        
                         // reset all scores
                         for( int i=0; i<numPossibleMovesFilled; i++ ) {
                             moveScores[i] = 0;
