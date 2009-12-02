@@ -94,8 +94,8 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
                             raisablePick = getRandom( 6 );
                             }
                         
-                        // raisable it by 1
-                        m.moveChars[raisablePick * 2] --;
+                        // raise it by 1
+                        m.moveChars[raisablePick * 2] ++;
                         }
                     }
                 }
@@ -158,8 +158,15 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
 
                     case 1: {
                         if( countBids > 1 ) {
-                            // raise A and lower B (total money spent the same)
-                            m.moveChars[ pickA * 3 + 1 ] ++;
+                            // lower B and potentially raise A
+                            // (total money spent the same or less)
+
+                            // only raise half the time (can't raise A w/o
+                            // lowering B)
+                            if( getRandom( 2 ) ) {
+                                m.moveChars[ pickA * 3 + 1 ] ++;
+                                }
+                            
                             m.moveChars[ pickB * 3 + 1 ] --;
                             }
                         }
@@ -215,7 +222,8 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
                         break;
                      
                     case 3: {
-                        
+                        // modify an inspector bribe
+
                         if( pickC > 1 && countBids > 1 ) {
                         
                             int otherPick = pickA;
@@ -226,8 +234,13 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
                             if( getRandom( 2 ) ) {
                                 
                                 // raise other bid and lower C's bribe 
-                                // (total money spent the same)
-                                m.moveChars[ otherPick * 3 + 1 ] ++;
+                                // (total money spent the same or less)
+
+                                // only raise half the time (can't raise w/o
+                                // lowering c's bribe)
+                                if( getRandom( 2 ) ) {
+                                    m.moveChars[ otherPick * 3 + 1 ] ++;
+                                    }
                                 m.moveChars[ pickC * 3 + 2 ] --;
                                 }
                             else {
