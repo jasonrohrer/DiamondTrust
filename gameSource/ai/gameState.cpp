@@ -431,7 +431,18 @@ possibleMove getPossibleMove( gameState *inState ) {
 
 
 
-        case moveUnits:
+        case moveUnits: {
+            
+            // FIXME:  dummy move for now
+            m.numCharsUsed = 9;
+            for( int i=0; i<9; i++ ) {
+                
+                m.moveChars[i] = 0;
+                }
+            }
+            break;
+            
+
         case moveUnitsCommit: {
             // 3 chars per player unit
             // dest, bid, bribe

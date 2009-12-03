@@ -19,26 +19,49 @@ static char moveDone;
 
 
 // scores for all possible moves at the current step
-#define numPossibleMoves 64 //256
+#define possibleMoveSpace 256
+int numPossibleMoves = 32;
 int numPossibleMovesFilled = numPossibleMoves;
-int moveScores[ numPossibleMoves ];
-int moveSimulations[ numPossibleMoves ];
+int moveScores[ possibleMoveSpace ];
+int moveSimulations[ possibleMoveSpace ];
 
 int nextMoveToTest = 0;
 
-possibleMove moves[ numPossibleMoves ];
+possibleMove moves[ possibleMoveSpace ];
 
-int moveSortMap[ numPossibleMoves ];
+int moveSortMap[ possibleMoveSpace ];
 
 
 
 //int maxNumSimulationsPerMove = 3720;//600;
-int maxNumSimulationsPerMove = 1200;//1200;//600;
+int maxNumSimulationsPerMove = 300;//1200;//600;
 
-int batchSizeBeforeReplaceWorstMoves = 40;
+int batchSizeBeforeReplaceWorstMoves = 10;
 int finalBatchSize = 200;
 
 int maxSimulationsPerStepAI = 100;
+
+
+
+char testingAI = true;
+
+
+int currentTestingRound = 0;
+#define numTestingRounds 5
+int testingRoundBatchSizes[ numTestingRounds ] = { 10, 20, 40, 80, 160 };
+
+int numRunsPerTestingRound = 20;
+
+int runBestScoreSums[ numTestingRounds ] = { 0, 0, 0, 0, 0 };
+int runsSoFarPerRound[ numTestingRounds ] = { 0, 0, 0, 0, 0 };
+
+int maxTestingPossibleMoves = 256;
+int maxTestingSimulationsPerMove = 2400;
+
+#include <stdio.h>
+#include <stdlib.h>
+
+FILE *testDataFile;
 
 
 
@@ -305,6 +328,10 @@ static void checkCurrentStateMatches() {
 
 
 void initAI() {
+    if( testingAI ) {
+        testDataFile = fopen( "aiTest.out", "w" );
+        }
+    
     currentState.monthsLeft = 1;
     currentState.nextMove = salaryBribe;
 
@@ -532,7 +559,100 @@ void stepAI() {
             if( moveSimulations[ chosenMove ] + 1 > 
                 maxNumSimulationsPerMove ) {
                 
-                moveDone = true;
+                if( ! ( testingAI && 
+                        currentState.nextMove == moveUnitsCommit ) ) {
+                    
+                    moveDone = true;
+                    }
+                else {
+                    /*
+                      
+                    int currentTestingRound = 0;
+                    #define numTestingRounds 5
+                    int testingRoundBatchSizes[ numTestingRounds ] = { 10, 20, 40, 80, 160 };
+                    
+                    int numRunsPerTestingRound = 10;
+                    
+                    int runBestScoreSums[ numTestingRounds ] = { 0, 0, 0, 0, 0 };
+                     */
+                    sortMovesByScore();
+                    
+                    runsSoFarPerRound[ currentTestingRound ] ++;
+                    
+                    runBestScoreSums[ currentTestingRound ] +=
+                        moveScores[ 
+                            moveSortMap[ numPossibleMovesFilled - 1 ] ];
+                    
+                    if( runsSoFarPerRound[ currentTestingRound ] >=
+                        numRunsPerTestingRound ) {
+                        
+                        currentTestingRound ++;
+                        
+                        if( currentTestingRound >= numTestingRounds ) {
+                            
+                            // totally done
+                            fprintf( testDataFile, 
+                                     "\n\n***** Test results for %d, %d:\n",
+                                     numPossibleMoves,
+                                     maxNumSimulationsPerMove );
+                            
+                            for( int r=0; r<numTestingRounds; r++ ) {
+                                fprintf( testDataFile,
+                                         "Batch size %d, ave score %d\n",
+                                         testingRoundBatchSizes[r],
+                                         runBestScoreSums[r] / 
+                                         numRunsPerTestingRound );
+
+                                // clear so we can use these again
+                                // for other values
+                                runBestScoreSums[r] = 0;
+                                runsSoFarPerRound[r] = 0;
+                                }
+                            
+                            
+
+                            //int maxTestingPossibleMoves = 256;
+                            //int maxTestingSimulationsPerMove = 1200;
+                            
+                            
+                            // start over with more simulations per move
+                            currentTestingRound = 0;
+
+                            maxNumSimulationsPerMove *= 2;
+
+                            if( maxNumSimulationsPerMove > 
+                                maxTestingSimulationsPerMove ) {
+                                
+                                // start over with more possible moves
+                                maxNumSimulationsPerMove = 300;
+                                
+                                numPossibleMoves *= 2;
+                                
+                                if( numPossibleMoves > 
+                                    maxTestingPossibleMoves ) {
+                                    
+                                    // really done!
+                                    
+                                    fclose( testDataFile );
+                                    exit( 0 );
+                                    }
+                                
+                                }
+                            }
+                        
+                        batchSizeBeforeReplaceWorstMoves =
+                            testingRoundBatchSizes[ currentTestingRound ];
+                        printOut( "***** Testing batch size %d\n",
+                                  batchSizeBeforeReplaceWorstMoves );
+                        
+                        }
+                    
+                    if( !moveDone ) {
+                        // start over for another run
+                        clearNextMove();
+                        }                    
+                    }
+                
                 }
             else {
 
