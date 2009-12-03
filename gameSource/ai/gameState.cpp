@@ -48,7 +48,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
         
 
     // perform a random number of mutations
-    int numMutations = 1;//getRandom( 20 ) + 1;
+    int numMutations = getRandom( 5 ) + 1;//1;//getRandom( 20 ) + 1;
     
     for( int i=0; i<numMutations; i++ ) {
         
@@ -297,6 +297,16 @@ possibleMove getPossibleMove( gameState *inState ) {
             // 2 chars per unit (salary or bribe, plus bribing unit)
             m.numCharsUsed = 12;
             
+
+            // FIXME:  for testing, return blank move
+            for( int u=0; u<6; u++ ) {
+                m.moveChars[ u* 2] = 0;
+                m.moveChars[ u* 2 + 1] = (unsigned char)-1;
+                }
+            return m;
+            
+
+
 
             // pick a random spending cap
             // (otherwise, all the random choices almost always add

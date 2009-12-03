@@ -19,7 +19,7 @@ static char moveDone;
 
 
 // scores for all possible moves at the current step
-#define numPossibleMoves 32 //256
+#define numPossibleMoves 64 //256
 int numPossibleMovesFilled = numPossibleMoves;
 int moveScores[ numPossibleMoves ];
 int moveSimulations[ numPossibleMoves ];
@@ -33,9 +33,9 @@ int moveSortMap[ numPossibleMoves ];
 
 
 //int maxNumSimulationsPerMove = 3720;//600;
-int maxNumSimulationsPerMove = 600;
+int maxNumSimulationsPerMove = 1200;//1200;//600;
 
-int batchSizeBeforeReplaceWorstMoves = 20;
+int batchSizeBeforeReplaceWorstMoves = 40;
 int finalBatchSize = 200;
 
 int maxSimulationsPerStepAI = 100;
@@ -638,10 +638,12 @@ void stepAI() {
                                     int moveToMutate = 
                                         ( numPossibleMovesFilled - 1 )
                                         - getRandom( 5 );
-
+                                    
+                                    int ii = moveSortMap[ moveToMutate ];
+                                    
                                     moves[ moveSortMap[i] ] =
                                         mutateMove( &currentState, 
-                                                    moves[ moveToMutate ] );
+                                                    moves[ ii ] );
                                     moves[ moveSortMap[i] ].flag = 1;
                                     }
 
