@@ -1,0 +1,12 @@
+##Sketch 1 2
+document()
+layout('A4',0)
+layer('Layer 1',1,1,0,0,(0,0,0))
+fp((0,0,0))
+le()
+lw(1)
+Fn('Oxford-Roman')
+Fs(48)
+txt('DIAMOND',(243.77,479.122))
+guidelayer('Guide Lines',1,0,0,1,(0,0,1))
+grid((0,0,20,20),0,(0,0,1),'Grid')
