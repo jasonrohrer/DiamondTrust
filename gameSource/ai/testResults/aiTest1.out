@@ -1,0 +1,128 @@
+
+
+***** Test results for 32, 300:
+Batch size 10, ave score 939
+Batch size 20, ave score 978
+Batch size 40, ave score 920
+Batch size 80, ave score 919
+Batch size 160, ave score 1153
+
+
+***** Test results for 32, 600:
+Batch size 10, ave score 1061
+Batch size 20, ave score 1050
+Batch size 40, ave score 1090
+Batch size 80, ave score 1233
+Batch size 160, ave score 1208
+
+
+***** Test results for 32, 1200:
+Batch size 10, ave score 1069
+Batch size 20, ave score 1100
+Batch size 40, ave score 1130
+Batch size 80, ave score 1132
+Batch size 160, ave score 1092
+
+
+***** Test results for 32, 2400:
+Batch size 10, ave score 1097
+Batch size 20, ave score 1149
+Batch size 40, ave score 1218
+Batch size 80, ave score 1124
+Batch size 160, ave score 1487
+
+
+***** Test results for 64, 300:
+Batch size 10, ave score 1005
+Batch size 20, ave score 1016
+Batch size 40, ave score 964
+Batch size 80, ave score 971
+Batch size 160, ave score 1245
+
+
+***** Test results for 64, 600:
+Batch size 10, ave score 1086
+Batch size 20, ave score 1102
+Batch size 40, ave score 1173
+Batch size 80, ave score 1289
+Batch size 160, ave score 1247
+
+
+***** Test results for 64, 1200:
+Batch size 10, ave score 1110
+Batch size 20, ave score 1139
+Batch size 40, ave score 1196
+Batch size 80, ave score 1128
+Batch size 160, ave score 1125
+
+
+***** Test results for 64, 2400:
+Batch size 10, ave score 1111
+Batch size 20, ave score 1160
+Batch size 40, ave score 1235
+Batch size 80, ave score 1208
+Batch size 160, ave score 1535
+
+
+***** Test results for 128, 300:
+Batch size 10, ave score 1031
+Batch size 20, ave score 1055
+Batch size 40, ave score 1057
+Batch size 80, ave score 1005
+Batch size 160, ave score 1247
+
+
+***** Test results for 128, 600:
+Batch size 10, ave score 1112
+Batch size 20, ave score 1148
+Batch size 40, ave score 1201
+Batch size 80, ave score 1341
+Batch size 160, ave score 1311
+
+
+***** Test results for 128, 1200:
+Batch size 10, ave score 1119
+Batch size 20, ave score 1158
+Batch size 40, ave score 1247
+Batch size 80, ave score 1236
+Batch size 160, ave score 1188
+
+
+***** Test results for 128, 2400:
+Batch size 10, ave score 1118
+Batch size 20, ave score 1172
+Batch size 40, ave score 1270
+Batch size 80, ave score 1258
+Batch size 160, ave score 1625
+
+
+***** Test results for 256, 300:
+Batch size 10, ave score 1103
+Batch size 20, ave score 1126
+Batch size 40, ave score 1103
+Batch size 80, ave score 1077
+Batch size 160, ave score 1370
+
+
+***** Test results for 256, 600:
+Batch size 10, ave score 1120
+Batch size 20, ave score 1156
+Batch size 40, ave score 1253
+Batch size 80, ave score 1396
+Batch size 160, ave score 1373
+
+
+***** Test results for 256, 1200:
+Batch size 10, ave score 1118
+Batch size 20, ave score 1180
+Batch size 40, ave score 1273
+Batch size 80, ave score 1256
+Batch size 160, ave score 1217
+
+
+***** Test results for 256, 2400:
+Batch size 10, ave score 1124
+Batch size 20, ave score 1177
+Batch size 40, ave score 1279
+Batch size 80, ave score 1270
+Batch size 160, ave score 1677
