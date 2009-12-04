@@ -1,3 +1,7 @@
+Top 5 moves potentially mutated.  Bottom half of moves discared, refilled
+with 50% mutations of top 5, 50% random moves.
+Between 1 and 5 mutations applied
+
 
 
 ***** Test results for 32, 300:
