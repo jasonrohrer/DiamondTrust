@@ -298,14 +298,15 @@ possibleMove getPossibleMove( gameState *inState ) {
             // 2 chars per unit (salary or bribe, plus bribing unit)
             m.numCharsUsed = 12;
             
-
-            // FIXME:  for testing, return blank move
+            
+            /*
+            // for testing, return blank move
             for( int u=0; u<6; u++ ) {
                 m.moveChars[ u* 2] = 0;
                 m.moveChars[ u* 2 + 1] = (unsigned char)-1;
                 }
             return m;
-            
+            */
 
 
 
@@ -1151,6 +1152,7 @@ gameState getMirrorState( gameState *inState ) {
     }
 
 
+
 static int getBribedCount( gameState *inState, int inPlayer ) {
     int count = 0;
     
@@ -1271,9 +1273,10 @@ int playRandomGameUntilEnd( gameState inState ) {
     int moneyValueFactor = 6;
     
     
+    int bribeCountFactor = 200;
+    
 
     // only diamonds matter toward victory at game end (unless there is a tie)
-
     if( !gameOver ) {
         // money can be used to purchase more diamonds in future rounds,
         // so it has some value
@@ -1282,6 +1285,14 @@ int playRandomGameUntilEnd( gameState inState ) {
         enemyTotal += inState.enemyMoney.t / moneyValueFactor;
         }
     
+    // bribed status also doesn't matter at game end... BUT
+    // our bribe counts measure up until final state (which may be game end)
+    // there's a benefit to bribing during those final moves
+
+    ourTotal += enemyBribedCount * bribeCountFactor;
+    enemyTotal += enemyBribedCount * bribeCountFactor;
+    
+
 
     int diff = ourTotal - enemyTotal;
     
