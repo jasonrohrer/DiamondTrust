@@ -24,6 +24,7 @@ int numPossibleMoves = 32;
 int numPossibleMovesFilled = numPossibleMoves;
 int moveScores[ possibleMoveSpace ];
 int moveSimulations[ possibleMoveSpace ];
+int moveSimulationsInScoreBatch[ possibleMoveSpace ];
 
 int nextMoveToTest = 0;
 
@@ -47,16 +48,17 @@ char testingAI = true;
 
 
 int currentTestingRound = 0;
-#define numTestingRounds 5
-int testingRoundBatchSizes[ numTestingRounds ] = { 10, 20, 40, 80, 160 };
+#define numTestingRoundsSpace 5
+int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 10, 20, 40, 80, 160 };
 
-int numRunsPerTestingRound = 20;
+int numRunsPerTestingRound = 2;
 
-int runBestScoreSums[ numTestingRounds ] = { 0, 0, 0, 0, 0 };
-int runsSoFarPerRound[ numTestingRounds ] = { 0, 0, 0, 0, 0 };
+float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
+int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
-int maxTestingPossibleMoves = 256;
-int maxTestingSimulationsPerMove = 2400;
+int numTestingRounds = 3;
+int maxTestingPossibleMoves = 64;
+int maxTestingSimulationsPerMove = 600;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -210,6 +212,7 @@ void clearNextMove() {
     for( int m=0; m<numPossibleMovesFilled; m++ ) {
         moveScores[m] = 0;
         moveSimulations[m] = 0;
+        moveSimulationsInScoreBatch[m] = 0;
         moves[m].flag = 0;
             
         /*
@@ -579,9 +582,12 @@ void stepAI() {
                     
                     runsSoFarPerRound[ currentTestingRound ] ++;
                     
+                    int bestMoveIndex = 
+                        moveSortMap[ numPossibleMovesFilled - 1 ];
+
                     runBestScoreSums[ currentTestingRound ] +=
-                        moveScores[ 
-                            moveSortMap[ numPossibleMovesFilled - 1 ] ];
+                        moveScores[ bestMoveIndex ] / 
+                        (float)moveSimulationsInScoreBatch[ bestMoveIndex ];
                     
                     if( runsSoFarPerRound[ currentTestingRound ] >=
                         numRunsPerTestingRound ) {
@@ -598,7 +604,7 @@ void stepAI() {
                             
                             for( int r=0; r<numTestingRounds; r++ ) {
                                 fprintf( testDataFile,
-                                         "Batch size %d, ave score %d\n",
+                                         "Batch size %d, ave score %f\n",
                                          testingRoundBatchSizes[r],
                                          runBestScoreSums[r] / 
                                          numRunsPerTestingRound );
@@ -608,7 +614,7 @@ void stepAI() {
                                 runBestScoreSums[r] = 0;
                                 runsSoFarPerRound[r] = 0;
                                 }
-                            
+                            fflush( testDataFile );
                             
 
                             //int maxTestingPossibleMoves = 256;
@@ -688,6 +694,7 @@ void stepAI() {
                 moveScores[ chosenMove ] += result;
                 */
                 moveSimulations[ chosenMove ] ++;
+                moveSimulationsInScoreBatch[ chosenMove ] ++;
         
                 nextMoveToTest ++;
                 nextMoveToTest %= numPossibleMovesFilled;
@@ -718,8 +725,10 @@ void stepAI() {
                     int bestMoveIndex = 
                         moveSortMap[ numPossibleMovesFilled - 1 ];
                     
-                    printOut( "High score so far = %d", 
-                              moveScores[ bestMoveIndex ] );
+                    printOut( "High score (per sim, avg) so far = %f", 
+                              moveScores[ bestMoveIndex ] / 
+                       (float)moveSimulationsInScoreBatch[ bestMoveIndex ] );
+                    
                     if( moves[ bestMoveIndex ].flag ) {
                         printOut( " (MUT)" );
                         }
@@ -796,9 +805,10 @@ void stepAI() {
                             
                             }
                         
-                        // reset all scores
+                        // reset all scores and batch counts
                         for( int i=0; i<numPossibleMovesFilled; i++ ) {
                             moveScores[i] = 0;
+                            moveSimulationsInScoreBatch[i] = 0;
                             }
                         }
                     
