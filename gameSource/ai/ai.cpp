@@ -40,7 +40,10 @@ int maxNumSimulationsPerMove = 300;//1200;//600;
 int batchSizeBeforeReplaceWorstMoves = 10;
 int finalBatchSize = 200;
 
-int maxSimulationsPerStepAI = 100;
+//int maxSimulationsPerStepAI = 100;
+
+// FIXME:  for testing
+int maxSimulationsPerStepAI = 1000;
 
 
 
@@ -51,14 +54,14 @@ int currentTestingRound = 0;
 #define numTestingRoundsSpace 5
 int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 10, 20, 40, 80, 160 };
 
-int numRunsPerTestingRound = 2;
+int numRunsPerTestingRound = 10;
 
 float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
-int numTestingRounds = 3;
-int maxTestingPossibleMoves = 64;
-int maxTestingSimulationsPerMove = 600;
+int numTestingRounds = 5;
+int maxTestingPossibleMoves = 256;
+int maxTestingSimulationsPerMove = 2400;
 
 #include <stdio.h>
 #include <stdlib.h>
