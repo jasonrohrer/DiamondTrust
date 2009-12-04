@@ -180,7 +180,8 @@ typedef struct possibleMove {
 possibleMove getPossibleMove( gameState *inState );
 
 
-possibleMove mutateMove( gameState *inState, possibleMove inMove );
+possibleMove mutateMove( gameState *inState, possibleMove inMove,
+                         int inMaxMutations );
 
 
 

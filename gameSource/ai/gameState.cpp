@@ -38,7 +38,8 @@ static void checkStateValid( gameState inState ) {
 
 
 
-possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
+possibleMove mutateMove( gameState *inState, possibleMove inMove,
+                         int inMaxMutations ) {
     possibleMove m;
 
     m.numCharsUsed = inMove.numCharsUsed;
@@ -48,7 +49,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove ) {
         
 
     // perform a random number of mutations
-    int numMutations = getRandom( 5 ) + 1;//1;//getRandom( 20 ) + 1;
+    int numMutations = getRandom( inMaxMutations ) + 1;
     
     for( int i=0; i<numMutations; i++ ) {
         

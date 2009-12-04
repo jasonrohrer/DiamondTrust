@@ -37,7 +37,28 @@ int moveSortMap[ possibleMoveSpace ];
 //int maxNumSimulationsPerMove = 3720;//600;
 int maxNumSimulationsPerMove = 300;//1200;//600;
 
-int batchSizeBeforeReplaceWorstMoves = 10;
+// testing has showed 7 to be the best here
+int batchSizeBeforeReplaceWorstMoves = 7;
+
+// testing showed 7 to be the best here
+int mutationPoolSize = 7;
+
+// out of 10
+// thus a value of 5 means that 50% of fresh replacement moves are mutations
+// testing showed 5 was fine
+int mutationVsRandomMixRatio = 5;
+
+// 1 was found to be the best through testing
+int maxMutationsPerMove = 1;
+
+// out of 10
+// 7 means lower 70% are discarded
+
+// testing showed 5 (50%) was fine
+int fractionOfMovesDiscarded = 5;
+
+
+
 int finalBatchSize = 200;
 
 //int maxSimulationsPerStepAI = 100;
@@ -47,21 +68,32 @@ int maxSimulationsPerStepAI = 1000;
 
 
 
-char testingAI = true;
+
+
+
+char testingAI = false;
 
 
 int currentTestingRound = 0;
 #define numTestingRoundsSpace 5
-int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 10, 20, 40, 80, 160 };
+// 40 was always worse than 20
+//int testingRoundBatchSizes[ numTestingRoundsSpace ] ={ 10, 20, 40, 80, 160 };
+// 20 was almost always worse than 15, and 25 never worth it
+//int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 5, 10, 15, 20, 25 };
+// 7 seems to win most times
+//int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 3, 5, 7, 10, 13 };
 
-int numRunsPerTestingRound = 10;
+// maxMutationsPerMove
+int testingRoundParameter[ numTestingRoundsSpace ] = { 1, 2, 3, 10, 10 };
+
+int numRunsPerTestingRound = 40;
 
 float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
-int numTestingRounds = 5;
-int maxTestingPossibleMoves = 256;
-int maxTestingSimulationsPerMove = 2400;
+int numTestingRounds = 3;
+int maxTestingPossibleMoves = 64;
+int maxTestingSimulationsPerMove = 600;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -607,8 +639,8 @@ void stepAI() {
                             
                             for( int r=0; r<numTestingRounds; r++ ) {
                                 fprintf( testDataFile,
-                                         "Batch size %d, ave score %f\n",
-                                         testingRoundBatchSizes[r],
+                                         "Parameter %d, ave score %f\n",
+                                         testingRoundParameter[r],
                                          runBestScoreSums[r] / 
                                          numRunsPerTestingRound );
 
@@ -649,10 +681,20 @@ void stepAI() {
                                 }
                             }
                         
-                        batchSizeBeforeReplaceWorstMoves =
-                            testingRoundBatchSizes[ currentTestingRound ];
-                        printOut( "***** Testing batch size %d\n",
-                                  batchSizeBeforeReplaceWorstMoves );
+                        
+                        //batchSizeBeforeReplaceWorstMoves =
+                        //    testingRoundBatchSizes[ currentTestingRound ];
+                        //mutationPoolSize = 
+                        //    testingRoundParameter[ currentTestingRound ];
+                        //mutationVsRandomMixRatio = 
+                        //    testingRoundParameter[ currentTestingRound ];
+                        //fractionOfMovesDiscarded =
+                        //    testingRoundParameter[ currentTestingRound ];
+                        maxMutationsPerMove =
+                            testingRoundParameter[ currentTestingRound ];
+
+                        printOut( "***** Testing parameter %d\n",
+                               testingRoundParameter[ currentTestingRound ] );
                         
                         }
                     
@@ -720,14 +762,15 @@ void stepAI() {
                 
                     
 
-                    printOut( "\n\n**** Intermediary %d-sim point: ",
-                              moveSimulations[ chosenMove ] );
+                    //printOut( "\n\n**** Intermediary %d-sim point: ",
+                    //          moveSimulations[ chosenMove ] );
+                    
                     //printSortedMoves();
                     sortMovesByScore();
 
                     int bestMoveIndex = 
                         moveSortMap[ numPossibleMovesFilled - 1 ];
-                    
+                    /*
                     printOut( "High score (per sim, avg) so far = %f", 
                               moveScores[ bestMoveIndex ] / 
                        (float)moveSimulationsInScoreBatch[ bestMoveIndex ] );
@@ -736,14 +779,19 @@ void stepAI() {
                         printOut( " (MUT)" );
                         }
                     printOut( "\n" );
-                    
+                    */
                     
                     if( numPossibleMovesFilled == numPossibleMoves ) {
                         
-                        printOut( 
-                            "Replacing bottom half of moves with fresh\n" );
+                        //printOut( 
+                        //    "Replacing bottom half of moves with fresh\n" );
                     
-                        for( int i=0; i<numPossibleMovesFilled/2; i++ ) {
+                        int numToReplace =
+                            ( fractionOfMovesDiscarded * 
+                              numPossibleMovesFilled ) / 10;
+
+
+                        for( int i=0; i<numToReplace; i++ ) {
                             
                             // pick a unique move (not same as already
                             // picked or as remainder of top half)
@@ -752,7 +800,8 @@ void stepAI() {
                             
                             while( collision ) {
                                 
-                                if( getRandom( 2 ) ) {
+                                if( (int)getRandom( 11 ) > 
+                                    mutationVsRandomMixRatio ) {
                                     // fresh move
                                     moves[ moveSortMap[i] ] =
                                         getPossibleMove( &currentState );
@@ -766,16 +815,17 @@ void stepAI() {
                                     getRandom( numPossibleMovesFilled / 4 )
                                     + (3 * numPossibleMovesFilled) / 4;
                                     */
-                                    // mutate one of top 5
+                                    // mutate one of top N
                                     int moveToMutate = 
                                         ( numPossibleMovesFilled - 1 )
-                                        - getRandom( 5 );
+                                        - getRandom( mutationPoolSize );
                                     
                                     int ii = moveSortMap[ moveToMutate ];
                                     
                                     moves[ moveSortMap[i] ] =
                                         mutateMove( &currentState, 
-                                                    moves[ ii ] );
+                                                    moves[ ii ],
+                                                    maxMutationsPerMove );
                                     moves[ moveSortMap[i] ].flag = 1;
                                     }
 
@@ -791,10 +841,10 @@ void stepAI() {
                                     } 
                                 
                                 if( !collision ) {
-                                    // make sure no collision with top 1/2
-                                    // moves
+                                    // make sure no collision with top, 
+                                    // retained moves
                                     
-                                    for( int ii=numPossibleMovesFilled/2; 
+                                    for( int ii=numToReplace; 
                                          ii < numPossibleMovesFilled && 
                                              !collision; ii++ ) {
 
