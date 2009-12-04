@@ -63,8 +63,9 @@ int finalBatchSize = 200;
 
 //int maxSimulationsPerStepAI = 100;
 
-// FIXME:  for testing
-int maxSimulationsPerStepAI = 1000;
+// for testing
+// int maxSimulationsPerStepAI = 1000;
+int maxSimulationsPerStepAI = 100;
 
 
 
@@ -370,7 +371,7 @@ void initAI() {
         testDataFile = fopen( "aiTest.out", "w" );
         }
     
-    currentState.monthsLeft = 1;
+    currentState.monthsLeft = 8;
     currentState.nextMove = salaryBribe;
 
     currentState.ourMoney = makeRange( 18 );

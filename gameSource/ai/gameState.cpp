@@ -1151,11 +1151,32 @@ gameState getMirrorState( gameState *inState ) {
     }
 
 
+static int getBribedCount( gameState *inState, int inPlayer ) {
+    int count = 0;
+    
+    for( int u=0; u<3; u++ ) {
+        if( inState->agentUnits[inPlayer][u].totalBribe.t >
+            inState->agentUnits[inPlayer][u].totalSalary.t ) {
+            count ++;
+            }            
+        }
+
+    return count;
+    }
+
+
+
 
 int playRandomGameUntilEnd( gameState inState ) {
     
     int originalMonthsLeft = inState.monthsLeft;
     NextMove originalNextMove = inState.nextMove;
+    
+
+    // number of units, per side, successfully bribed
+    // ticks up before each state transition if a unit is still bribed
+    int ourBribedCount = 0;
+    int enemyBribedCount = 0;
     
     
     // skip sell diamonds during last month and fly everyone home
@@ -1182,6 +1203,10 @@ int playRandomGameUntilEnd( gameState inState ) {
         
         // checkStateValid( inState );
         
+        ourBribedCount += getBribedCount( &inState, 0 );
+        enemyBribedCount += getBribedCount( &inState, 1 );
+        
+
         inState = 
             stateTransition( &inState,
                              ourMove.moveChars,
@@ -1192,37 +1217,69 @@ int playRandomGameUntilEnd( gameState inState ) {
         //checkStateValid( inState );
         }
     
-    // on sell diamonds state in month zero
-    // don't sell
-    // instead, "fly" everyone home to get diamond totals
+    // tally up everyone's diamond totals
     int ourTotal = inState.ourDiamonds;
     int enemyTotal = inState.enemyDiamonds;
     
+    int ourFieldTotal = 0;
+    int enemyFieldTotal = 0;
     for( int u=0; u<3; u++ ) {
-        ourTotal += inState.agentUnits[0][u].diamonds;
-        enemyTotal += inState.agentUnits[1][u].diamonds;
+        ourFieldTotal += inState.agentUnits[0][u].diamonds;
+        enemyFieldTotal += inState.agentUnits[1][u].diamonds;
         }
-
+    
 
     // did we play until end, or stop short?
     char gameOver = ( inState.monthsLeft == 0 && 
                       inState.nextMove == sellDiamonds );
     
+    int homeDiamondsValueFactor = 4;
 
-    // only diamonds matter toward victory (unless there is a tie)
+    if( !gameOver ) {
+        // diamonds in the field are worth less, since they're at risk
+
+        // they're worth full value at gameOver, though, because everyone
+        // flies home for free
+
+        ourTotal *= homeDiamondsValueFactor;
+        enemyTotal *= homeDiamondsValueFactor;
+        
+        // now add in field diamonds, which are worth only 1 each
+        ourTotal += ourFieldTotal;
+        enemyTotal += enemyFieldTotal;
+        }
+    else {
+        // add in field diamonds first, then apply factor to all
+        // (because all are being flown home at game end anyway)
+        ourTotal += ourFieldTotal;
+        enemyTotal += enemyFieldTotal;
+        
+        ourTotal *= homeDiamondsValueFactor;
+        enemyTotal *= homeDiamondsValueFactor;
+        }
+
+
+    // money unit worth (roughly) 1/4 of a diamond
+        
+    // according to design doc, each diamond is worth $3.2 to $5.6 
+    // (depending on the amount of money injected into the game).
+    // The midpoint is $4.4, which we can approximate as $4
+    
+    // but AI is still hoarding money by end
+    // tweak this so that AI spends more...
+    
+    int moneyValueFactor = 6;
+    
+    
+
+    // only diamonds matter toward victory at game end (unless there is a tie)
 
     if( !gameOver ) {
         // money can be used to purchase more diamonds in future rounds,
         // so it has some value
 
-        // money unit worth (roughly) 1/4 of a diamond
-        
-        // according to design doc, each diamond is worth $3.2 to $5.6 
-        // (depending on the amount of money injected into the game).
-        // The midpoint is $4.4, which we can approximate as $4
-
-        ourTotal += inState.ourMoney.t / 4;
-        enemyTotal += inState.enemyMoney.t / 4;
+        ourTotal += inState.ourMoney.t / moneyValueFactor;
+        enemyTotal += inState.enemyMoney.t / moneyValueFactor;
         }
     
 
@@ -1234,11 +1291,11 @@ int playRandomGameUntilEnd( gameState inState ) {
         
         // winner is person with the most money
 
-        // keep the 1/4 conversion rate, because winning with diamonds
+        // keep the fractional conversion rate, because winning with diamonds
         // is much "safer" than tying and relying on your money balance
         // to put you over the top
         
-        diff = (inState.ourMoney.t - inState.enemyMoney.t) / 4;
+        diff = (inState.ourMoney.t - inState.enemyMoney.t) / moneyValueFactor;
         }
 
     return diff;
