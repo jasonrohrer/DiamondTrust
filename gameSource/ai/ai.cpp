@@ -108,7 +108,7 @@ static void sortMovesByScore() {
     
     char beenPicked[ numPossibleMovesFilled ];
 
-    int nextScoreToPick = -1000000;
+    int nextScoreToPick = -10000000;
 
     for( int i=0; i<numPossibleMovesFilled; i++ ) {
         beenPicked[i] = false;
@@ -116,7 +116,7 @@ static void sortMovesByScore() {
     for( int i=0; i<numPossibleMovesFilled; i++ ) {
         
         int indexToPick = -1;
-        int scoreToPick = 10000000;
+        int scoreToPick = 100000000;
         for( int m=0; m<numPossibleMovesFilled; m++ ) {
             if( ! beenPicked[ m ] && 
                 moveScores[m] >= nextScoreToPick && 
@@ -378,12 +378,18 @@ void initAI() {
     currentState.knownOurTotalMoneyReceived = 18;
     currentState.knownOurTotalMoneySpent = 0;
     currentState.ourDiamonds = 2;
+
+    currentState.ourDiamondsToSell = 0;
+    
     
     currentState.enemyMoney = makeRange( 18 );
     currentState.knownEnemyTotalMoneyReceived = 18;
     currentState.knownEnemyTotalMoneySpent = 0;
     currentState.enemyDiamonds = 2; 
     
+    currentState.enemyDiamondsToSell = 0;
+
+
     for( int p=0; p<2; p++ ) {
         for( int u=0; u<3; u++ ) {
             unit *thisUnit = &( currentState.agentUnits[p][u] );
@@ -395,7 +401,7 @@ void initAI() {
             thisUnit->totalBribe = zeroRange;
             thisUnit->diamonds = 0;
             thisUnit->region = p;
-            //thisUnit->destination = p;
+            thisUnit->destination = p;
             thisUnit->diamondBid = 0;
             thisUnit->inspectorBribe = 0;
             thisUnit->opponentBribingUnit = -1;
@@ -433,7 +439,7 @@ void freeAI() {
 static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
     
     // pick move with highest score
-    int highScore = -10000;
+    int highScore = -10000000;
     int chosenMove = -1;
     for( int m=0; m<numPossibleMovesFilled; m++ ) {
         if( moveScores[m] > highScore ) {
@@ -715,7 +721,8 @@ void stepAI() {
                 
                 // pick a possible co-move for opponent
                 gameState mirror = getMirrorState( &startState );
-                possibleMove enemyMove = getPossibleMove( &mirror );
+                possibleMove enemyMove = getPossibleMove( &mirror,
+                                                          true );
                 
                 gameState nextState = 
                     stateTransition( &startState,

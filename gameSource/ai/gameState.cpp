@@ -283,7 +283,361 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
 
 
 
-possibleMove getPossibleMove( gameState *inState ) {
+
+
+#define isUnitBribed( inState, inPlayer, inUnit ) \
+  inState->agentUnits[inPlayer][inUnit].totalBribe.t >   \
+  inState->agentUnits[inPlayer][inUnit].totalSalary.t
+
+
+
+// was peek avaiable in our last state?
+// if so, we can change our move
+// if not, we have to stick with the move that we picked in the last state
+char wasPeekAvailable( gameState *inState ) {
+
+    switch( inState->nextMove ) {
+        case moveUnitsCommit: {
+            
+            
+            for( int u=0; u<3; u++ ) {
+                // have we bribed an enemy unit?
+                if( isUnitBribed( inState, 1, u ) ) {
+                    
+                    return true;
+                    }
+
+                // is our unit bribed?
+                if( isUnitBribed( inState, 0, u ) ) {
+                    
+                    int bribingUnit = 
+                        inState->agentUnits[0][u].opponentBribingUnit;
+                    
+                    if( isUnitBribed( inState, 1, bribingUnit ) ) {
+                        // we've bribed our briber, so we know
+                        return true;
+                        }
+
+                    }
+                }
+
+            return false;
+            }
+            break;
+        case sellDiamondsCommit: {
+            
+            if( inState->ourDiamonds == 0 ) {
+                return false;
+                }
+            // do we have a bribed unit in the enemy home?
+            for( int u=0; u<3; u++ ) {
+                if( inState->agentUnits[1][u].region == 1 &&
+                    isUnitBribed( inState, 1, u ) ) {
+                    
+                    return true;
+                    }
+                }
+            // do we know that we have a bribed unit in our home?
+            for( int u=0; u<3; u++ ) {
+                if( inState->agentUnits[0][u].region == 0 &&
+                    isUnitBribed( inState, 0, u ) ) {
+                    
+                    // this a bribed unit in our home, but do we know it?
+
+                    int bribingUnit = 
+                        inState->agentUnits[0][u].opponentBribingUnit;
+                    
+                    if( isUnitBribed( inState, 1, bribingUnit ) ) {
+                        // we've bribed our briber, so we know
+                        return true;
+                        }
+                    }
+                }
+
+            return false;
+            }
+            break;
+        default:
+            printOut( 
+                "Error:  wasPeekAvailable called in a non-commit state\n" );
+            return false;
+        }        
+    }
+
+
+
+
+possibleMove getMoveUnitsMove( gameState *inState ) {
+    possibleMove m;
+    
+    // 3 chars per player unit
+    // dest, bid, bribe
+    m.numCharsUsed = 9;
+
+    int dest[3];
+    int bid[3];
+    int bribe[3];
+
+    int totalSpent = 0;
+            
+
+    // pick a random spending cap
+    // (otherwise, all the random choices almost always add
+    //  up to equal our total money---i.e., we spend everything
+    //  we have!)
+    int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
+
+
+    int u;
+    for( u=0; u<3; u++ ) {
+        // start with all dests to current unit regions
+        dest[u] = inState->agentUnits[0][u].region;
+        }
+            
+    // check for collisions to be safe
+    for( u=0; u<3; u++ ) {
+        if( dest[u] != 0 ) {
+            for( int o=0; o<3; o++ ) {
+                if( o != u ) {
+                    if( dest[o] == dest[u] ) {
+                        printOut( "Units collide in chosen move!\n" );
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+    for( u=0; u<3; u++ ) {
+                
+        char uniqueDestFound = false;
+                
+        // pick "home" half of the time for variety
+        if( getRandom( 10 ) < 5 ) {
+            dest[u] = 0;
+            uniqueDestFound = true;
+            }
+                
+
+        while( !uniqueDestFound ) {    
+            dest[u] = getRandom( 7 );
+            if( dest[u] > 0 ) {
+                // add 1 to make total range [0, 2..7]
+                dest[u]++;
+                }
+                    
+            if( dest == 0 ) {
+                // more than one unit can occupy home
+                uniqueDestFound = true;
+                }
+            else {
+                uniqueDestFound = true;
+                        
+                // make sure this isn't same as existing dest of
+                // another unit
+                for( int o=0; o<3; o++ ) {
+                    if( o != u ) {
+                        if( dest[o] == dest[u] ) {
+                            // collision
+                            uniqueDestFound = false;
+                            }
+                        }
+                    }
+                }                    
+            }
+                
+
+        bid[u] = 0;
+        if( dest[u] > 1 ) {
+            // can bid here
+            bid[u] = getRandom( maxTotalToSpend + 1 );
+            totalSpent += bid[u];
+            }
+
+        bribe[u] = 0;
+        if( dest[u] == inState->inspectorRegion ) {
+            bribe[u] = getRandom( maxTotalToSpend + 1 );
+
+            if( bid[u] > 0 && bribe[u] == 0 ) {
+                // illogical choice:
+                // we're bidding in inspector's region, but
+                // we're not bribing him to move him away, so
+                // our bid will be lost
+                        
+                // bribe at least 1
+                bribe[u] = 1;
+                }
+                    
+            totalSpent += bribe[u];
+            }
+
+        // cost of trip
+        if( dest[u] != inState->agentUnits[0][u].region ) {
+            totalSpent++;
+
+            if( dest[u] == 0 ||
+                inState->agentUnits[0][u].region == 0 ) {
+                // flying to/from home costs double
+                totalSpent++;
+                }
+            }
+        }
+            
+    // check for collisions to be safe
+    for( u=0; u<3; u++ ) {
+        if( dest[u] != 0 ) {
+            for( int o=0; o<3; o++ ) {
+                if( o != u ) {
+                    if( dest[o] == dest[u] ) {
+                        printOut( "Units collide in chosen move!\n" );
+                        }
+                    }
+                }
+            }
+        }
+
+            
+
+
+
+
+    while( totalSpent > maxTotalToSpend ) {
+        // spending too much
+                
+        // pick one to reduce
+        u = getRandom( 3 );
+                
+        // priority:  trip itself, bribe, bid
+        if( bid[u] > 0 ) {
+            bid[u] --;
+            totalSpent --;
+            }
+        else if( bribe[u] > 0 ) {
+            bribe[u] --;
+            totalSpent --;
+            }
+        else {
+            // cancel trip?
+            if( dest[u] != inState->agentUnits[0][u].region ) {
+                totalSpent --;
+                        
+                if( dest[u] == 0 || 
+                    inState->agentUnits[0][u].region == 0 ) {
+
+                    // flying to/from home costs double
+                    totalSpent --;
+                    }
+
+                // stay where it is
+                dest[u] = inState->agentUnits[0][u].region;
+                }
+            } 
+
+                
+        // check for collisions that have been created by
+        // this roll-back process
+
+        char collisionFound = true;
+        while( collisionFound ) {
+
+            collisionFound = false;
+                    
+            if( dest[u] != 0 ) {
+
+                for( int o=0; o<3 && !collisionFound; o++ ) {
+                    if( o != u ) {
+                        if( dest[o] == dest[u] ) {
+                            // collision
+                            collisionFound = true;
+                                    
+                            // u's dest already it's current region
+                                    
+                            // roll back o to current region
+                            totalSpent--;
+
+                            if( dest[o] == 0 || 
+                                inState->agentUnits[0][o].region 
+                                == 0 ) {
+                                        
+                                // flying to/from home costs double
+                                totalSpent --;
+                                }
+
+                            dest[o] = inState->agentUnits[0][o].region;
+                                    
+                                    
+                            // roll back bids and bribes, since
+                            // they no longer make sense w/o move
+                            totalSpent -= bid[o];
+                            totalSpent -= bribe[o];
+                            bid[o] = 0;
+                            bribe[o] = 0;
+                                    
+                            // let o be the new "u", the 
+                            // just-rolled-back unit
+                            u = o;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+    // check for collisions to be safe
+    for( u=0; u<3; u++ ) {
+        if( dest[u] != 0 ) {
+            for( int o=0; o<3; o++ ) {
+                if( o != u ) {
+                    if( dest[o] == dest[u] ) {
+                        printOut( "Units collide in chosen move!\n" );
+                        }
+                    }
+                }
+            }
+        }
+            
+            
+    // within budget limits now
+            
+    // pack into char string
+    int index = 0;
+    for( u=0; u<3; u++ ) {
+        m.moveChars[ index++ ] = (unsigned char)( dest[u] );
+        m.moveChars[ index++ ] = (unsigned char)( bid[u] );
+        m.moveChars[ index++ ] = (unsigned char)( bribe[u] );
+        }
+    
+
+    return m;
+    }
+
+
+
+
+possibleMove getSellDiamondsMove( gameState *inState ) {
+    possibleMove m;
+    
+    // 3 chars
+    // 0 = number sold
+    // 1 = image present in subsequent messages?
+    // 2 = number of 300-byte messages forthcoming to contain image
+    
+    // always skip sending image
+    m.numCharsUsed = 3;
+    m.moveChars[0] = 
+        (unsigned char)getRandom( inState->ourDiamonds + 1 );
+    m.moveChars[1] = 0;
+    m.moveChars[2] = 0;
+    
+    return m;
+    }
+
+
+
+
+possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
     // checkStateValid( inState );
     
 
@@ -433,258 +787,54 @@ possibleMove getPossibleMove( gameState *inState ) {
 
 
 
-        case moveUnits: {
+        case moveUnits:
+            m = getMoveUnitsMove( inState );
+            /*
+            {
             
-            // FIXME:  dummy move for now
+            // dummy move for testing
             m.numCharsUsed = 9;
             for( int i=0; i<9; i++ ) {
                 
                 m.moveChars[i] = 0;
                 }
             }
+            */
             break;
             
 
-        case moveUnitsCommit: {
-            // 3 chars per player unit
-            // dest, bid, bribe
-            m.numCharsUsed = 9;
 
-            int dest[3];
-            int bid[3];
-            int bribe[3];
-
-            int totalSpent = 0;
-            
-
-            // pick a random spending cap
-            // (otherwise, all the random choices almost always add
-            //  up to equal our total money---i.e., we spend everything
-            //  we have!)
-            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
-
-
-            int u;
-            for( u=0; u<3; u++ ) {
-                // start with all dests to current unit regions
-                dest[u] = inState->agentUnits[0][u].region;
+        case moveUnitsCommit:
+            if( inForceFreshPick || wasPeekAvailable( inState ) ) {
+                // generate a fresh move, because we could peek
+                m = getMoveUnitsMove( inState );
                 }
-            
-            // check for collisions to be safe
-            for( u=0; u<3; u++ ) {
-                if( dest[u] != 0 ) {
-                    for( int o=0; o<3; o++ ) {
-                        if( o != u ) {
-                            if( dest[o] == dest[u] ) {
-                                printOut( "Units collide in chosen move!\n" );
-                                }
-                            }
-                        }
-                    }
-                }
+            else {
+                // stick with the move saved in inState
 
-
-
-            for( u=0; u<3; u++ ) {
+                // 3 chars per player unit
+                // dest, bid, bribe
+                m.numCharsUsed = 9;
                 
-                char uniqueDestFound = false;
-                
-                // pick "home" half of the time for variety
-                if( getRandom( 10 ) < 5 ) {
-                    dest[u] = 0;
-                    uniqueDestFound = true;
+                int dest[3];
+                int bid[3];
+                int bribe[3];
+
+                int u;
+                for( u=0; u<3; u++ ) {
+                    dest[u] = inState->agentUnits[0][u].destination;
+                    bid[u] = inState->agentUnits[0][u].diamondBid;
+                    bribe[u] = inState->agentUnits[0][u].inspectorBribe;
                     }
                 
-
-                while( !uniqueDestFound ) {    
-                    dest[u] = getRandom( 7 );
-                    if( dest[u] > 0 ) {
-                        // add 1 to make total range [0, 2..7]
-                        dest[u]++;
-                        }
-                    
-                    if( dest == 0 ) {
-                        // more than one unit can occupy home
-                        uniqueDestFound = true;
-                        }
-                    else {
-                        uniqueDestFound = true;
-                        
-                        // make sure this isn't same as existing dest of
-                        // another unit
-                        for( int o=0; o<3; o++ ) {
-                            if( o != u ) {
-                                if( dest[o] == dest[u] ) {
-                                    // collision
-                                    uniqueDestFound = false;
-                                    }
-                                }
-                            }
-                        }                    
-                    }
-                
-
-                bid[u] = 0;
-                if( dest[u] > 1 ) {
-                    // can bid here
-                    bid[u] = getRandom( maxTotalToSpend + 1 );
-                    totalSpent += bid[u];
-                    }
-
-                bribe[u] = 0;
-                if( dest[u] == inState->inspectorRegion ) {
-                    bribe[u] = getRandom( maxTotalToSpend + 1 );
-
-                    if( bid[u] > 0 && bribe[u] == 0 ) {
-                        // illogical choice:
-                        // we're bidding in inspector's region, but
-                        // we're not bribing him to move him away, so
-                        // our bid will be lost
-                        
-                        // bribe at least 1
-                        bribe[u] = 1;
-                        }
-                    
-                    totalSpent += bribe[u];
-                    }
-
-                // cost of trip
-                if( dest[u] != inState->agentUnits[0][u].region ) {
-                    totalSpent++;
-
-                    if( dest[u] == 0 ||
-                        inState->agentUnits[0][u].region == 0 ) {
-                        // flying to/from home costs double
-                        totalSpent++;
-                        }
+                // pack into char string
+                int index = 0;
+                for( u=0; u<3; u++ ) {
+                    m.moveChars[ index++ ] = (unsigned char)( dest[u] );
+                    m.moveChars[ index++ ] = (unsigned char)( bid[u] );
+                    m.moveChars[ index++ ] = (unsigned char)( bribe[u] );
                     }
                 }
-            
-            // check for collisions to be safe
-            for( u=0; u<3; u++ ) {
-                if( dest[u] != 0 ) {
-                    for( int o=0; o<3; o++ ) {
-                        if( o != u ) {
-                            if( dest[o] == dest[u] ) {
-                                printOut( "Units collide in chosen move!\n" );
-                                }
-                            }
-                        }
-                    }
-                }
-
-            
-
-
-
-
-            while( totalSpent > maxTotalToSpend ) {
-                // spending too much
-                
-                // pick one to reduce
-                u = getRandom( 3 );
-                
-                // priority:  trip itself, bribe, bid
-                if( bid[u] > 0 ) {
-                    bid[u] --;
-                    totalSpent --;
-                    }
-                else if( bribe[u] > 0 ) {
-                    bribe[u] --;
-                    totalSpent --;
-                    }
-                else {
-                    // cancel trip?
-                    if( dest[u] != inState->agentUnits[0][u].region ) {
-                        totalSpent --;
-                        
-                        if( dest[u] == 0 || 
-                            inState->agentUnits[0][u].region == 0 ) {
-
-                            // flying to/from home costs double
-                            totalSpent --;
-                            }
-
-                        // stay where it is
-                        dest[u] = inState->agentUnits[0][u].region;
-                        }
-                    } 
-
-                
-                // check for collisions that have been created by
-                // this roll-back process
-
-                char collisionFound = true;
-                while( collisionFound ) {
-
-                    collisionFound = false;
-                    
-                    if( dest[u] != 0 ) {
-
-                        for( int o=0; o<3 && !collisionFound; o++ ) {
-                            if( o != u ) {
-                                if( dest[o] == dest[u] ) {
-                                    // collision
-                                    collisionFound = true;
-                                    
-                                    // u's dest already it's current region
-                                    
-                                    // roll back o to current region
-                                    totalSpent--;
-
-                                    if( dest[o] == 0 || 
-                                        inState->agentUnits[0][o].region 
-                                        == 0 ) {
-                                        
-                                        // flying to/from home costs double
-                                        totalSpent --;
-                                        }
-
-                                    dest[o] = inState->agentUnits[0][o].region;
-                                    
-                                    
-                                    // roll back bids and bribes, since
-                                    // they no longer make sense w/o move
-                                    totalSpent -= bid[o];
-                                    totalSpent -= bribe[o];
-                                    bid[o] = 0;
-                                    bribe[o] = 0;
-                                    
-                                    // let o be the new "u", the 
-                                    // just-rolled-back unit
-                                    u = o;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-            // check for collisions to be safe
-            for( u=0; u<3; u++ ) {
-                if( dest[u] != 0 ) {
-                    for( int o=0; o<3; o++ ) {
-                        if( o != u ) {
-                            if( dest[o] == dest[u] ) {
-                                printOut( "Units collide in chosen move!\n" );
-                                }
-                            }
-                        }
-                    }
-                }
-            
-            
-            // within budget limits now
-            
-            // pack into char string
-            int index = 0;
-            for( u=0; u<3; u++ ) {
-                m.moveChars[ index++ ] = (unsigned char)( dest[u] );
-                m.moveChars[ index++ ] = (unsigned char)( bid[u] );
-                m.moveChars[ index++ ] = (unsigned char)( bribe[u] );
-                }
-            }
             break;
 
 
@@ -764,18 +914,27 @@ possibleMove getPossibleMove( gameState *inState ) {
 
 
         case sellDiamonds:
+            m = getSellDiamondsMove( inState );
+            break;            
         case sellDiamondsCommit:
-            // 3 chars
-            // 0 = number sold
-            // 1 = image present in subsequent messages?
-            // 2 = number of 300-byte messages forthcoming to contain image
+            if( inForceFreshPick || wasPeekAvailable( inState ) ) {
+                // generate a fresh move, because we could peek
+                m = getSellDiamondsMove( inState );
+                }
+            else {
+                // stick with the move saved in inState
 
-            // always skip sending image
-            m.numCharsUsed = 3;
-            m.moveChars[0] = 
-                (unsigned char)getRandom( inState->ourDiamonds + 1 );
-            m.moveChars[1] = 0;
-            m.moveChars[2] = 0;
+                // 3 chars
+                // 0 = number sold
+                // 1 = image present in subsequent messages?
+                // 2 = number of 300-byte messages forthcoming to contain image
+                
+                // always skip sending image
+                m.numCharsUsed = 3;
+                m.moveChars[0] = inState->ourDiamondsToSell;
+                m.moveChars[1] = 0;
+                m.moveChars[2] = 0;
+                }
             break;
         }
 
@@ -804,9 +963,19 @@ int getNumTotalPossibleMoves( gameState *inState ) {
             
         case sellDiamonds:
         case sellDiamondsCommit:
+            if( inState->nextMove == sellDiamonds ||
+                wasPeekAvailable( inState ) ) {
+                // fresh pick
+                
+                // can sell between 0 and ourDiamonds diamonds
+                return inState->ourDiamonds + 1;
+                }
+            else {
+                // the move we saved in inState
+                return 1;
+                }
             
-            // can sell between 0 and ourDiamonds diamonds
-            return inState->ourDiamonds + 1;
+            
             break;    
         
         default:
@@ -847,28 +1016,49 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
 
         case sellDiamonds:
         case sellDiamondsCommit:
-            if( numMoves != inState->ourDiamonds + 1 ) {
-                printOut( "Error:  num moves doesn't match expected count "
-                          " for sellDiamonds\n" );
-                return;
+            
+            if( inState->nextMove == sellDiamonds ||
+                wasPeekAvailable( inState ) ) {
+        
+
+                if( numMoves != inState->ourDiamonds + 1 ) {
+                    printOut( "Error:  num moves doesn't match expected count "
+                              " for sellDiamonds\n" );
+                    return;
+                    }
+            
+                for( int i=0; i<numMoves; i++ ) {
+                    possibleMove m;
+                    
+                    // 3 chars
+                    // 0 = number sold
+                    // 1 = image present in subsequent messages?
+                    // 2 = number of 300-byte messages forthcoming to contain 
+                    //     image
+                    m.numCharsUsed = 3;
+                    
+                    // sell this number of diamonds
+                    m.moveChars[ 0 ] = i;
+                    m.moveChars[1] = 0;
+                    m.moveChars[2] = 0;
+                    
+                    outMoves[i] = m;                
+                    }
+                }
+            else {
+                // just one move, the one saved in inState
+
+                if( numMoves != 1 ) {
+                    printOut( "Error:  num moves doesn't match expected count "
+                              " for sellDiamonds\n" );
+                    return;
+                    }
+                outMoves[0].numCharsUsed = 3;
+                outMoves[0].moveChars[0] = inState->ourDiamondsToSell;
+                outMoves[0].moveChars[1] = 0;
+                outMoves[0].moveChars[2] = 0;
                 }
             
-            for( int i=0; i<numMoves; i++ ) {
-                possibleMove m;
-
-                // 3 chars
-                // 0 = number sold
-                // 1 = image present in subsequent messages?
-                // 2 = number of 300-byte messages forthcoming to contain image
-                m.numCharsUsed = 3;
-
-                // sell this number of diamonds
-                m.moveChars[ 0 ] = i;
-                m.moveChars[1] = 0;
-                m.moveChars[2] = 0;
-                
-                outMoves[i] = m;                
-                }
             return;
             break;    
                     
@@ -1021,6 +1211,41 @@ static intRange collapseRangeToTrue( intRange inRange ) {
 gameState collapseState( gameState *inState ) {
     gameState result = *inState;
     
+    int moneySpentOnVisibleMoves = 0;
+    
+    if( inState->nextMove == moveUnitsCommit ) {
+        // enemy has already specified a move
+
+        // which parts of it can we see?
+        for( int u=0; u<3; u++ ) {
+            if( isUnitBribed( inState, 1, u ) ) {
+                // we can see this unit's tentative move
+                // so we know that enemy has at least this much money
+
+                moneySpentOnVisibleMoves +=
+                    inState->agentUnits[1][u].diamondBid;
+                moneySpentOnVisibleMoves +=
+                    inState->agentUnits[1][u].inspectorBribe;
+                
+                if( inState->agentUnits[1][u].region !=
+                    inState->agentUnits[1][u].destination ) {
+                    
+                    // agent moving, too, which costs
+                    moneySpentOnVisibleMoves += 1;
+                    
+                    if( inState->agentUnits[1][u].region == 1
+                        ||
+                        inState->agentUnits[1][u].destination == 1 ) {
+                        
+                        // moving to/from home costs extra
+                        moneySpentOnVisibleMoves += 1;
+                        }
+                    }
+                }
+            }
+        }
+    
+
     // collapse each enemy unit salary and each player unit bribe
     
     // sum them as we do this
@@ -1045,7 +1270,10 @@ gameState collapseState( gameState *inState ) {
     int availableForSalaryBribe = 
         result.knownEnemyTotalMoneyReceived -
         result.knownEnemyTotalMoneySpent;
+
+    availableForSalaryBribe -= moneySpentOnVisibleMoves;
     
+
     // make sure it's not too high
     while( salaryBribeSum > availableForSalaryBribe ) {
 
@@ -1063,6 +1291,7 @@ gameState collapseState( gameState *inState ) {
             
                 result.agentUnits[p][u].totalBribe.hi --;
                 result.agentUnits[p][u].totalBribe.lo --;
+                result.agentUnits[p][u].totalBribe.t --;
                 salaryBribeSum --;
                 }
             }
@@ -1072,6 +1301,7 @@ gameState collapseState( gameState *inState ) {
             
                 result.agentUnits[p][u].totalSalary.hi --;
                 result.agentUnits[p][u].totalSalary.lo --;
+                result.agentUnits[p][u].totalSalary.t --;
                 salaryBribeSum --;
                 }
             }
@@ -1126,8 +1356,12 @@ gameState getMirrorState( gameState *inState ) {
     
     result.ourMoney = inState->enemyMoney;
     result.ourDiamonds = inState->enemyDiamonds;
+    result.ourDiamondsToSell = inState->enemyDiamondsToSell;
+    
     result.enemyMoney = inState->ourMoney;
     result.enemyDiamonds = inState->ourDiamonds;
+    result.enemyDiamondsToSell = inState->ourDiamondsToSell;
+
 
     result.knownEnemyTotalMoneyReceived = inState->knownOurTotalMoneyReceived;
     result.knownEnemyTotalMoneySpent = inState->knownOurTotalMoneySpent;
@@ -1173,6 +1407,11 @@ int playRandomGameUntilEnd( gameState inState ) {
     
     int originalMonthsLeft = inState.monthsLeft;
     NextMove originalNextMove = inState.nextMove;
+    
+    if( originalNextMove == moveInspector ) {
+        // this might not come up again for a while, or ever!
+        originalNextMove = sellDiamonds;
+        }
     
 
     // number of units, per side, successfully bribed
@@ -1466,6 +1705,36 @@ gameState stateTransition( gameState *inState,
                 printOut( "Bad move lengths passed to AI\n" );
                 return result;
                 }
+
+
+            // save parameters of move for when we peek
+            unsigned char *moves[2] = { ourMove, enemyMove };
+            
+            for( int p=0; p<2; p++ ) {
+                for( int u=0; u<3; u++ ) {
+                    
+                    // dest
+                    int dest = moves[p][ u * 3 ];
+                    
+                    // swap home regions if this is enemy move
+                    if( p == 1 && dest == 0 ) {
+                        dest = 1;
+                        }
+
+                    result.agentUnits[p][u].destination = dest;
+
+                    // bid
+                    int bid = moves[p][ u * 3 + 1 ];
+                    result.agentUnits[p][u].diamondBid = bid;
+                    
+                    // inspector bribe
+                    int bribe = moves[p][ u * 3 + 2 ];
+                    result.agentUnits[p][u].inspectorBribe = bribe;
+                    }
+                }
+            
+
+
             result.nextMove = moveUnitsCommit;
             }
             break;
@@ -1634,6 +1903,11 @@ gameState stateTransition( gameState *inState,
                 printOut( "Bad move lengths passed to AI\n" );
                 return result;
                 }
+
+            result.ourDiamondsToSell = ourMove[0];
+            result.enemyDiamondsToSell = enemyMove[0];
+
+
             result.nextMove = sellDiamondsCommit;
             }
             break;
@@ -1648,6 +1922,10 @@ gameState stateTransition( gameState *inState,
             result.ourDiamonds -= ourMove[0];
             result.enemyDiamonds -= enemyMove[0];
             
+            result.ourDiamondsToSell = 0;
+            result.enemyDiamondsToSell = 0;
+
+
             int totalSold = ourMove[0] + enemyMove[0];
 
             int ourIncrease = 18;

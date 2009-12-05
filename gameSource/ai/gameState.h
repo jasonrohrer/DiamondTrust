@@ -39,7 +39,7 @@ typedef struct unit {
         int region;
 
         // -1 if unknown (or unset)
-        //int destination;
+        int destination;
 
         //intRange diamondBid;
         //intRange inspectorBribe;
@@ -104,6 +104,8 @@ typedef struct gameState {
         int ourDiamonds;
         
         
+        int ourDiamondsToSell;
+
 
 
         intRange enemyMoney;
@@ -112,6 +114,11 @@ typedef struct gameState {
         int knownEnemyTotalMoneySpent;
         
         int enemyDiamonds;
+
+
+        int enemyDiamondsToSell;
+        
+
 
         // 0 for player, 1 for enemy, 3 units each
         unit agentUnits[2][3];
@@ -177,7 +184,9 @@ typedef struct possibleMove {
 
 // gets a randomly-selected possible move for player
 // (use getMirrorState to extract move for enemy)
-possibleMove getPossibleMove( gameState *inState );
+// force fresh pick during a commit state
+possibleMove getPossibleMove( gameState *inState,
+                              char inForceFreshPick = false );
 
 
 possibleMove mutateMove( gameState *inState, possibleMove inMove,
