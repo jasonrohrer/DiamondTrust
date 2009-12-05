@@ -1189,6 +1189,11 @@ static void collectDiamonds( gameState *inState ) {
         }
     }
 
+
+
+
+    
+
     
 
 
@@ -1208,9 +1213,179 @@ static intRange collapseRangeToTrue( intRange inRange ) {
 
 
 
+gameState applyKnowledge( gameState *inState ) {
+    gameState result = *inState;
+
+    int moneySpentOnVisibleMoves[2] = { 0, 0 };
+    
+
+    for( int p=0; p<2; p++ ) {
+        int opponent = (p + 1) % 2;
+        
+        for( int u=0; u<3; u++ ) {
+            
+            if( isUnitBribed( (&result), p, u ) ) {
+                
+                // salary known to opponent
+                result.agentUnits[p][u].totalSalary = 
+                    collapseRangeToTrue( result.agentUnits[p][u].totalSalary );
+
+                // is the unit at home?
+                if( result.agentUnits[p][u].region == p ) {
+                
+                    // that player's money balance is known
+                    if( p == 0 ) {
+                        result.ourMoney =
+                            collapseRangeToTrue( result.ourMoney );
+                        }
+                    else {
+                        result.enemyMoney =
+                            collapseRangeToTrue( result.enemyMoney );
+                        }
+                    }
+                else {
+                    // can't completely collapse knowledge about money
+
+                    // BUT... we might be able to learn something from this
+                    // agents tentative move, which we can see
+                    
+                    moneySpentOnVisibleMoves[p] +=
+                        inState->agentUnits[p][u].diamondBid;
+                    moneySpentOnVisibleMoves[p] +=
+                        inState->agentUnits[p][u].inspectorBribe;
+                
+                    if( inState->agentUnits[p][u].region !=
+                        inState->agentUnits[p][u].destination ) {
+                    
+                        // agent moving, too, which costs
+                        moneySpentOnVisibleMoves[p] += 1;
+                    
+                        if( inState->agentUnits[p][u].region == p
+                            ||
+                            inState->agentUnits[p][u].destination == p ) {
+                        
+                            // moving to/from home costs extra
+                            moneySpentOnVisibleMoves[p] += 1;
+                            }
+                        }
+                    
+                    }
+                
+                
+                // any opponent units bribed by this unit divulge their
+                // bribes to the opponent
+                
+                for( int uu=0; uu<3; uu++ ) {
+                    if( result.agentUnits[opponent][uu].opponentBribingUnit
+                        == u ) {
+                        result.agentUnits[opponent][uu].totalBribe
+                            = collapseRangeToTrue( 
+                                result.agentUnits[opponent][uu].totalBribe );
+                        }
+                    }
+                
+                }
+            
+            }
+        }
+    
+    // okay, now that we've condensed salaries, bribes, and money balances,
+    // we need to reconcile them together.  I.e., some high ranges may no
+    // longer be accurate because of the knowledge gained (i.e., if we now
+    // know opponent's money balance for sure, we might know that opponent
+    // CAN'T have paid an agent as much as we thought before).
+    
+    for( int p=0; p<2; p++ ) {
+        if( p == 0 ) {
+            if( result.ourMoney.lo < moneySpentOnVisibleMoves[p] ) {
+                result.ourMoney.lo = moneySpentOnVisibleMoves[p];
+                }
+            }
+        else {
+            if( result.enemyMoney.lo < moneySpentOnVisibleMoves[p] ) {
+                result.enemyMoney.lo = moneySpentOnVisibleMoves[p];
+                }
+            }
+        
+
+        int opponent = (p + 1) % 2;
+
+        int minTotalSpent = 0;
+        int receivedTotal = 0;
+        
+        if( p==0 ) {
+            minTotalSpent += result.knownOurTotalMoneySpent;
+            receivedTotal = result.knownOurTotalMoneyReceived;
+            }
+        else {
+            minTotalSpent += result.knownEnemyTotalMoneySpent;
+            receivedTotal = result.knownEnemyTotalMoneyReceived;
+            }
+        
+    
+        for( int u=0; u<3; u++ ) {
+            // money p spent paying p's agents
+            minTotalSpent += result.agentUnits[p][u].totalSalary.lo;
+            
+            // money p spent paying opponent's agents
+            minTotalSpent += result.agentUnits[opponent][u].totalBribe.lo;
+            }
+        
+        int unaccountedMoney = receivedTotal - minTotalSpent;
+        
+        if( p==0 ) {
+            unaccountedMoney -= result.ourMoney.hi;
+            }
+        else {
+            unaccountedMoney -= result.enemyMoney.hi;
+            }
+        
+        if( unaccountedMoney < 0 ) {
+            // opponent knows that P doesn't have that much money
+            if( p==0 ) {
+                result.ourMoney.hi += unaccountedMoney;
+                }
+            else {
+                result.enemyMoney.hi +=unaccountedMoney;
+                }
+            unaccountedMoney = 0;
+            }
+        else {
+                
+            for( int u=0; u<3; u++ ) {
+                if( result.agentUnits[p][u].totalSalary.hi -
+                    result.agentUnits[p][u].totalSalary.lo >
+                    unaccountedMoney ) {
+                    
+                    result.agentUnits[p][u].totalSalary.hi =
+                        result.agentUnits[p][u].totalSalary.lo + 
+                        unaccountedMoney;
+                    }
+                if( result.agentUnits[opponent][u].totalBribe.hi -
+                    result.agentUnits[opponent][u].totalBribe.lo >
+                    unaccountedMoney ) {
+                    
+                    result.agentUnits[opponent][u].totalBribe.hi =
+                        result.agentUnits[opponent][u].totalBribe.lo + 
+                        unaccountedMoney;
+                    }
+                }
+            }
+        
+        
+
+        }
+    
+    return result;
+    }
+
+
+
+
+
 gameState collapseState( gameState *inState ) {
     gameState result = *inState;
-    
+    /*
     int moneySpentOnVisibleMoves = 0;
     
     if( inState->nextMove == moveUnitsCommit ) {
@@ -1244,7 +1419,7 @@ gameState collapseState( gameState *inState ) {
                 }
             }
         }
-    
+    */
 
     // collapse each enemy unit salary and each player unit bribe
     
@@ -1271,7 +1446,7 @@ gameState collapseState( gameState *inState ) {
         result.knownEnemyTotalMoneyReceived -
         result.knownEnemyTotalMoneySpent;
 
-    availableForSalaryBribe -= moneySpentOnVisibleMoves;
+    //availableForSalaryBribe -= moneySpentOnVisibleMoves;
     
 
     // make sure it's not too high

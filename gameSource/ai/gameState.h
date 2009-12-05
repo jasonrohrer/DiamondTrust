@@ -158,6 +158,12 @@ gameState stateTransition( gameState *inState,
                            char inPreserveHiddenInfo );
 
 
+// partially collapses possibility space of inState based on knowledge
+// that we have from successfully-bribed units
+gameState applyKnowledge( gameState *inState );
+
+
+
 // collapses a state into a single, randomly selected state within
 // the possibility space of inState
 gameState collapseState( gameState *inState );

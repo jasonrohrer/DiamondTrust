@@ -468,6 +468,13 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
                                     externalEnemyMove,
                                     externalEnemyMoveLength,
                                     true );
+    
+    // apply knowledge that we gained from this move
+    // FIXME:  this doesn't seem to be working right.  Set break here
+    // and check it.
+    currentState = applyKnowledge( &currentState );
+    
+    
 
     delete [] externalEnemyMove;
     externalEnemyMove = NULL;
