@@ -1331,47 +1331,52 @@ gameState applyKnowledge( gameState *inState ) {
             minTotalSpent += result.agentUnits[opponent][u].totalBribe.lo;
             }
         
-        int unaccountedMoney = receivedTotal - minTotalSpent;
+        // this is the known money gap (money they may or may not have spent)
+        int moneyGap = receivedTotal - minTotalSpent;
         
+        
+        
+        // (potentially) reduce hi based on this known gap
+        // or reduce gap based on hi-lo
         if( p==0 ) {
-            unaccountedMoney -= result.ourMoney.hi;
-            }
-        else {
-            unaccountedMoney -= result.enemyMoney.hi;
-            }
-        
-        if( unaccountedMoney < 0 ) {
-            // opponent knows that P doesn't have that much money
-            if( p==0 ) {
-                result.ourMoney.hi += unaccountedMoney;
+            if( moneyGap < result.ourMoney.hi - result.ourMoney.lo ) {
+                result.ourMoney.hi = result.ourMoney.lo + moneyGap;
                 }
             else {
-                result.enemyMoney.hi +=unaccountedMoney;
+                moneyGap = result.ourMoney.hi - result.ourMoney.lo;
                 }
-            unaccountedMoney = 0;
             }
         else {
+            if( moneyGap < result.enemyMoney.hi - result.enemyMoney.lo ) {
+                result.enemyMoney.hi = result.enemyMoney.lo + moneyGap;
+                }
+            else {
+                moneyGap = result.enemyMoney.hi - result.enemyMoney.lo;
+                }
+            }
+            
+        
+        // make sure no salary or bribe gap is bigger than this known gap
+        for( int u=0; u<3; u++ ) {
+            if( result.agentUnits[p][u].totalSalary.hi -
+                result.agentUnits[p][u].totalSalary.lo >
+                moneyGap ) {
                 
-            for( int u=0; u<3; u++ ) {
-                if( result.agentUnits[p][u].totalSalary.hi -
-                    result.agentUnits[p][u].totalSalary.lo >
-                    unaccountedMoney ) {
-                    
-                    result.agentUnits[p][u].totalSalary.hi =
-                        result.agentUnits[p][u].totalSalary.lo + 
-                        unaccountedMoney;
-                    }
+                result.agentUnits[p][u].totalSalary.hi =
+                    result.agentUnits[p][u].totalSalary.lo + 
+                    moneyGap;
+                }
                 if( result.agentUnits[opponent][u].totalBribe.hi -
                     result.agentUnits[opponent][u].totalBribe.lo >
-                    unaccountedMoney ) {
+                    moneyGap ) {
                     
                     result.agentUnits[opponent][u].totalBribe.hi =
                         result.agentUnits[opponent][u].totalBribe.lo + 
-                        unaccountedMoney;
+                        moneyGap;
                     }
-                }
             }
-        
+    
+    
         
 
         }
@@ -1991,7 +1996,11 @@ gameState stateTransition( gameState *inState,
             // spend the money that was spent
             addToRange( &( result.ourMoney ), - moneySpent[0] );
             addToRange( &( result.enemyMoney ), - moneySpent[1] );
+           
+            result.knownOurTotalMoneySpent += moneySpent[0];
+            result.knownEnemyTotalMoneySpent += moneySpent[1];
             
+
             if( result.ourMoney.lo < 0 ) {
                 result.ourMoney.lo = 0;
                 }
