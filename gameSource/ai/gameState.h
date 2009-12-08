@@ -45,6 +45,10 @@ typedef struct unit {
         //intRange inspectorBribe;
         int diamondBid;
         int inspectorBribe;
+        
+        // set to freeze move to values set in moveUnits
+        char moveFrozen;
+        
 
         // -1 if none
         // or [0..2] to indicate the opponent unit

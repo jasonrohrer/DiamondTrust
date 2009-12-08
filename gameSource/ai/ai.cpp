@@ -13,6 +13,10 @@ static gameState currentState;
 static unsigned char *externalEnemyMove;
 static unsigned int externalEnemyMoveLength;
 
+// to skip past camera data
+static int externalEnemyMoveCharsToSkip = 0;
+
+
 static char moveDone;
 
 
@@ -404,6 +408,8 @@ void initAI() {
             thisUnit->destination = p;
             thisUnit->diamondBid = 0;
             thisUnit->inspectorBribe = 0;
+            thisUnit->moveFrozen = false;
+            
             thisUnit->opponentBribingUnit = -1;
             }
         }
@@ -549,6 +555,26 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
 
 void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
 
+    if( externalEnemyMoveCharsToSkip > 0 ) {
+        
+        // skip this message
+        // do nothing with it
+
+        externalEnemyMoveCharsToSkip -= inEnemyLength;
+        
+        if( externalEnemyMoveCharsToSkip < 0 ) {
+            printOut( 
+                "Error:  received more camera data than expected by AI\n" );
+            
+            externalEnemyMoveCharsToSkip = 0;
+            }
+        
+        return;
+        }
+    
+
+
+
     if( externalEnemyMove != NULL ) {
         // existing, unused move message waiting
         delete [] externalEnemyMove;
@@ -564,7 +590,21 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
     memcpy( externalEnemyMove, inEnemyMove, inEnemyLength );
     externalEnemyMoveLength = inEnemyLength;
 
+    
+    if( ( currentState.nextMove == sellDiamonds ||
+          currentState.nextMove == sellDiamondsCommit ) &&
+        externalEnemyMoveLength == 3 ) {
+        
+        if( externalEnemyMove[1] == 1 ) {
+            // third byte is # of forthcoming 300-byte messages containing
+            // camera data
+            
+            externalEnemyMoveCharsToSkip = 300 * externalEnemyMove[2];
+            }
+        }
 
+
+    
     // in case of moveInspector state, we may not be making a move ourself
 
     if( currentState.nextMove == moveInspector &&
@@ -783,9 +823,82 @@ void stepAI() {
                 
                 // pick a possible co-move for opponent
                 gameState mirror = getMirrorState( &startState );
+
+                // if we KNOW that none of our agents have been bribed,
+                // then we KNOW that the enemy can't peek
+                // However, we might not have seen any of the enemy move
+                // it depends on which of their agents have been bribed
+
+                char anyOfOurAgentsPotentiallyBribed = false;
+                for( int u=0; u<3; u++ ) {
+                    if( currentState.agentUnits[0][u].totalSalary.t <
+                        currentState.agentUnits[0][u].totalBribe.hi ) {
+                        
+                        // bribe MIGHT be higher than true salary
+                        anyOfOurAgentsPotentiallyBribed = true;
+                        }
+                    }
+                
+                    
+
+                // first, generate a fresh move
                 possibleMove enemyMove = getPossibleMove( &mirror,
                                                           true );
                 
+                if( !anyOfOurAgentsPotentiallyBribed ) {
+                    // enemy can't peek
+                    // the move enemy already set is it
+    
+                    if( currentState.nextMove == moveUnitsCommit ) {
+
+                        // which parts can we see
+                        char anyPartsFrozen = false;
+                        for( int u=0; u<3; u++ ) {
+                            if( currentState.agentUnits[1][u].totalSalary.t <
+                                currentState.agentUnits[1][u].totalBribe.t ) {
+                                
+                                // we have successfully bribed this enemy agent
+
+                                // freeze its part of the move
+                                
+                                mirror.agentUnits[0][u].moveFrozen = true;
+                                anyPartsFrozen = true;
+                                }
+                            }
+
+                        if( anyPartsFrozen ) {    
+                            // now with those parts frozen, re-gen a fresh move
+                            // this will fill in guesses for the part of
+                            // the move that we can't see
+                            enemyMove = getPossibleMove( &mirror, true );
+                            }
+                        }
+                    else if( currentState.nextMove == sellDiamondsCommit ) {
+                        // do we have a bribed agent in the enemy's home?
+                        
+                        char bribedAgentInEnemyHome = false;
+                        for( int u=0; u<3; u++ ) {
+                            if( currentState.agentUnits[1][u].region == 1
+                                &&
+                                currentState.agentUnits[1][u].totalSalary.t <
+                                currentState.agentUnits[1][u].totalBribe.t ) {
+                                
+                                bribedAgentInEnemyHome = true;
+                                }
+                            }
+
+                        if( bribedAgentInEnemyHome ) {    
+                            // replace move with one enemy already set
+                            enemyMove = getPossibleMove( &mirror,
+                                                         false );
+                            }
+                        
+                        }
+                    
+                    }
+
+                
+
                 gameState nextState = 
                     stateTransition( &startState,
                                      moves[chosenMove].moveChars,
