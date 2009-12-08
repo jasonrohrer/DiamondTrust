@@ -17,6 +17,7 @@ unit_noArm_mask.tga \
 activeUnitHalo.tga \
 diamond.tga \
 diamondBorder.tga \
+diamondBorder2.tga \
 bidPicker.tga \
 pickerBorder.tga \
 bid.tga \

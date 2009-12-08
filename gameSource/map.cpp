@@ -572,7 +572,7 @@ void initMap() {
     diamondSpriteID = loadSprite( "diamond.tga", 
                                   &diamondSpriteW, &diamondSpriteH,
                                   true );
-    diamondBorderSpriteID = loadSprite( "diamondBorder.tga", true );
+    diamondBorderSpriteID = loadSprite( "diamondBorder2.tga", true );
 
     vaultSpriteID = loadSprite( "vault.tga", 
                                 &vaultSpriteW, &vaultSpriteH,
@@ -703,7 +703,7 @@ void drawMap() {
             
             drawSprite( diamondBorderSpriteID, 
                         mapRegionDiamondPosition[i].x - diamondSpriteW/2, 
-                        mapRegionDiamondPosition[i].y - diamondSpriteH/2, 
+                        mapRegionDiamondPosition[i].y - diamondSpriteH/2 - 2, 
                         borderColor );
             }        
         }
