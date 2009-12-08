@@ -431,6 +431,53 @@ void freeAI() {
 
 
 
+static void printRange( intRange inRange ) {
+    printOut( "(h=%d, l=%d, t=%d)", inRange.hi, inRange.lo, inRange.t );
+    }
+
+
+static void printStateKnowledgeStats() {
+    printOut( "Next move: %s\n", nextMoveNames[ currentState.nextMove ] );
+    
+    for( int p=0; p<2; p++ ) {
+        printOut( "Player %d\n", p );
+        
+        if( p==0 ) {
+            printOut( "  Money: " );
+            printRange( currentState.ourMoney );
+            
+            printOut( "\n  Known received: %d\n", 
+                      currentState.knownOurTotalMoneyReceived );
+            
+            printOut( "  Known spent: %d\n", 
+                      currentState.knownOurTotalMoneySpent );
+            }
+        else {
+            printOut( "  Money: " );
+            printRange( currentState.enemyMoney );
+            
+            printOut( "\n  Known received: %d\n", 
+                      currentState.knownEnemyTotalMoneyReceived );
+            
+            printOut( "  Known spent: %d\n", 
+                      currentState.knownEnemyTotalMoneySpent );
+            }
+        
+
+        for( int u=0; u<3; u++ ) {
+            printOut( "  Agent %d\n", u );
+            
+            printOut( "    Salary: " );
+            printRange( currentState.agentUnits[p][u].totalSalary );
+            
+            printOut( "\n    Bribe: " );
+            printRange( currentState.agentUnits[p][u].totalBribe );
+            printOut( "\n" );
+            }
+        }
+    printOut( "\n" );
+    }
+
 
 
 
@@ -460,7 +507,9 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
 
     
         
-
+    printOut( "Before transition...." );
+    printStateKnowledgeStats();
+    
     // apply both moves to our game state, preserving hidden info
     currentState = stateTransition( &currentState, 
                                     ourMove,
@@ -468,13 +517,19 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
                                     externalEnemyMove,
                                     externalEnemyMoveLength,
                                     true );
+    printOut( "Before applyKnowledge...." );
+    printStateKnowledgeStats();
     
+
     // apply knowledge that we gained from this move
     // FIXME:  this doesn't seem to be working right.  Set break here
     // and check it.
     currentState = applyKnowledge( &currentState );
     
     
+    printOut( "After applyKnowledge...." );
+    printStateKnowledgeStats();
+
 
     delete [] externalEnemyMove;
     externalEnemyMove = NULL;

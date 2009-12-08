@@ -78,13 +78,16 @@ sellDiamondsState.cpp:
 
 
 enum NextMove { 
-    salaryBribe,
+    salaryBribe = 0,
     moveUnits,
     moveUnitsCommit,
     moveInspector,
     sellDiamonds,
     sellDiamondsCommit
     };
+
+
+extern char *nextMoveNames[6];
 
 
 

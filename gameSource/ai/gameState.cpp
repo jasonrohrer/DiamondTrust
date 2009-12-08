@@ -7,6 +7,12 @@
 #include <assert.h>
 
 
+char *nextMoveNames[6] = { "salaryBribe", "moveUnits", "moveUnitsCommit",
+                           "moveInspector", "sellDiamonds", 
+                           "sellDiamondsCommit" };
+
+
+
 static void checkStateValid( gameState inState ) {
     for( int p=0; p<2; p++ ) {
         
@@ -1332,26 +1338,28 @@ gameState applyKnowledge( gameState *inState ) {
             }
         
         // this is the known money gap (money they may or may not have spent)
+
+        // gap = receivedTotal - spentTotal - knownMoneyHeld
+
         int moneyGap = receivedTotal - minTotalSpent;
         
+        if( p==0 ) {
+            moneyGap -= result.ourMoney.lo;
+            }
+        else {
+            moneyGap -= result.enemyMoney.lo;
+            }
         
         
         // (potentially) reduce hi based on this known gap
-        // or reduce gap based on hi-lo
         if( p==0 ) {
             if( moneyGap < result.ourMoney.hi - result.ourMoney.lo ) {
                 result.ourMoney.hi = result.ourMoney.lo + moneyGap;
-                }
-            else {
-                moneyGap = result.ourMoney.hi - result.ourMoney.lo;
                 }
             }
         else {
             if( moneyGap < result.enemyMoney.hi - result.enemyMoney.lo ) {
                 result.enemyMoney.hi = result.enemyMoney.lo + moneyGap;
-                }
-            else {
-                moneyGap = result.enemyMoney.hi - result.enemyMoney.lo;
                 }
             }
             
@@ -1366,14 +1374,14 @@ gameState applyKnowledge( gameState *inState ) {
                     result.agentUnits[p][u].totalSalary.lo + 
                     moneyGap;
                 }
-                if( result.agentUnits[opponent][u].totalBribe.hi -
-                    result.agentUnits[opponent][u].totalBribe.lo >
-                    moneyGap ) {
-                    
-                    result.agentUnits[opponent][u].totalBribe.hi =
-                        result.agentUnits[opponent][u].totalBribe.lo + 
-                        moneyGap;
-                    }
+            if( result.agentUnits[opponent][u].totalBribe.hi -
+                result.agentUnits[opponent][u].totalBribe.lo >
+                moneyGap ) {
+                
+                result.agentUnits[opponent][u].totalBribe.hi =
+                    result.agentUnits[opponent][u].totalBribe.lo + 
+                    moneyGap;
+                }
             }
     
     
@@ -1960,7 +1968,12 @@ gameState stateTransition( gameState *inState,
                     
 
                     result.agentUnits[p][u].region = dest;
-
+                    
+                    // saved destination might not equal final dest
+                    // clear it
+                    result.agentUnits[p][u].destination = 
+                        result.agentUnits[p][u].region;
+                    
                         
                     
                     // save the resulting bid/bribe for use in inspector state
