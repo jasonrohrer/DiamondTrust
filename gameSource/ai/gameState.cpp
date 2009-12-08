@@ -1442,6 +1442,16 @@ gameState collapseState( gameState *inState ) {
 
     // collapse each enemy unit salary and each player unit bribe
     
+    int availableForSalaryBribe = 
+        result.knownEnemyTotalMoneyReceived -
+        result.knownEnemyTotalMoneySpent;
+
+    // pick a random cap (or else almost all collapsed states result
+    // in enemy spending all available money on salaries and bribes---
+    //   we need to explore states where that's not the case)
+    availableForSalaryBribe = getRandom( availableForSalaryBribe + 1 );
+
+
     // sum them as we do this
     int salaryBribeSum = 0;
     int u;
@@ -1461,9 +1471,6 @@ gameState collapseState( gameState *inState ) {
         salaryBribeSum += result.agentUnits[0][u].totalBribe.hi;
         }
     
-    int availableForSalaryBribe = 
-        result.knownEnemyTotalMoneyReceived -
-        result.knownEnemyTotalMoneySpent;
 
     //availableForSalaryBribe -= moneySpentOnVisibleMoves;
     
