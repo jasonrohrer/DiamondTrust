@@ -1255,23 +1255,29 @@ gameState applyKnowledge( gameState *inState ) {
                     // BUT... we might be able to learn something from this
                     // agents tentative move, which we can see
                     
-                    moneySpentOnVisibleMoves[p] +=
-                        inState->agentUnits[p][u].diamondBid;
-                    moneySpentOnVisibleMoves[p] +=
-                        inState->agentUnits[p][u].inspectorBribe;
+                    // only do this in middle of move sequence
+                    // or else this info has already been applied to balance
+                    
+                    if( inState->nextMove == moveUnitsCommit ) {
+                    
+                        moneySpentOnVisibleMoves[p] +=
+                            inState->agentUnits[p][u].diamondBid;
+                        moneySpentOnVisibleMoves[p] +=
+                            inState->agentUnits[p][u].inspectorBribe;
                 
-                    if( inState->agentUnits[p][u].region !=
-                        inState->agentUnits[p][u].destination ) {
+                        if( inState->agentUnits[p][u].region !=
+                            inState->agentUnits[p][u].destination ) {
                     
-                        // agent moving, too, which costs
-                        moneySpentOnVisibleMoves[p] += 1;
-                    
-                        if( inState->agentUnits[p][u].region == p
-                            ||
-                            inState->agentUnits[p][u].destination == p ) {
-                        
-                            // moving to/from home costs extra
+                            // agent moving, too, which costs
                             moneySpentOnVisibleMoves[p] += 1;
+                    
+                            if( inState->agentUnits[p][u].region == p
+                                ||
+                                inState->agentUnits[p][u].destination == p ) {
+                        
+                                // moving to/from home costs extra
+                                moneySpentOnVisibleMoves[p] += 1;
+                                }
                             }
                         }
                     
