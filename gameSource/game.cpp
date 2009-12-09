@@ -26,7 +26,7 @@ int satelliteBottomSpriteID;
 int satelliteBottomHalfOffset;
 unsigned char satelliteFade;
 
-int titleSpriteID[3];
+int titleSpriteID;
 unsigned char titleFade;
 
 
@@ -216,7 +216,7 @@ void gameInit() {
     titleFade = 255;
 
     int titleW, titleH;
-    rgbaColor *titleRGBA = readTGAFile( "title256.tga",
+    rgbaColor *titleRGBA = readTGAFile( "titleBlack16.tga",
                                         &titleW, &titleH );
 
     applyCornerTransparency( titleRGBA, titleW * titleH );
@@ -227,6 +227,7 @@ void gameInit() {
         return;
         }
 
+    /*
     // split into 3 parts to save texture memory
     int bandHeights[3] = { 64, 16, 8 };
     int nextBandOffset = 0;
@@ -239,6 +240,11 @@ void gameInit() {
         
         nextBandOffset += bandHeights[b];
         }
+    */
+    
+    titleSpriteID = 
+            addSprite( titleRGBA, titleW, titleH );
+
     delete [] titleRGBA;
     
 
@@ -315,11 +321,11 @@ void gameInit() {
 
     aiButton = new Button( font16, translate( "button_ai" ),
                            128,
-                           106 );
+                           148 );
 
     wifiButton = new Button( font16, translate( "button_wifi" ),
                              128,
-                             146 );
+                             178 );
 
 
     printOut( "  ++++++  Init map\n" );

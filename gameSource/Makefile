@@ -33,7 +33,7 @@ jet_rotated16.tga \
 piper_rotated16.tga \
 puma_rotated16.tga \
 angola_satellite.tga \
-title256.tga \
+titleBlack16.tga \
 rolodex_manilla16.tga \
 playerPictures.tga \
 enemyPictures.tga \

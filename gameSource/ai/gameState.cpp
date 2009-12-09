@@ -995,8 +995,6 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                     }
                 m.moveChars[ 0 ] = pick;                    
                 }
-
-            int x = 0;
             }
             break;
 

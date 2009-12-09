@@ -14,7 +14,7 @@ extern int satelliteTopSpriteID;
 extern int satelliteBottomSpriteID;
 extern int satelliteBottomHalfOffset;
 
-extern int titleSpriteID[3];
+extern int titleSpriteID;
 extern unsigned char titleFade;
 
 
@@ -237,14 +237,15 @@ void ConnectState::drawState() {
         rgbaColor titleColor = white;
         titleColor.a = titleFade;
         
-        drawSprite( titleSpriteID[0], 
-                    0,0, titleColor );
-
+        drawSprite( titleSpriteID, 
+                    0,6, titleColor );
+        /*
         drawSprite( titleSpriteID[1], 
                     0,64, titleColor );
 
         drawSprite( titleSpriteID[2], 
                     0,80, titleColor );
+        */
         }
     
     if( !connecting ) {
