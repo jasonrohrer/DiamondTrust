@@ -6,6 +6,11 @@ void initAI();
 void freeAI();
 
 
+void setAIThinkingTime( int inSeconds );
+
+int getAIThinkingTime();
+
+
 
 void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength );
 

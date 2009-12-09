@@ -39,7 +39,11 @@ int moveSortMap[ possibleMoveSpace ];
 
 
 //int maxNumSimulationsPerMove = 3720;//600;
-int maxNumSimulationsPerMove = 300;//1200;//600;
+int maxNumSimulationsPerMove = 468;//1200;//600;
+
+// 5 seconds
+int maxNumSimulationsPerFinalChoice = 15000;
+
 
 // testing has showed 7 to be the best here
 int batchSizeBeforeReplaceWorstMoves = 7;
@@ -266,6 +270,24 @@ void clearNextMove() {
             */
         }
     
+    // if we have fewer possible moves to test, take advantage of this
+    // by running more simulations per move
+    //maxNumSimulationsPerMove = 
+    //    maxNumSimulationsPerFinalChoice / numPossibleMovesFilled;
+    
+    // actually, keep it constant per possible move... simply return
+    //   faster if we have fewer moves to test.
+    // so, maxNumSimulationsPerFinalChoice is our total maximum, not
+    //   the time we will use every time
+    // Otherwise, we take a long time to re-test our our single chosen
+    //   move in the commit phase (when we can't switch our move).
+    // (If there is only one possible move, we don't need to test it anyway,
+    //   but we don't have time to fix this now!)
+    
+    maxNumSimulationsPerMove = 
+        maxNumSimulationsPerFinalChoice / numPossibleMoves;
+    
+
     nextMoveToTest = 0;
     }
 
@@ -433,6 +455,24 @@ void initAI() {
 
 void freeAI() {
     }
+
+
+
+
+void setAIThinkingTime( int inSeconds ) {
+    int simsPerSecond = maxSimulationsPerStepAI * 30;
+    
+    maxNumSimulationsPerFinalChoice = inSeconds * simsPerSecond;
+    }
+
+    
+
+int getAIThinkingTime() {
+    int simsPerSecond = maxSimulationsPerStepAI * 30;
+
+    return maxNumSimulationsPerFinalChoice / simsPerSecond;
+    }
+
 
 
 

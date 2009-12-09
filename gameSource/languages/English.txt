@@ -46,6 +46,10 @@ phaseStatus_gameType  "Select game type"
 phaseSubStatus_gameType  "Play against AI or over local WiFi"
 
 
+phaseStatus_aiLevel  "Set AI thinking time"
+phaseSubStatus_aiLevel  "More time lets AI pick better moves"
+
+
 phaseStatus_connect  "Connect to opponent"
 phaseSubStatus_parentOrChild  "Host a game or join one started by your friend"
 phaseSubStatus_waitingConnect  "Waiting for a connection"
