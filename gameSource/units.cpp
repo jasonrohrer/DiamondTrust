@@ -1687,6 +1687,7 @@ char isAnyUnitBuyingDiamonds() {
 
     char found = false;
     
+    int inspectorRegion = getUnitRegion( numUnits - 1 );
     
     for( int i=0; i<numPlayerUnits*2 && !found; i++ ) {
         
@@ -1694,7 +1695,9 @@ char isAnyUnitBuyingDiamonds() {
         int unitBid = getUnitBid( i );
         char highest = true;
         
-        if( unitBid > 0 && getDiamondsInRegion( unitRegion ) ) {
+        if( unitRegion != inspectorRegion &&
+            unitBid > 0 && 
+            getDiamondsInRegion( unitRegion ) > 0 ) {
             
             // look for other unit in this region
             for( int j=0; j<numPlayerUnits*2; j++ ) {
