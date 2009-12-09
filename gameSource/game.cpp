@@ -73,6 +73,7 @@ char networkOpponent;
 GameState *currentGameState;
 
 extern GameState *pickGameTypeState;
+extern GameState *setAILevelState;
 extern GameState *connectState;
 extern GameState *accumulateDiamondsState;
 extern GameState *salaryBribeState;
@@ -544,11 +545,13 @@ static void goToNextGameState() {
             currentGameState = connectState;
             }
         else {
-            // FIXME:  set AI level here
-
-            // for now, just start game
-            currentGameState = accumulateDiamondsState;
+            // set AI level here
+            currentGameState = setAILevelState;
             }
+        }
+    else if( currentGameState == setAILevelState ) {
+        // start game
+        currentGameState = accumulateDiamondsState;
         }
     else if( currentGameState == connectState ) {
         currentGameState = accumulateDiamondsState;

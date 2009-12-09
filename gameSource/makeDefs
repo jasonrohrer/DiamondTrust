@@ -12,6 +12,7 @@ common.cpp \
 DataFifo.cpp \
 TranslationManager.cpp \
 pickGameTypeState.cpp \
+setAILevelState.cpp \
 connectState.cpp \
 accumulateDiamondsState.cpp \
 salaryBribeState.cpp \
@@ -54,6 +55,7 @@ s/^common\.o/\.\.\/common\.o/; \
 s/^DataFifo\.o/\.\.\/DataFifo\.o/; \
 s/^TranslationManager\.o/\.\.\/TranslationManager\.o/; \
 s/^pickGameTypeState\.o/\.\.\/pickGameTypeState\.o/; \
+s/^setAILevelState\.o/\.\.\/setAILevelState\.o/; \
 s/^connectState\.o/\.\.\/connectState\.o/; \
 s/^accumulateDiamondsState\.o/\.\.\/accumulateDiamondsState\.o/; \
 s/^salaryBribeState\.o/\.\.\/salaryBribeState\.o/; \
