@@ -905,15 +905,57 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                 int bidTotal = 0;
                 
                 if( inState->agentUnits[1][u].diamondBid > 0 ) {
-                    
-                    diamondTotal += 
-                        inState->regionDiamondCounts[ 
-                            inState->agentUnits[1][u].region ];
-                    
                     bidTotal += inState->agentUnits[1][u].diamondBid;
                     }
                 
+                // only count diamonds for this agent if it is winning
+                // the bid in that region
                 
+                // also, SUBTRACT the amount of diamonds that we would 
+                // lose if the inspector ended up there
+                
+                char anyOfOurUnitsInRegion = false;
+                
+                for( int uu=0; uu<3; uu++ ) {
+                    if( inState->agentUnits[0][uu].region ==
+                        inState->agentUnits[1][u].region ) {
+                        
+                        anyOfOurUnitsInRegion = true;
+                        
+                        if( inState->agentUnits[0][uu].diamondBid <
+                            inState->agentUnits[1][u].diamondBid ) {
+                        
+                            // they will win in this region
+
+                            // so if we don't move inspector there,
+                            // they will get the diamonds
+                            diamondTotal += 
+                                inState->regionDiamondCounts[ 
+                                    inState->agentUnits[1][u].region ];
+                            }
+
+                        // we'd lose this much, though...
+                        diamondTotal -=
+                            inState->agentUnits[0][uu].diamonds;
+                        }
+                    }
+                
+                if( !anyOfOurUnitsInRegion ) {
+                    // no contest there
+                    // they would win those diamonds
+
+                    // if they bid more than 0
+                    if( inState->agentUnits[1][u].diamondBid > 0 ) {
+                        diamondTotal += 
+                            inState->regionDiamondCounts[ 
+                                inState->agentUnits[1][u].region ];
+                        }
+                    }
+                
+
+                
+                // priority to diamonds confiscated
+                // break ties based on highest bid blocked
                 if( diamondTotal >= maxBuyingPlusCarrying ) {
                     maxBuyingPlusCarrying = diamondTotal;
                     
@@ -953,6 +995,8 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                     }
                 m.moveChars[ 0 ] = pick;                    
                 }
+
+            int x = 0;
             }
             break;
 
