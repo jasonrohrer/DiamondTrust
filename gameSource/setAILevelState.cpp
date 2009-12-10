@@ -162,6 +162,11 @@ void SetAILevelState::enterState() {
     statusSubMessage = translate( "phaseSubStatus_aiLevel" ); 
     
     waitingForDone = true;
+
+    int thinkingTime = getAIThinkingTime();
+    
+    // picker adjusts in batches of 5, with 5 being the lowest
+    setPickerSale( (thinkingTime - 5) / 5 );
     }
 
 
