@@ -1,4 +1,5 @@
-Test on the new, improved AI setup.  Batch size of 7 is still the best.
+Test on the new, improved AI setup.  Batch size of 7 called into question
+for longer runs.
 
 Parameter N = batch size before moves replaced  
 50% of moves discarded
@@ -8,12 +9,55 @@ Mutations chosen out of top 7 moves
 
 
 ***** Test results for 32, 468:
-Parameter 7, ave score 21.815601
-Parameter 10, ave score 22.203215
-Parameter 15, ave score 22.489354
+Parameter 7, ave score 22.428961
+Parameter 10, ave score 21.295433
+Parameter 15, ave score 21.514317
 
 
 ***** Test results for 32, 937:
-Parameter 7, ave score 23.077229
-Parameter 10, ave score 22.935643
-Parameter 15, ave score 23.001489
+Parameter 7, ave score 22.759901
+Parameter 10, ave score 23.345168
+Parameter 15, ave score 23.616829
+
+
+
+Here's another run that shows 7 is still okay (good for 5 seconds of thinking per move... still okay for 10 seconds of thinking):
+
+
+***** Test results for 32, 468:
+Parameter 7, ave score 20.065347
+Parameter 15, ave score 19.477229
+Parameter 20, ave score 19.341827
+Parameter 25, ave score 19.236009
+
+
+***** Test results for 32, 937:
+Parameter 7, ave score 21.433417
+Parameter 15, ave score 21.809651
+Parameter 20, ave score 21.034332
+Parameter 25, ave score 21.249524
+
+
+
+
+This test shows that 20 is best for longer runs:
+
+***** Test results for 32, 468:
+Parameter 7, ave score 19.903465
+Parameter 15, ave score 19.569720
+Parameter 20, ave score 19.042067
+Parameter 25, ave score 18.155278
+
+
+***** Test results for 32, 937:
+Parameter 7, ave score 21.200992
+Parameter 15, ave score 21.487624
+Parameter 20, ave score 21.697693
+Parameter 25, ave score 20.864626
+
+
+***** Test results for 32, 1875:
+Parameter 7, ave score 21.915347
+Parameter 15, ave score 22.067143
+Parameter 20, ave score 22.182794
+Parameter 25, ave score 22.055774

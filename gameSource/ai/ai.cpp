@@ -46,6 +46,7 @@ int maxNumSimulationsPerFinalChoice = 15000;
 
 
 // testing has showed 7 to be the best here
+// except on longer runs, where we go up to 20
 int batchSizeBeforeReplaceWorstMoves = 7;
 
 // testing showed 7 to be the best here
@@ -94,16 +95,16 @@ int currentTestingRound = 0;
 
 // maxMutationsPerMove
 // batch sizes
-int testingRoundParameter[ numTestingRoundsSpace ] = { 7, 10, 15, 10, 10 };
+int testingRoundParameter[ numTestingRoundsSpace ] = { 7, 15, 20, 25, 10 };
 
 int numRunsPerTestingRound = 40;
 
 float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
-int numTestingRounds = 3;
+int numTestingRounds = 4;
 int maxTestingPossibleMoves = 32;
-int maxTestingSimulationsPerMove = 936;
+int maxTestingSimulationsPerMove = 3744;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -288,6 +289,19 @@ void clearNextMove() {
     maxNumSimulationsPerMove = 
         maxNumSimulationsPerFinalChoice / numPossibleMoves;
     
+    if( !testingAI ) {
+        
+        if( maxNumSimulationsPerMove <= 468 ) {
+            batchSizeBeforeReplaceWorstMoves = 7;
+            }
+        else {
+            batchSizeBeforeReplaceWorstMoves = 20;
+            }
+        printOut( "using batch size of %d\n", 
+                  batchSizeBeforeReplaceWorstMoves );
+        
+        }
+    
 
     nextMoveToTest = 0;
     }
@@ -463,8 +477,7 @@ void freeAI() {
 void setAIThinkingTime( int inSeconds ) {
     int simsPerSecond = maxSimulationsPerStepAI * 30;
     
-    // FIXME
-    //maxNumSimulationsPerFinalChoice = inSeconds * simsPerSecond;
+    maxNumSimulationsPerFinalChoice = inSeconds * simsPerSecond;
     }
 
     
@@ -834,7 +847,7 @@ void stepAI() {
                             }
                         
                         
-                        //batchSizeBeforeReplaceWorstMoves =
+                        batchSizeBeforeReplaceWorstMoves =
                             testingRoundParameter[ currentTestingRound ];
                         //mutationPoolSize = 
                         //    testingRoundParameter[ currentTestingRound ];
