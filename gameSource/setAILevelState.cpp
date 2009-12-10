@@ -96,6 +96,9 @@ void SetAILevelState::clickState( int inX, int inY ) {
         if( doneButton->getPressed( inX, inY ) ) {
             waitingForDone = false;
             stateDone = true;
+            
+            // start the AI
+            initOpponent( true );
             }
         }
     

@@ -80,7 +80,6 @@ void PickGameTypeState::clickState( int inX, int inY ) {
             selectionMade = true;
             
             networkOpponent = false;
-            initOpponent( true );
             }
         else if( wifiButton->getPressed( inX, inY ) ) {
             selectionMade = true;
