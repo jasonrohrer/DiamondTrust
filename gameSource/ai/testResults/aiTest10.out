@@ -1,0 +1,19 @@
+Test on the new, improved AI setup.  Batch size of 7 is still the best.
+
+Parameter N = batch size before moves replaced  
+50% of moves discarded
+Moves replaced with 50/50 mix of random and mutated moves.
+Mutations chosen out of top 7 moves
+1 mutation applied to a move
+
+
+***** Test results for 32, 468:
+Parameter 7, ave score 21.815601
+Parameter 10, ave score 22.203215
+Parameter 15, ave score 22.489354
+
+
+***** Test results for 32, 937:
+Parameter 7, ave score 23.077229
+Parameter 10, ave score 22.935643
+Parameter 15, ave score 23.001489

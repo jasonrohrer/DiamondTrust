@@ -1,0 +1,28 @@
+Parameter N = N/10 replacment moves are mutations.  
+Bottom half of moves discared.
+Mutations chosen out of top 7 moves
+Between 1 and 5 mutations applied
+
+
+***** Test results for 32, 300:
+Parameter 3, ave score 4.648143
+Parameter 5, ave score 4.622773
+Parameter 7, ave score 4.653217
+
+
+***** Test results for 32, 600:
+Parameter 3, ave score 4.909204
+Parameter 5, ave score 4.945646
+Parameter 7, ave score 4.905597
+
+
+***** Test results for 64, 300:
+Parameter 3, ave score 4.898144
+Parameter 5, ave score 4.909406
+Parameter 7, ave score 4.813985
+
+
+***** Test results for 64, 600:
+Parameter 3, ave score 5.227487
+Parameter 5, ave score 5.205597
+Parameter 7, ave score 5.071518

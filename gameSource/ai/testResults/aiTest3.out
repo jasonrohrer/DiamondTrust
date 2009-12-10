@@ -1,0 +1,43 @@
+Top 5 moves potentially mutated.  Bottom half of moves discared, refilled
+with 50% mutations of top 5, 50% random moves.
+Between 1 and 5 mutations applied
+
+
+***** Test results for 32, 300:
+Batch size 3, ave score 4.614524
+Batch size 5, ave score 4.722561
+Batch size 7, ave score 4.743070
+Batch size 10, ave score 4.562618
+Batch size 13, ave score 4.492942
+
+
+***** Test results for 32, 600:
+Batch size 3, ave score 5.146890
+Batch size 5, ave score 5.051342
+Batch size 7, ave score 5.005970
+Batch size 10, ave score 4.932500
+Batch size 13, ave score 4.889643
+
+
+***** Test results for 32, 1200:
+Batch size 3, ave score 5.107213
+Batch size 5, ave score 5.133781
+Batch size 7, ave score 5.200243
+Batch size 10, ave score 5.158572
+Batch size 13, ave score 5.035023
+
+
+***** Test results for 32, 2400:
+Batch size 3, ave score 5.104104
+Batch size 5, ave score 5.181098
+Batch size 7, ave score 5.207673
+Batch size 10, ave score 5.210833
+Batch size 13, ave score 5.180172
+
+
+***** Test results for 64, 300:
+Batch size 3, ave score 5.026990
+Batch size 5, ave score 4.873292
+Batch size 7, ave score 4.791584
+Batch size 10, ave score 4.718214
+Batch size 13, ave score 4.719020

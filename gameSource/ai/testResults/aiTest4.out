@@ -1,0 +1,35 @@
+Parameter N = top N moves potentially mutated.  
+Bottom half of moves discared, refilled with 50% mutations of top N, 
+50% random moves.
+Between 1 and 5 mutations applied
+
+***** Test results for 32, 300:
+Parameter 3, ave score 4.559034
+Parameter 5, ave score 4.591212
+Parameter 7, ave score 4.682302
+Parameter 10, ave score 4.642574
+Parameter 16, ave score 4.556931
+
+
+***** Test results for 32, 600:
+Parameter 3, ave score 5.043532
+Parameter 5, ave score 4.889055
+Parameter 7, ave score 5.054478
+Parameter 10, ave score 4.997140
+Parameter 16, ave score 5.005349
+
+
+***** Test results for 64, 300:
+Parameter 3, ave score 4.902228
+Parameter 5, ave score 4.799629
+Parameter 7, ave score 4.936263
+Parameter 10, ave score 4.909653
+Parameter 16, ave score 4.894678
+
+
+***** Test results for 64, 600:
+Parameter 3, ave score 5.158582
+Parameter 5, ave score 5.240298
+Parameter 7, ave score 5.172761
+Parameter 10, ave score 5.151243
+Parameter 16, ave score 5.193657

@@ -1,0 +1,28 @@
+Parameter N = max of N mutations applied to a move.  
+50% of moves discarded
+Moves replaced with 50/50 mix of random and mutated moves.
+Mutations chosen out of top 7 moves
+
+
+***** Test results for 32, 300:
+Parameter 1, ave score 4.639604
+Parameter 5, ave score 4.623763
+Parameter 10, ave score 4.548886
+
+
+***** Test results for 32, 600:
+Parameter 1, ave score 5.033582
+Parameter 5, ave score 5.083083
+Parameter 10, ave score 4.930348
+
+
+***** Test results for 64, 300:
+Parameter 1, ave score 4.912129
+Parameter 5, ave score 4.913985
+Parameter 10, ave score 4.772401
+
+
+***** Test results for 64, 600:
+Parameter 1, ave score 5.206965
+Parameter 5, ave score 5.185945
+Parameter 10, ave score 5.198133
