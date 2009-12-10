@@ -28,6 +28,13 @@ void showInspectorPanel( char inShow );
 
 
 
+// true if opponent money can be seen by player
+// false if opponent money is currently "?"
+char isOpponentMoneyVisible();
+
+
+
+
 #define noSaleFlatRate 18
 #define saleNet 24
 

@@ -615,6 +615,18 @@ void SellDiamondsState::stepState() {
                         addPlayerMoney( i, 1 );
                         playerEarnings[i]--;
                         
+                        if( i==1 && ! isOpponentMoneyVisible() ) {
+                            // no need to step it, because we can't see 
+                            // it anyway
+                            // (and we would have to wait w/ no activity
+                            //  on the screen if opp earns more money than
+                            //  us )
+
+                            addPlayerMoney( 1, playerEarnings[1] );
+                            playerEarnings[1] = 0;
+                            }
+                        
+
                         changedSome = true;
                         stepsSinceEarningTick = 0;
                         }

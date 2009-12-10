@@ -445,6 +445,29 @@ static void drawMoneyValue8( int inX, int inY, int inValue,
     }
 
 
+char isOpponentMoneyVisible() {
+    
+    if( opponentMoneyUnknown ) {
+        // show their money only if a bribed unit is at home
+        for( int i=numPlayerUnits; i<numPlayerUnits*2; i++ ) {
+            Unit *u = getUnit( i );
+            if( getUnitRegion( i ) == 1 ) {
+                // home
+                
+                if( u->mTotalBribe > u->mTotalSalary ) {
+                    return true;
+                    }
+                }
+            }
+        
+        
+        return false;
+        }
+    else {
+        return true;
+        }
+    }
+
 
 static void drawPanelContents( int inX, int inPlayer ) {
     
@@ -455,22 +478,10 @@ static void drawPanelContents( int inX, int inPlayer ) {
 
     int showMoney = true;
     
-    if( inPlayer == 1 && opponentMoneyUnknown ) {
+    if( inPlayer == 1 ) {
         // other player
         
-        showMoney = false;
-        
-        // show their money only if a bribed unit is at home
-        for( int i=numPlayerUnits; i<numPlayerUnits*2; i++ ) {
-            Unit *u = getUnit( i );
-            if( getUnitRegion( i ) == 1 ) {
-                // home
-                
-                if( u->mTotalBribe > u->mTotalSalary ) {
-                    showMoney = true;
-                    }
-                }
-            }
+        showMoney = isOpponentMoneyVisible();
         }
     
             
