@@ -2090,6 +2090,10 @@ void getFrame( unsigned char *inBuffer ) {
 
 // snap the next frame as a finished picture
 void snapPicture( unsigned char *inBuffer ) {
+    
+    getFrame( inBuffer );
+    
+    // FIXME:  play Shutter sound here
     }
 
 

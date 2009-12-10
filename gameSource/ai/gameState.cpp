@@ -45,19 +45,19 @@ static void checkStateValid( gameState inState ) {
 
 
 possibleMove mutateMove( gameState *inState, possibleMove inMove,
-                         int inMaxMutations ) {
+                         unsigned int inMaxMutations ) {
     possibleMove m;
 
     m.numCharsUsed = inMove.numCharsUsed;
     
     // first, copy it
-    memcpy( m.moveChars, inMove.moveChars, m.numCharsUsed );
+    memcpy( m.moveChars, inMove.moveChars, (unsigned int)m.numCharsUsed );
         
 
     // perform a random number of mutations
-    int numMutations = getRandom( inMaxMutations ) + 1;
+    unsigned int numMutations = getRandom( inMaxMutations ) + 1;
     
-    for( int i=0; i<numMutations; i++ ) {
+    for( unsigned int i=0; i<numMutations; i++ ) {
         
         switch( inState->nextMove ) {
             case salaryBribe: {
@@ -71,7 +71,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
                     }
                 if( anyLowerable ) {
                     
-                    int lowerablePick = getRandom( 6 );
+                    unsigned int lowerablePick = getRandom( 6 );
                     
                     while( (char)m.moveChars[ lowerablePick * 2 ] <= 1 ) {
                         lowerablePick = getRandom( 6 );
@@ -95,7 +95,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
                         }
                     
                     if( anyRaisable ) {
-                        int raisablePick = getRandom( 6 );
+                        unsigned int raisablePick = getRandom( 6 );
                     
                         while( (char)m.moveChars[ raisablePick * 2 ] <= 0 ) {
                             raisablePick = getRandom( 6 );
@@ -129,20 +129,20 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
                     }
                 if( countBids > 1 ) {
                     // pick two to swap
-                    pickA = getRandom( 3 );
+                    pickA = (int)getRandom( 3 );
                     while( m.moveChars[ pickA * 3 + 1 ] == 0 ) {
-                        pickA = getRandom( 3 );
+                        pickA = (int)getRandom( 3 );
                         }
                     
-                    pickB = getRandom( 3 );
+                    pickB = (int)getRandom( 3 );
                     while( m.moveChars[ pickB * 3 + 1 ] == 0 || 
                            pickB == pickA ) {
-                        pickB = getRandom( 3 );
+                        pickB = (int)getRandom( 3 );
                         }
                     }
 
                 
-                int mutType = getRandom( 4 );
+                unsigned int mutType = getRandom( 4 );
 
                 switch( mutType ) {
                     case 0: {
@@ -205,7 +205,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
 
                         if( countBids > 0 ) {
                             
-                            int regionPick = getRandom( 6 ) + 2;
+                            unsigned int regionPick = getRandom( 6 ) + 2;
                             
                             while( m.moveChars[ 0 ] == regionPick
                                    ||
@@ -218,7 +218,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
 
                             char done = false;
                             while( ! done ) {
-                                int u = getRandom( 3 );
+                                unsigned int u = getRandom( 3 );
                                 
                                 if( m.moveChars[ u * 3 + 1 ] > 0
                                     &&
@@ -229,7 +229,8 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
                                     inState->inspectorRegion ) {
                                 
                                     // switch to new region
-                                    m.moveChars[ u * 3 ] = regionPick;
+                                    m.moveChars[ u * 3 ] = 
+                                        (unsigned char)regionPick;
                                     done = true;
                                     }
                                 
@@ -300,7 +301,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
 // was peek avaiable in our last state?
 // if so, we can change our move
 // if not, we have to stick with the move that we picked in the last state
-char wasPeekAvailable( gameState *inState ) {
+static char wasPeekAvailable( gameState *inState ) {
 
     switch( inState->nextMove ) {
         case moveUnitsCommit: {
@@ -392,7 +393,7 @@ static int computeTripCost( gameState *inState, int inP, int inU,
 
 
 
-possibleMove getMoveUnitsMove( gameState *inState ) {
+static possibleMove getMoveUnitsMove( gameState *inState ) {
     possibleMove m;
     
     // 3 chars per player unit
@@ -434,7 +435,8 @@ possibleMove getMoveUnitsMove( gameState *inState ) {
     // (otherwise, all the random choices almost always add
     //  up to equal our total money---i.e., we spend everything
     //  we have!)
-    int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 - totalSpent);
+    int maxTotalToSpend = (int)getRandom( 
+        (unsigned int)( inState->ourMoney.t + 1 - totalSpent ) );
 
     if( inState->monthsLeft == 0 ) {
         // last month, go for broke and spend it all!
@@ -474,7 +476,7 @@ possibleMove getMoveUnitsMove( gameState *inState ) {
                 
 
             while( !uniqueDestFound ) {    
-                dest[u] = getRandom( 7 );
+                dest[u] = (int)getRandom( 7 );
                 if( dest[u] > 0 ) {
                     // add 1 to make total range [0, 2..7]
                     dest[u]++;
@@ -504,13 +506,13 @@ possibleMove getMoveUnitsMove( gameState *inState ) {
             bid[u] = 0;
             if( dest[u] > 1 ) {
                 // can bid here
-                bid[u] = getRandom( maxTotalToSpend + 1 );
+                bid[u] = (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
                 totalSpent += bid[u];
                 }
 
             bribe[u] = 0;
             if( dest[u] == inState->inspectorRegion ) {
-                bribe[u] = getRandom( maxTotalToSpend + 1 );
+                bribe[u] = (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
 
                 if( bid[u] > 0 && bribe[u] == 0 ) {
                     // illogical choice:
@@ -553,7 +555,7 @@ possibleMove getMoveUnitsMove( gameState *inState ) {
         // spending too much
                 
         // pick one to reduce
-        u = getRandom( 3 );
+        u = (int)getRandom( 3 );
                 
         // skip any that are frozen
         if( ! inState->agentUnits[0][u].moveFrozen ) {
@@ -667,7 +669,7 @@ possibleMove getMoveUnitsMove( gameState *inState ) {
 
 
 
-possibleMove getSellDiamondsMove( gameState *inState ) {
+static possibleMove getSellDiamondsMove( gameState *inState ) {
     possibleMove m;
     
     // 3 chars
@@ -678,7 +680,7 @@ possibleMove getSellDiamondsMove( gameState *inState ) {
     // always skip sending image
     m.numCharsUsed = 3;
     m.moveChars[0] = 
-        (unsigned char)getRandom( inState->ourDiamonds + 1 );
+        (unsigned char)getRandom( (unsigned int)inState->ourDiamonds + 1 );
     m.moveChars[1] = 0;
     m.moveChars[2] = 0;
     
@@ -719,7 +721,8 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
             // (otherwise, all the random choices almost always add
             //  up to equal our total money---i.e., we spend everything
             //  we have!)
-            int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 );
+            unsigned int maxTotalToSpend = 
+                getRandom( (unsigned int)( inState->ourMoney.t + 1 ) );
             
             // for testing
             // int maxTotalToSpend = inState->ourMoney.t / 2;
@@ -747,7 +750,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                     }
                 else {
                     salaryBribeAmounts[ u + 3 ] = 
-                        getRandom( maxTotalToSpend + 1 );
+                        (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
                         // force bribes for testing
                         // inState->ourMoney.t;
                     }
@@ -756,7 +759,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                 if( inState->agentUnits[0][u].region == 0 ) {
                     
                     salaryBribeAmounts[u] = 
-                        getRandom( maxTotalToSpend + 1 );
+                        (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
                     }
                 else {
                     // away from home
@@ -776,7 +779,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
             
             while( amountSum > maxTotalToSpend ) {    
                 // pick one
-                int pick = getRandom( 6 );
+                unsigned int pick = getRandom( 6 );
                 
                 if( salaryBribeAmounts[pick] > 0 ) {
                     // lower it
@@ -789,7 +792,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
 
             for( i=0; i<6; i++ ) {
                 int index = i*2;
-                m.moveChars[ index++ ] = salaryBribeAmounts[i];
+                m.moveChars[ index++ ] = (unsigned char)salaryBribeAmounts[i];
                 
                 if( i > 2 && salaryBribeAmounts[i] > 0 ) {
                     // new payment to enemy
@@ -808,7 +811,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                         }
 
                     // [0..2] range fine for this
-                    m.moveChars[ index++ ] = sharingUnit;
+                    m.moveChars[ index++ ] = (unsigned char)sharingUnit;
                     }
                 else {
                     // keep old value
@@ -980,14 +983,15 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
 
             if( maxEnemyUnit != -1 ) {
                 // found best to attack with inspector
-                m.moveChars[ 0 ] = inState->agentUnits[1][maxEnemyUnit].region;
+                m.moveChars[ 0 ] = (unsigned char)( 
+                    inState->agentUnits[1][maxEnemyUnit].region );
                 }
             else {
                 // none to attack
                 
                 // find some region not occupied by us
                 char occupied = true;
-                int pick = -1;
+                unsigned int pick = 2;
                 while( occupied ) {
                     occupied = false;
                     // avoid regions 1 and 2
@@ -999,7 +1003,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                             }
                         }
                     }
-                m.moveChars[ 0 ] = pick;                    
+                m.moveChars[ 0 ] = (unsigned char)pick;                    
                 }
             }
             break;
@@ -1024,7 +1028,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                 
                 // always skip sending image
                 m.numCharsUsed = 3;
-                m.moveChars[0] = inState->ourDiamondsToSell;
+                m.moveChars[0] = (unsigned char)( inState->ourDiamondsToSell );
                 m.moveChars[1] = 0;
                 m.moveChars[2] = 0;
                 }
@@ -1100,7 +1104,7 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
                 m.numCharsUsed = 1;
 
                 // one of the producing regions
-                m.moveChars[ 0 ] = i + 2;
+                m.moveChars[ 0 ] = (unsigned char)( i + 2 );
                 
                 outMoves[i] = m;                
                 }
@@ -1131,7 +1135,7 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
                     m.numCharsUsed = 3;
                     
                     // sell this number of diamonds
-                    m.moveChars[ 0 ] = i;
+                    m.moveChars[ 0 ] = (unsigned char)i;
                     m.moveChars[1] = 0;
                     m.moveChars[2] = 0;
                     
@@ -1147,7 +1151,8 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
                     return;
                     }
                 outMoves[0].numCharsUsed = 3;
-                outMoves[0].moveChars[0] = inState->ourDiamondsToSell;
+                outMoves[0].moveChars[0] = 
+                    (unsigned char)( inState->ourDiamondsToSell );
                 outMoves[0].moveChars[1] = 0;
                 outMoves[0].moveChars[2] = 0;
                 }
@@ -1300,7 +1305,9 @@ static void collectDiamonds( gameState *inState ) {
 
 // pick a random value in range
 static intRange collapseRange( intRange inRange ) {
-    int point = inRange.lo + getRandom( ( inRange.hi - inRange.lo ) + 1 );
+    int point = inRange.lo + 
+        (int)getRandom( (unsigned int)( 
+                            ( inRange.hi - inRange.lo ) + 1 ) );
     
     return makeRange( point );
     }
@@ -1561,7 +1568,8 @@ gameState collapseState( gameState *inState ) {
     // pick a random cap (or else almost all collapsed states result
     // in enemy spending all available money on salaries and bribes---
     //   we need to explore states where that's not the case)
-    availableForSalaryBribe = getRandom( availableForSalaryBribe + 1 );
+    availableForSalaryBribe = 
+        (int)getRandom( (unsigned int)availableForSalaryBribe + 1 );
 
     // make sure there's room under our random cap for the min values
     // that we know (random cap can get as low as zero)
@@ -1603,8 +1611,8 @@ gameState collapseState( gameState *inState ) {
     while( salaryBribeSum > availableForSalaryBribe ) {
 
         // pick one
-        u = getRandom( 3 );
-        int p = getRandom( 2 );
+        u = (int)getRandom( 3 );
+        int p = (int)getRandom( 2 );
         
         // look at uncollapsed ranges for room to reduce (can't reduce below
         //  lo  value in original, uncollapsed range)

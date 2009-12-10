@@ -203,7 +203,7 @@ possibleMove getPossibleMove( gameState *inState,
 
 
 possibleMove mutateMove( gameState *inState, possibleMove inMove,
-                         int inMaxMutations );
+                         unsigned int inMaxMutations );
 
 
 

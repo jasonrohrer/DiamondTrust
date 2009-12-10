@@ -1,4 +1,5 @@
 #include "ai/gameState.h"
+#include "ai/ai.h"
 
 #include "units.h"
 #include "map.h"
@@ -50,7 +51,7 @@ int maxNumSimulationsPerFinalChoice = 15000;
 int batchSizeBeforeReplaceWorstMoves = 7;
 
 // testing showed 7 to be the best here
-int mutationPoolSize = 7;
+unsigned int mutationPoolSize = 7;
 
 // out of 10
 // thus a value of 5 means that 50% of fresh replacement moves are mutations
@@ -58,7 +59,7 @@ int mutationPoolSize = 7;
 int mutationVsRandomMixRatio = 5;
 
 // 1 was found to be the best through testing
-int maxMutationsPerMove = 1;
+unsigned int maxMutationsPerMove = 1;
 
 // out of 10
 // 7 means lower 70% are discarded
@@ -79,10 +80,14 @@ int maxSimulationsPerStepAI = 100;
 
 
 
-
+// define this to enable AI testing code.
+// some of it doesn't compile on DS
+//#define AI_TESTING_ENABLED
 
 char testingAI = false;
 
+
+#ifdef AI_TESTING_ENABLED
 
 int currentTestingRound = 0;
 #define numTestingRoundsSpace 5
@@ -111,12 +116,13 @@ int maxTestingSimulationsPerMove = 3744;
 
 FILE *testDataFile;
 
+#endif
 
 
 
 static void sortMovesByScore() {
     
-    char beenPicked[ numPossibleMovesFilled ];
+    char beenPicked[ possibleMoveSpace ];
 
     int nextScoreToPick = -10000000;
 
@@ -180,7 +186,7 @@ static void printSortedMoves() {
 char stateChecked = true;
 
 
-char equal( possibleMove inA, possibleMove inB ) {
+static char equal( possibleMove inA, possibleMove inB ) {
     for( int c=0; c<inA.numCharsUsed; c++ ) {
         if( inA.moveChars[c] != inB.moveChars[c] ) {
             return false;
@@ -193,7 +199,7 @@ char equal( possibleMove inA, possibleMove inB ) {
 
 
 
-void clearNextMove() {
+static void clearNextMove() {
     // printOut( "Clearing move\n" );
     
     int numTotalMoves = getNumTotalPossibleMoves( &currentState );
@@ -408,10 +414,12 @@ static void checkCurrentStateMatches() {
 
 
 void initAI() {
+    #ifdef AI_TESTING_ENABLED
     if( testingAI ) {
         testDataFile = fopen( "aiTest.out", "w" );
         }
-    
+    #endif
+
     currentState.monthsLeft = 8;
     currentState.nextMove = salaryBribe;
 
@@ -558,7 +566,7 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
     
 
     // compose our move into a string
-    *outMoveLength = moves[chosenMove].numCharsUsed;
+    *outMoveLength = (unsigned int)( moves[chosenMove].numCharsUsed );
 
     unsigned char *ourMove = 
         new unsigned char[ *outMoveLength ];
@@ -574,9 +582,9 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
     // apply both moves to our game state, preserving hidden info
     currentState = stateTransition( &currentState, 
                                     ourMove,
-                                    *outMoveLength,
+                                    (int)( *outMoveLength ),
                                     externalEnemyMove,
-                                    externalEnemyMoveLength,
+                                    (int)externalEnemyMoveLength,
                                     true );
     printOut( "Before applyKnowledge...." );
     printStateKnowledgeStats();
@@ -767,6 +775,8 @@ void stepAI() {
                     moveDone = true;
                     }
                 else {
+                    #ifdef AI_TESTING_ENABLED
+
                     /*
                       
                     int currentTestingRound = 0;
@@ -866,8 +876,11 @@ void stepAI() {
                     if( !moveDone ) {
                         // start over for another run
                         clearNextMove();
-                        }                    
+                        }
+
+                    #endif
                     }
+                
                 
                 }
             else {
@@ -1057,7 +1070,7 @@ void stepAI() {
                                     // mutate one of top N
                                     int moveToMutate = 
                                         ( numPossibleMovesFilled - 1 )
-                                        - getRandom( mutationPoolSize );
+                                        - (int)getRandom( mutationPoolSize );
                                     
                                     int ii = moveSortMap[ moveToMutate ];
                                     
@@ -1183,8 +1196,8 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
 
         externalEnemyMove = new unsigned char[ enemyMove.numCharsUsed ];
         memcpy( externalEnemyMove, enemyMove.moveChars, 
-                enemyMove.numCharsUsed );
-        externalEnemyMoveLength = enemyMove.numCharsUsed;
+                (unsigned int)( enemyMove.numCharsUsed ) );
+        externalEnemyMoveLength = (unsigned int)( enemyMove.numCharsUsed );
         }
 
     char isMoveUnitsState = false;
