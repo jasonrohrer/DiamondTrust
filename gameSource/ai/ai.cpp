@@ -93,7 +93,8 @@ int currentTestingRound = 0;
 //int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 3, 5, 7, 10, 13 };
 
 // maxMutationsPerMove
-int testingRoundParameter[ numTestingRoundsSpace ] = { 1, 2, 3, 10, 10 };
+// batch sizes
+int testingRoundParameter[ numTestingRoundsSpace ] = { 7, 10, 15, 10, 10 };
 
 int numRunsPerTestingRound = 40;
 
@@ -101,8 +102,8 @@ float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
 int numTestingRounds = 3;
-int maxTestingPossibleMoves = 64;
-int maxTestingSimulationsPerMove = 600;
+int maxTestingPossibleMoves = 32;
+int maxTestingSimulationsPerMove = 936;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -462,7 +463,8 @@ void freeAI() {
 void setAIThinkingTime( int inSeconds ) {
     int simsPerSecond = maxSimulationsPerStepAI * 30;
     
-    maxNumSimulationsPerFinalChoice = inSeconds * simsPerSecond;
+    // FIXME
+    //maxNumSimulationsPerFinalChoice = inSeconds * simsPerSecond;
     }
 
     
@@ -747,7 +749,7 @@ void stepAI() {
                 maxNumSimulationsPerMove ) {
                 
                 if( ! ( testingAI && 
-                        currentState.nextMove == moveUnitsCommit ) ) {
+                        currentState.nextMove == moveUnits ) ) {
                     
                     moveDone = true;
                     }
@@ -809,7 +811,8 @@ void stepAI() {
                             currentTestingRound = 0;
 
                             maxNumSimulationsPerMove *= 2;
-
+                            maxNumSimulationsPerFinalChoice *= 2;
+                            
                             if( maxNumSimulationsPerMove > 
                                 maxTestingSimulationsPerMove ) {
                                 
@@ -832,15 +835,15 @@ void stepAI() {
                         
                         
                         //batchSizeBeforeReplaceWorstMoves =
-                        //    testingRoundBatchSizes[ currentTestingRound ];
+                            testingRoundParameter[ currentTestingRound ];
                         //mutationPoolSize = 
                         //    testingRoundParameter[ currentTestingRound ];
                         //mutationVsRandomMixRatio = 
                         //    testingRoundParameter[ currentTestingRound ];
                         //fractionOfMovesDiscarded =
                         //    testingRoundParameter[ currentTestingRound ];
-                        maxMutationsPerMove =
-                            testingRoundParameter[ currentTestingRound ];
+                        //maxMutationsPerMove =
+                        //    testingRoundParameter[ currentTestingRound ];
 
                         printOut( "***** Testing parameter %d\n",
                                testingRoundParameter[ currentTestingRound ] );
