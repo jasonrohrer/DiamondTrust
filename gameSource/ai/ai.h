@@ -5,10 +5,15 @@ void initAI();
 
 void freeAI();
 
+// the number of steps to run for each move in pool
+void setAIThinkingSteps( int inNumSteps );
 
-void setAIThinkingTime( int inSeconds );
+int getAIThinkingSteps();
 
-int getAIThinkingTime();
+
+// if full speed is set to true, AI runs more simulations per step
+// defaults to OFF
+void toggleAICPUMode( char inFullSpeed );
 
 
 

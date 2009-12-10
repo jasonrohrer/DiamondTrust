@@ -88,8 +88,8 @@ void SetAILevelState::clickState( int inX, int inY ) {
             setPickerSale( oldSetting );
             }
         
-        // batches of 5 seconds, with 5 being the lowest
-        setAIThinkingTime( 5 + newSetting * 5 );
+        // batches of 100 steps, with 200 being the lowest
+        setAIThinkingSteps( 200 + newSetting * 100 );
         
         //setPlayerNumToSell( 0, newSale );
         
@@ -128,25 +128,28 @@ void SetAILevelState::drawState() {
     if( waitingForDone ) {
         doneButton->draw();
         
-        drawSalePicker( 209, 58 );
+        drawSalePicker( 150, 58 );
 
-        char *timeString = autoSprintf( "%d seconds", getAIThinkingTime() );
+        int aiLevel = ( getAIThinkingSteps() - 200 ) / 100 + 1;
+        
+
+        char *levelString = autoSprintf( "level %d", aiLevel );
 
         // shadow
         rgbaColor shadowColor = black;
         shadowColor.a = 128;
         
-        font16->drawString( timeString, 
-                            198, 
-                            53, shadowColor, alignRight );
+        font16->drawString( levelString, 
+                            168, 
+                            53, shadowColor, alignLeft );
 
         startNewSpriteLayer();
         
-        font16->drawString( timeString, 
-                            197, 
-                            52, white, alignRight );
+        font16->drawString( levelString, 
+                            167, 
+                            52, white, alignLeft );
         
-        delete [] timeString;
+        delete [] levelString;
         }
     
     }
@@ -163,10 +166,10 @@ void SetAILevelState::enterState() {
     
     waitingForDone = true;
 
-    int thinkingTime = getAIThinkingTime();
+    int thinkingSteps = getAIThinkingSteps();
     
-    // picker adjusts in batches of 5, with 5 being the lowest
-    setPickerSale( (thinkingTime - 5) / 5 );
+    // picker adjusts in batches of 100, with 200 being the lowest
+    setPickerSale( (thinkingSteps - 200) / 100 );
     }
 
 

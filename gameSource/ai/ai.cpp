@@ -40,10 +40,10 @@ int moveSortMap[ possibleMoveSpace ];
 
 
 //int maxNumSimulationsPerMove = 3720;//600;
-int maxNumSimulationsPerMove = 468;//1200;//600;
+int maxNumSimulationsPerMove = 200;//1200;//600;
 
 // 5 seconds
-int maxNumSimulationsPerFinalChoice = 15000;
+int maxNumSimulationsPerFinalChoice = 6400;
 
 
 // testing has showed 7 to be the best here
@@ -69,13 +69,29 @@ int fractionOfMovesDiscarded = 5;
 
 
 
-int finalBatchSize = 200;
+int finalBatchSize = 100;
 
 //int maxSimulationsPerStepAI = 100;
 
 // for testing
 // int maxSimulationsPerStepAI = 1000;
-int maxSimulationsPerStepAI = 100;
+// this worked during testing on the PC
+//int maxSimulationsPerStepAI = 100;
+// too long for the DS
+int maxSimulationsPerStepAI = 10;
+
+int simulationsPerStepSlowMode = 10;
+int simulationsPerStepFastMode = 100;
+
+void toggleAICPUMode( char inFullSpeed ) {
+    if( inFullSpeed ) {
+        maxSimulationsPerStepAI = simulationsPerStepFastMode;
+        }
+    else {
+        maxSimulationsPerStepAI = simulationsPerStepSlowMode;
+        }
+    }
+
 
 
 
@@ -292,8 +308,9 @@ static void clearNextMove() {
     // (If there is only one possible move, we don't need to test it anyway,
     //   but we don't have time to fix this now!)
     
-    maxNumSimulationsPerMove = 
-        maxNumSimulationsPerFinalChoice / numPossibleMoves;
+    // no longer need to touch this at all
+    //maxNumSimulationsPerMove = 
+    //    maxNumSimulationsPerFinalChoice / numPossibleMoves;
     
     if( !testingAI ) {
         
@@ -482,18 +499,18 @@ void freeAI() {
 
 
 
-void setAIThinkingTime( int inSeconds ) {
-    int simsPerSecond = maxSimulationsPerStepAI * 30;
+void setAIThinkingSteps( int inNumSteps ) {
+    maxNumSimulationsPerMove = inNumSteps;
     
-    maxNumSimulationsPerFinalChoice = inSeconds * simsPerSecond;
+    maxNumSimulationsPerFinalChoice = 
+        maxNumSimulationsPerMove * numPossibleMoves;
     }
 
     
 
-int getAIThinkingTime() {
-    int simsPerSecond = maxSimulationsPerStepAI * 30;
+int getAIThinkingSteps() {
 
-    return maxNumSimulationsPerFinalChoice / simsPerSecond;
+    return maxNumSimulationsPerMove;
     }
 
 
