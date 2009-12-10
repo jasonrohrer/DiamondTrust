@@ -435,6 +435,12 @@ possibleMove getMoveUnitsMove( gameState *inState ) {
     //  up to equal our total money---i.e., we spend everything
     //  we have!)
     int maxTotalToSpend = getRandom( inState->ourMoney.t + 1 - totalSpent);
+
+    if( inState->monthsLeft == 0 ) {
+        // last month, go for broke and spend it all!
+        maxTotalToSpend = inState->ourMoney.t - totalSpent;
+        }
+    
     maxTotalToSpend += totalSpent;
     
 
