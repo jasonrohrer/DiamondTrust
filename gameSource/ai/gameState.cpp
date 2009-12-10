@@ -1761,8 +1761,7 @@ int playRandomGameUntilEnd( gameState inState ) {
               && inState.nextMove == originalNextMove ) 
            &&
            ( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) ) {
-        
-        
+            
         possibleMove ourMove = getPossibleMove( &inState );
         
         gameState mirror = getMirrorState( &inState );
@@ -1806,20 +1805,26 @@ int playRandomGameUntilEnd( gameState inState ) {
     char gameOver = ( inState.monthsLeft == 0 && 
                       inState.nextMove == sellDiamonds );
     
-    int homeDiamondsValueFactor = 4;
+    int homeDiamondsValueFactor = 10;
+
+    // for now, have field diamonds worth 0... seems to work the best
+    // (odd that even with this, AI agents never fly diamonds home, but it
+    //   seems that they never need to... waste of money...
+    //   instead, AI almost always controls inspector)
+    int fieldDiamondValueFactor = 0;
+
+    // diamonds in the field are worth less, since they're at risk
+    
+    // they're worth full value at gameOver, though, because everyone
+    // flies home for free
 
     if( !gameOver ) {
-        // diamonds in the field are worth less, since they're at risk
-
-        // they're worth full value at gameOver, though, because everyone
-        // flies home for free
-
         ourTotal *= homeDiamondsValueFactor;
         enemyTotal *= homeDiamondsValueFactor;
         
-        // now add in field diamonds, which are worth only 1 each
-        ourTotal += ourFieldTotal;
-        enemyTotal += enemyFieldTotal;
+        // now add in field diamonds, which are worth a different amount
+        ourTotal += fieldDiamondValueFactor * ourFieldTotal;
+        enemyTotal += fieldDiamondValueFactor * enemyFieldTotal;
         }
     else {
         // add in field diamonds first, then apply factor to all
@@ -1841,10 +1846,10 @@ int playRandomGameUntilEnd( gameState inState ) {
     // but AI is still hoarding money by end
     // tweak this so that AI spends more...
     
-    int moneyValueFactor = 6;
+    int moneyValueFactor = 2;//6;
     
     
-    int bribeCountFactor = 200;
+    int bribeCountFactor = 8;//200;
     
 
     // only diamonds matter toward victory at game end (unless there is a tie)
@@ -1852,8 +1857,8 @@ int playRandomGameUntilEnd( gameState inState ) {
         // money can be used to purchase more diamonds in future rounds,
         // so it has some value
 
-        ourTotal += inState.ourMoney.t / moneyValueFactor;
-        enemyTotal += inState.enemyMoney.t / moneyValueFactor;
+        ourTotal += inState.ourMoney.t * moneyValueFactor;
+        enemyTotal += inState.enemyMoney.t * moneyValueFactor;
         }
     
     // bribed status also doesn't matter at game end... BUT
@@ -1877,7 +1882,7 @@ int playRandomGameUntilEnd( gameState inState ) {
         // is much "safer" than tying and relying on your money balance
         // to put you over the top
         
-        diff = (inState.ourMoney.t - inState.enemyMoney.t) / moneyValueFactor;
+        diff = (inState.ourMoney.t - inState.enemyMoney.t) * moneyValueFactor;
         }
 
     return diff;
