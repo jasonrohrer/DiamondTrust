@@ -1,0 +1,40 @@
+Test effect of only considering "good moves" and their mutations.
+
+
+Gaussian around good move had sig^2 of 10:
+
+***** Test results for 32, 100:
+Parameter 0, ave score 17.917722
+Parameter 1, ave score 22.525314
+
+
+
+sig^2 of 4:
+
+***** Test results for 32, 100:
+Parameter 0, ave score 18.352531
+Parameter 1, ave score 23.113924
+
+
+
+sig^2 of 1:
+
+***** Test results for 32, 100:
+Parameter 0, ave score 16.706331
+Parameter 1, ave score 22.070888
+
+
+
+sig^2 of 4:
+
+
+***** Test results for 32, 100:
+Parameter 0, ave score 18.236073
+Parameter 1, ave score 24.225313
+
+
+***** Test results for 32, 200:
+Parameter 0, ave score 22.697530
+Parameter 1, ave score 24.267900
+
+Note that longer runs no longer improves things...

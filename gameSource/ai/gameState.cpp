@@ -1087,7 +1087,12 @@ static int fauxGaussian( int *outWeights, int inLength, int inMean ) {
         // gaussian-like, with center around mean
         // 10 / 2**( (s - mean)**2 /10 )
 
-        int twoExponent = intPower( (s - inMean), 2 ) / 10;
+        // these define, roughly, standard deviation
+        // higher quotient makes the gaussian narrower
+        int quotient = 1;
+        int denominator = 4;
+        
+        int twoExponent = quotient * intPower( (s - inMean), 2 ) / denominator;
         
         if( twoExponent > 30 ) {
             // overflow
@@ -1265,12 +1270,15 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
             // now we have weights for all the possible regions
             // (0 weights on regions that are blocked)
             dest[u] = pickRandomWeighedIndex( regionWeights, 8, totalWeight );
+            
+            /*
             printOut( "Region weights: " );
             for( int r=0; r<8; r++ ) {
                 printOut( "%d, ", regionWeights[r] );
                 }
             printOut( "\n" );
             printOut( "Picked dest %d\n", dest[u] );
+            */
             }
         }
     
@@ -1409,11 +1417,11 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                 }
             }
         
-        printOut( "About to delete possible weights..., length %d\n",
-                  moneyAvailable + 1 );
+        //printOut( "About to delete possible weights..., length %d\n",
+        //          moneyAvailable + 1 );
         
         delete [] possibleSpendingWeights;        
-        printOut( "...done\n" );
+        //printOut( "...done\n" );
         }
     
 

@@ -61,6 +61,10 @@ int mutationVsRandomMixRatio = 5;
 // 1 was found to be the best through testing
 unsigned int maxMutationsPerMove = 1;
 
+
+char useGoodMovesOnly = false;
+
+
 // out of 10
 // 7 means lower 70% are discarded
 
@@ -117,17 +121,17 @@ int currentTestingRound = 0;
 //int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 3, 5, 7, 10, 13 };
 
 // maxMutationsPerMove
-// batch sizes
-int testingRoundParameter[ numTestingRoundsSpace ] = { 7, 15, 20, 25, 10 };
+// flag to use good moves
+int testingRoundParameter[ numTestingRoundsSpace ] = { false, true, 1, 1, 1 };
 
 int numRunsPerTestingRound = 40;
 
 float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
-int numTestingRounds = 4;
+int numTestingRounds = 2;
 int maxTestingPossibleMoves = 32;
-int maxTestingSimulationsPerMove = 3744;
+int maxTestingSimulationsPerMove = 200;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -248,8 +252,13 @@ static void clearNextMove() {
             
             while( collision && collisionCount < 100 ) {
                 
-                //moves[m] = getPossibleMove( &currentState );
-                moves[m] = getGoodMove( &currentState );
+                if( useGoodMovesOnly ) {
+                    moves[m] = getGoodMove( &currentState );
+                    }
+                else {
+                    moves[m] = getPossibleMove( &currentState );
+                    }
+                
                 
             
                 // make sure this is not a collision with one already picked
@@ -917,8 +926,8 @@ void stepAI() {
                             }
                         
                         
-                        batchSizeBeforeReplaceWorstMoves =
-                            testingRoundParameter[ currentTestingRound ];
+                        //batchSizeBeforeReplaceWorstMoves =
+                        //    testingRoundParameter[ currentTestingRound ];
                         //mutationPoolSize = 
                         //    testingRoundParameter[ currentTestingRound ];
                         //mutationVsRandomMixRatio = 
@@ -927,7 +936,9 @@ void stepAI() {
                         //    testingRoundParameter[ currentTestingRound ];
                         //maxMutationsPerMove =
                         //    testingRoundParameter[ currentTestingRound ];
-
+                        useGoodMovesOnly = 
+                            testingRoundParameter[ currentTestingRound ];
+                        
                         printOut( "***** Testing parameter %d\n",
                                testingRoundParameter[ currentTestingRound ] );
                         
@@ -1115,10 +1126,14 @@ void stepAI() {
                                 if( (int)getRandom( 11 ) > 
                                     mutationVsRandomMixRatio ) {
                                     // fresh move
-                                    //moves[ moveSortMap[i] ] =
-                                    //    getPossibleMove( &currentState );
-                                    moves[ moveSortMap[i] ] =
-                                        getGoodMove( &currentState );
+                                    if( useGoodMovesOnly ) {
+                                        moves[ moveSortMap[i] ] =
+                                            getGoodMove( &currentState );
+                                        }
+                                    else {
+                                        moves[ moveSortMap[i] ] =
+                                            getPossibleMove( &currentState );
+                                        }
                                     moves[ moveSortMap[i] ].flag = 0;
                                     }
                                 else {
