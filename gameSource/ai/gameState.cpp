@@ -1258,6 +1258,15 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                                 
                                 regionWeights[r] += 4;
                                 }
+                            
+                            // if we have fewer than 2 diamonds at home,
+                            // then we can't compete well in the sell-diamonds
+                            // phase
+                            if( inState->ourDiamonds < 2 ) {
+                                // only a factor if we have diamonds
+                                regionWeights[r] += 
+                                    inState->agentUnits[0][u].diamonds * 4;
+                                }
                             }
                         
                         }
@@ -1780,13 +1789,20 @@ int getNumTotalPossibleMoves( gameState *inState ) {
             // AIs game-run-playing algorithm pick the best one
 
             // can move to one of 5 other regions, or stay in current one
-            return 6;
+            //return 6;
+
+            // actually, don't bother with this, because we know the best one
+            // we're no longer running enough sim steps to be able to pick
+            // the very best move here, so don't let sim do it.
+            return 1;
             break;
             
             
             
         case sellDiamonds:
         case sellDiamondsCommit:
+
+            /*
             if( inState->nextMove == sellDiamonds ||
                 wasPeekAvailable( inState ) ) {
                 // fresh pick
@@ -1798,8 +1814,19 @@ int getNumTotalPossibleMoves( gameState *inState ) {
                 // the move we saved in inState
                 return 1;
                 }
+            */
+
+            // sim doesn't work well to find a good move, because it
+            // essentially computes the expected value of the move, and
+            // thus almost always picks the same move (sell 0), which 
+            // usually has the highest E
             
+            // however, that's a dominated strategy
+            // Instead, better to select a known good move, or select
+            // from possibly-winning moves at random
+            // Best to just pick 1 here and not sim at all.
             
+            return 1;
             break;    
         
         default:
@@ -1820,12 +1847,17 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
             
     switch( inState->nextMove ) {
         case moveInspector:
-            if( numMoves != 6 ) {
+            if( numMoves != 1 ) {
                 printOut( "Error:  num moves doesn't match expected count "
                           " for moveInspector\n" );
                 return;
                 }
             
+            // return the 1 very best move we can find
+            outMoves[0] = getPossibleMove( inState, false );
+            
+            
+            /*
             for( int i=0; i<numMoves; i++ ) {
                 possibleMove m;
                 m.numCharsUsed = 1;
@@ -1835,6 +1867,7 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
                 
                 outMoves[i] = m;                
                 }
+            */
             return;
             break;
 
@@ -1845,12 +1878,16 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
                 wasPeekAvailable( inState ) ) {
         
 
-                if( numMoves != inState->ourDiamonds + 1 ) {
+                if( numMoves != 1 /*inState->ourDiamonds + 1*/  ) {
                     printOut( "Error:  num moves doesn't match expected count "
                               " for sellDiamonds\n" );
                     return;
                     }
             
+                // return the 1 move, selected at random from good ones
+                outMoves[0] = getGoodMove( inState, false );
+                
+                /*
                 for( int i=0; i<numMoves; i++ ) {
                     possibleMove m;
                     
@@ -1868,6 +1905,7 @@ void getAllPossibleMoves( gameState *inState, possibleMove *outMoves ) {
                     
                     outMoves[i] = m;                
                     }
+                */
                 }
             else {
                 // just one move, the one saved in inState
@@ -2587,7 +2625,10 @@ int playRandomGameUntilEnd( gameState inState ) {
     // but AI is still hoarding money by end
     // tweak this so that AI spends more...
     
-    int moneyValueFactor = 2;//6;
+    //int moneyValueFactor = 2;//6;
+    
+    // new:  don't value money at all here
+    int moneyValueFactor = 0;
     
     
     int bribeCountFactor = 8;//200;
