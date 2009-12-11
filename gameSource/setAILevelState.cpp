@@ -88,8 +88,8 @@ void SetAILevelState::clickState( int inX, int inY ) {
             setPickerSale( oldSetting );
             }
         
-        // batches of 100 steps, with 200 being the lowest
-        setAIThinkingSteps( 200 + newSetting * 100 );
+        // batches of 100 steps, with 100 being the lowest
+        setAIThinkingSteps( 100 + newSetting * 100 );
         
         //setPlayerNumToSell( 0, newSale );
         
@@ -130,7 +130,7 @@ void SetAILevelState::drawState() {
         
         drawSalePicker( 150, 58 );
 
-        int aiLevel = ( getAIThinkingSteps() - 200 ) / 100 + 1;
+        int aiLevel = ( getAIThinkingSteps() - 100 ) / 100 + 1;
         
 
         char *levelString = autoSprintf( "level %d", aiLevel );
@@ -168,8 +168,8 @@ void SetAILevelState::enterState() {
 
     int thinkingSteps = getAIThinkingSteps();
     
-    // picker adjusts in batches of 100, with 200 being the lowest
-    setPickerSale( (thinkingSteps - 200) / 100 );
+    // picker adjusts in batches of 100, with 100 being the lowest
+    setPickerSale( (thinkingSteps - 100) / 100 );
     }
 
 

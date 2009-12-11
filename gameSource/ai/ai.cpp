@@ -40,7 +40,7 @@ int moveSortMap[ possibleMoveSpace ];
 
 
 //int maxNumSimulationsPerMove = 3720;//600;
-int maxNumSimulationsPerMove = 200;//1200;//600;
+int maxNumSimulationsPerMove = 100;//1200;//600;
 
 // 5 seconds
 int maxNumSimulationsPerFinalChoice = 6400;
@@ -69,7 +69,7 @@ int fractionOfMovesDiscarded = 5;
 
 
 
-int finalBatchSize = 100;
+int finalBatchSize = 75;
 
 //int maxSimulationsPerStepAI = 100;
 
@@ -77,10 +77,12 @@ int finalBatchSize = 100;
 // int maxSimulationsPerStepAI = 1000;
 // this worked during testing on the PC
 //int maxSimulationsPerStepAI = 100;
-// too long for the DS
-int maxSimulationsPerStepAI = 10;
+// too long for the DSi
+int simulationsPerStepSlowMode = 12;
 
-int simulationsPerStepSlowMode = 10;
+
+int maxSimulationsPerStepAI = simulationsPerStepSlowMode;
+
 int simulationsPerStepFastMode = 100;
 
 void toggleAICPUMode( char inFullSpeed ) {
@@ -322,6 +324,16 @@ static void clearNextMove() {
             }
         printOut( "using batch size of %d\n", 
                   batchSizeBeforeReplaceWorstMoves );
+
+        if( maxNumSimulationsPerMove < 200 ) {
+            finalBatchSize = 50;
+            }
+        else {
+            finalBatchSize = 100;
+            }
+        printOut( "using final batch size of %d\n", 
+                  finalBatchSize );
+            
         
         }
     
@@ -429,8 +441,38 @@ static void checkCurrentStateMatches() {
 
 
 
+//#include "minorGems/util/stringUtils.h"
+
+//extern char *statusMessage;
 
 void initAI() {
+
+#ifdef SDK_TWL
+    printOut( "Got to AI check for console type\n" );
+
+    unsigned int consoleType = OS_GetConsoleType();
+
+    unsigned int console = consoleType & OS_CONSOLE_MASK;
+
+    if( console == OS_CONSOLE_NITRO ||
+        console == OS_CONSOLE_ISDEBUGGER ) {
+        // DS is half the speed of DSi... do this to avoid slowdown
+        simulationsPerStepSlowMode = 6;
+        maxSimulationsPerStepAI = simulationsPerStepSlowMode;
+        printOut( "Console type is NITRO\n" );
+        //statusMessage = "NITRO";
+        }
+    else {
+        printOut( "Console type is NOT NITRO\n" );
+        //statusMessage = "NOT NITRO";
+        }
+    /*
+    statusMessage = autoSprintf( "t=0x%02lX, c=0x%02lX, n=0x%02lX", 
+                                 consoleType, console, OS_CONSOLE_NITRO );
+    */
+#endif
+
+
     #ifdef AI_TESTING_ENABLED
     if( testingAI ) {
         testDataFile = fopen( "aiTest.out", "w" );
