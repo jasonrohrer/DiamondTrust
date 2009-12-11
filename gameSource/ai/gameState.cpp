@@ -2,6 +2,7 @@
 
 #include "units.h"
 #include "map.h"
+#include "common.h"
 
 
 #include <assert.h>
@@ -454,6 +455,7 @@ static possibleMove getMoveUnitsMove( gameState *inState ) {
                 if( o != u ) {
                     if( dest[o] == dest[u] ) {
                         printOut( "Units collide in chosen move!\n" );
+                        assert( 0 );
                         }
                     }
                 }
@@ -1038,6 +1040,723 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
 
     return m;
     }
+
+
+
+
+
+static void zeroIntArray( int *inArray, int inLength ) {
+    for( int i=0; i<inLength; i++ ) {
+        inArray[i] = 0;
+        }
+    }
+
+
+// pick an index at random, with probability proportional
+// to weight
+static int pickRandomWeighedIndex( int *inWeights, int inLength, 
+                                   unsigned int inTotalWeight ) {
+    
+    assert( inTotalWeight > 0 );
+    
+    unsigned int randomWeightPick = getRandom( inTotalWeight );
+            
+    unsigned int cumWeight = 0;
+    int pickI = -1;
+            
+    for( int i=0; i<inLength && pickI == -1; i++ ) {
+        cumWeight += (unsigned int)inWeights[i];
+                
+        if( cumWeight >= randomWeightPick ) {
+            pickI = i;
+            }
+        }
+
+    return pickI;
+    }
+
+
+
+// fill an array with gaussian-like weights, centered on inMean index
+// returns total weight assigned
+static int fauxGaussian( int *outWeights, int inLength, int inMean ) {
+    
+    unsigned int totalWeight = 0;
+    for( int s=0; s<inLength; s++ ) {
+                    
+        // gaussian-like, with center around mean
+        // 10 / 2**( (s - mean)**2 /10 )
+
+        int twoExponent = intPower( (s - inMean), 2 ) / 10;
+        
+        if( twoExponent > 30 ) {
+            // overflow
+            outWeights[s] = 0;
+            }
+        else {
+            int powerValue = intPower( 2, twoExponent );
+
+            outWeights[s] = 10 / powerValue;
+            }
+        
+        totalWeight += outWeights[s];
+        }
+
+    return totalWeight;
+    }
+
+
+
+
+static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
+    possibleMove m;
+    
+    // 3 chars per player unit
+    // dest, bid, bribe
+    m.numCharsUsed = 9;
+
+    int dest[3];
+    int bid[3];
+    int bribe[3];
+
+    int totalSpent = 0;
+    
+
+    int u;
+    for( u=0; u<3; u++ ) {
+        // start with all dests to current unit regions
+        dest[u] = inState->agentUnits[0][u].region;
+        bid[u] = 0;
+        bribe[u] = 0;
+        }
+
+
+    // first, deal with any moves that are already frozen
+    for( u=0; u<3; u++ ) {
+        if( inState->agentUnits[0][u].moveFrozen ) {
+            
+            dest[u] = inState->agentUnits[0][u].destination;
+            bid[u] = inState->agentUnits[0][u].diamondBid;
+            bribe[u] = inState->agentUnits[0][u].inspectorBribe;
+            
+            totalSpent += bid[u];
+            totalSpent += bribe[u];
+            
+            totalSpent += computeTripCost( inState, 0, u, dest[u] );
+            }
+        }
+
+    // count the number of diamonds carried by agents in the field
+    int atRiskDiamondCounts[2] = { 0, 0 };
+    
+    for( int p=0; p<2; p++ ) {
+        
+        for( u=0; u<3; u++ ) {
+            atRiskDiamondCounts[p] += inState->agentUnits[p][u].diamonds;
+            }
+        }
+    
+
+    
+
+    // first pick a smart destination for each unit
+    
+    // process units in a random order
+    unsigned int unitOrder[3];
+    for( u=0; u<3; u++ ) {
+
+        char assigned = false;
+        while( !assigned ) {
+            
+            assigned = true;
+
+            unitOrder[u] = getRandom( 3 );
+            for( int uu=0; uu<u; uu++ ) {
+                if( unitOrder[u] == unitOrder[uu] ) {
+                    // collision with existing assignment
+                    assigned = false;
+                    }
+                }
+            }
+        }
+    
+    int i;
+    
+
+    for( i=0; i<3; i++ ) {
+        u = unitOrder[i];
+        
+        if( !inState->agentUnits[0][u].moveFrozen ) {
+            
+            int regionWeights[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+            
+            int totalWeight = 0;
+            
+
+            for( int r=0; r<8; r++ ) {
+                if( r == 1 ) {
+                    // never move into enemy home
+                    regionWeights[r] = 0;
+                    }
+                else {
+                    
+                    char alreadyOccupied = false;
+                    for( int uu=0; uu<3; uu++ ) {
+                        if( uu!= u && dest[uu] == r ) {
+                            alreadyOccupied = true;
+                            }
+                        }
+                    
+                    if( alreadyOccupied && r != 0 ) {
+                        // can't move into a non-home region already
+                        // being moved to by one of our agents
+                        regionWeights[r] = 0;
+                        }
+                    else {
+                        
+                        // bit of weight to staying in current region
+                        // because it saves money
+                        if( inState->agentUnits[0][u].region == r ) {
+                            regionWeights[r] +=  2;
+                            }
+
+                        // weight based on number of diamonds present
+                        // approximate dollare value
+
+                        regionWeights[r] += 
+                            inState->regionDiamondCounts[r] * 4;
+                        
+                        if( inState->inspectorRegion == r ) {
+                            // beneficial to move the inspector
+                            regionWeights[r] += 4;
+
+                            // even more beneficial depending on at-risk
+                            // diamond counts
+                            // (doesn't matter whoes they are... if they're
+                            //  ours, we want to protect them... if they're
+                            //  enemy's, we want to have them confiscated)
+                            regionWeights[r] += 
+                                atRiskDiamondCounts[0] + 
+                                atRiskDiamondCounts[1];
+                            }
+
+                        if( r == 0 ) {
+                            // should we go home?
+                        
+                            // if we're carrying a lot of diamonds, then yes
+                            regionWeights[r] += 
+                                inState->agentUnits[0][u].diamonds * 4;
+                            
+                            // if we're likely bribed, then yes
+                            if( inState->agentUnits[0][u].totalBribe.hi >
+                                inState->agentUnits[0][u].totalSalary.t ) {
+                                
+                                regionWeights[r] += 4;
+                                }
+                            }
+                        
+                        }
+                    }
+
+                totalWeight += regionWeights[r];
+                }
+            
+
+            // now we have weights for all the possible regions
+            // (0 weights on regions that are blocked)
+            dest[u] = pickRandomWeighedIndex( regionWeights, 8, totalWeight );
+            printOut( "Region weights: " );
+            for( int r=0; r<8; r++ ) {
+                printOut( "%d, ", regionWeights[r] );
+                }
+            printOut( "\n" );
+            printOut( "Picked dest %d\n", dest[u] );
+            }
+        }
+    
+    
+    // now we have destinations for everyone
+
+    // how much should each one spend?
+    int moneyAvailable = inState->ourMoney.t;
+    // subtract money spent on frozen moves
+    moneyAvailable -= totalSpent;
+
+    // subtract trip costs
+    for( u=0; u<3; u++ ) {
+        if( ! inState->agentUnits[0][u].moveFrozen ) {
+            int tripCost = computeTripCost( inState, 0, u, dest[u] );
+            moneyAvailable -= tripCost;
+            totalSpent += tripCost;
+            }
+        }
+    
+    
+    
+    if( moneyAvailable <= 0 ) {
+        // don't even have enough for our trips
+
+        // units had better stay where they are and save up for next time
+        for( u=0; u<3; u++ ) {
+            if( ! inState->agentUnits[0][u].moveFrozen ) {            
+                totalSpent -= computeTripCost( inState, 0, u, dest[u] );
+                dest[u] = inState->agentUnits[0][u].region;
+                }
+            }
+        }
+    else {
+        
+        
+
+        // pick best amounts to spend in each region
+
+        
+        int *possibleSpendingWeights = new int[moneyAvailable + 1];
+        
+        int totalDiamondsInDests = 0;
+        char oneDestHasInspector = false;
+        int uWithInspector = -1;
+        
+        for( u=0; u<3; u++ ) {
+            if( ! inState->agentUnits[0][u].moveFrozen ) {
+                totalDiamondsInDests += 
+                    inState->regionDiamondCounts[ dest[u] ];
+            
+                if( dest[u] == inState->inspectorRegion ) {
+                    oneDestHasInspector = true;
+                    uWithInspector = u;
+                    }
+                }
+            }
+        
+
+        int idealToSpendOnInspector = 0;
+        
+        if( oneDestHasInspector ) {
+            // spend based on how much inspector stands to take
+            // vs how many diamonds we might buy
+            
+            idealToSpendOnInspector += 
+                ( atRiskDiamondCounts[0] + 
+                  atRiskDiamondCounts[1] ) / 2;
+            
+            idealToSpendOnInspector -= totalDiamondsInDests / 3;
+            
+            // bump up if there are a lot of diamonds in inspector's region
+            idealToSpendOnInspector += 
+                inState->regionDiamondCounts[ inState->inspectorRegion ] / 2;
+            
+            // bump up if unit in inspector's region is carrying a lot
+            // (wanna get inspector out of there)
+            idealToSpendOnInspector +=
+                inState->agentUnits[0][uWithInspector].diamonds / 2;
+            }
+        
+        
+
+        for( u=0; u<3; u++ ) {
+            if( ! inState->agentUnits[0][u].moveFrozen &&        
+                dest[u] != 0 ) {
+                
+                // fraction of our money that we can spend on these diamonds
+                int idealToSpendOnDiamonds = 
+                    inState->regionDiamondCounts[ dest[u] ] * moneyAvailable /
+                    totalDiamondsInDests;
+             
+                /*
+                  // this doesn't make sense... how can we "try to spend
+                  //   more than we have"?
+                // try to spend more if we know enemy has more money than us
+                idealToSpendOnDiamonds +=
+                    (inState->enemyMoney.hi - inState->ourMoney.t) / 3;
+                    
+                */
+                if( oneDestHasInspector ) {
+                    // spend a bit less so that we can pay inspector
+                    idealToSpendOnDiamonds -= idealToSpendOnInspector / 3;
+                    }
+                
+
+
+                zeroIntArray( possibleSpendingWeights, moneyAvailable + 1 );
+            
+                unsigned int totalWeight = 
+                    fauxGaussian( possibleSpendingWeights,
+                                  moneyAvailable + 1, idealToSpendOnDiamonds );
+                
+                bid[u] = pickRandomWeighedIndex( possibleSpendingWeights,
+                                                 moneyAvailable + 1,
+                                                 totalWeight );
+                totalSpent += bid[u];
+                
+
+                if( u == uWithInspector ) {
+                    
+                    // do it again for inspector
+
+                    // but we've already computed the ideal
+
+                    totalWeight = 
+                        fauxGaussian( possibleSpendingWeights,
+                                      moneyAvailable + 1, 
+                                      idealToSpendOnInspector );
+                    
+                    bribe[u] = pickRandomWeighedIndex( possibleSpendingWeights,
+                                                       moneyAvailable + 1,
+                                                       totalWeight );
+                    totalSpent += bribe[u];
+                    }
+                }
+            }
+        
+        printOut( "About to delete possible weights..., length %d\n",
+                  moneyAvailable + 1 );
+        
+        delete [] possibleSpendingWeights;        
+        printOut( "...done\n" );
+        }
+    
+
+    // so now we have dest, bids, and bribes for everyone
+    
+
+    // but they may go over budget
+
+    while( totalSpent > inState->ourMoney.t ) {
+        
+        // pick one to reduce
+        u = (int)getRandom( 3 );
+                
+        // skip any that are frozen
+        if( ! inState->agentUnits[0][u].moveFrozen ) {
+
+            // priority:  trip itself (unchangeable), bribe, bid
+            if( bid[u] > 0 ) {
+                bid[u] --;
+                totalSpent --;
+                }
+            else if( bribe[u] > 0 ) {
+                bribe[u] --;
+                totalSpent --;
+                }
+            }        
+        }
+    
+    // within budget limits now
+            
+    // pack into char string
+    int index = 0;
+    for( u=0; u<3; u++ ) {
+        m.moveChars[ index++ ] = (unsigned char)( dest[u] );
+        m.moveChars[ index++ ] = (unsigned char)( bid[u] );
+        m.moveChars[ index++ ] = (unsigned char)( bribe[u] );
+        }
+    
+
+    return m;
+    }
+
+
+
+
+
+
+
+
+
+static possibleMove getSellDiamondsGoodMove( gameState *inState ) {
+    possibleMove m;
+    
+    // 3 chars
+    // 0 = number sold
+    // 1 = image present in subsequent messages?
+    // 2 = number of 300-byte messages forthcoming to contain image
+    
+    // always skip sending image
+    m.numCharsUsed = 3;
+    
+    unsigned int idealNumToSell = 0;
+    
+    if( inState->enemyDiamonds == 0 ) {
+        idealNumToSell = 1;
+        }
+    else if( inState->enemyDiamonds == 1 ) {
+        // switch between 1 and 2 at random
+        idealNumToSell = getRandom( 2 ) + 1;
+        }
+    else if( inState->enemyDiamonds >= 2 ) {
+        // switch between 0, 1, and 2 at random
+
+        // going higher than this never makes sense, because even if they
+        // are selling 3 or 4, 0 still beats it
+        idealNumToSell = getRandom( 3 );
+        }
+    
+    if( idealNumToSell > (unsigned int)inState->ourDiamonds ) {
+        // we don't have enough to compete
+        // sell 0 to be safe
+        idealNumToSell = 0;
+        }
+    
+    m.moveChars[0] = (unsigned char)idealNumToSell;
+    m.moveChars[1] = 0;
+    m.moveChars[2] = 0;
+    
+    return m;
+    }
+
+
+
+
+
+
+
+possibleMove getGoodMove( gameState *inState,
+                          char inForceFreshPick ) {
+    
+    possibleMove m;
+    
+    switch( inState->nextMove ) {
+
+
+
+        case salaryBribe: {
+            
+            // FIXME:  this is the same code that is in getPossibleMove
+
+            // 2 chars per unit (salary or bribe, plus bribing unit)
+            m.numCharsUsed = 12;
+            
+            
+            /*
+            // for testing, return blank move
+            for( int u=0; u<6; u++ ) {
+                m.moveChars[ u* 2] = 0;
+                m.moveChars[ u* 2 + 1] = (unsigned char)-1;
+                }
+            return m;
+            */
+
+
+
+            // pick a random spending cap
+            // (otherwise, all the random choices almost always add
+            //  up to equal our total money---i.e., we spend everything
+            //  we have!)
+            unsigned int maxTotalToSpend = 
+                getRandom( (unsigned int)( inState->ourMoney.t + 1 ) );
+            
+            // for testing
+            // int maxTotalToSpend = inState->ourMoney.t / 2;
+
+
+
+            int salaryBribeAmounts[6];
+            
+            for( int u=0; u<3; u++ ) {
+                unit enemyUnit = inState->agentUnits[1][u];
+                
+                char sharedRegion = false;
+
+                for( int p=0; p<3; p++ ) {
+                    unit playerUnit = inState->agentUnits[0][p];
+            
+                    if( playerUnit.region == enemyUnit.region ) {
+                        sharedRegion = true;
+                        }
+                    }
+
+                // enemy units
+                if( ! sharedRegion ) {
+                    salaryBribeAmounts[ u + 3 ] = 0;
+                    }
+                else {
+                    salaryBribeAmounts[ u + 3 ] = 
+                        (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
+                        // force bribes for testing
+                        // inState->ourMoney.t;
+                    }
+
+                // player units
+                if( inState->agentUnits[0][u].region == 0 ) {
+                    
+                    salaryBribeAmounts[u] = 
+                        (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
+                    }
+                else {
+                    // away from home
+                    salaryBribeAmounts[u] = 0;
+                    }
+                }
+            
+            
+            
+
+            // make sure amount sum is not greater than our spending cap
+            unsigned int amountSum = 0;
+            int i;
+            for( i=0; i<6; i++ ) {
+                amountSum += salaryBribeAmounts[i];
+                }
+            
+            while( amountSum > maxTotalToSpend ) {    
+                // pick one
+                unsigned int pick = getRandom( 6 );
+                
+                if( salaryBribeAmounts[pick] > 0 ) {
+                    // lower it
+                    salaryBribeAmounts[pick] --;
+                    amountSum--;
+                    }
+                }
+            
+            // assemble into a move
+
+            for( i=0; i<6; i++ ) {
+                int index = i*2;
+                m.moveChars[ index++ ] = (unsigned char)salaryBribeAmounts[i];
+                
+                if( i > 2 && salaryBribeAmounts[i] > 0 ) {
+                    // new payment to enemy
+
+                    // find region-sharing unit
+                    int sharingUnit = 0;
+                    
+                    unit enemyUnit = inState->agentUnits[1][i-3];
+                
+                    for( int pu=0; pu<3; pu++ ) {
+                        unit playerUnit = inState->agentUnits[0][pu];
+            
+                        if( playerUnit.region == enemyUnit.region ) {
+                            sharingUnit = pu;
+                            }
+                        }
+
+                    // [0..2] range fine for this
+                    m.moveChars[ index++ ] = (unsigned char)sharingUnit;
+                    }
+                else {
+                    // keep old value
+                    int knownValue =
+                        inState->agentUnits[ i/3 ][ i%3 ].opponentBribingUnit;
+                    
+                    
+                    if( knownValue != -1 ) {
+                        
+                        // turn it into [0..5] range
+                        if( i < 3 ) {
+                            // value describes an enemy unit that is bribing
+                            // us
+                            knownValue += 3;
+                            }
+                        }
+
+                    m.moveChars[ index++ ] = (unsigned char)( knownValue );
+                    }
+                }
+            
+            
+            
+            }
+            break;
+
+
+
+
+        case moveUnits:
+            m = getMoveUnitsGoodMove( inState );
+            /*
+            {
+            
+            // dummy move for testing
+            m.numCharsUsed = 9;
+            for( int i=0; i<9; i++ ) {
+                
+                m.moveChars[i] = 0;
+                }
+            }
+            */
+            break;
+            
+
+
+        case moveUnitsCommit:
+            if( inForceFreshPick || wasPeekAvailable( inState ) ) {
+                // generate a fresh move, because we could peek
+                m = getMoveUnitsGoodMove( inState );
+                }
+            else {
+                // stick with the move saved in inState
+
+                // 3 chars per player unit
+                // dest, bid, bribe
+                m.numCharsUsed = 9;
+                
+                int dest[3];
+                int bid[3];
+                int bribe[3];
+
+                int u;
+                for( u=0; u<3; u++ ) {
+                    dest[u] = inState->agentUnits[0][u].destination;
+                    bid[u] = inState->agentUnits[0][u].diamondBid;
+                    bribe[u] = inState->agentUnits[0][u].inspectorBribe;
+                    }
+                
+                // pack into char string
+                int index = 0;
+                for( u=0; u<3; u++ ) {
+                    m.moveChars[ index++ ] = (unsigned char)( dest[u] );
+                    m.moveChars[ index++ ] = (unsigned char)( bid[u] );
+                    m.moveChars[ index++ ] = (unsigned char)( bribe[u] );
+                    }
+                }
+            break;
+
+
+
+        case moveInspector: {
+            
+            // good alg for this already present in getPossibleMove
+            // no need to replicate it here
+            m = getPossibleMove( inState, inForceFreshPick );
+            }
+            break;
+
+
+
+        case sellDiamonds:
+            m = getSellDiamondsGoodMove( inState );
+            break;            
+        case sellDiamondsCommit:
+            if( inForceFreshPick || wasPeekAvailable( inState ) ) {
+                // generate a fresh move, because we could peek
+                m = getSellDiamondsGoodMove( inState );
+                }
+            else {
+                // stick with the move saved in inState
+
+                // 3 chars
+                // 0 = number sold
+                // 1 = image present in subsequent messages?
+                // 2 = number of 300-byte messages forthcoming to contain image
+                
+                // always skip sending image
+                m.numCharsUsed = 3;
+                m.moveChars[0] = (unsigned char)( inState->ourDiamondsToSell );
+                m.moveChars[1] = 0;
+                m.moveChars[2] = 0;
+                }
+            break;
+        }
+
+
+    return m;
+    }
+
+
+
+
 
 
 

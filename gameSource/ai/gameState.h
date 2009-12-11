@@ -202,6 +202,14 @@ possibleMove getPossibleMove( gameState *inState,
                               char inForceFreshPick = false );
 
 
+// gets a "good" move using heuristics
+possibleMove getGoodMove( gameState *inState,
+                          char inForceFreshPick = false );
+
+    
+
+
+
 possibleMove mutateMove( gameState *inState, possibleMove inMove,
                          unsigned int inMaxMutations );
 

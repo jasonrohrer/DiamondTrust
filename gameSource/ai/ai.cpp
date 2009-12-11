@@ -248,7 +248,8 @@ static void clearNextMove() {
             
             while( collision && collisionCount < 100 ) {
                 
-                moves[m] = getPossibleMove( &currentState );
+                //moves[m] = getPossibleMove( &currentState );
+                moves[m] = getGoodMove( &currentState );
                 
             
                 // make sure this is not a collision with one already picked
@@ -1114,8 +1115,10 @@ void stepAI() {
                                 if( (int)getRandom( 11 ) > 
                                     mutationVsRandomMixRatio ) {
                                     // fresh move
+                                    //moves[ moveSortMap[i] ] =
+                                    //    getPossibleMove( &currentState );
                                     moves[ moveSortMap[i] ] =
-                                        getPossibleMove( &currentState );
+                                        getGoodMove( &currentState );
                                     moves[ moveSortMap[i] ].flag = 0;
                                     }
                                 else {
