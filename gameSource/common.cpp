@@ -54,6 +54,20 @@ unsigned int intSqrt( unsigned int inX ) {
     }
 
 
+
+int intPower( int inX, unsigned int inY ) {
+    int res = 1;
+    
+    for( unsigned int y=0; y<inY; y++ ) {
+        res *= inX;
+        }
+
+    return res;
+    }
+
+
+
+
 // integer arctan2 found here:
 // http://cboard.cprogramming.com/c-programming/110593-trig-functions-without-math-h.html#post820808
 int intArctan2( int inX, int inY ) {
