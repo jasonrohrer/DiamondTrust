@@ -86,7 +86,7 @@ possibleMove mutateMove( gameState *inState, possibleMove inMove,
                     
                     char anyRaisable = false;
                 
-                    for( int u=0; u<6; u++ ) {
+                    for( unsigned int u=0; u<6; u++ ) {
                         if( u != lowerablePick && 
                             (char)m.moveChars[u*2] > 0 ) {
                             
@@ -771,7 +771,7 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
             
 
             // make sure amount sum is not greater than our spending cap
-            int amountSum = 0;
+            unsigned int amountSum = 0;
             int i;
             for( i=0; i<6; i++ ) {
                 amountSum += salaryBribeAmounts[i];
@@ -991,11 +991,11 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
                 
                 // find some region not occupied by us
                 char occupied = true;
-                unsigned int pick = 2;
+                int pick = 2;
                 while( occupied ) {
                     occupied = false;
                     // avoid regions 1 and 2
-                    pick = getRandom( 6 ) + 2;
+                    pick = (int)getRandom( 6 ) + 2;
 
                     for( int u=0; u<3; u++ ) {
                         if( inState->agentUnits[0][u].region == pick ) {
