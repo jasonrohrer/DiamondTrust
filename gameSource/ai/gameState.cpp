@@ -1056,8 +1056,9 @@ static void zeroIntArray( int *inArray, int inLength ) {
 // to weight
 static int pickRandomWeighedIndex( int *inWeights, int inLength, 
                                    unsigned int inTotalWeight ) {
-    
+
     assert( inTotalWeight > 0 );
+    
     
     unsigned int randomWeightPick = getRandom( inTotalWeight );
             
@@ -1157,7 +1158,12 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
     for( int p=0; p<2; p++ ) {
         
         for( u=0; u<3; u++ ) {
-            atRiskDiamondCounts[p] += inState->agentUnits[p][u].diamonds;
+            if( u == 0 && dest[u] == 0 ) {
+                // don't count these, because they're going home
+                }
+            else {
+                atRiskDiamondCounts[p] += inState->agentUnits[p][u].diamonds;
+                }
             }
         }
     
@@ -1294,6 +1300,15 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
     
     // now we have destinations for everyone
 
+    // if some are flying home, their diamonds are no longer at risk
+    for( u=0; u<3; u++ ) {
+        if( !inState->agentUnits[0][u].moveFrozen && dest[u] == 0 ) {
+            
+            atRiskDiamondCounts[0] += inState->agentUnits[0][u].diamonds;
+            }
+        }
+
+
     // how much should each one spend?
     int moneyAvailable = inState->ourMoney.t;
     // subtract money spent on frozen moves
@@ -1367,6 +1382,13 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
             // (wanna get inspector out of there)
             idealToSpendOnInspector +=
                 inState->agentUnits[0][uWithInspector].diamonds / 2;
+
+            if( idealToSpendOnInspector > moneyAvailable ) {
+                idealToSpendOnInspector = moneyAvailable;
+                }
+            else if( idealToSpendOnInspector < 0 ) {
+                idealToSpendOnInspector = 0;
+                }
             }
         
         
@@ -1391,6 +1413,9 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                 if( oneDestHasInspector ) {
                     // spend a bit less so that we can pay inspector
                     idealToSpendOnDiamonds -= idealToSpendOnInspector / 3;
+                    }
+                if( idealToSpendOnDiamonds < 0 ) {
+                    idealToSpendOnDiamonds = 0;
                     }
                 
 
@@ -2541,10 +2566,12 @@ int playRandomGameUntilEnd( gameState inState ) {
            &&
            ( inState.monthsLeft > 0 || inState.nextMove != sellDiamonds ) ) {
             
-        possibleMove ourMove = getPossibleMove( &inState );
+        //possibleMove ourMove = getPossibleMove( &inState );
+        possibleMove ourMove = getGoodMove( &inState );
         
         gameState mirror = getMirrorState( &inState );
-        possibleMove enemyMove = getPossibleMove( &mirror );
+        //possibleMove enemyMove = getPossibleMove( &mirror );
+        possibleMove enemyMove = getGoodMove( &mirror );
         
         if( inState.ourMoney.t < 0 || inState.enemyMoney.t < 0 ) {
             
