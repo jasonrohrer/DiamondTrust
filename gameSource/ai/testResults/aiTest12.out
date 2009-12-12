@@ -252,3 +252,36 @@ Maybe longer batches between replacing bad moves?
 
 Also... need to standardize test with inspector position and 0 out first
 salaries (so that random salaries in the run-up don't influence the results.
+
+
+Standardized...
+
+Trying longer and longer batches, to see if "best move" rating stabilizes.
+
+**** Intermediary 1600-sim point: Moves sorted by score:
+[2] Score: 920, Move: 7, 4, 0, 2, 6, 0, 5, 2, 0, 
+[4] Score: 4280, Move: 0, 0, 0, 6, 9, 0, 2, 4, 1, 
+[5] Score: 5170, Move: 3, 3, 0, 6, 6, 0, 2, 2, 1, 
+[1] Score: 5220, Move: 2, 4, 2, 6, 7, 0, 0, 0, 0, 
+[7] Score: 6400, Move: 6, 8, 0, 7, 2, 0, 3, 2, 0, 
+[6] Score: 6530, Move: 4, 1, 0, 7, 2, 0, 6, 8, 0, 
+[3] Score: 6720, Move: 7, 2, 0, 6, 6, 0, 2, 3, 1, 
+[0] Score: 7710, Move: 4, 3, 0, 5, 3, 0, 6, 6, 0, 
+
+
+**** Intermediary 3200-sim point: Moves sorted by score:
+[1] Score: 5060, Move: 0, 0, 0, 6, 9, 0, 5, 5, 0, 
+[0] Score: 5910, Move: 4, 3, 0, 5, 3, 0, 6, 6, 0, 
+[4] Score: 6290, Move: 7, 2, 0, 6, 6, 0, 2, 2, 1,  (MUT)
+[7] Score: 6430, Move: 6, 8, 0, 7, 2, 0, 3, 2, 0, 
+[5] Score: 6720, Move: 7, 2, 0, 6, 6, 0, 2, 2, 2,  (MUT)
+[6] Score: 6740, Move: 4, 1, 0, 7, 2, 0, 6, 8, 0, 
+[3] Score: 6780, Move: 7, 2, 0, 6, 6, 0, 2, 3, 1, 
+[2] Score: 7150, Move: 4, 3, 0, 7, 3, 0, 6, 6, 0,  (MUT)
+
+
+
+
+Here move 0 jumps from 7710 down to 5910.  30 % decrease... not good!
+
+So do these measurements not really mean anything???
