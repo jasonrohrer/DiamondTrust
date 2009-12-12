@@ -25,7 +25,7 @@ static char moveDone;
 
 // scores for all possible moves at the current step
 #define possibleMoveSpace 256
-int numPossibleMoves = 32;
+int numPossibleMoves = 8;
 int numPossibleMovesFilled = numPossibleMoves;
 int moveScores[ possibleMoveSpace ];
 int moveSimulations[ possibleMoveSpace ];
@@ -51,7 +51,7 @@ int maxNumSimulationsPerFinalChoice = 6400;
 int batchSizeBeforeReplaceWorstMoves = 7;
 
 // testing showed 7 to be the best here
-unsigned int mutationPoolSize = 7;
+unsigned int mutationPoolSize = 4;
 
 // out of 10
 // thus a value of 5 means that 50% of fresh replacement moves are mutations
@@ -73,7 +73,7 @@ int fractionOfMovesDiscarded = 5;
 
 
 
-int finalBatchSize = 75;
+int finalBatchSize = 100;
 
 //int maxSimulationsPerStepAI = 100;
 
@@ -87,7 +87,7 @@ int simulationsPerStepSlowMode = 12;
 
 int maxSimulationsPerStepAI = simulationsPerStepSlowMode;
 
-int simulationsPerStepFastMode = 100;
+int simulationsPerStepFastMode = 1000;
 
 void toggleAICPUMode( char inFullSpeed ) {
     if( inFullSpeed ) {
@@ -104,9 +104,9 @@ void toggleAICPUMode( char inFullSpeed ) {
 
 // define this to enable AI testing code.
 // some of it doesn't compile on DS
-//#define AI_TESTING_ENABLED
+#define AI_TESTING_ENABLED
 
-char testingAI = false;
+char testingAI = true;
 
 
 #ifdef AI_TESTING_ENABLED
@@ -122,16 +122,16 @@ int currentTestingRound = 0;
 
 // maxMutationsPerMove
 // flag to use good moves
-int testingRoundParameter[ numTestingRoundsSpace ] = { false, true, 1, 1, 1 };
+int testingRoundParameter[ numTestingRoundsSpace ] = { true, true, 1, 1, 1 };
 
 int numRunsPerTestingRound = 40;
 
 float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
-int numTestingRounds = 2;
-int maxTestingPossibleMoves = 32;
-int maxTestingSimulationsPerMove = 200;
+int numTestingRounds = 1;
+int maxTestingPossibleMoves = 16;
+int maxTestingSimulationsPerMove = 500;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -335,16 +335,16 @@ static void clearNextMove() {
         printOut( "using batch size of %d\n", 
                   batchSizeBeforeReplaceWorstMoves );
 
-        if( maxNumSimulationsPerMove < 200 ) {
-            finalBatchSize = 50;
+        /*
+        finalBatchSize = maxNumSimulationsPerMove / 2;
+        
+        if( finalBatchSize > 200 ) {
+            finalBatchSize = 200;
             }
-        else {
-            finalBatchSize = 100;
-            }
+        
         printOut( "using final batch size of %d\n", 
                   finalBatchSize );
-            
-        
+        */
         }
     
 
@@ -552,10 +552,14 @@ void freeAI() {
 
 
 void setAIThinkingSteps( int inNumSteps ) {
-    maxNumSimulationsPerMove = inNumSteps;
+    if( !testingAI ) {
+        
+        maxNumSimulationsPerMove = inNumSteps;
+        
+        maxNumSimulationsPerFinalChoice = 
+            maxNumSimulationsPerMove * numPossibleMoves;
+        }
     
-    maxNumSimulationsPerFinalChoice = 
-        maxNumSimulationsPerMove * numPossibleMoves;
     }
 
     
@@ -902,14 +906,15 @@ void stepAI() {
                             // start over with more simulations per move
                             currentTestingRound = 0;
 
-                            maxNumSimulationsPerMove *= 2;
-                            maxNumSimulationsPerFinalChoice *= 2;
+                            maxNumSimulationsPerMove += 50;
+                            maxNumSimulationsPerFinalChoice =
+                                maxNumSimulationsPerMove * numPossibleMoves;
                             
                             if( maxNumSimulationsPerMove > 
                                 maxTestingSimulationsPerMove ) {
                                 
                                 // start over with more possible moves
-                                maxNumSimulationsPerMove = 300;
+                                maxNumSimulationsPerMove = 50;
                                 
                                 numPossibleMoves *= 2;
                                 
@@ -923,6 +928,15 @@ void stepAI() {
                                     }
                                 
                                 }
+
+                            /*
+                            finalBatchSize = maxNumSimulationsPerMove / 2;
+                            
+                            if( finalBatchSize > 200 ) {
+                                finalBatchSize = 200;
+                                }
+                            */
+
                             }
                         
                         

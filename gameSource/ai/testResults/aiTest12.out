@@ -1,0 +1,254 @@
+
+
+Testing whether more sims produces better play:
+
+
+***** Test results for 32, 50:
+Parameter 1, ave score 6.740000
+
+
+***** Test results for 32, 100:
+Parameter 1, ave score 6.946078
+
+
+***** Test results for 32, 200:
+Parameter 1, ave score 6.115196
+
+
+
+Yikes... doesn't seem to!
+
+Maybe it has something to do with our final batch size growing (so
+our measurements of the final batch of moves become more and more accurate)
+
+
+
+
+
+These were all done with a final batch size of 100.
+
+Still no improvement as more rounds of sim and move repacement are done:
+
+
+
+***** Test results for 32, 100:
+Parameter 1, ave score 5.907500
+
+
+***** Test results for 32, 110:
+Parameter 1, ave score 5.876215
+
+
+***** Test results for 32, 120:
+Parameter 1, ave score 5.839623
+
+
+***** Test results for 32, 130:
+Parameter 1, ave score 5.860294
+
+
+***** Test results for 32, 140:
+Parameter 1, ave score 6.066667
+
+
+***** Test results for 32, 150:
+Parameter 1, ave score 5.997525
+
+
+***** Test results for 32, 160:
+Parameter 1, ave score 6.045673
+
+
+***** Test results for 32, 170:
+Parameter 1, ave score 5.932242
+
+
+***** Test results for 32, 180:
+Parameter 1, ave score 5.922330
+
+
+***** Test results for 32, 190:
+Parameter 1, ave score 5.900943
+
+
+***** Test results for 32, 200:
+Parameter 1, ave score 6.102942
+
+
+
+
+Maybe our move pool is too large?  Big enough to have pretty good moves in
+it right off the bat?
+
+Yes, this seems to work:
+
+***** Test results for 16, 100:
+Parameter 1, ave score 4.660001
+
+
+***** Test results for 16, 110:
+Parameter 1, ave score 5.065533
+
+
+***** Test results for 16, 120:
+Parameter 1, ave score 4.662735
+
+
+***** Test results for 16, 130:
+Parameter 1, ave score 5.093138
+
+
+***** Test results for 16, 140:
+Parameter 1, ave score 5.142858
+
+
+***** Test results for 16, 150:
+Parameter 1, ave score 5.188118
+
+
+***** Test results for 16, 160:
+Parameter 1, ave score 5.252403
+
+
+***** Test results for 16, 170:
+Parameter 1, ave score 5.238318
+
+
+***** Test results for 16, 180:
+Parameter 1, ave score 5.242718
+
+
+***** Test results for 16, 190:
+Parameter 1, ave score 4.997641
+
+
+***** Test results for 16, 200:
+Parameter 1, ave score 5.428922
+
+
+
+
+But this run does not make it look promising:
+
+
+***** Test results for 16, 100:
+Parameter 1, ave score 5.462500
+
+
+***** Test results for 16, 150:
+Parameter 1, ave score 5.611385
+
+
+***** Test results for 16, 200:
+Parameter 1, ave score 5.585785
+
+
+***** Test results for 16, 250:
+Parameter 1, ave score 5.468446
+
+
+***** Test results for 16, 300:
+Parameter 1, ave score 5.507211
+
+
+***** Test results for 16, 350:
+Parameter 1, ave score 5.354762
+
+
+***** Test results for 16, 400:
+Parameter 1, ave score 5.391509
+
+
+***** Test results for 16, 450:
+Parameter 1, ave score 5.413551
+
+
+***** Test results for 16, 500:
+Parameter 1, ave score 5.591584
+
+
+
+
+Also not promising:
+
+
+
+***** Test results for 8, 100:
+Parameter 1, ave score 4.775000
+
+
+***** Test results for 8, 150:
+Parameter 1, ave score 4.358911
+
+
+***** Test results for 8, 200:
+Parameter 1, ave score 4.889706
+
+
+***** Test results for 8, 250:
+Parameter 1, ave score 4.536408
+
+
+***** Test results for 8, 300:
+Parameter 1, ave score 4.750000
+
+
+***** Test results for 8, 350:
+Parameter 1, ave score 4.680952
+
+
+***** Test results for 8, 400:
+Parameter 1, ave score 4.875000
+
+
+***** Test results for 8, 450:
+Parameter 1, ave score 4.675233
+
+
+***** Test results for 8, 500:
+Parameter 1, ave score 4.514852
+
+
+***** Test results for 16, 50:
+Parameter 1, ave score 5.600000
+
+
+***** Test results for 16, 100:
+Parameter 1, ave score 5.167500
+
+
+***** Test results for 16, 150:
+Parameter 1, ave score 5.460396
+
+
+***** Test results for 16, 200:
+Parameter 1, ave score 5.166667
+
+
+***** Test results for 16, 250:
+Parameter 1, ave score 5.390777
+
+
+***** Test results for 16, 300:
+Parameter 1, ave score 5.149039
+
+
+***** Test results for 16, 350:
+Parameter 1, ave score 5.376191
+
+
+***** Test results for 16, 400:
+Parameter 1, ave score 5.169812
+
+
+
+
+
+So.....  maybe the mutation rounds do nothing... maybe the moves are so close
+together that 7 sims each isn't enough to differentiate them...
+
+Maybe longer batches between replacing bad moves?
+
+
+Also... need to standardize test with inspector position and 0 out first
+salaries (so that random salaries in the run-up don't influence the results.
