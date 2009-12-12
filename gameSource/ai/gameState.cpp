@@ -1068,7 +1068,7 @@ static int pickRandomWeighedIndex( int *inWeights, int inLength,
     for( int i=0; i<inLength && pickI == -1; i++ ) {
         cumWeight += (unsigned int)inWeights[i];
                 
-        if( cumWeight >= randomWeightPick ) {
+        if( cumWeight > randomWeightPick ) {
             pickI = i;
             }
         }
@@ -1564,8 +1564,6 @@ possibleMove getGoodMove( gameState *inState,
 
         case salaryBribe: {
             
-            // FIXME:  this is the same code that is in getPossibleMove
-
             // 2 chars per unit (salary or bribe, plus bribing unit)
             m.numCharsUsed = 12;
             
@@ -1578,19 +1576,14 @@ possibleMove getGoodMove( gameState *inState,
                 }
             return m;
             */
-
-
-
-            // pick a random spending cap
-            // (otherwise, all the random choices almost always add
-            //  up to equal our total money---i.e., we spend everything
-            //  we have!)
-            unsigned int maxTotalToSpend = 
-                getRandom( (unsigned int)( inState->ourMoney.t + 1 ) );
             
-            // for testing
-            // int maxTotalToSpend = inState->ourMoney.t / 2;
 
+
+            // potentially spend it all to counter-act bribes
+            // or bribe enemy units
+            int moneyAvailable = inState->ourMoney.t;
+            
+            int *possibleSpendingWeights = new int[moneyAvailable + 1];
 
 
             int salaryBribeAmounts[6];
@@ -1613,17 +1606,78 @@ possibleMove getGoodMove( gameState *inState,
                     salaryBribeAmounts[ u + 3 ] = 0;
                     }
                 else {
-                    salaryBribeAmounts[ u + 3 ] = 
-                        (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
-                        // force bribes for testing
-                        // inState->ourMoney.t;
+                    // just enough to overcome AVERAGE possible salary
+                    int averageSalary = 
+                        ( inState->agentUnits[1][u].totalSalary.hi
+                          +
+                          inState->agentUnits[1][u].totalSalary.lo ) / 2;
+                    
+                    int idealBribe = 
+                        averageSalary -
+                        inState->agentUnits[1][u].totalBribe.t + 1;
+                    
+                    if( idealBribe < 0 ) {
+                        idealBribe = 0;
+                        }
+                    else if( idealBribe > moneyAvailable ) {
+                        idealBribe = moneyAvailable;
+                        }
+                    
+                    
+                    
+                    int totalWeight = 
+                        fauxGaussian( possibleSpendingWeights,
+                                      moneyAvailable + 1, 
+                                      idealBribe );
+                    /*
+                    printOut( "Bribe weights: " );
+                    for( int s=0; s<=moneyAvailable; s++ ) {
+                        printOut( "%d, ", possibleSpendingWeights[s] );
+                        }
+                    printOut( "\n" );
+                    */
+                    
+                    salaryBribeAmounts[ u+3 ] = 
+                        pickRandomWeighedIndex( possibleSpendingWeights,
+                                                moneyAvailable + 1,
+                                                totalWeight );
+                    /*
+                    printOut( "Chosen bribe = %d\n", 
+                              salaryBribeAmounts[ u+3] );
+                    */
                     }
+
 
                 // player units
                 if( inState->agentUnits[0][u].region == 0 ) {
                     
+                    // just enough to overcome AVERAGE possible bribe
+                    int averageBribe = 
+                        ( inState->agentUnits[0][u].totalBribe.hi
+                          +
+                          inState->agentUnits[0][u].totalBribe.lo ) / 2;
+
+                    int idealSalary = 
+                        averageBribe -
+                        inState->agentUnits[0][u].totalSalary.t + 1;
+                    
+                    if( idealSalary < 0 ) {
+                        idealSalary = 0;
+                        }
+                    else if( idealSalary > moneyAvailable ) {
+                        idealSalary = moneyAvailable;
+                        }
+                    
+                    
+                    int totalWeight = 
+                        fauxGaussian( possibleSpendingWeights,
+                                      moneyAvailable + 1, 
+                                      idealSalary );
+                    
                     salaryBribeAmounts[u] = 
-                        (int)getRandom( (unsigned int)maxTotalToSpend + 1 );
+                        pickRandomWeighedIndex( possibleSpendingWeights,
+                                                moneyAvailable + 1,
+                                                totalWeight );
                     }
                 else {
                     // away from home
@@ -1632,16 +1686,17 @@ possibleMove getGoodMove( gameState *inState,
                 }
             
             
+            delete [] possibleSpendingWeights;
             
 
             // make sure amount sum is not greater than our spending cap
-            unsigned int amountSum = 0;
+            int amountSum = 0;
             int i;
             for( i=0; i<6; i++ ) {
                 amountSum += salaryBribeAmounts[i];
                 }
             
-            while( amountSum > maxTotalToSpend ) {    
+            while( amountSum > moneyAvailable ) {    
                 // pick one
                 unsigned int pick = getRandom( 6 );
                 

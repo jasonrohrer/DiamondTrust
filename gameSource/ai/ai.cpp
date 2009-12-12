@@ -62,7 +62,7 @@ int mutationVsRandomMixRatio = 5;
 unsigned int maxMutationsPerMove = 1;
 
 
-char useGoodMovesOnly = false;
+char useGoodMovesOnly = true;
 
 
 // out of 10
