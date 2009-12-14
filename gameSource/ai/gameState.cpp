@@ -1247,12 +1247,14 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
 
                             // even more beneficial depending on at-risk
                             // diamond counts
-                            // (doesn't matter whoes they are... if they're
+                            // (doesn't matter whose they are... if they're
                             //  ours, we want to protect them... if they're
                             //  enemy's, we want to have them confiscated)
-                            regionWeights[r] += 
-                                atRiskDiamondCounts[0] + 
-                                atRiskDiamondCounts[1];
+
+                            // (approximate dollar value)
+                            regionWeights[r] += 4 * 
+                                ( atRiskDiamondCounts[0] + 
+                                  atRiskDiamondCounts[1] );
                             }
 
                         if( r == 0 ) {
