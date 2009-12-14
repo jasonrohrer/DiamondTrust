@@ -779,59 +779,6 @@ void stepAI() {
                 // first, generate a fresh move
                 possibleMove enemyMove = getGoodMove( &mirror,
                                                       true );
-                /*
-                if( !anyOfOurAgentsPotentiallyBribed ) {
-                    // enemy can't peek
-                    // the move enemy already set is it
-    
-                    if( currentState.nextMove == moveUnitsCommit ) {
-
-                        // which parts can we see
-                        char anyPartsFrozen = false;
-                        for( int u=0; u<3; u++ ) {
-                            if( currentState.agentUnits[1][u].totalSalary.t <
-                                currentState.agentUnits[1][u].totalBribe.t ) {
-                                
-                                // we have successfully bribed this enemy agent
-
-                                // freeze its part of the move
-                                
-                                mirror.agentUnits[0][u].moveFrozen = true;
-                                anyPartsFrozen = true;
-                                }
-                            }
-
-                        if( anyPartsFrozen ) {    
-                            // now with those parts frozen, re-gen a fresh move
-                            // this will fill in guesses for the part of
-                            // the move that we can't see
-                            enemyMove = getPossibleMove( &mirror, true );
-                            }
-                        }
-                    else if( currentState.nextMove == sellDiamondsCommit ) {
-                        // do we have a bribed agent in the enemy's home?
-                        
-                        char bribedAgentInEnemyHome = false;
-                        for( int u=0; u<3; u++ ) {
-                            if( currentState.agentUnits[1][u].region == 1
-                                &&
-                                currentState.agentUnits[1][u].totalSalary.t <
-                                currentState.agentUnits[1][u].totalBribe.t ) {
-                                
-                                bribedAgentInEnemyHome = true;
-                                }
-                            }
-
-                        if( bribedAgentInEnemyHome ) {    
-                            // replace move with one enemy already set
-                            enemyMove = getPossibleMove( &mirror,
-                                                         false );
-                            }
-                        
-                        }
-                    
-                    }
-                */
                 
 
                 gameState nextState = 
