@@ -112,8 +112,9 @@ typedef struct gameState {
         
         
         int ourDiamondsToSell;
-
-
+        
+        char ourDiamondsToSellFrozen;
+        
 
         intRange enemyMoney;
         int knownEnemyTotalMoneyReceived;
@@ -124,6 +125,8 @@ typedef struct gameState {
 
 
         int enemyDiamondsToSell;
+        
+        char enemyDiamondsToSellFrozen;
         
 
 

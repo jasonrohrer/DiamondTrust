@@ -1451,6 +1451,99 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                 }
             }
         
+
+
+
+        // now make sure that we are being smart against any frozen enemy
+        // moves in our dest regions
+        for( u=0; u<3; u++ ) {
+            if( ! inState->agentUnits[0][u].moveFrozen &&        
+                dest[u] != 0 ) {
+
+                
+                for( int e=0; e<3; e++ ) {
+                    if( inState->agentUnits[1][e].moveFrozen &&
+                        inState->agentUnits[1][e].destination == dest[u] ) {
+                     
+                        // we can see move of enemy that is going into our
+                        // region (and enemy can't change it)!
+
+                        // pick a new bid
+                        totalSpent -= bid[u];
+                        
+                        int extraMoney = inState->ourMoney.t - totalSpent;
+                        
+                        if( extraMoney < 
+                            inState->agentUnits[1][e].diamondBid ) {
+                            
+                            // we're going to lose this bid and cannot afford
+                            // to win, so spend nothing instead
+                            bid[u] = 0;
+                            }
+                        else if( extraMoney == 
+                                 inState->agentUnits[1][e].diamondBid ) {
+                            
+                            // we can just afford to tie!
+                            // do it to block opponent
+                            bid[u] = inState->agentUnits[1][e].diamondBid;
+                            }
+                        else {
+                            // we can afford to win, make it exactly 1 over
+                            bid[u] = 
+                                inState->agentUnits[1][e].diamondBid + 1;
+                            }
+                        totalSpent += bid[u];
+
+                                                
+                        if( u == uWithInspector ) {
+                            // deal with bribes in same way
+                            
+                            totalSpent -= bribe[u];
+                            extraMoney = inState->ourMoney.t - totalSpent;
+                        
+                            if( extraMoney < 
+                                inState->agentUnits[1][e].inspectorBribe ) {
+                                // we're going to lose this bribe and can't
+                                // afford to win, so spend nothing instead
+                                bribe[u] = 0;
+
+                                // no sense in winning the bid if we're 
+                                // going to lose the bribe!
+                                totalSpent -= bid[u];
+                                bid[u] = 0;
+                                }
+                            else if( extraMoney == 
+                                  inState->agentUnits[1][e].inspectorBribe ) {
+                            
+                                // we can just afford to tie!
+                                // do it to block opponent
+                                bribe[u] = 
+                                    inState->agentUnits[1][e].inspectorBribe;
+
+                                // but inspector will block sale here,
+                                // so bid nothing
+                                totalSpent -= bid[u];
+                                bid[u] = 0;
+                                }
+                            else {
+                                // we can afford to win
+                                // make it exactly 1 over
+                             
+                                bribe[u] = 
+                                    inState->agentUnits[1][e].inspectorBribe 
+                                    + 1;
+                                }
+
+                            totalSpent += bribe[u];
+                            }
+
+                        }
+                    }                
+                }
+            }
+        
+
+
         //printOut( "About to delete possible weights..., length %d\n",
         //          moneyAvailable + 1 );
         
@@ -1519,19 +1612,31 @@ static possibleMove getSellDiamondsGoodMove( gameState *inState ) {
     
     unsigned int idealNumToSell = 0;
     
-    if( inState->enemyDiamonds == 0 ) {
-        idealNumToSell = 1;
-        }
-    else if( inState->enemyDiamonds == 1 ) {
-        // switch between 1 and 2 at random
-        idealNumToSell = getRandom( 2 ) + 1;
-        }
-    else if( inState->enemyDiamonds >= 2 ) {
-        // switch between 0, 1, and 2 at random
+    if( !inState->enemyDiamondsToSellFrozen ) {
+        
+        if( inState->enemyDiamonds == 0 ) {
+            idealNumToSell = 1;
+            }
+        else if( inState->enemyDiamonds == 1 ) {
+            // switch between 1 and 2 at random
+            idealNumToSell = getRandom( 2 ) + 1;
+            }
+        else if( inState->enemyDiamonds >= 2 ) {
+            // switch between 0, 1, and 2 at random
 
-        // going higher than this never makes sense, because even if they
-        // are selling 3 or 4, 0 still beats it
-        idealNumToSell = getRandom( 3 );
+            // going higher than this never makes sense, because even if they
+            // are selling 3 or 4, 0 still beats it
+            idealNumToSell = getRandom( 3 );
+            }
+        }
+    else {
+        // we know how many enemy is selling!
+        if( inState->enemyDiamondsToSell < 2 ) {
+            idealNumToSell = inState->enemyDiamondsToSell + 1;
+            }
+        else {
+            idealNumToSell = 0;
+            }
         }
     
     if( idealNumToSell > (unsigned int)inState->ourDiamonds ) {
@@ -1877,8 +1982,21 @@ int getNumTotalPossibleMoves( gameState *inState ) {
             return 1;
             break;
             
-            
-            
+          
+        case moveUnitsCommit:
+            if( wasPeekAvailable( inState ) ) {
+                // can pick a totally new move
+                return -1;
+                }
+            else {
+                // must stick with move we already picked
+                return 1;
+                }
+            break;
+
+
+
+
         case sellDiamonds:
         case sellDiamondsCommit:
 
@@ -2536,6 +2654,7 @@ gameState getMirrorState( gameState *inState ) {
     result.ourMoney = inState->enemyMoney;
     result.ourDiamonds = inState->enemyDiamonds;
     result.ourDiamondsToSell = inState->enemyDiamondsToSell;
+    result.ourDiamondsToSellFrozen = inState->enemyDiamondsToSellFrozen;
 
     result.knownOurTotalMoneyReceived = inState->knownEnemyTotalMoneyReceived;
     result.knownOurTotalMoneySpent = inState->knownEnemyTotalMoneySpent;
@@ -2544,6 +2663,7 @@ gameState getMirrorState( gameState *inState ) {
     result.enemyMoney = inState->ourMoney;
     result.enemyDiamonds = inState->ourDiamonds;
     result.enemyDiamondsToSell = inState->ourDiamondsToSell;
+    result.enemyDiamondsToSellFrozen = inState->ourDiamondsToSellFrozen;
 
     result.knownEnemyTotalMoneyReceived = inState->knownOurTotalMoneyReceived;
     result.knownEnemyTotalMoneySpent = inState->knownOurTotalMoneySpent;
@@ -2993,6 +3113,10 @@ gameState stateTransition( gameState *inState,
             for( int p=0; p<2; p++ ) {
                 for( int u=0; u<3; u++ ) {
                     
+                    // unfreeze
+                    result.agentUnits[p][u].moveFrozen = false;
+
+
                     // dest
                     int dest = moves[p][ u * 3 ];
                     
@@ -3169,6 +3293,9 @@ gameState stateTransition( gameState *inState,
             
             result.ourDiamondsToSell = 0;
             result.enemyDiamondsToSell = 0;
+
+            result.ourDiamondsToSellFrozen = false;
+            result.enemyDiamondsToSellFrozen = false;
 
 
             int totalSold = ourMove[0] + enemyMove[0];

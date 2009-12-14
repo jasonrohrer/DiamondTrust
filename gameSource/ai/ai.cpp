@@ -131,6 +131,80 @@ char stateChecked = true;
 static void clearNextMove() {
     // printOut( "Clearing move\n" );
     
+    // start with all not frozen
+    for( int p=0; p<2; p++ ) {
+        for( int u=0; u<3; u++ ) {
+            unit *thisUnit = &( currentState.agentUnits[p][u] );
+            thisUnit->moveFrozen = false;
+            }
+        }
+    currentState.ourDiamondsToSellFrozen = false;
+    currentState.enemyDiamondsToSellFrozen = false;
+    
+
+    // if we KNOW that none of our agents have been bribed,
+    // then we KNOW that the enemy can't peek
+    // However, we might not have seen any of the enemy move
+    // it depends on which of their agents have been bribed
+
+    char anyOfOurAgentsPotentiallyBribed = false;
+    for( int u=0; u<3; u++ ) {
+        if( currentState.agentUnits[0][u].totalSalary.t <
+            currentState.agentUnits[0][u].totalBribe.hi ) {
+                        
+            // bribe MIGHT be higher than true salary
+            anyOfOurAgentsPotentiallyBribed = true;
+            }
+        }
+
+                
+    if( !anyOfOurAgentsPotentiallyBribed ) {
+        // enemy can't peek
+        // the move enemy already set is it
+    
+        if( currentState.nextMove == moveUnitsCommit ) {
+            
+            // which parts can we see?
+            for( int u=0; u<3; u++ ) {
+                if( currentState.agentUnits[1][u].totalSalary.t <
+                    currentState.agentUnits[1][u].totalBribe.t ) {
+                                
+                    // we have successfully bribed this enemy agent
+
+                    // freeze its part of the move
+                                
+                    currentState.agentUnits[1][u].moveFrozen = true;
+                    }
+                }
+            }
+        else if( currentState.nextMove == sellDiamondsCommit ) {
+            // do we have a bribed agent in the enemy's home?
+                        
+            char bribedAgentInEnemyHome = false;
+            for( int u=0; u<3; u++ ) {
+                if( currentState.agentUnits[1][u].region == 1
+                    &&
+                    currentState.agentUnits[1][u].totalSalary.t <
+                    currentState.agentUnits[1][u].totalBribe.t ) {
+                                
+                    bribedAgentInEnemyHome = true;
+                    }
+                }
+
+            if( bribedAgentInEnemyHome ) {
+                currentState.enemyDiamondsToSellFrozen = true;
+                }
+                        
+            }
+                    
+        }
+
+
+
+
+    
+
+
     int numTotalMoves = getNumTotalPossibleMoves( &currentState );
     
 
@@ -146,7 +220,8 @@ static void clearNextMove() {
     
     if( numTotalMoves == 1 ) {
         // don't even need to test
-        printOut( "Only one possible move found, not running sims.\n" );
+        printOut( "Only one possible move found for %s, not running sims.\n",
+                  nextMoveNames[ currentState.nextMove ] );
         moveDone = true;
         }
     
@@ -702,9 +777,9 @@ void stepAI() {
                     
 
                 // first, generate a fresh move
-                possibleMove enemyMove = getPossibleMove( &mirror,
-                                                          true );
-                
+                possibleMove enemyMove = getGoodMove( &mirror,
+                                                      true );
+                /*
                 if( !anyOfOurAgentsPotentiallyBribed ) {
                     // enemy can't peek
                     // the move enemy already set is it
@@ -756,7 +831,7 @@ void stepAI() {
                         }
                     
                     }
-
+                */
                 
 
                 gameState nextState = 
@@ -810,7 +885,7 @@ void stepAI() {
                         }
                     
 
-                    /*
+                    
                     printOut( "\n\n**** Intermediary %d-sim point: ",
                               totalMoveSimulationsForThisChoice );
                     
@@ -828,7 +903,7 @@ void stepAI() {
                         }
                     
                     printOut( "\n" );
-                    */
+                    
                     }
                 }
             
