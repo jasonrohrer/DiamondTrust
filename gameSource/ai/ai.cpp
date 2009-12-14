@@ -22,10 +22,11 @@ static char moveDone;
 
 
 
-
+// track best move so far
 possibleMove bestMoveSoFar;
 int bestMoveScore = -10000000;
 
+// test a new candidate move
 possibleMove nextCandidateMove;
 int nextCandidateMoveScore;
 int nextCandidateMoveSimulations;
@@ -35,37 +36,14 @@ int totalMoveSimulationsForThisChoice = 0;
 
 
 
+// number of simulations to run for each candidate
+int maxNumSimulationsPerMove = 600;
 
-// scores for all possible moves at the current step
-#define possibleMoveSpace 256
-int numPossibleMoves = 8;
-int numPossibleMovesFilled = numPossibleMoves;
-int moveScores[ possibleMoveSpace ];
-int moveSimulations[ possibleMoveSpace ];
-int moveSimulationsInScoreBatch[ possibleMoveSpace ];
-
-int nextMoveToTest = 0;
-
-possibleMove moves[ possibleMoveSpace ];
-
-int moveSortMap[ possibleMoveSpace ];
+// number of candidates to test before chosing best move
+int maxNumMovesToTest = 4;
 
 
-
-//int maxNumSimulationsPerMove = 3720;//600;
-int maxNumSimulationsPerMove = 600;//1200;//600;
-
-// 5 seconds
-int maxNumMovesToTest = 8;
-int maxNumSimulationsPerFinalChoice = 4800;
-
-
-// testing has showed 7 to be the best here
-// except on longer runs, where we go up to 20
-int batchSizeBeforeReplaceWorstMoves = 1600;
-
-// testing showed 7 to be the best here
-unsigned int mutationPoolSize = 2;
+// Should new candidates be mutations of best or fresh, random moves?
 
 // out of 10
 // thus a value of 5 means that 50% of fresh replacement moves are mutations
@@ -76,18 +54,7 @@ int mutationVsRandomMixRatio = 7;
 unsigned int maxMutationsPerMove = 1;
 
 
-char useGoodMovesOnly = true;
 
-
-// out of 10
-// 7 means lower 70% are discarded
-
-// testing showed 5 (50%) was fine
-int fractionOfMovesDiscarded = 5;
-
-
-
-int finalBatchSize = 100;
 
 //int maxSimulationsPerStepAI = 100;
 
@@ -118,9 +85,9 @@ void toggleAICPUMode( char inFullSpeed ) {
 
 // define this to enable AI testing code.
 // some of it doesn't compile on DS
-#define AI_TESTING_ENABLED
+//#define AI_TESTING_ENABLED
 
-char testingAI = true;
+char testingAI = false;
 
 
 #ifdef AI_TESTING_ENABLED
@@ -135,7 +102,7 @@ int currentTestingRound = 0;
 //int testingRoundBatchSizes[ numTestingRoundsSpace ] = { 3, 5, 7, 10, 13 };
 
 // max num moves to test
-int testingRoundParameter[ numTestingRoundsSpace ] = { 8, 16, 24, 32, 40 };
+int testingRoundParameter[ numTestingRoundsSpace ] = { 4, 8, 12, 16, 32 };
 
 int numRunsPerTestingRound = 40;
 
@@ -143,7 +110,7 @@ float runBestScoreSums[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 int runsSoFarPerRound[ numTestingRoundsSpace ] = { 0, 0, 0, 0, 0 };
 
 int numTestingRounds = 5;
-int maxTestingSimulationsPerMove = 1200;
+int maxTestingSimulationsPerMove = 600;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,82 +121,10 @@ FILE *testDataFile;
 
 
 
-static void sortMovesByScore() {
-    
-    char beenPicked[ possibleMoveSpace ];
-
-    int nextScoreToPick = -10000000;
-
-    for( int i=0; i<numPossibleMovesFilled; i++ ) {
-        beenPicked[i] = false;
-        }
-    for( int i=0; i<numPossibleMovesFilled; i++ ) {
-        
-        int indexToPick = -1;
-        int scoreToPick = 100000000;
-        for( int m=0; m<numPossibleMovesFilled; m++ ) {
-            if( ! beenPicked[ m ] && 
-                moveScores[m] >= nextScoreToPick && 
-                moveScores[m] < scoreToPick ) {
-                
-                scoreToPick = moveScores[m];
-                indexToPick = m;
-                }
-            }
-
-        moveSortMap[i] = indexToPick;
-        
-        beenPicked[ indexToPick ] = true;
-        
-        nextScoreToPick = scoreToPick;
-        }
-    }
-
-
-
-static void printSortedMoves() {
-    printOut( "Moves sorted by score:\n" );
-    
-    sortMovesByScore();
-    
-    for( int i=0; i<numPossibleMovesFilled; i++ ) {
-        int indexToPrint = moveSortMap[ i ];
-
-        printOut( "[%d] Score: %d, Move: ", indexToPrint, 
-                  moveScores[indexToPrint] );
-        
-        for( int c=0; c<moves[indexToPrint].numCharsUsed; c++ ) {
-            printOut( "%d, ", (int)(char)moves[indexToPrint].moveChars[c] );
-            }
-
-        if( moves[ indexToPrint ].flag ) {
-            printOut( " (MUT)" );
-            }
-                    
-        printOut( "\n" );
-        }
-    
-    }
-
-
-
-
 
 
 
 char stateChecked = true;
-
-
-static char equal( possibleMove inA, possibleMove inB ) {
-    for( int c=0; c<inA.numCharsUsed; c++ ) {
-        if( inA.moveChars[c] != inB.moveChars[c] ) {
-            return false;
-            }
-        }
-
-    return true;
-    }
-
 
 
 
@@ -251,151 +146,19 @@ static void clearNextMove() {
     
     if( numTotalMoves == 1 ) {
         // don't even need to test
+        printOut( "Only one possible move found, not running sims.\n" );
         moveDone = true;
         }
     
     totalMoveSimulationsForThisChoice = 0;
     
     numMovesTested = 0;
-
-    // skip rest
-    if( true ) return;
-    
-
-
-
-
-
-    if( numTotalMoves == -1 || numTotalMoves > numPossibleMoves ) {
-        // unpractical number of total moves, or too many to fit in our array
-
-        // default to a fixed number of randomly chosen moves
-        numPossibleMovesFilled = numPossibleMoves;
-        
-        
-        // but in some cases, there are only a small number of available moves
-
-        // if we detect too many collisions when trying to add a new move,
-        // we can assume that this is the case, and limit the possible
-        // move array there
-
-
-        for( int m=0; m<numPossibleMovesFilled; m++ ) {
-            
-            // pick a unique move
-            char collision = true;
-            
-            // in some situations, picking a unique move is impossible
-            // (like if we're out of money, or there are no payable units)
-            int collisionCount = 0;
-            // bail after 100 collisions in a row
-            
-            while( collision && collisionCount < 100 ) {
-                
-                if( useGoodMovesOnly ) {
-                    moves[m] = getGoodMove( &currentState );
-                    }
-                else {
-                    moves[m] = getPossibleMove( &currentState );
-                    }
-                
-                
-            
-                // make sure this is not a collision with one already picked
-                collision = false;
-                
-                for( int mm=0; mm < m && !collision; mm++ ) {
-                    if( equal( moves[mm], moves[m] ) ) {
-                        collision = true;
-                        collisionCount++;
-                        }
-                    }                    
-                }
-            if( collision ) {
-                // we bailed w/out finding another unique move
-                // assume that this is it
-                numPossibleMovesFilled = m;
-                
-                printOut( "Only found %d unique moves\n", m );
-                }
-            }
-        }
-    else {
-        // fixed number of possible moves that is small enough for our array
-        // use it!
-        numPossibleMovesFilled = numTotalMoves;
-
-        getAllPossibleMoves( &currentState, moves );        
-        }
-    
-
-    for( int m=0; m<numPossibleMovesFilled; m++ ) {
-        moveScores[m] = 0;
-        moveSimulations[m] = 0;
-        moveSimulationsInScoreBatch[m] = 0;
-        moves[m].flag = 0;
-            
-        /*
-              if( currentState.nextMove == salaryBribe ) {
-              printOut( "Possible SB move: " );
-              for( int i=0; i<moves[m].numCharsUsed; i++ ) {
-              printOut( "%d, ", (int)(char)moves[m].moveChars[i] );
-              }
-              printOut( "\n" );
-              }
-            */
-        }
-    
-    // if we have fewer possible moves to test, take advantage of this
-    // by running more simulations per move
-    //maxNumSimulationsPerMove = 
-    //    maxNumSimulationsPerFinalChoice / numPossibleMovesFilled;
-    
-    // actually, keep it constant per possible move... simply return
-    //   faster if we have fewer moves to test.
-    // so, maxNumSimulationsPerFinalChoice is our total maximum, not
-    //   the time we will use every time
-    // Otherwise, we take a long time to re-test our our single chosen
-    //   move in the commit phase (when we can't switch our move).
-    // (If there is only one possible move, we don't need to test it anyway,
-    //   but we don't have time to fix this now!)
-    
-    // no longer need to touch this at all
-    //maxNumSimulationsPerMove = 
-    //    maxNumSimulationsPerFinalChoice / numPossibleMoves;
-    
-    if( !testingAI ) {
-        
-        if( maxNumSimulationsPerMove <= 468 ) {
-            batchSizeBeforeReplaceWorstMoves = 7;
-            }
-        else {
-            batchSizeBeforeReplaceWorstMoves = 20;
-            }
-        printOut( "using batch size of %d\n", 
-                  batchSizeBeforeReplaceWorstMoves );
-
-        /*
-        finalBatchSize = maxNumSimulationsPerMove / 2;
-        
-        if( finalBatchSize > 200 ) {
-            finalBatchSize = 200;
-            }
-        
-        printOut( "using final batch size of %d\n", 
-                  finalBatchSize );
-        */
-        }
-    
-
-    nextMoveToTest = 0;
     }
 
 
 
 static void checkEqual( int inA, int inB ) {
-    assert( inA == inB );
-    
+    assert( inA == inB );    
     }
 
 
@@ -591,22 +354,20 @@ void freeAI() {
 
 
 
-void setAIThinkingSteps( int inNumSteps ) {
+void setAINumMovesToTest( int inNumMoves ) {
     if( !testingAI ) {
-        
-        maxNumSimulationsPerMove = inNumSteps;
-        
-        maxNumSimulationsPerFinalChoice = 
-            maxNumSimulationsPerMove * numPossibleMoves;
+
+        maxNumMovesToTest = inNumMoves;
+        printOut( "Setting AI num moves to: %d\n", maxNumMovesToTest );
         }
     
     }
 
     
 
-int getAIThinkingSteps() {
+int getAINumMovesToTest() {
 
-    return maxNumSimulationsPerMove;
+    return maxNumMovesToTest;
     }
 
 
@@ -666,18 +427,7 @@ static void printStateKnowledgeStats() {
 
 // assumes that externalEnemyMove has been set
 static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
-    /*
-    // pick move with highest score
-    int highScore = -10000000;
-    int chosenMove = -1;
-    for( int m=0; m<numPossibleMovesFilled; m++ ) {
-        if( moveScores[m] > highScore ) {
-            chosenMove = m;
-            highScore = moveScores[m];
-            }
-        }
-    */
-    
+
     // compose our move into a string
     *outMoveLength = (unsigned int)( bestMoveSoFar.numCharsUsed );
 
@@ -704,8 +454,6 @@ static unsigned char *pickAndApplyMove( unsigned int *outMoveLength ) {
     
 
     // apply knowledge that we gained from this move
-    // FIXME:  this doesn't seem to be working right.  Set break here
-    // and check it.
     currentState = applyKnowledge( &currentState );
     
     
@@ -831,67 +579,7 @@ void stepAI() {
             gamesThisStep++;
             
             // simulate one game for our next candidate
-            
 
-            
-
-
-
-
-
-            /*
-            // pick moves by weighting them according to their win scores
-            // so far
-            
-            int normMoveScores[ numPossibleMoves ];
-            int minScore = 2147483647;
-            for( int m=0; m<numPossibleMovesFilled; m++ ) {
-                if( moveScores[ m ] < minScore ) {
-                    minScore = moveScores[m];
-                    }
-                }
-            // subtract minScore from each score, and add 1 to put all scores
-            // in [1...) range (at start, before any scores known, all 
-            // normalized scores are 1
-            // use squares of scores to amplify effect
-            int totalNormScores = 0;
-            for( int m=0; m<numPossibleMovesFilled; m++ ) {
-                normMoveScores[m] = ( moveScores[ m ] - minScore ) + 1;
-
-                normMoveScores[m] *= normMoveScores[m];
-                totalNormScores += normMoveScores[m];
-                }
-            
-            
-            int weightThreshold = getRandom( totalNormScores );
-            
-
-            int chosenMove = -1;
-            
-            int weightPassedSoFar = 0;
-            while( weightPassedSoFar <= weightThreshold ) {
-                chosenMove ++;
-                weightPassedSoFar += normMoveScores[chosenMove];
-                }
-            
-            // this picks a move m with probability of 
-            // normMoveScores[m] / totalNormScores
-            
-            // at start, this is a uniform distribution, but as wins/losses
-            // build up, probability of picking good moves for additional
-            // exploration grows
-            */
-
-            // FIXME:  back to original uniform dist for testing
-            // chosenMove = getRandom( numPossibleMovesFilled );
-        
-            
-
-            // new:  just walk through moves, 
-            // running maxNumSimulationsPerMove games for each move
-
-            int chosenMove = nextMoveToTest;
-            
 
             // stop as soon as we exhaust total simulations we're allowed
             // to do
@@ -904,19 +592,7 @@ void stepAI() {
                     }
                 else {
                     #ifdef AI_TESTING_ENABLED
-
-                    /*
-                      
-                    int currentTestingRound = 0;
-                    #define numTestingRounds 5
-                    int testingRoundBatchSizes[ numTestingRounds ] = { 10, 20, 40, 80, 160 };
-                    
-                    int numRunsPerTestingRound = 10;
-                    
-                    int runBestScoreSums[ numTestingRounds ] = { 0, 0, 0, 0, 0 };
-                     */
-                    sortMovesByScore();
-                    
+        
                     runsSoFarPerRound[ currentTestingRound ] ++;
                     
                     runBestScoreSums[ currentTestingRound ] +=
@@ -954,8 +630,6 @@ void stepAI() {
                             currentTestingRound = 0;
 
                             maxNumSimulationsPerMove += 600;
-                            //maxNumSimulationsPerFinalChoice =
-                            //    maxNumSimulationsPerMove * 8;
                             maxNumMovesToTest = 
                                 testingRoundParameter[ currentTestingRound ];
                             
@@ -966,15 +640,6 @@ void stepAI() {
                                 fclose( testDataFile );
                                 exit( 0 );
                                 }
-
-                            /*
-                            finalBatchSize = maxNumSimulationsPerMove / 2;
-                            
-                            if( finalBatchSize > 200 ) {
-                                finalBatchSize = 200;
-                                }
-                            */
-
                             }
                         
                         
@@ -1106,31 +771,9 @@ void stepAI() {
                 // track total score
                 nextCandidateMoveScore += result;
 
-                /*
-                // new:  track (wins - losses)
-                if( result < 0 ) {
-                result = -1;
-                }
-                if( result > 0 ) {
-                result = 1;
-                }
-                moveScores[ chosenMove ] += result;
-                */
                 nextCandidateMoveSimulations ++;
-                //moveSimulationsInScoreBatch[ chosenMove ] ++;
                 totalMoveSimulationsForThisChoice ++;
-                
-                //nextMoveToTest ++;
-                //nextMoveToTest %= numPossibleMovesFilled;
-            
 
-                // after batches of a given size, throw out the bottom
-                // half of the moves, replace them with fresh random moves,
-                // and reset all move scores
-
-                // but save the last 1/4 of the simulations for deep
-                // simulation of the final set of moves (to really tease
-                // out the very best move)
 
                 if( nextCandidateMoveSimulations >= 
                     maxNumSimulationsPerMove ) {
@@ -1167,7 +810,7 @@ void stepAI() {
                         }
                     
 
-
+                    /*
                     printOut( "\n\n**** Intermediary %d-sim point: ",
                               totalMoveSimulationsForThisChoice );
                     
@@ -1185,35 +828,7 @@ void stepAI() {
                         }
                     
                     printOut( "\n" );
-
-                                        
-
-                    
-
-                    
-                    // print out stats, then clear them out and start over
-                    
-                    // do we settle on same choice again?
-                    
-                    /*
-                    printOut( "Move visit counts at halfway:\n" );
-    
-                    for( int m=0; m<numPossibleMovesFilled; m++ ) {
-                        printOut( "[%d : %d], ", m, moveSimulations[ m ] );
-                        moveSimulations[ m ] = 0;
-                        }
-                    printOut( "\n\n" );
-
-                    printOut( "Move score counts at halfway:\n" );
-    
-                    for( int m=0; m<numPossibleMovesFilled; m++ ) {
-                        printOut( "[%d : %d], ", m, moveScores[ m ] );
-                        moveScores[m] = 0;
-                        }
-                    printOut( "\n\n" );
                     */
-                
-
                     }
                 }
             
@@ -1275,27 +890,7 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
         currentState.nextMove == moveUnitsCommit ) {
     
         isMoveUnitsState = true;
-        }
-    
-
-    // make sure our current state matches actual game
-    // checkCurrentStateMatches();
-    
-    printOut( "Move simulation counts:\n" );
-    
-    for( int m=0; m<numPossibleMovesFilled; m++ ) {
-        printOut( "[%d : %d], ", m, moveSimulations[ m ] );
-        }
-    printOut( "\n\n" );
-    printOut( "Move score counts:\n" );
-    
-    for( int m=0; m<numPossibleMovesFilled; m++ ) {
-        printOut( "[%d : %d], ", m, moveScores[ m ] );
-        }
-    printOut( "\n\n" );
-
-    printSortedMoves();
-    
+        }    
 
         
 

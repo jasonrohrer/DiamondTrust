@@ -5,10 +5,10 @@ void initAI();
 
 void freeAI();
 
-// the number of steps to run for each move in pool
-void setAIThinkingSteps( int inNumSteps );
+// the number of candidate moves to test before picking best one
+void setAINumMovesToTest( int inNumMoves );
 
-int getAIThinkingSteps();
+int getAINumMovesToTest();
 
 
 // if full speed is set to true, AI runs more simulations per step
