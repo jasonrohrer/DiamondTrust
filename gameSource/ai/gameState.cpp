@@ -1125,6 +1125,8 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
     int bid[3];
     int bribe[3];
 
+    char frozen[3];
+    
     int totalSpent = 0;
     
 
@@ -1134,12 +1136,14 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
         dest[u] = inState->agentUnits[0][u].region;
         bid[u] = 0;
         bribe[u] = 0;
+        frozen[u] = false;
         }
 
 
     // first, deal with any moves that are already frozen
     for( u=0; u<3; u++ ) {
         if( inState->agentUnits[0][u].moveFrozen ) {
+            frozen[u] = true;
             
             dest[u] = inState->agentUnits[0][u].destination;
             bid[u] = inState->agentUnits[0][u].diamondBid;
@@ -1197,7 +1201,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
     for( i=0; i<3; i++ ) {
         u = unitOrder[i];
         
-        if( !inState->agentUnits[0][u].moveFrozen ) {
+        if( !frozen[u] ) {
             
             int regionWeights[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
             
@@ -1302,7 +1306,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
 
     // if some are flying home, their diamonds are no longer at risk
     for( u=0; u<3; u++ ) {
-        if( !inState->agentUnits[0][u].moveFrozen && dest[u] == 0 ) {
+        if( !frozen[u] && dest[u] == 0 ) {
             
             atRiskDiamondCounts[0] += inState->agentUnits[0][u].diamonds;
             }
@@ -1316,7 +1320,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
 
     // subtract trip costs
     for( u=0; u<3; u++ ) {
-        if( ! inState->agentUnits[0][u].moveFrozen ) {
+        if( ! frozen[u] ) {
             int tripCost = computeTripCost( inState, 0, u, dest[u] );
             moneyAvailable -= tripCost;
             totalSpent += tripCost;
@@ -1330,7 +1334,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
 
         // units had better stay where they are and save up for next time
         for( u=0; u<3; u++ ) {
-            if( ! inState->agentUnits[0][u].moveFrozen ) {            
+            if( ! frozen[u] ) {            
                 totalSpent -= computeTripCost( inState, 0, u, dest[u] );
                 dest[u] = inState->agentUnits[0][u].region;
                 }
@@ -1350,7 +1354,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
         int uWithInspector = -1;
         
         for( u=0; u<3; u++ ) {
-            if( ! inState->agentUnits[0][u].moveFrozen ) {
+            if( ! frozen[u] ) {
                 totalDiamondsInDests += 
                     inState->regionDiamondCounts[ dest[u] ];
             
@@ -1394,8 +1398,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
         
 
         for( u=0; u<3; u++ ) {
-            if( ! inState->agentUnits[0][u].moveFrozen &&        
-                dest[u] != 0 ) {
+            if( ! frozen[u] && dest[u] != 0 ) {
                 
                 // fraction of our money that we can spend on these diamonds
                 int idealToSpendOnDiamonds = 
@@ -1457,9 +1460,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
         // now make sure that we are being smart against any frozen enemy
         // moves in our dest regions
         for( u=0; u<3; u++ ) {
-            if( ! inState->agentUnits[0][u].moveFrozen &&        
-                dest[u] != 0 ) {
-
+            if( ! frozen[u] && dest[u] != 0 ) {
                 
                 for( int e=0; e<3; e++ ) {
                     if( inState->agentUnits[1][e].moveFrozen &&
@@ -1563,7 +1564,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
         u = (int)getRandom( 3 );
                 
         // skip any that are frozen
-        if( ! inState->agentUnits[0][u].moveFrozen ) {
+        if( ! frozen[u] ) {
 
             // priority:  trip itself (unchangeable), bribe, bid
             if( bid[u] > 0 ) {
