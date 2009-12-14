@@ -166,6 +166,11 @@ void MoveInspectorState::stepState() {
             // now that destination is known, show result
             showInspectorPanel( true );
 
+            // turn off inspector bribe tags for move
+            for( int i=0; i<numPlayerUnits*2; i++ ) {
+                showInspectorBribe( i, false );
+                }
+
             executeUnitMoves();
             }        
         }
