@@ -37,7 +37,7 @@ int totalMoveSimulationsForThisChoice = 0;
 
 
 // number of simulations to run for each candidate
-int maxNumSimulationsPerMove = 600;
+int maxNumSimulationsPerMove = 200;
 
 // number of candidates to test before chosing best move
 int maxNumMovesToTest = 4;
