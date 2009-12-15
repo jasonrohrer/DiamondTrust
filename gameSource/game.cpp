@@ -678,6 +678,8 @@ void gameLoopTick() {
 
             if( nextButton->getPressed( tx, ty ) ) {
                 goToNextGameState();
+                // reset the frame counter after each NEXT
+                frameCounter = 0;
                 }
             
             }

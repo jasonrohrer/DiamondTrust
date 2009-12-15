@@ -63,7 +63,7 @@ unsigned int maxMutationsPerMove = 1;
 // this worked during testing on the PC
 //int maxSimulationsPerStepAI = 100;
 // too long for the DSi
-int simulationsPerStepSlowMode = 5;
+int simulationsPerStepSlowMode = 4;
 
 
 int maxSimulationsPerStepAI = simulationsPerStepSlowMode;
@@ -345,7 +345,7 @@ void initAI() {
     if( console == OS_CONSOLE_NITRO ||
         console == OS_CONSOLE_ISDEBUGGER ) {
         // DS is half the speed of DSi... do this to avoid slowdown
-        simulationsPerStepSlowMode = 1;
+        simulationsPerStepSlowMode = 2;
         maxSimulationsPerStepAI = simulationsPerStepSlowMode;
         printOut( "Console type is NITRO\n" );
         //statusMessage = "NITRO";
@@ -641,8 +641,7 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
 void stepAI() {
     // check state once per month
     if( !stateChecked && currentState.nextMove == moveUnits ) {
-        // FIXME:  for profiling
-        //checkCurrentStateMatches();
+        checkCurrentStateMatches();
         stateChecked = true;
         }
 
