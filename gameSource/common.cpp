@@ -54,7 +54,26 @@ unsigned int intSqrt( unsigned int inX ) {
     }
 
 
+// O(log inY) algorithm found here:
+// http://stackoverflow.com/questions/101439/
+//  the-most-efficient-way-to-implement-an-integer-based-power-
+//  function-powint-int
+// this might actually have more overhead for smaller exponents
+/*
+int intPower( int inX, unsigned int inY ) {
+    int result = 1;
+    while( inY ) {
+        if( inY & 1 ) {
+            result *= inX;
+            }
+        inY >>= 1;
+        inX *= inX;
+        }
+    return result;
+    }
+*/
 
+// my original O( inY ) implementation
 int intPower( int inX, unsigned int inY ) {
     int res = 1;
     
@@ -64,8 +83,6 @@ int intPower( int inX, unsigned int inY ) {
 
     return res;
     }
-
-
 
 
 // integer arctan2 found here:

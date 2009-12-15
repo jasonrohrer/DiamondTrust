@@ -123,6 +123,12 @@ void gameInit() {
     /*
     printOut( "Testing AI...\n" );
     
+    printOut( "  ++++++  Init map\n" );
+    initMap();
+
+    printOut( "  ++++++  Init units\n" );
+    initUnits();
+
     initOpponent( true );
     unsigned char message[12];
     for( int i=0; i<6; i++ ) {
