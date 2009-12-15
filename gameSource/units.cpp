@@ -1205,8 +1205,21 @@ void drawUnitBribe( int inUnit, int inX, int inY ) {
 
 
 
+// custom function so that we can disable entropy-inducing calls
+// to getRandom when testing
+static inline unsigned int getRandomFake( unsigned int inMax ) {    
+    return inMax / 2;
+    }
+
+#define getRandomCustom getRandom
+// for testing:
+//#define getRandomCustom getRandomFake
+
+
+
+
 static int getArmHoldDownTime() {
-    return (int)( getRandom( 60 ) + 30 );
+    return (int)( getRandomCustom( 60 ) + 30 );
     }
 
 
@@ -1552,7 +1565,7 @@ void stepUnits() {
 
                     // pick how many times to wave
                     gameUnit[i].mWavesLeftBeforeBreak = 
-                        (int)( getRandom( 4 ) + 3 );
+                        (int)( getRandomCustom( 4 ) + 3 );
                     }
                 
                 
@@ -1575,7 +1588,7 @@ void stepUnits() {
                     }
 
                 gameUnit[i].mStepsUntilNextFrame = 
-                    (int)( getRandom( 4 ) + 4 );
+                    (int)( getRandomCustom( 4 ) + 4 );
 
                 if( gameUnit[i].mWavesLeftBeforeBreak == 0 ) {
                     

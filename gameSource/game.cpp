@@ -117,6 +117,18 @@ static char isInside( int inX, int inY,
 
 void gameInit() {
 
+    printOut( "Setting random seed..." );
+    // note:  we can do this with constant values, because getRandom
+    // is called for agent arm waving.... and if we're using the AI,
+    // those calls to getRandom will be interleaved in a random way based on 
+    // how long the user waits before pressing NEXT
+    setRandomSeed( 23423983, 23783294 );
+    
+    printOut( "Testing getRandom:\n" );
+    for( int i=0; i<10; i++ ) {
+        printOut( "%d\n", getRandom( 400 ) );
+        }
+    
     
 
     // FIXME:  for testing only

@@ -38,8 +38,10 @@ void printOut( const char *inFormatString, ... );
 
 
 // random value greater than or equal to 0 and less than inMax
-unsigned int getRandom( unsigned int inMax );
+//unsigned int getRandom( unsigned int inMax );
 
+// now defined in a common place for all platforms
+#include "random.h"
 
 
 typedef struct rgbaColor {
