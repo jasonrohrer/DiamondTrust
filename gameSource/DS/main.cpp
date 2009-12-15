@@ -108,13 +108,14 @@ void printOut( const char *inFormatString, ... ) {
     }
 
 
-
+// now implemented centrally
+/*
 MATHRandContext32 randContext;
 
 unsigned int getRandom( unsigned int inMax ) {
     return MATH_Rand32( &randContext, inMax );
     }
-
+*/
 
 
 
@@ -2243,7 +2244,8 @@ static void VBlankCallback() {
     TP_Init();
     
 
-    MATH_InitRand32( &randContext, 13728749 );
+    // now implemented in common code
+    //MATH_InitRand32( &randContext, 13728749 );
     
     
     printOut( "Calibrating touch panel\n" );
