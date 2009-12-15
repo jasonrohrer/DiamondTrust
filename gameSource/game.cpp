@@ -117,7 +117,7 @@ static char isInside( int inX, int inY,
 
 void gameInit() {
 
-    printOut( "Setting random seed..." );
+    printOut( "Setting random seed to a constant...\n" );
     // note:  we can do this with constant values, because getRandom
     // is called for agent arm waving.... and if we're using the AI,
     // those calls to getRandom will be interleaved in a random way based on 
@@ -129,7 +129,15 @@ void gameInit() {
         printOut( "%d\n", getRandom( 400 ) );
         }
     
+    printOut( "Testing getSecondsSinceEpoc: %d\n", getSecondsSinceEpoc() );
     
+    printOut( "Setting new random seed based on time\n" );
+    setRandomSeed( getSecondsSinceEpoc(), getSecondsSinceEpoc() + 2378923 );
+    
+    printOut( "Testing getRandom again:\n" );
+    for( int i=0; i<10; i++ ) {
+        printOut( "%d\n", getRandom( 400 ) );
+        }
 
     // FIXME:  for testing only
     /*

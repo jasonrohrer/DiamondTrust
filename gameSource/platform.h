@@ -44,6 +44,10 @@ void printOut( const char *inFormatString, ... );
 #include "random.h"
 
 
+unsigned int getSecondsSinceEpoc();
+
+
+
 typedef struct rgbaColor {
         unsigned char r;
         unsigned char g;

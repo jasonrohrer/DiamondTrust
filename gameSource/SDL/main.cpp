@@ -82,21 +82,6 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
 
 
 
-
-/*
-// as suggested by George Marsaglia
-//   http://www.math.uni-bielefeld.de/~sillke/ALGORITHMS/random/marsaglia-c 
-#define znew  ((z=36969*(z&65535)+(z>>16))<<16)
-#define vnew  ((v=18000*(v&65535)+(v>>16))&65535)
-#define IUNI  (znew+vnew)
-#define UNI   (znew+vnew)*2.328306e-10
-static unsigned int z=362436069, v=521288629;
-void setseed( unsigned int i1,unsigned int i2 ){z=i1; v=i2;}
-*/
-
-
-
-
 int w = 256;
 int h = 384;
 
@@ -121,14 +106,10 @@ int touchX = 0;
 int touchY = 0;
 
 
-#include <time.h>
 
 
 int mainFunction( int inNumArgs, char **inArgs ) {
 
-    //setseed( time(NULL), time(NULL) + 4789343 );
-    //setseed( 2343241, 879872 + 4789343 );
-    
 
     if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE ) < 0 ) {
         printf( "Couldn't initialize SDL: %s\n", SDL_GetError() );
@@ -637,23 +618,14 @@ void printOut( const char *inFormatString, ... ) {
     }
 
 
-//#include "minorGems/util/random/StdRandomSource.h"
 
-//StdRandomSource randSource;
 
-/*
-unsigned int getRandom( unsigned int inMax ) {
-    //return randSource.getRandomBoundedInt( 0, inMax - 1 );
-    //unsigned int fullRand = IUNI;
-    //printOut( "Full Rand value = %u\n", fullRand );
+#include <time.h>
 
-    //unsigned int returnValue = fullRand % inMax;
-    //printOut( "Rand value = %d\n", returnValue );
-    
-    return IUNI % inMax;
-    //return returnValue;
+unsigned int getSecondsSinceEpoc() {
+    return time( NULL );
     }
-*/
+
 
 
 

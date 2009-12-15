@@ -108,15 +108,19 @@ void printOut( const char *inFormatString, ... ) {
     }
 
 
-// now implemented centrally
-/*
-MATHRandContext32 randContext;
 
-unsigned int getRandom( unsigned int inMax ) {
-    return MATH_Rand32( &randContext, inMax );
+
+unsigned int getSecondsSinceEpoc() {
+    RTCDate date;
+    RTCTime time;
+    
+    RTC_GetDate( &date );
+    RTC_GetTime( &time );
+    
+    s64 seconds = RTC_ConvertDateTimeToSecond( &date , &time );
+    
+    return (unsigned int)seconds;
     }
-*/
-
 
 
 //#define MAX_TEXTURES  512
@@ -2239,6 +2243,7 @@ static void VBlankCallback() {
     
     OS_Printf( "Main starting\n" );
 
+    RTC_Init();
 
     FX_Init();
     TP_Init();
