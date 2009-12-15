@@ -20,7 +20,7 @@
 #include "opponent.h"
 
 
-int drawFrameCounter = true;
+int drawFrameCounter = false;
 int frameCounter = 0;
 
 
