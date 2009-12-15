@@ -20,6 +20,9 @@
 #include "opponent.h"
 
 
+int drawFrameCounter = true;
+int frameCounter = 0;
+
 
 int satelliteTopSpriteID;
 int satelliteBottomSpriteID;
@@ -663,7 +666,7 @@ void gameLoopTick() {
 
 
 void drawTopScreen() {
-        
+    
     drawStats();
     
 
@@ -699,6 +702,22 @@ void drawTopScreen() {
                                180, white, alignCenter );
             }
         
+        }
+
+    if( drawFrameCounter ) {
+        
+        startNewSpriteLayer();
+    
+        char *countString = autoSprintf( "%d", frameCounter / 30 );
+        
+        font16->drawString( countString, 128, 130, red, alignCenter );
+        
+        delete [] countString;
+        }
+    
+    if( currentGameState != pickGameTypeState ) {
+        // start counter as soon as player touches first button
+        frameCounter++;
         }
     
     }

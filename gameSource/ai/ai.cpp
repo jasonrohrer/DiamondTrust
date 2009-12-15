@@ -63,7 +63,7 @@ unsigned int maxMutationsPerMove = 1;
 // this worked during testing on the PC
 //int maxSimulationsPerStepAI = 100;
 // too long for the DSi
-int simulationsPerStepSlowMode = 12;
+int simulationsPerStepSlowMode = 5;
 
 
 int maxSimulationsPerStepAI = simulationsPerStepSlowMode;
@@ -345,7 +345,7 @@ void initAI() {
     if( console == OS_CONSOLE_NITRO ||
         console == OS_CONSOLE_ISDEBUGGER ) {
         // DS is half the speed of DSi... do this to avoid slowdown
-        simulationsPerStepSlowMode = 6;
+        simulationsPerStepSlowMode = 1;
         maxSimulationsPerStepAI = simulationsPerStepSlowMode;
         printOut( "Console type is NITRO\n" );
         //statusMessage = "NITRO";
@@ -759,22 +759,6 @@ void stepAI() {
                 // pick a possible co-move for opponent
                 gameState mirror = getMirrorState( &startState );
 
-                // if we KNOW that none of our agents have been bribed,
-                // then we KNOW that the enemy can't peek
-                // However, we might not have seen any of the enemy move
-                // it depends on which of their agents have been bribed
-
-                char anyOfOurAgentsPotentiallyBribed = false;
-                for( int u=0; u<3; u++ ) {
-                    if( currentState.agentUnits[0][u].totalSalary.t <
-                        currentState.agentUnits[0][u].totalBribe.hi ) {
-                        
-                        // bribe MIGHT be higher than true salary
-                        anyOfOurAgentsPotentiallyBribed = true;
-                        }
-                    }
-                
-                    
 
                 // first, generate a fresh move
                 possibleMove enemyMove = getGoodMove( &mirror,
