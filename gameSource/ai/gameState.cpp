@@ -1262,13 +1262,13 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                         
                             // if we're carrying a lot of diamonds, then yes
                             regionWeights[r] += 
-                                inState->agentUnits[0][u].diamonds * 4;
+                                inState->agentUnits[0][u].diamonds * 8;
                             
                             // if we're likely bribed, then yes
                             if( inState->agentUnits[0][u].totalBribe.hi >
                                 inState->agentUnits[0][u].totalSalary.t ) {
                                 
-                                regionWeights[r] += 4;
+                                regionWeights[r] += 16;
                                 }
                             
                             // if we have fewer than 2 diamonds at home,
@@ -1687,9 +1687,9 @@ possibleMove getGoodMove( gameState *inState,
             
 
 
-            // potentially spend it all to counter-act bribes
+            // potentially spend half of money to counter-act bribes
             // or bribe enemy units
-            int moneyAvailable = inState->ourMoney.t;
+            int moneyAvailable = inState->ourMoney.t / 2;
             
             int *possibleSpendingWeights = new int[moneyAvailable + 1];
 
