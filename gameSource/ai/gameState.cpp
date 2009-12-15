@@ -1054,13 +1054,13 @@ static void zeroIntArray( int *inArray, int inLength ) {
 
 // pick an index at random, with probability proportional
 // to weight
-static int pickRandomWeighedIndex( int *inWeights, int inLength, 
-                                   unsigned int inTotalWeight ) {
+static int pickRandomWeightedIndex( int *inWeights, int inLength, 
+                                    int inTotalWeight ) {
 
     assert( inTotalWeight > 0 );
     
     
-    unsigned int randomWeightPick = getRandom( inTotalWeight );
+    unsigned int randomWeightPick = getRandom( (unsigned int)inTotalWeight );
             
     unsigned int cumWeight = 0;
     int pickI = -1;
@@ -1082,7 +1082,7 @@ static int pickRandomWeighedIndex( int *inWeights, int inLength,
 // returns total weight assigned
 static int fauxGaussian( int *outWeights, int inLength, int inMean ) {
     
-    unsigned int totalWeight = 0;
+    int totalWeight = 0;
     for( int s=0; s<inLength; s++ ) {
                     
         // gaussian-like, with center around mean
@@ -1100,7 +1100,7 @@ static int fauxGaussian( int *outWeights, int inLength, int inMean ) {
             outWeights[s] = 0;
             }
         else {
-            int powerValue = intPower( 2, twoExponent );
+            int powerValue = intPower( 2, (unsigned int)twoExponent );
 
             outWeights[s] = 10 / powerValue;
             }
@@ -1177,7 +1177,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
     // first pick a smart destination for each unit
     
     // process units in a random order
-    unsigned int unitOrder[3];
+    int unitOrder[3];
     for( u=0; u<3; u++ ) {
 
         char assigned = false;
@@ -1185,7 +1185,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
             
             assigned = true;
 
-            unitOrder[u] = getRandom( 3 );
+            unitOrder[u] = (int)getRandom( 3 );
             for( int uu=0; uu<u; uu++ ) {
                 if( unitOrder[u] == unitOrder[uu] ) {
                     // collision with existing assignment
@@ -1290,7 +1290,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
 
             // now we have weights for all the possible regions
             // (0 weights on regions that are blocked)
-            dest[u] = pickRandomWeighedIndex( regionWeights, 8, totalWeight );
+            dest[u] = pickRandomWeightedIndex( regionWeights, 8, totalWeight );
             
             /*
             printOut( "Region weights: " );
@@ -1427,13 +1427,13 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
 
                 zeroIntArray( possibleSpendingWeights, moneyAvailable + 1 );
             
-                unsigned int totalWeight = 
+                int totalWeight = 
                     fauxGaussian( possibleSpendingWeights,
                                   moneyAvailable + 1, idealToSpendOnDiamonds );
                 
-                bid[u] = pickRandomWeighedIndex( possibleSpendingWeights,
-                                                 moneyAvailable + 1,
-                                                 totalWeight );
+                bid[u] = pickRandomWeightedIndex( possibleSpendingWeights,
+                                                  moneyAvailable + 1,
+                                                  totalWeight );
                 totalSpent += bid[u];
                 
 
@@ -1448,9 +1448,11 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                                       moneyAvailable + 1, 
                                       idealToSpendOnInspector );
                     
-                    bribe[u] = pickRandomWeighedIndex( possibleSpendingWeights,
-                                                       moneyAvailable + 1,
-                                                       totalWeight );
+                    bribe[u] = pickRandomWeightedIndex( 
+                        possibleSpendingWeights,
+                        moneyAvailable + 1,
+                        totalWeight );
+
                     totalSpent += bribe[u];
                     }
                 }
@@ -1635,7 +1637,7 @@ static possibleMove getSellDiamondsGoodMove( gameState *inState ) {
     else {
         // we know how many enemy is selling!
         if( inState->enemyDiamondsToSell < 2 ) {
-            idealNumToSell = inState->enemyDiamondsToSell + 1;
+            idealNumToSell = (unsigned int)inState->enemyDiamondsToSell + 1;
             }
         else {
             idealNumToSell = 0;
@@ -1746,9 +1748,9 @@ possibleMove getGoodMove( gameState *inState,
                     */
                     
                     salaryBribeAmounts[ u+3 ] = 
-                        pickRandomWeighedIndex( possibleSpendingWeights,
-                                                moneyAvailable + 1,
-                                                totalWeight );
+                        pickRandomWeightedIndex( possibleSpendingWeights,
+                                                 moneyAvailable + 1,
+                                                 totalWeight );
                     /*
                     printOut( "Chosen bribe = %d\n", 
                               salaryBribeAmounts[ u+3] );
@@ -1783,9 +1785,9 @@ possibleMove getGoodMove( gameState *inState,
                                       idealSalary );
                     
                     salaryBribeAmounts[u] = 
-                        pickRandomWeighedIndex( possibleSpendingWeights,
-                                                moneyAvailable + 1,
-                                                totalWeight );
+                        pickRandomWeightedIndex( possibleSpendingWeights,
+                                                 moneyAvailable + 1,
+                                                 totalWeight );
                     }
                 else {
                     // away from home

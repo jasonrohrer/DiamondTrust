@@ -213,8 +213,17 @@ void applyCornerTransparency( rgbaColor *inImage, int inNumPixels ) {
 rgbaColor *extractRegion( rgbaColor *inImage, int inW, int inH,
                           int inOffsetX, int inOffsetY, 
                           int inExtractW, int inExtractH ) {
-    rgbaColor *extracted = new rgbaColor[ inExtractW * inExtractH ];
     
+    if( inOffsetY + inExtractH > inH
+        || 
+        inOffsetX + inExtractW > inW ) {
+        printOut( "Error:  extractRegion out of image boundaries\n" );
+        return NULL;
+        }
+    
+
+    rgbaColor *extracted = new rgbaColor[ inExtractW * inExtractH ];
+
     for( int y=0; y<inExtractH; y++ ) {
         int imageY = y + inOffsetY;
         for( int x=0; x<inExtractW; x++ ) {
