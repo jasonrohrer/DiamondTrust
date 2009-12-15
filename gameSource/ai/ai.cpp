@@ -641,7 +641,8 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
 void stepAI() {
     // check state once per month
     if( !stateChecked && currentState.nextMove == moveUnits ) {
-        checkCurrentStateMatches();
+        // FIXME:  for profiling
+        //checkCurrentStateMatches();
         stateChecked = true;
         }
 

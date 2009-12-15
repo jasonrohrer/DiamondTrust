@@ -126,7 +126,8 @@ int touchY = 0;
 
 int mainFunction( int inNumArgs, char **inArgs ) {
 
-    setseed( time(NULL), time(NULL) + 4789343 );
+    //setseed( time(NULL), time(NULL) + 4789343 );
+    setseed( 2343241, 879872 + 4789343 );
     
 
     if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE ) < 0 ) {

@@ -1045,11 +1045,6 @@ possibleMove getPossibleMove( gameState *inState, char inForceFreshPick ) {
 
 
 
-static void zeroIntArray( int *inArray, int inLength ) {
-    for( int i=0; i<inLength; i++ ) {
-        inArray[i] = 0;
-        }
-    }
 
 
 // pick an index at random, with probability proportional
@@ -1081,6 +1076,8 @@ static int pickRandomWeightedIndex( int *inWeights, int inLength,
 // fill an array with gaussian-like weights, centered on inMean index
 // returns total weight assigned
 static int fauxGaussian( int *outWeights, int inLength, int inMean ) {
+    // this is a code bottleneck, so there are a lot of optimizations here
+
     
     int totalWeight = 0;
     for( int s=0; s<inLength; s++ ) {
@@ -1090,22 +1087,48 @@ static int fauxGaussian( int *outWeights, int inLength, int inMean ) {
 
         // these define, roughly, standard deviation
         // higher quotient makes the gaussian narrower
-        int quotient = 1;
-        int denominator = 4;
+        // NOTE:  these are hard-coded below as an opt
+        //int quotient = 1;
+        //int denominator = 4;
         
-        int twoExponent = quotient * intPower( (s - inMean), 2 ) / denominator;
         
-        if( twoExponent > 30 ) {
-            // overflow
+        //int twoExponent = quotient * 
+        //    intPower( (s - inMean), 2 ) / denominator;
+        
+        // Opt:  no need to call intPower here... just squaring
+        int sMinusMean = s - inMean;
+        
+        //int twoExponent = 
+        // ( quotient * sMinusMean * sMinusMean ) / denominator;
+        
+        // OPT:  since quotient is 1 and denominator is 4... dividing by 4 is 
+        // shifting by 2
+        int twoExponent = (sMinusMean * sMinusMean) >> 2;
+
+        // Opt:  we're going to divide 10 by this power of 2 anyway...
+        // it will be zero for all exp values greater than 3
+        //if( twoExponent > 30 ) {
+        if( twoExponent > 3 ) {
+            // (2^twoExponent) swamps 10, so don't even compute it
             outWeights[s] = 0;
             }
         else {
-            int powerValue = intPower( 2, (unsigned int)twoExponent );
+            
+            //int powerValue = intPower( 2, (unsigned int)twoExponent );
 
-            outWeights[s] = 10 / powerValue;
+            // Opt:  no need to call intPower here, since we can use base-2
+            //int powerValue = 1 << twoExponent;
+            
+
+            //outWeights[s] = 10 / powerValue;
+
+            // further opt!
+            // dividing by a power of two is just shifting!
+            outWeights[s] = 10  >> twoExponent;
+
+            // opt:  no need to do the add into totalWeight in zero case
+            totalWeight += outWeights[s];
             }
-        
-        totalWeight += outWeights[s];
         }
 
     return totalWeight;
@@ -1203,6 +1226,10 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
         
         if( !frozen[u] ) {
             
+            // opt: access this once
+            unit *thisUnit = &( inState->agentUnits[0][u] );
+            
+
             int regionWeights[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
             
             int totalWeight = 0;
@@ -1231,7 +1258,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                         
                         // bit of weight to staying in current region
                         // because it saves money
-                        if( inState->agentUnits[0][u].region == r ) {
+                        if( thisUnit->region == r ) {
                             regionWeights[r] +=  2;
                             }
 
@@ -1262,11 +1289,11 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                         
                             // if we're carrying a lot of diamonds, then yes
                             regionWeights[r] += 
-                                inState->agentUnits[0][u].diamonds * 8;
+                                thisUnit->diamonds * 8;
                             
                             // if we're likely bribed, then yes
-                            if( inState->agentUnits[0][u].totalBribe.hi >
-                                inState->agentUnits[0][u].totalSalary.t ) {
+                            if( thisUnit->totalBribe.hi >
+                                thisUnit->totalSalary.t ) {
                                 
                                 regionWeights[r] += 16;
                                 }
@@ -1277,7 +1304,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                             if( inState->ourDiamonds < 2 ) {
                                 // only a factor if we have diamonds
                                 regionWeights[r] += 
-                                    inState->agentUnits[0][u].diamonds * 4;
+                                    thisUnit->diamonds * 4;
                                 }
                             }
                         
@@ -1422,10 +1449,7 @@ static possibleMove getMoveUnitsGoodMove( gameState *inState ) {
                 if( idealToSpendOnDiamonds < 0 ) {
                     idealToSpendOnDiamonds = 0;
                     }
-                
 
-
-                zeroIntArray( possibleSpendingWeights, moneyAvailable + 1 );
             
                 int totalWeight = 
                     fauxGaussian( possibleSpendingWeights,
@@ -1704,9 +1728,9 @@ possibleMove getGoodMove( gameState *inState,
                 char sharedRegion = false;
 
                 for( int p=0; p<3; p++ ) {
-                    unit playerUnit = inState->agentUnits[0][p];
-            
-                    if( playerUnit.region == enemyUnit.region ) {
+                    if( inState->agentUnits[0][p].region == 
+                        enemyUnit.region ) {
+                        
                         sharedRegion = true;
                         }
                     }
@@ -2674,25 +2698,31 @@ gameState getMirrorState( gameState *inState ) {
     result.knownEnemyTotalMoneySpent = inState->knownOurTotalMoneySpent;
 
 
-
+    // opt:  access these outside loop
+    unit *player0UnitArray = inState->agentUnits[0];
+    unit *player1UnitArray = inState->agentUnits[1];
+    
     for( int u=0; u<3; u++ ) {
-        result.agentUnits[0][u] = inState->agentUnits[1][u];
-        result.agentUnits[1][u] = inState->agentUnits[0][u];
-
+        result.agentUnits[0][u] = player1UnitArray[u];
+        result.agentUnits[1][u] = player0UnitArray[u];
+        
         // swap home regions (both sides see 0 as their home
         for( int p=0; p<2; p++ ) {
-            if( result.agentUnits[p][u].region == 0 ) {
-                result.agentUnits[p][u].region = 1;
+            // opt:  do this once
+            unit *playerUnit = &( result.agentUnits[p][u] );
+            
+            if( playerUnit->region == 0 ) {
+                playerUnit->region = 1;
                 }
-            else if( result.agentUnits[p][u].region == 1 ) {
-                result.agentUnits[p][u].region = 0;
+            else if( playerUnit->region == 1 ) {
+                playerUnit->region = 0;
                 }
 
-            if( result.agentUnits[p][u].destination == 0 ) {
-                result.agentUnits[p][u].destination = 1;
+            if( playerUnit->destination == 0 ) {
+                playerUnit->destination = 1;
                 }
-            else if( result.agentUnits[p][u].destination == 1 ) {
-                result.agentUnits[p][u].destination = 0;
+            else if( playerUnit->destination == 1 ) {
+                playerUnit->destination = 0;
                 }
             }
         }
@@ -2706,9 +2736,13 @@ gameState getMirrorState( gameState *inState ) {
 static int getBribedCount( gameState *inState, int inPlayer ) {
     int count = 0;
     
+    // opt:
+    // do this outside of loop
+    unit *playerUnitArray = inState->agentUnits[inPlayer];
+
     for( int u=0; u<3; u++ ) {
-        if( inState->agentUnits[inPlayer][u].totalBribe.t >
-            inState->agentUnits[inPlayer][u].totalSalary.t ) {
+        if( playerUnitArray[u].totalBribe.t >
+            playerUnitArray[u].totalSalary.t ) {
             count ++;
             }            
         }
