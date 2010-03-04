@@ -1,0 +1,60 @@
+#!/bin/sh
+
+#
+# Modification History
+#
+# 2007-November-12   Jason Rohrer
+# Copied from Cultivation build.
+#
+
+
+if [ $# -lt 3 ] ; then
+   echo "Usage: $0 release_name unix_platform_name path_to_SDL.framework"
+   exit 1
+fi
+
+
+rm -rf mac
+
+mkdir mac
+
+
+
+mkdir mac/Between
+mkdir mac/Between/graphics
+mkdir mac/Between/music
+mkdir mac/Between/settings
+mkdir mac/Between/languages
+
+
+cp ../gameSource/graphics/*.tga mac/Between/graphics
+cp ../gameSource/music/*.tga mac/Between/music
+cp ../gameSource/settings/*.ini mac/Between/settings
+cp ../gameSource/languages/*.txt mac/Between/languages
+cp ../gameSource/language.txt mac/Between
+cp ../documentation/Readme.txt mac/Between
+
+
+
+
+cp -r macOSX/Between.app mac/Between/Between.app
+cp ../gameSource/Between mac/Between/Between.app/Contents/MacOS
+
+rm -r mac/Between/Between.app/CVS
+rm -r mac/Between/Between.app/Contents/CVS
+rm -r mac/Between/Between.app/Contents/MacOS/CVS
+rm -r mac/Between/Between.app/Contents/Resources/CVS
+rm -r mac/Between/Between.app/Contents/Frameworks/CVS
+
+# install SDL framework
+cp -r $3 mac/Between/Between.app/Contents/Frameworks/
+
+cd mac
+tar cf "Between_$1_$2.tar" Between
+gzip "Between_$1_$2.tar"
+
+
+
+
+
+

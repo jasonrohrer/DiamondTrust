@@ -1,0 +1,13 @@
+rm -r minorGems/ai
+rm -r minorGems/bench
+rm -r minorGems/doc
+rm -r minorGems/examples
+rm -r minorGems/sound
+rm -r minorGems/temp
+
+
+
+rm -r game7/documentation/concept
+rm -r game7/documentation/html
+rm -r game7/documentation/igf2009
+rm -r game7/documentation/esquire

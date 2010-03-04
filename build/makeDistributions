@@ -1,0 +1,72 @@
+#!/bin/sh
+
+#
+# Modification History
+#
+# 2007-November-12   Jason Rohrer
+# Copied from Cultivation build.
+#
+
+
+if [ $# -lt 2 ] ; then
+   echo "Usage: $0 release_name unix_platform_name"
+   exit 1
+fi
+
+
+rm -rf unix
+rm -rf windows
+
+mkdir windows
+mkdir unix
+
+
+# work on unix tree first
+mkdir unix/Between
+mkdir unix/Between/graphics
+mkdir unix/Between/music
+mkdir unix/Between/settings
+mkdir unix/Between/languages
+
+
+cp ../gameSource/graphics/*.tga unix/Between/graphics
+cp ../gameSource/music/*.tga unix/Between/music
+cp ../gameSource/settings/*.ini unix/Between/settings
+cp ../gameSource/languages/*.txt unix/Between/languages
+cp ../gameSource/language.txt unix/Between
+cp ../documentation/Readme.txt unix/Between
+
+
+# duplicate unix tree so far to make windows tree
+cp -r unix/Between windows/
+
+cp ../gameSource/Between unix/Between/
+
+cp win32/Between.exe win32/*.dll windows/Between/
+
+cd unix
+tar cf "Between_$1_$2.tar" Between
+gzip "Between_$1_$2.tar"
+
+
+cd ..
+
+g++ -o unix2dos unix2dos.c 
+cp unix2dos windows
+cp unix2dosScript windows
+
+
+cd windows
+
+
+for file in Between/languages/*.txt
+do
+	./unix2dosScript "$file"
+done
+
+zip -r "Between_$1_Windows.zip" Between
+
+
+
+
+
