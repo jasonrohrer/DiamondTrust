@@ -22,7 +22,7 @@ SDL_SOURCE = \
 main.cpp \
 
 
-EXE_FILE = ../gameApp
+EXE_FILE = ../DiamondTrust
 
 
 SDL_OBJECTS = ${SDL_SOURCE:.cpp=.o}
