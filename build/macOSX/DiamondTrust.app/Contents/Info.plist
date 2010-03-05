@@ -5,15 +5,15 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.passage</string>
+	<string>com.diamondtrustgame</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>Between</string>
+	<string>DiamondTrust</string>
 	<key>CFBundleIconFile</key>
-	<string>Between.icns</string>
+	<string>DiamondTrusticns</string>
 	<key>CFBundleName</key>
-	<string>Between</string>
+	<string>DiamondTrust</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
@@ -23,11 +23,11 @@
 	<key>CFBundleShortVersionString</key>
 	<string>0</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Between</string>
+	<string>DiamondTrust</string>
 	<key>CFBundleLongVersionString</key>
 	<string>0</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Public Domain, 2008</string>
+	<string>Public Domain, 2010</string>
 	<key>LSRequiresCarbon</key>
         <true/>
 	<key>CSResourcesFileMapped</key>

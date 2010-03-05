@@ -20,38 +20,29 @@ mkdir mac
 
 
 
-mkdir mac/Between
-mkdir mac/Between/graphics
-mkdir mac/Between/music
-mkdir mac/Between/settings
-mkdir mac/Between/languages
+mkdir mac/DiamondTrust
+mkdir mac/DiamondTrust/gameData
 
-
-cp ../gameSource/graphics/*.tga mac/Between/graphics
-cp ../gameSource/music/*.tga mac/Between/music
-cp ../gameSource/settings/*.ini mac/Between/settings
-cp ../gameSource/languages/*.txt mac/Between/languages
-cp ../gameSource/language.txt mac/Between
-cp ../documentation/Readme.txt mac/Between
+cp ../gameSource/gameData/*.tga mac/DiamondTrust/gameData
+cp ../gameSource/gameData/*.txt mac/DiamondTrust/gameData
 
 
 
+cp -r macOSX/DiamondTrust.app mac/DiamondTrust/DiamondTrust.app
+cp ../gameSource/DiamondTrust mac/DiamondTrust/DiamondTrust.app/Contents/MacOS
 
-cp -r macOSX/Between.app mac/Between/Between.app
-cp ../gameSource/Between mac/Between/Between.app/Contents/MacOS
-
-rm -r mac/Between/Between.app/CVS
-rm -r mac/Between/Between.app/Contents/CVS
-rm -r mac/Between/Between.app/Contents/MacOS/CVS
-rm -r mac/Between/Between.app/Contents/Resources/CVS
-rm -r mac/Between/Between.app/Contents/Frameworks/CVS
+rm -r mac/DiamondTrust/DiamondTrust.app/CVS
+rm -r mac/DiamondTrust/DiamondTrust.app/Contents/CVS
+rm -r mac/DiamondTrust/DiamondTrust.app/Contents/MacOS/CVS
+rm -r mac/DiamondTrust/DiamondTrust.app/Contents/Resources/CVS
+rm -r mac/DiamondTrust/DiamondTrust.app/Contents/Frameworks/CVS
 
 # install SDL framework
-cp -r $3 mac/Between/Between.app/Contents/Frameworks/
+cp -r $3 mac/DiamondTrust/DiamondTrust.app/Contents/Frameworks/
 
 cd mac
-tar cf "Between_$1_$2.tar" Between
-gzip "Between_$1_$2.tar"
+tar cf "DiamondTrust_$1_$2.tar" DiamondTrust
+gzip "DiamondTrust_$1_$2.tar"
 
 
 
