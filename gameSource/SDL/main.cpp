@@ -757,7 +757,7 @@ void replaceSprite256( int inSpriteID,
     SingleTextureGL *s = *( spriteTextures.getElement( inSpriteID ) );
 
     s->replaceTextureData( (unsigned char*)fullColorImage,
-                           inWidth, inHeight );
+                           false, inWidth, inHeight );
 
     delete [] fullColorImage;
     }
