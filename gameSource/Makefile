@@ -73,7 +73,7 @@ PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))
 
 
 
-all: ${PATH_GAME_GRAPHICS} gameData
+all: gameData ${PATH_GAME_GRAPHICS}
 	cp languages/*.txt gameData
 
 
