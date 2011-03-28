@@ -1,0 +1,14 @@
+Images fetched from here:
+
+http://visibleearth.nasa.gov/view_detail.php?id=7115
+
+
+Images cropped using VIPS:
+
+http://www.vips.ecs.soton.ac.uk/index.php?title=VIPS
+
+
+with the im_extract_area command.
+
+
+See the .desc file for cropping info
