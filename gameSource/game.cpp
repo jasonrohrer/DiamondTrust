@@ -93,6 +93,8 @@ extern GameState *gameEndState;
 Button *doneButton;
 Button *nextButton;
 Button *parentButton;
+// this one can be NULL if not supported
+Button *parentServeCloneDownloaButton;
 Button *childButton;
 
 Button *aiButton;
@@ -341,9 +343,32 @@ void gameInit() {
     
     nextButton = new Button( font16, translate( "button_next" ), 38, 111 );
     
-    parentButton = new Button( font16, translate( "button_parent" ),
-                                                  128,
-                                                  106 );
+    
+
+    if( isCloneBootPossible() ) {
+        // two options for hosting
+        
+        parentButton = new Button( 
+            font16, 
+            translate( "button_parent_muti_card" ),
+            128,
+            66 );
+        parentServeCloneDownloaButton = new Button( 
+            font16, 
+            translate( "button_parent_clone" ),
+            128,
+            106 );
+        }
+    else {
+        // just a straight hosting button
+    
+        parentServeCloneDownloaButton = NULL;
+        
+        parentButton = new Button( font16, translate( "button_parent" ),
+                                   128,
+                                   106 );
+        }
+    
     childButton = new Button( font16, translate( "button_child" ),
                                                  128,
                                                  146 );
@@ -417,6 +442,11 @@ void gameFree() {
     delete aiButton;
     delete wifiButton;
     
+    if( parentServeCloneDownloaButton != NULL ) {
+        delete parentServeCloneDownloaButton;
+        parentServeCloneDownloaButton = NULL;
+        }
+
     delete parentButton;
     delete childButton;
     

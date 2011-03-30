@@ -156,6 +156,23 @@ char getTouch( int *outX, int *outY );
 char isAutoconnecting();
 
 
+// true if platform supports clone booting (from a single executable on
+// the parent side, sent over the connection to the child)
+char isCloneBootPossible();
+
+
+// starts a parent server that waits for a connection and then serve
+// a clone boot executable over that connection
+void acceptCloneDownloadRequest();
+
+
+// called at beginning of gameInit to check if this is a clone boot
+// child and fetch clone data if so
+void checkCloneFetch();
+
+
+
+
 // local address (where clients should connect) as a newly allocated string
 // NULL on address-free platforms (like DS)
 char *getLocalAddress();

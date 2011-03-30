@@ -19,6 +19,7 @@ extern unsigned char titleFade;
 
 
 extern Button *parentButton;
+extern Button *parentServeCloneDownloaButton;
 extern Button *childButton;
 extern char *statusMessage;
 extern char *statusSubMessage;
@@ -107,6 +108,26 @@ void ConnectState::clickState( int inX, int inY ) {
                     stringDuplicate( 
                         translate( "phaseSubStatus_waitingConnect" ) );
                 }
+            
+            statusSubMessage = mMessage;
+            connecting = true;
+            stepsSinceConnectTry = 0;
+            }
+        else if( parentServeCloneDownloaButton != NULL &&
+                 parentServeCloneDownloaButton->getPressed( inX, inY ) ) {
+            
+            isParent = true;
+            
+            acceptCloneDownloadRequest();
+            
+         
+            if( mMessage != NULL ) {
+                delete [] mMessage;
+                }
+            
+            mMessage = 
+                stringDuplicate( 
+                    translate( "phaseSubStatus_waitingConnect" ) );
             
             statusSubMessage = mMessage;
             connecting = true;
@@ -251,6 +272,11 @@ void ConnectState::drawState() {
     if( !connecting ) {
         
         parentButton->draw();
+
+        if( parentServeCloneDownloaButton != NULL ) {
+            parentServeCloneDownloaButton->draw();
+            }
+        
         childButton->draw();
         }
     

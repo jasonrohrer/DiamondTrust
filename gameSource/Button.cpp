@@ -14,6 +14,13 @@ static int buttonDisplayW = 60;
 
 static int longButtonSpriteID;
 static int longButtonW, longButtonH;
+static int longButtonDisplayW = 118;
+
+// variable-length button
+static int buttonLeftEndSpriteID;
+static int buttonMiddleSpriteID;
+static int buttonRightEndSpriteID;
+static int buttonPartW, buttonPartH;
 
 
 
@@ -22,6 +29,17 @@ void initButton() {
     buttonSpriteID = loadSprite( "button.tga", &buttonW, &buttonH, true );
     longButtonSpriteID = 
         loadSprite( "longButton.tga", &longButtonW, &longButtonH, true );
+    
+
+    buttonLeftEndSpriteID = 
+        loadSprite( "buttonLeftEnd.tga", &buttonPartW, &buttonPartH, true );
+   
+    buttonMiddleSpriteID = 
+        loadSprite( "buttonMiddle.tga", &buttonPartW, &buttonPartH, true );
+    
+    buttonRightEndSpriteID = 
+        loadSprite( "buttonRightEnd.tga", &buttonPartW, &buttonPartH, true );
+    
     }
 
 
@@ -34,15 +52,34 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
 
     mClickRadiusY = 13;
     
-    if( textWidth > buttonDisplayW ) {
+    mNumMiddleParts = -1;
+
+    if( textWidth <= buttonDisplayW ) {
+        mLong = false;
+        mClickRadiusX = 33;
+
+        mW = buttonW;
+        mH = buttonH;
+        }
+    else if( textWidth <= longButtonDisplayW ) {
         mLong = true;
         mClickRadiusX = 64;
+
+        mW = longButtonW;
+        mH = longButtonH;
         }
     else {
         mLong = false;
-        mClickRadiusX = 33;
+        
+        mNumMiddleParts = textWidth / buttonPartW;
+        
+        mW = ( mNumMiddleParts + 2 ) * buttonPartW;
+        mH = buttonPartH;
+        
+        mClickRadiusX = mW / 2;
         }
     
+            
     mTextX = mX;
 
     mTextY = mY - 6;
@@ -68,14 +105,35 @@ char Button::getPressed( int inClickX, int inClickY ) {
 
 
 void Button::draw() {
-    int spriteID = buttonSpriteID;
-    int w = buttonW;
-    if( mLong ) {
-        spriteID = longButtonSpriteID;
-        w = longButtonW;
-        } 
 
-    drawSprite( spriteID, mX - w/2, mY - buttonH/2, white );
+    if( mNumMiddleParts < 0 ) {
+        
+        int spriteID = buttonSpriteID;
+
+        if( mLong ) {
+            spriteID = longButtonSpriteID;
+            }
+
+        drawSprite( spriteID, mX - mW/2, mY - mH/2, white );
+        }
+    else {
+        // variable length button
+        
+        int y = mY - mH/2;;
+
+        int x = mX - mW/2;
+        
+        drawSprite( buttonLeftEndSpriteID, x, y, white );
+
+        for( int i=0; i<mNumMiddleParts; i++ ) {
+            x += buttonPartW;
+            
+            drawSprite( buttonMiddleSpriteID, x, y, white );
+            }
+
+        x += buttonPartW;
+        drawSprite( buttonRightEndSpriteID, x, y, white );    
+        }
     
     startNewSpriteLayer();
 

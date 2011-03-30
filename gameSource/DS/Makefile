@@ -1,15 +1,16 @@
-#TWLSDK_PLATFORM = NITRO
-TWLSDK_PLATFORM = TWL
+TWLSDK_PLATFORM = NITRO
+#TWLSDK_PLATFORM = TWL
 TWL_DEBUG = TRUE
 
-TARGET_PLATFORM = TWL NITRO
+#TARGET_PLATFORM = TWL NITRO
+TARGET_PLATFORM = NITRO
 
 # make invoked automatically in these dirs
 # this makes our romfiles 
 SUBDIRS = ..
 
 
-DS_SOURCE = main.cpp
+DS_SOURCE = main.cpp cloneBoot.cpp
 
 
 

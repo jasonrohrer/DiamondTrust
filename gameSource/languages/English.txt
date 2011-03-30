@@ -13,6 +13,8 @@ button_wifi "WiFi Game"
 
 
 button_parent "Host Game"
+button_parent_muti_card "Host Multi-card"
+button_parent_clone "Host Download Play" 
 button_child "Join Game"
 
 

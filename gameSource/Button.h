@@ -31,8 +31,14 @@ class Button {
         int mClickRadiusY;
         
 
+        int mW, mH;
+
         int mTextX, mTextY;
         char mLong;
+        
+        // -1 if not variable length
+        int mNumMiddleParts;
+        
         
     };
 
