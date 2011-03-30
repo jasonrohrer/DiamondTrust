@@ -1,10 +1,11 @@
 
 
 GAME_GRAPHICS = \
-parentButton.tga \
-childButton.tga \
 button.tga \
 longButton.tga \
+buttonLeftEnd.tga \
+buttonRightEnd.tga \
+buttonMiddle.tga \
 angola_map.tga \
 font8.tga \
 font16_sans.tga \
