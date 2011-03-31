@@ -63,9 +63,9 @@ const MBGameRegistry mbGameInfo = {
     // FIXME!!!
 
     // icon character data
-    "/data/icon.char",
+    "/icon.nbfc",
     // icond palette
-    "/data/icon.plt",
+    "/icon.nbfp",
     LOCAL_GGID,
     // 2 players (including parent
     2 };

@@ -55,11 +55,21 @@ INCDIR = .. ../../.. $(MBP_DIR)
 
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
+do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
+
+
 # force rebuild of targets if romfiles change
 $(TARGETS): $(MAKEROM_ROMROOT)/$(MAKEROM_ROMFILES)
 
 
-do-build:  $(TARGETS)
+
+
+../gameData/icon.nbfc ../gameData/icon.nbfp: icon.bmp
+	$(NTEXCONV) -no -bg -bgb -bgnc -f palette16 icon.bmp
+	mv icon.nbfc icon.nbfp ../gameData
+
+icon.bmp: icon.png
+	convert icon.png icon.bmp
 
 
 include	$(TWLSDK_ROOT)/build/buildtools/modulerules
