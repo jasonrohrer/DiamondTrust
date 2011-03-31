@@ -53,6 +53,18 @@ INCDIR = .. ../../.. $(MBP_DIR)
 # LCFILE =
 
 
+# clone boot template
+LCFILE_TEMPLATE	= $(NITRO_SPECDIR)/ARM9-TS-cloneboot-C.lcf.template
+
+
+# FIXME:  
+
+# need libsyscall definitions
+
+# need presign and post-sign rules
+
+
+
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
 do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 

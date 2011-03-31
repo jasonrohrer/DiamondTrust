@@ -51,6 +51,16 @@ static char cloneBootStarted = false;
 
 
 
+
+// FOR NOW:
+// just send child the entire codebase
+#include <nitro/parent_begin.h>
+
+static char parentDummy = false;
+
+#include <nitro/parent_end.h>
+
+
 // game info sent out to child
 const MBGameRegistry mbGameInfo = {
     // specify NULL as program path name when clone booting
