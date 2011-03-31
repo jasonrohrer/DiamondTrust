@@ -10,7 +10,10 @@ TARGET_PLATFORM = NITRO
 SUBDIRS = ..
 
 
-DS_SOURCE = main.cpp cloneBoot.cpp
+MBP_DIR = $(ROOT)/build/demos/wireless_shared/mbp
+
+DS_SOURCE = main.cpp measureChannel.cpp cloneBoot.cpp \
+cloneBootChild.cpp $(MBP_DIR)/mbp.c
 
 
 
@@ -43,7 +46,7 @@ MAKEROM_ROMFILES = *
 
 
 
-INCDIR = .. ../../..
+INCDIR = .. ../../.. $(MBP_DIR)
 
 # use defaults for these
 # SRCDIR =

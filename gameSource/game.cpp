@@ -119,6 +119,8 @@ static char isInside( int inX, int inY,
 
 void gameInit() {
 
+    checkCloneFetch();
+
     printOut( "Setting random seed to a constant...\n" );
     // note:  we can do this with constant values, because getRandom
     // is called for agent arm waving.... and if we're using the AI,

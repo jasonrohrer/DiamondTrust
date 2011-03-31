@@ -12,6 +12,8 @@
 
 #include "platform.h"
 #include "common.h"
+#include "measureChannel.h"
+#include "cloneBoot.h"
 #include "minorGems/util/SimpleVector.h"
 
 // implement plaform functions
@@ -996,7 +998,7 @@ char getTouch( int *outX, int *outY ) {
 
 
 // wireless stuff
-static unsigned char wmBuffer[ WM_SYSTEM_BUF_SIZE ] ATTRIBUTE_ALIGN( 32 );
+unsigned char wmBuffer[ WM_SYSTEM_BUF_SIZE ] ATTRIBUTE_ALIGN( 32 );
 
 int wmStatus = 0;
 char mpRunning = false;
@@ -1012,10 +1014,6 @@ unsigned short tgid = 0;
 unsigned short allowedChannels = 0;
 unsigned short nextChannel = 0;
 
-// FIXME:  replace with actual measurement of traffic when game runs
-int requiredTraffic = 20;
-int bestChannel = -1;
-int bestBusyRatio = 101;
 
 
 static WMParentParam parentParam ATTRIBUTE_ALIGN(32);
@@ -1329,108 +1327,44 @@ static void wmSetParentParamCallback( void *inArg ) {
     }
 
 
-void measureNextChannel();
 
+static void measureChannelCallback( short inBestChannel ) {
+    // done measuring
 
-
-static void wmMeasureChannelCallback( void *inArg ) {
-    WMMeasureChannelCallback *callbackArg = ( WMMeasureChannelCallback *)inArg;
-    
-    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
-        wmStatus = -1;
-        printOut( "Error returned to wmMeasureChannelCallback\n" );
-        WM_End( wmEndCallback );
-        }
-    else {
-        // ignore channels too busy for our traffic
-        if( callbackArg->ccaBusyRatio + requiredTraffic < 100 ) {
-            if( callbackArg->ccaBusyRatio < bestBusyRatio ) {
-                // best yet
-                bestBusyRatio = callbackArg->ccaBusyRatio;
-                bestChannel = callbackArg->channel;
-                }
-            }
-        if( nextChannel < 12 ) {
-            nextChannel ++;
-            measureNextChannel();
-            }
-        else {
-            // done measuring
-
-            if( bestChannel == -1 ) {
-                wmStatus = -1;
-                WM_End( wmEndCallback );
-
-                return;
-                }
-            else {
-                // found one
-                printOut( "Picking best channel:  %d\n", bestChannel );
-                                
-
-                // set parent params
-                // FIXME:  use userGameInfo to specify identifying
-                // info for child lobby, like parent name
-                parentParam.userGameInfo = NULL;
-                parentParam.userGameInfoLength = 0;
-                parentParam.tgid = tgid;
-                parentParam.ggid = LOCAL_GGID;
-                parentParam.channel = (unsigned short)bestChannel;
-                parentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
-                parentParam.parentMaxSize = 512;
-                parentParam.childMaxSize = 512;
-                parentParam.maxEntry = 1;
-                parentParam.CS_Flag = 0;
-                parentParam.multiBootFlag = 0;
-                parentParam.entryFlag = 1;
-                parentParam.KS_Flag = 0;
-            
-                WMErrCode result =
-                    WM_SetParentParameter( wmSetParentParamCallback,  
-                                           &parentParam );
-                if( result != WM_ERRCODE_OPERATING ) {
-                    wmStatus = -1;
-                    WM_End( wmEndCallback );
-                    }
-                }
-            }
-        
-        }
-    }
-
-
-
-void measureNextChannel() {
-    if( allowedChannels == 0 ) {
+    if( inBestChannel == -1 ) {
         wmStatus = -1;
         WM_End( wmEndCallback );
+
         return;
         }
-    while( ! ( (1 << nextChannel) & allowedChannels ) ) {
-        nextChannel++;
-        
-        // 14 broken?
-        if( nextChannel >= 13 ) {
-            return;
+    else {
+
+        // set parent params
+        // FIXME:  use userGameInfo to specify identifying
+        // info for child lobby, like parent name
+        parentParam.userGameInfo = NULL;
+        parentParam.userGameInfoLength = 0;
+        parentParam.tgid = tgid;
+        parentParam.ggid = LOCAL_GGID;
+        parentParam.channel = (unsigned short)inBestChannel;
+        parentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
+        parentParam.parentMaxSize = 512;
+        parentParam.childMaxSize = 512;
+        parentParam.maxEntry = 1;
+        parentParam.CS_Flag = 0;
+        parentParam.multiBootFlag = 0;
+        parentParam.entryFlag = 1;
+        parentParam.KS_Flag = 0;
+            
+        WMErrCode result =
+            WM_SetParentParameter( wmSetParentParamCallback,  
+                                   &parentParam );
+        if( result != WM_ERRCODE_OPERATING ) {
+            wmStatus = -1;
+            WM_End( wmEndCallback );
             }
         }
-    
-            
-    
-    WMErrCode result = 
-        WM_MeasureChannel(
-            wmMeasureChannelCallback,
-            3,
-            17,
-            (unsigned short)( nextChannel + 1 ),
-            30 );
-    
-    if( result != WM_ERRCODE_OPERATING ) {
-        wmStatus = -1;
-        WM_End( wmEndCallback );
-        }
     }
-
 
 
 
@@ -1764,7 +1698,7 @@ static void wmInitializeCallback( void *inArg ) {
             // can't call this from inside a callback
             //tgid = WM_GetNextTgid();
 
-            measureNextChannel();
+            startMeasureChannel( measureChannelCallback );
             }
         else {
             // child
@@ -2481,6 +2415,8 @@ static void VBlankCallback() {
             gameLoopTick();
             // same for network step
             stepNetwork();
+
+            stepCloneBootParent();
             }
         else {
             drawBottomScreen();
