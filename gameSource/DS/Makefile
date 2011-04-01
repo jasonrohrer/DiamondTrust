@@ -57,7 +57,7 @@ INCDIR = .. ../../.. $(MBP_DIR)
 LCFILE_TEMPLATE	= $(NITRO_SPECDIR)/ARM9-TS-cloneboot-C.lcf.template
 
 
-# FIXME:  
+# FIXME (for final signing only):  
 
 # need libsyscall definitions
 
@@ -77,7 +77,7 @@ $(TARGETS): $(MAKEROM_ROMROOT)/$(MAKEROM_ROMFILES)
 
 
 ../gameData/icon.nbfc ../gameData/icon.nbfp: icon.bmp
-	$(NTEXCONV) -no -bg -bgb -bgnc -f palette16 icon.bmp
+	$(NTEXCONV) -no -bg -bgb -bgnc -f palette16 -tc=255,0,0 icon.bmp
 	mv icon.nbfc icon.nbfp ../gameData
 
 icon.bmp: icon.png
