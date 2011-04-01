@@ -106,7 +106,13 @@ static void measureChannelCallback( short inBestChannel ) {
     channel = inBestChannel;
     
     // shut down WM so we can start multiboot process
-    WM_End( wmEndCallback );
+    // WM_End( wmEndCallback );
+
+    // Actually, DON'T end WM... MBP is expecting WM to be idle
+    
+    // ready to start multiboot
+    cloneBootStarted = true;
+    MBP_Init( LOCAL_GGID, tgid );
     }
 
 
