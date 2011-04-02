@@ -91,9 +91,12 @@ static void wmEndCallback( void *inArg ) {
         printOut( "Error returned to wmEndCallback\n" );
         }
     else {
-        // ready to start multiboot
-        cloneBootStarted = true;
-        MBP_Init( LOCAL_GGID, tgid );
+        // done with multiboot
+
+        cloneBootRunning = false;
+
+        // start accepting connections to transfer data to child
+        acceptConnection();
         }
     }
 
@@ -201,7 +204,9 @@ int stepCloneBootParent() {
             break;
         case MBP_STATE_COMPLETE:
             // done with success, child is booted
-            cloneBootRunning = false;
+
+            // shut down WM so we can accept a fresh connection
+            WM_End( wmEndCallback );
             break;
         case MBP_STATE_ERROR:
             // cancel MB before reporting error
