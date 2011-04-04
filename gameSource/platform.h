@@ -192,13 +192,15 @@ int checkConnectionStatus();
 
 
 // inMessage destroyed by caller
-void sendMessage( unsigned char *inMessage, unsigned int inLength );
+void sendMessage( unsigned char *inMessage, unsigned int inLength,
+                  unsigned char inChannel = 0 );
 
 
 // poll for new incoming message
 // returns NULL if no message ready
 // result freed by caller
-unsigned char *getMessage( unsigned int *outLength );
+unsigned char *getMessage( unsigned int *outLength,
+                           unsigned char inChannel = 0 );
 
 
 

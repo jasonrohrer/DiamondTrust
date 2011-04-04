@@ -1126,8 +1126,16 @@ static void wmPortCallback( void *inArg ) {
             printOut( "wmPortCallback getting message of length %d\n",
                       callbackArg->length );
             
+            unsigned char channel = 0;
+            
+            if( callbackArg->length >= 5 ) {
+                // room for channel flag
+                channel = ( (unsigned char*)callbackArg->data )[4];
+                }
+
             receiveFifo.addData( (unsigned char*)callbackArg->data, 
-                                 (unsigned int)callbackArg->length );
+                                 (unsigned int)callbackArg->length,
+                                 channel );
             }
         }
     }
@@ -1597,9 +1605,16 @@ static void wmPortSendCallback( void *inArg ) {
         else {
             printOut( "Data send did not reach all recipients\n" );
 
+            unsigned char channel = 0;
+            
+            if( callbackArg->length >= 5 ) {
+                // room for channel flag
+                channel = ( (unsigned char*)callbackArg->data )[4];
+                }
+
             // put back on send fifo in next position to try again
             sendFifo.pushData( (unsigned char *)( callbackArg->data ), 
-                               callbackArg->length );
+                               callbackArg->length, channel );
             sendPending = false;
             
             delete [] callbackArg->data;
@@ -1622,7 +1637,8 @@ void startNextSend() {
     
     unsigned int numBytes;
     
-    unsigned char *data = sendFifo.getData( &numBytes );
+    // ignore channels, just send next message
+    unsigned char *data = sendFifo.getData( &numBytes, false, 0 );
     
     if( data != NULL ) {
         sendPending = true;
@@ -1645,7 +1661,13 @@ void startNextSend() {
             
             printOut( "Pushing data back onto send fifo until later\n" );
             
-            sendFifo.pushData( data, numBytes );
+            unsigned char channel = 0;
+            if( numBytes >= 5 ) {
+                // room for channel flag
+                channel = data[4];
+                }
+
+            sendFifo.pushData( data, numBytes, channel );
 
             sendPending = false;
             
@@ -1776,14 +1798,16 @@ int checkConnectionStatus() {
     }
 
 
-void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
+void sendMessage( unsigned char *inMessage, unsigned int inLength,
+                  unsigned char inChannel ) {
     printOut( "Putting message of %d bytes onto send fifo\n", inLength );
     
     // add first 4 bytes, which is message length
     // must do this because DS data sharing doesn't seem to preserve
     // data length (sometimes longer than message that was sent, with
     // garbage bytes at end).
-    unsigned int sendSize = inLength + 4;
+    // also add channel field
+    unsigned int sendSize = inLength + 4 + 1;
     unsigned char *sendData = new unsigned char[ sendSize ];
                 
     sendData[0] = (unsigned char)( ( inLength >> 24 ) & 0xFF );
@@ -1791,19 +1815,21 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
     sendData[2] = (unsigned char)( ( inLength >> 8 ) & 0xFF );
     sendData[3] = (unsigned char)( ( inLength ) & 0xFF );
     
-    memcpy( &( sendData[4] ), inMessage, inLength );
+    sendData[4] = inChannel;
+
+    memcpy( &( sendData[5] ), inMessage, inLength );
 
 
-    sendFifo.addData( sendData, sendSize );
+    sendFifo.addData( sendData, sendSize, inChannel );
     delete [] sendData;
     
     // send will start during next network step
     }
 
 
-unsigned char *getMessage( unsigned int *outLength ) {
+unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
     unsigned int dataLength;
-    unsigned char *data = receiveFifo.getData( &dataLength );
+    unsigned char *data = receiveFifo.getData( &dataLength, true, inChannel );
     
     if( data == NULL ) {
         return NULL;
@@ -1832,16 +1858,23 @@ unsigned char *getMessage( unsigned int *outLength ) {
         return NULL;
         } 
 
-    if( dataLength > messageLength + 4 ) {
+    if( dataLength > messageLength + 5 ) {
         printOut( "Extra bytes padded onto end of received message:%d\n",
-                  dataLength - ( messageLength + 4 ) );
+                  dataLength - ( messageLength + 5 ) );
         }
     
+    if( data[4] != inChannel ) {
+        printOut( "Message's channel field %u does not match flag in data "
+                  "fifo %u", data[4], inChannel );
+        delete [] data;
+        return NULL;
+        }
+
     printOut( "Message of length %d waiting in receive FIFO for getMessage\n", 
               messageLength );
     
     unsigned char *message = new unsigned char[ messageLength ];
-    memcpy( message, &( data[4] ), messageLength );
+    memcpy( message, &( data[5] ), messageLength );
     
     delete [] data;
     

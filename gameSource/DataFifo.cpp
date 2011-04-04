@@ -4,7 +4,8 @@
 #include <string.h>
 
 
-void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes ) {
+void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes,
+                        unsigned char inChannel ) {
     dataFifoElement *f = new dataFifoElement;
             
     f->next = mHead;
@@ -20,7 +21,8 @@ void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes ) {
 
     mHead = f;
     f->numBytes = inNumBytes;
-            
+    f->channel = inChannel;
+    
     f->data = new unsigned char[ inNumBytes ];
             
     memcpy( f->data, inData, inNumBytes );
@@ -28,7 +30,8 @@ void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes ) {
 
 
 
-void DataFifo::pushData( unsigned char *inData, unsigned int inNumBytes ) {
+void DataFifo::pushData( unsigned char *inData, unsigned int inNumBytes,
+                         unsigned char inChannel ) {
     dataFifoElement *f = new dataFifoElement;
             
     f->next = NULL;
@@ -44,62 +47,108 @@ void DataFifo::pushData( unsigned char *inData, unsigned int inNumBytes ) {
 
     mTail = f;
     f->numBytes = inNumBytes;
-            
+    f->channel = inChannel;
+    
     f->data = new unsigned char[ inNumBytes ];
             
     memcpy( f->data, inData, inNumBytes );
     }
 
 
-unsigned char *DataFifo::getData( unsigned int *outSize ) {
-    if( mTail == NULL ) {
-        return NULL;
-        }
-    else {
-        unsigned char *returnData = mTail->data;
-        *outSize = mTail->numBytes;
 
-        dataFifoElement *oldTail = mTail;
-        mTail = mTail->previous;
-                
-        if( mTail == NULL ) {
-            mHead = NULL;
-            }
-        else {
-            mTail->next = NULL;
-            }
-        delete oldTail;
-                
-        return returnData;
+dataFifoElement *DataFifo::findMatch( char inMatchChannel,
+                                      unsigned char inChannel ) {
+    dataFifoElement *match = mTail;
+    
+    if( ! inMatchChannel ) {
+        return match;
         }
+    
+    // else search for channel match
+
+    while( match != NULL &&
+           match->channel != inChannel ) {
+        match = match->previous;
+        }
+    
+    return match;
     }
 
 
 
-unsigned char *DataFifo::peekData( unsigned int *outSize ) {
+unsigned char *DataFifo::getData( unsigned int *outSize,
+                                  char inMatchChannel,
+                                  unsigned char inChannel ) {
+  
+    
+    dataFifoElement *match = findMatch( inMatchChannel, inChannel );
+    
+    if( match == NULL ) {
+        return NULL;
+        }
+    
+
+
+    unsigned char *returnData = match->data;
+    *outSize = match->numBytes;
+    
+    if( match == mHead || match == mTail ) {    
+        if( match == mHead ) {
+            // new head
+            mHead = match->next;
+            }
+        if( match == mTail ) {
+            // new tail
+            mTail = match->previous;
+            }
+        }
+    else {
+        // taken out from middle, both previous and next not NULL
+        match->previous->next = match->next;
+        match->next->previous = match->previous;
+        }
+    
+    delete match;
+    
+    return returnData;
+    }
+
+
+
+unsigned char *DataFifo::peekData( unsigned int *outSize,
+                                   char inMatchChannel,
+                                   unsigned char inChannel ) {
+
+    dataFifoElement *match = findMatch( inMatchChannel, inChannel );
+
+    if( match == NULL ) {
+        return NULL;
+        }
+
+
     if( mTail == NULL ) {
         return NULL;
         }
-    else {
-        unsigned int numBytes = mTail->numBytes;
-        
-        unsigned char *returnData = new unsigned char[ numBytes ];
-        memcpy( returnData, mTail->data, numBytes );
-        *outSize = mTail->numBytes;
-        
-        return returnData;
-        }
+
+
+    unsigned int numBytes = match->numBytes;
+
+    unsigned char *returnData = new unsigned char[ numBytes ];
+    memcpy( returnData, match->data, numBytes );
+    *outSize = match->numBytes;
+    
+    return returnData;
     }
 
 
 
 void DataFifo::clearData() {
     unsigned int numBytes;
-    unsigned char *data = getData( &numBytes );
+    unsigned char *data = getData( &numBytes, false, 0 );
             
             
     while( data != NULL ) {
         delete [] data;
-        data = getData( &numBytes );
+        data = getData( &numBytes, false, 0 );
         }
     }
