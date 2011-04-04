@@ -226,3 +226,90 @@ int stepCloneBootParent() {
     }
 
 
+
+
+void checkForFileRequest() {
+    
+    unsigned int messageLength;
+    
+    unsigned char *message = getMessage( &messageLength, 1 );
+    if( message != NULL ) {
+        // special case:  a file request
+        
+        // intercept it without placing it in received fifo
+
+
+        // serve file in response
+                
+                
+        char *fileName = new char[ messageLength + 1 ];
+                    
+        memcpy( fileName, message, messageLength );
+                    
+        fileName[ messageLength ] = '\0';
+        
+        delete [] message;
+        
+        printOut( "Parent received request for file '%s',",
+                  fileName );
+        
+        int fileSize;
+        
+        unsigned char *fileData = readFile( fileName, &fileSize );
+        
+
+        
+        if( fileData != NULL ) {
+
+            // split into messages
+            unsigned int messageSize = 300;
+            
+            unsigned int numFullMessages = fileSize / messageSize;
+            unsigned int lastMessageSize = fileSize % messageSize;
+            
+            unsigned int numTotalMessages = numFullMessages;
+
+            if( lastMessageSize > 0 ) {
+                numTotalMessages ++;
+                }
+
+            printOut( " serving file of size %d (in %d %d-byte chunks)\n", 
+                      fileSize, numTotalMessages, messageSize );
+            
+            // simply send the number of chunks forthcoming as the 
+            // first message
+            unsigned char headerMessage[4];
+
+            headerMessage[0] = 
+                (unsigned char)( ( numTotalMessages >> 24 ) & 0xFF );
+            headerMessage[1] = 
+                (unsigned char)( ( numTotalMessages >> 16 ) & 0xFF );
+            headerMessage[2] = 
+                (unsigned char)( ( numTotalMessages >> 8 ) & 0xFF );
+            headerMessage[3] = 
+                (unsigned char)( ( numTotalMessages ) & 0xFF );
+
+            sendMessage( headerMessage, 4, 1 );
+            
+            // full chunks
+            for( int i=0; i<numFullMessages; i++ ) {
+                sendMessage( &( fileData[ i * messageSize ] ),
+                             messageSize, 1 );
+                }
+            
+            // final chunk
+            if( lastMessageSize > 0 ) {
+                sendMessage( &( fileData[ numFullMessages * messageSize ] ),
+                             lastMessageSize, 1 );
+                }
+
+            delete [] fileData;
+            }
+        else {
+            printOut( " not found\n" );
+            }
+        
+        delete [] fileName;
+        }
+    }
+

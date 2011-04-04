@@ -64,8 +64,86 @@ void NitroStartUp( void ) {
     }
 
 
+// tries to start next pending network send
+void stepNetwork();
+
+
+
+
+// true if we are a clone-booted child with no local file system
+char isCloneChild = false;
+
 
 unsigned char *readFile( char *inFileName, int *outSize ) {
+    if( isCloneChild ) {
+        // no local file system, send requests for files to parent
+
+        printOut( "Child requesting file '%s' from parent...\n", inFileName );
+
+        // channel 1 for file requests
+        sendMessage( (unsigned char *)inFileName, strlen( inFileName ), 1 );
+    
+        unsigned char *message = NULL;
+
+        unsigned int length;
+        
+        // poll for response message
+        while( message == NULL ) {
+            stepNetwork();
+            message = getMessage( &length, 1 );
+            }
+        
+        if( length != 4 ) {
+            printOut( " ...child received bad file header\n" );
+            delete [] message;
+            return NULL;
+            }
+        
+        unsigned int numChunks =
+            (unsigned int)( message[0] << 24 ) |
+            (unsigned int)( message[1] << 16 ) |
+            (unsigned int)( message[2] << 8 ) |
+            (unsigned int)( message[3] );
+        
+        delete [] message;
+        
+        printOut( " ...child recieving file in %d chunks\n", numChunks );
+        
+        printOut( "Allocating vector\n" );
+        
+        SimpleVector<unsigned char> fileContents;
+        
+        for( int i=0; i<numChunks; i++ ) {
+            // wait for next chunk to arrive
+            message = NULL;
+            
+            printOut( "Waiting for chunk %d...\n", i );
+            while( message == NULL ) {
+                printOut( "...stepping network\n" );
+                stepNetwork();
+                printOut( "...checking for message\n" );
+                message = getMessage( &length, 1 );
+                }
+            
+            printOut( "... got it" );
+
+            fileContents.push_back( message, (int)length );
+            delete [] message;
+            }
+        
+        unsigned char *returnData = fileContents.getElementArray();
+        
+
+
+        printOut( "  ...child got complete file \n" );
+
+
+        *outSize = fileContents.size();
+        return returnData;
+        }
+
+
+
     FSFile file;
     
     if( FS_OpenFileEx( &file, inFileName, FS_FILEMODE_R ) ) {
@@ -1885,7 +1963,7 @@ unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
 
 
 
-static void stepNetwork() {
+void stepNetwork() {
     if( !sendPending && mpRunning ) {
         // try sending next message
         startNextSend();
@@ -2450,6 +2528,10 @@ static void VBlankCallback() {
             stepNetwork();
 
             stepCloneBootParent();
+            
+            if( !isCloneChild ) {
+                checkForFileRequest();
+                }
             }
         else {
             drawBottomScreen();
