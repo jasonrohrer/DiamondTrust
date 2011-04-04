@@ -1714,9 +1714,10 @@ static void wmPortSendCallback( void *inArg ) {
 void startNextSend() {
     
     unsigned int numBytes;
+    unsigned char channel;
     
     // ignore channels, just send next message
-    unsigned char *data = sendFifo.getData( &numBytes, false, 0 );
+    unsigned char *data = sendFifo.getData( &numBytes, false, 0, &channel );
     
     if( data != NULL ) {
         sendPending = true;
@@ -1907,7 +1908,10 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength,
 
 unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
     unsigned int dataLength;
-    unsigned char *data = receiveFifo.getData( &dataLength, true, inChannel );
+    unsigned char channel;
+    
+    unsigned char *data = receiveFifo.getData( &dataLength, true, inChannel,
+                                               &channel );
     
     if( data == NULL ) {
         return NULL;

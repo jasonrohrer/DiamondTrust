@@ -38,7 +38,8 @@ class DataFifo {
         // NULL if empty
         // caller destroys
         unsigned char *getData( unsigned int *outSize, 
-                                char inMatchChannel, unsigned char inChannel );
+                                char inMatchChannel, unsigned char inChannel,
+                                unsigned char *outChannel );
         
         
         // peeks at copy of next item without removing
@@ -46,7 +47,8 @@ class DataFifo {
         // caller destroys
         unsigned char *peekData( unsigned int *outSize, 
                                  char inMatchChannel, 
-                                 unsigned char inChannel );
+                                 unsigned char inChannel,
+                                 unsigned char *outChannel );
 
 
         void clearData();

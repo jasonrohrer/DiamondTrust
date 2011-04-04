@@ -81,7 +81,8 @@ dataFifoElement *DataFifo::findMatch( char inMatchChannel,
 
 unsigned char *DataFifo::getData( unsigned int *outSize,
                                   char inMatchChannel,
-                                  unsigned char inChannel ) {
+                                  unsigned char inChannel,
+                                  unsigned char *outChannel ) {
   
     
     dataFifoElement *match = findMatch( inMatchChannel, inChannel );
@@ -94,6 +95,7 @@ unsigned char *DataFifo::getData( unsigned int *outSize,
 
     unsigned char *returnData = match->data;
     *outSize = match->numBytes;
+    *outChannel = match->channel;
     
     if( match == mHead || match == mTail ) {    
         if( match == mHead ) {
@@ -123,7 +125,8 @@ unsigned char *DataFifo::getData( unsigned int *outSize,
 
 unsigned char *DataFifo::peekData( unsigned int *outSize,
                                    char inMatchChannel,
-                                   unsigned char inChannel ) {
+                                   unsigned char inChannel,
+                                   unsigned char *outChannel ) {
 
     dataFifoElement *match = findMatch( inMatchChannel, inChannel );
 
@@ -142,6 +145,7 @@ unsigned char *DataFifo::peekData( unsigned int *outSize,
     unsigned char *returnData = new unsigned char[ numBytes ];
     memcpy( returnData, match->data, numBytes );
     *outSize = match->numBytes;
+    *outChannel = match->channel;
     
     return returnData;
     }
@@ -150,12 +154,13 @@ unsigned char *DataFifo::peekData( unsigned int *outSize,
 
 void DataFifo::clearData() {
     unsigned int numBytes;
-    unsigned char *data = getData( &numBytes, false, 0 );
+    unsigned char channel;
+    unsigned char *data = getData( &numBytes, false, 0, &channel );
             
             
     while( data != NULL ) {
         delete [] data;
-        data = getData( &numBytes, false, 0 );
+        data = getData( &numBytes, false, 0, &channel );
         }
     }
 

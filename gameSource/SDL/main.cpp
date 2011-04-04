@@ -963,18 +963,22 @@ DataFifo sendFifo;
 DataFifo receiveFifo;
 
 unsigned int nextIncomingMessageSize = 0;
+unsigned char nextIncomingMessageChannel = 0;
 unsigned char *nextIncomingMessage = NULL;
 unsigned int nextIncomingBytesRecievedSoFar = 0;
 
 
 
-void sendMessage( unsigned char *inMessage, unsigned int inLength ) {
-    sendFifo.addData( inMessage, inLength );
+void sendMessage( unsigned char *inMessage, unsigned int inLength,
+                  unsigned char inChannel ) {
+    sendFifo.addData( inMessage, inLength, inChannel );
     }
 
 
-unsigned char *getMessage( unsigned int *outLength ) {
-    return receiveFifo.getData( outLength );
+unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
+    unsigned char channel;
+
+    return receiveFifo.getData( outLength, true, inChannel, &channel );
     }
 
 
@@ -1014,20 +1018,23 @@ void stepNetwork() {
 
         // try sending next message
         unsigned int numBytes;
-            
-        unsigned char *nextData = sendFifo.peekData( &numBytes );
+        unsigned char channel;
+        
+        unsigned char *nextData = sendFifo.peekData( &numBytes, false, 0,
+                                                     &channel );
             
         if( nextData != NULL ) {
-            // first 4 bytes are size
-            unsigned int sendSize = numBytes + 4;
+            // first 5 bytes are size and channel
+            unsigned int sendSize = numBytes + 5;
             unsigned char *sendData = new unsigned char[ sendSize ];
                 
             sendData[0] = ( numBytes >> 24 ) & 0xFF;
             sendData[1] = ( numBytes >> 16 ) & 0xFF;
             sendData[2] = ( numBytes >> 8 ) & 0xFF;
             sendData[3] = ( numBytes ) & 0xFF;
-                
-            memcpy( &( sendData[4] ), nextData, numBytes );
+            sendData[4] = channel;
+            
+            memcpy( &( sendData[5] ), nextData, numBytes );
                 
             delete [] nextData;
                 
@@ -1048,7 +1055,7 @@ void stepNetwork() {
                 // done
                     
                 // remove from fifo
-                nextData = sendFifo.getData( &numBytes );
+                nextData = sendFifo.getData( &numBytes, false, 0, &channel );
                 delete [] nextData;
                 }
             // else if -2, would block, try again next time
@@ -1061,11 +1068,11 @@ void stepNetwork() {
 
         if( nextIncomingMessageSize == 0 ) {
                 
-            // size bytes first
-            unsigned char sizeBuffer[4];
+            // size and channel bytes first
+            unsigned char headerBuffer[5];
             
             // non-block
-            int numRecv = connectionSock->receive( sizeBuffer, 4, 0 );
+            int numRecv = connectionSock->receive( headerBuffer, 5, 0 );
             
                 
             if( numRecv == -1 ) {
@@ -1074,13 +1081,14 @@ void stepNetwork() {
                 printOut( "Receive error\n");
                 return;
                 }
-            else if( numRecv == 4 ) {
+            else if( numRecv == 5 ) {
                 nextIncomingMessageSize =
-                    sizeBuffer[0] << 24 |
-                    sizeBuffer[1] << 16 |
-                    sizeBuffer[2] << 8 |
-                    sizeBuffer[3];
-
+                    headerBuffer[0] << 24 |
+                    headerBuffer[1] << 16 |
+                    headerBuffer[2] << 8 |
+                    headerBuffer[3];
+                nextIncomingMessageChannel = headerBuffer[4];
+                
                 // make sure size is sane
                 if( nextIncomingMessageSize > 10000000 ) {
                     printOut( "Huge message size of %u received\n",
@@ -1127,7 +1135,8 @@ void stepNetwork() {
                     // got it all
 
                     receiveFifo.addData( nextIncomingMessage, 
-                                         nextIncomingMessageSize );
+                                         nextIncomingMessageSize,
+                                         nextIncomingMessageChannel );
 
                     // prepare for next
                     nextIncomingMessageSize = 0;
@@ -1195,4 +1204,20 @@ void snapPicture( unsigned char *inBuffer ) {
     for( int i=0; i<numPixels; i++ ) {
         inBuffer[i] = getRandom( 255 );
         }
+    }
+
+
+
+
+
+// these do nothing for non-DS platforms
+
+char isCloneBootPossible() {
+    return false;
+    }
+
+void acceptCloneDownloadRequest() {
+    }
+
+void checkCloneFetch() {
     }
