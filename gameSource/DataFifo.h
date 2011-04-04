@@ -52,6 +52,8 @@ class DataFifo {
         void clearData();
         
 
+
+        void printFifo();
         
                     
     private:

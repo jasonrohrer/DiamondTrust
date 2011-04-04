@@ -3,6 +3,9 @@
 
 #include <string.h>
 
+// for printOut definition
+#include "platform.h"
+
 
 void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes,
                         unsigned char inChannel ) {
@@ -102,12 +105,15 @@ unsigned char *DataFifo::getData( unsigned int *outSize,
             mTail = match->previous;
             }
         }
-    else {
-        // taken out from middle, both previous and next not NULL
+    
+    if( match->previous != NULL ) {
         match->previous->next = match->next;
-        match->next->previous = match->previous;
         }
     
+    if( match->next != NULL ) {
+        match->next->previous = match->previous;
+        }
+        
     delete match;
     
     return returnData;
@@ -150,5 +156,31 @@ void DataFifo::clearData() {
     while( data != NULL ) {
         delete [] data;
         data = getData( &numBytes, false, 0 );
+        }
+    }
+
+
+
+void DataFifo::printFifo() {
+    printOut( "Fifo:\n" );
+    
+    dataFifoElement *next = mHead;
+    
+    int index = 0;
+
+    while( next != NULL ) {
+        
+        if( index > 25 ) {
+            printOut( "Cutting off print-out\n" );
+            break;
+            }
+
+        printOut( "  %d:  [%X], chan %d, %d bytes, '%10s'\n",
+                index, (unsigned int)next, 
+                next->channel, next->numBytes, next->data );
+        
+        index ++;
+
+        next = next->next;
         }
     }
