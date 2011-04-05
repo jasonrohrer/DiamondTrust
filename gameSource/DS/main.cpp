@@ -109,7 +109,7 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
         
         printOut( " ...child recieving file in %d chunks\n", numChunks );
         
-        printOut( "Allocating vector\n" );
+        //printOut( "Allocating vector\n" );
         
         SimpleVector<unsigned char> fileContents;
         
@@ -117,16 +117,11 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
             // wait for next chunk to arrive
             message = NULL;
             
-            printOut( "Waiting for chunk %d...\n", i );
             while( message == NULL ) {
-                printOut( "...stepping network\n" );
                 stepNetwork();
-                printOut( "...checking for message\n" );
                 message = getMessage( &length, 1 );
                 }
             
-            printOut( "... got it" );
-
             fileContents.push_back( message, (int)length );
             delete [] message;
             }
@@ -1201,8 +1196,8 @@ static void wmPortCallback( void *inArg ) {
         }
     else {
         if( callbackArg->state == WM_STATECODE_PORT_RECV ) {
-            printOut( "wmPortCallback getting message of length %d\n",
-                      callbackArg->length );
+            //printOut( "wmPortCallback getting message of length %d\n",
+            //          callbackArg->length );
             
             unsigned char channel = 0;
             
@@ -1939,12 +1934,14 @@ unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
         delete [] data;
         return NULL;
         } 
-
+    
+    /*
     if( dataLength > messageLength + 5 ) {
         printOut( "Extra bytes padded onto end of received message:%d\n",
                   dataLength - ( messageLength + 5 ) );
         }
-    
+    */
+
     if( data[4] != inChannel ) {
         printOut( "Message's channel field %u does not match flag in data "
                   "fifo %u", data[4], inChannel );
@@ -1952,8 +1949,8 @@ unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
         return NULL;
         }
 
-    printOut( "Message of length %d waiting in receive FIFO for getMessage\n", 
-              messageLength );
+  //printOut( "Message of length %d waiting in receive FIFO for getMessage\n", 
+  //            messageLength );
     
     unsigned char *message = new unsigned char[ messageLength ];
     memcpy( message, &( data[5] ), messageLength );

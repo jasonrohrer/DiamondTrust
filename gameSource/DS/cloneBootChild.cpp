@@ -13,11 +13,12 @@ void checkCloneFetch() {
         return;
         }
 
+    /*
     char keepLooping = true;
     while( keepLooping ) {
         // busy loop to allow breaking into child to set breakpoints
         }
-    
+    */
 
 
     isCloneChild = true;
