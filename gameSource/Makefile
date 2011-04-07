@@ -71,10 +71,13 @@ sellingPanel.tga \
 # prepend path
 PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))
 
+JRI_GAME_GRAPHICS = ${PATH_GAME_GRAPHICS:.tga=.jri}
+
+JRI_CONVERTER_DIR = ../../minorGems/graphics/formats/jri/
+JRI_CONVERTER = ${JRI_CONVERTER_DIR}tgaToJri
 
 
-
-all: gameData ${PATH_GAME_GRAPHICS}
+all: gameData ${JRI_GAME_GRAPHICS}
 	cp languages/*.txt gameData
 
 
@@ -83,6 +86,13 @@ gameData:
 
 clean:
 	rm -f ${PATH_GAME_GRAPHICS}
+
+
+
+${JRI_CONVERTER}:
+	pushd ${JRI_CONVERTER_DIR}
+	./compileConverters
+	popd
 
 
 # 
@@ -95,6 +105,20 @@ clean:
 #
 gameData/%.tga: graphics/%.png
 	convert $< $@
+
+
+# 
+# Generic:
+#
+# Map all .tga files into .jri files
+# Remove .tga files.
+#
+# $@   represents the name.jri file
+# $<   represents the name.tga file
+#
+gameData/%.jri: gameData/%.tga
+	${JRI_CONVERTER} $< $@
+	rm $<
 
 
 
