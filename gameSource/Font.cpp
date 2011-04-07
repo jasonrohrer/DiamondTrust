@@ -10,134 +10,128 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
         : mCharSpacing( inCharSpacing ), mSpaceWidth( inSpaceWidth ),
           mFixedWidth( inFixedWidth ) {
     
-    int fileDataSize;
-    unsigned char *spriteFileData = readFile( inFileName, 
-                                              &fileDataSize );
-    if( spriteFileData != NULL ) {
-        
-        int width, height;
-        
-        rgbaColor *spriteRGBA = extractTGAData( spriteFileData, fileDataSize,
-                                                &width, &height );
-        
-        if( spriteRGBA != NULL ) {
+
+    int width, height;
+
+    rgbaColor *spriteRGBA = readTGAFile( inFileName, &width, &height );
+
+    if( spriteRGBA != NULL ) {
                         
-            // use corner color as transparency
-            // copy red channel into other channels
-            // (ignore other channels, even for transparency)
+        // use corner color as transparency
+        // copy red channel into other channels
+        // (ignore other channels, even for transparency)
 
-            spriteRGBA[0].a = 0;
-            unsigned char tr;
-            tr = spriteRGBA[0].r;
+        spriteRGBA[0].a = 0;
+        unsigned char tr;
+        tr = spriteRGBA[0].r;
 
-            int numPixels = width * height; 
-            for( int i=0; i<numPixels; i++ ) {
-                unsigned char r = spriteRGBA[i].r;
+        int numPixels = width * height; 
+        for( int i=0; i<numPixels; i++ ) {
+            unsigned char r = spriteRGBA[i].r;
                 
-                if( r == tr ) {
-                    // matches corner r
-                    spriteRGBA[i].a = 0;
-                    }
-                
-                spriteRGBA[i].g = r;
-                spriteRGBA[i].b = r;
+            if( r == tr ) {
+                // matches corner r
+                spriteRGBA[i].a = 0;
                 }
+                
+            spriteRGBA[i].g = r;
+            spriteRGBA[i].b = r;
+            }
             
                         
                 
-            mSpriteWidth = width / 16;
+        mSpriteWidth = width / 16;
             
-            int pixelsPerChar = mSpriteWidth * mSpriteWidth;
+        int pixelsPerChar = mSpriteWidth * mSpriteWidth;
             
-            for( int i=0; i<128; i++ ) {
-                int yOffset = ( i / 16 ) * mSpriteWidth;
-                int xOffset = ( i % 16 ) * mSpriteWidth;
+        for( int i=0; i<128; i++ ) {
+            int yOffset = ( i / 16 ) * mSpriteWidth;
+            int xOffset = ( i % 16 ) * mSpriteWidth;
                 
-                rgbaColor *charRGBA = new rgbaColor[ pixelsPerChar ];
+            rgbaColor *charRGBA = new rgbaColor[ pixelsPerChar ];
                 
+            for( int y=0; y<mSpriteWidth; y++ ) {
+                for( int x=0; x<mSpriteWidth; x++ ) {
+                        
+                    int imageIndex = (y + yOffset) * width
+                        + x + xOffset;
+                    int charIndex = y * mSpriteWidth + x;
+                        
+                    charRGBA[ charIndex ] = spriteRGBA[ imageIndex ];
+                    }
+                }
+                
+            // don't bother consuming texture ram for blank sprites
+            char allTransparent = true;
+                
+            for( int p=0; p<pixelsPerChar && allTransparent; p++ ) {
+                if( charRGBA[ p ].a != 0 ) {
+                    allTransparent = false;
+                    }
+                }
+                
+            if( !allTransparent ) {
+                mSpriteMap[i] = 
+                    addSprite( charRGBA, mSpriteWidth, mSpriteWidth );
+                }
+            else {
+                mSpriteMap[i] = -1;
+                }
+                
+
+            if( mFixedWidth ) {
+                mCharLeftEdgeOffset[i] = 0;
+                mCharWidth[i] = mSpriteWidth;
+                }
+            else if( allTransparent ) {
+                mCharLeftEdgeOffset[i] = 0;
+                mCharWidth[i] = mSpriteWidth;
+                }
+            else {
+                // implement pseudo-kerning
+                    
+                int farthestLeft = mSpriteWidth;
+                int farthestRight = 0;
+                    
+                char someInk = false;
+                    
                 for( int y=0; y<mSpriteWidth; y++ ) {
                     for( int x=0; x<mSpriteWidth; x++ ) {
-                        
-                        int imageIndex = (y + yOffset) * width
-                            + x + xOffset;
-                        int charIndex = y * mSpriteWidth + x;
-                        
-                        charRGBA[ charIndex ] = spriteRGBA[ imageIndex ];
-                        }
-                    }
-                
-                // don't bother consuming texture ram for blank sprites
-                char allTransparent = true;
-                
-                for( int p=0; p<pixelsPerChar && allTransparent; p++ ) {
-                    if( charRGBA[ p ].a != 0 ) {
-                        allTransparent = false;
-                        }
-                    }
-                
-                if( !allTransparent ) {
-                    mSpriteMap[i] = 
-                        addSprite( charRGBA, mSpriteWidth, mSpriteWidth );
-                    }
-                else {
-                    mSpriteMap[i] = -1;
-                    }
-                
-
-                if( mFixedWidth ) {
-                    mCharLeftEdgeOffset[i] = 0;
-                    mCharWidth[i] = mSpriteWidth;
-                    }
-                else if( allTransparent ) {
-                    mCharLeftEdgeOffset[i] = 0;
-                    mCharWidth[i] = mSpriteWidth;
-                    }
-                else {
-                    // implement pseudo-kerning
-                    
-                    int farthestLeft = mSpriteWidth;
-                    int farthestRight = 0;
-                    
-                    char someInk = false;
-                    
-                    for( int y=0; y<mSpriteWidth; y++ ) {
-                        for( int x=0; x<mSpriteWidth; x++ ) {
                             
-                            unsigned char r = 
-                                charRGBA[ y * mSpriteWidth + x ].r;
+                        unsigned char r = 
+                            charRGBA[ y * mSpriteWidth + x ].r;
                             
-                            if( r > 0 ) {
-                                someInk = true;
+                        if( r > 0 ) {
+                            someInk = true;
 
-                                if( x < farthestLeft ) {
-                                    farthestLeft = x;
-                                    }
-                                if( x > farthestRight ) {
-                                    farthestRight = x;
-                                    }
+                            if( x < farthestLeft ) {
+                                farthestLeft = x;
+                                }
+                            if( x > farthestRight ) {
+                                farthestRight = x;
                                 }
                             }
                         }
-                    
-                    if( ! someInk  ) {
-                        mCharLeftEdgeOffset[i] = 0;
-                        mCharWidth[i] = mSpriteWidth;
-                        }
-                    else {
-                        mCharLeftEdgeOffset[i] = farthestLeft;
-                        mCharWidth[i] = farthestRight - farthestLeft + 1;
-                        }
                     }
+                    
+                if( ! someInk  ) {
+                    mCharLeftEdgeOffset[i] = 0;
+                    mCharWidth[i] = mSpriteWidth;
+                    }
+                else {
+                    mCharLeftEdgeOffset[i] = farthestLeft;
+                    mCharWidth[i] = farthestRight - farthestLeft + 1;
+                    }
+                }
                 
 
-                delete [] charRGBA;
-                }
-                        
-            delete [] spriteRGBA;
+            delete [] charRGBA;
             }
-
-        delete [] spriteFileData;
+                        
+        delete [] spriteRGBA;
         }
+    
+
     }
 
 

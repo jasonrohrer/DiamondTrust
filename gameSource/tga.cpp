@@ -160,20 +160,53 @@ rgbaColor *extractTGAData( unsigned char *inData, int inNumBytes,
 
 
 
+#include "minorGems/graphics/formats/jri/jri.h"
+#include "minorGems/util/stringUtils.h"
+
+
 rgbaColor *readTGAFile( char *inFileName, int *outWidth, int *outHeight ) {
+    
+    // read JRI version of file instead (jri saves space, and this is one
+    // spot in the code where we can change this globally)
+
+    char found;
+    
+    char *jriFileName = replaceOnce( inFileName, ".tga", ".jri", &found );
+    
+    if( !found ) {
+        printOut( "ERROR:  Failed to find .tga extension "
+                  "in file name %s\n", inFileName );
+        
+        delete [] jriFileName;
+        return NULL;
+        }
+
+
+
     int fileDataSize;
-    unsigned char *spriteFileData = readFile( inFileName, 
+    unsigned char *spriteFileData = readFile( jriFileName, 
                                               &fileDataSize );
     if( spriteFileData != NULL ) {
         
-        rgbaColor *spriteRGBA = extractTGAData( spriteFileData, fileDataSize,
-                                                outWidth, outHeight );
-
+        rgbaColor *spriteRGBA = extractJRI( spriteFileData, fileDataSize,
+                                            outWidth, outHeight );
         delete [] spriteFileData;
         
+        if( spriteRGBA == NULL ) {
+            printOut( "ERROR:  Failed to parse JRI from file %s\n", 
+                      jriFileName );
+            }
+        
+        delete [] jriFileName;
+
         return spriteRGBA;
         }
+    else {
+        printOut( "ERROR:  Failed to read from file %s\n", jriFileName );
+        }
 
+    delete [] jriFileName;
+    
 
     return NULL;
     }

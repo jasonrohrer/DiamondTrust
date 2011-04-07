@@ -47,13 +47,7 @@ void printOut( const char *inFormatString, ... );
 unsigned int getSecondsSinceEpoc();
 
 
-
-typedef struct rgbaColor {
-        unsigned char r;
-        unsigned char g;
-        unsigned char b;
-        unsigned char a;
-    } rgbaColor;
+#include "minorGems/graphics/rgbaColor.h"
 
 
 
