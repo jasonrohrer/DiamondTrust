@@ -262,7 +262,7 @@ void checkForFileRequest() {
         if( fileData != NULL ) {
 
             // split into messages
-            unsigned int messageSize = 300;
+            unsigned int messageSize = 500;
             
             unsigned int numFullMessages = fileSize / messageSize;
             unsigned int lastMessageSize = fileSize % messageSize;
