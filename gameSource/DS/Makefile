@@ -27,6 +27,7 @@ include ../makeDefs
 
 MINOR_GEMS_SOURCE = \
 util/stringUtils.cpp \
+graphics/formats/jri/jri.cpp \
 
 
 # prepend paths

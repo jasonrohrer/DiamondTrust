@@ -68,6 +68,7 @@ sellingPanel.tga \
 #puma_rotated.tga \
 
 
+
 # prepend path
 PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))
 
@@ -77,7 +78,7 @@ JRI_CONVERTER_DIR = ../../minorGems/graphics/formats/jri/
 JRI_CONVERTER = ${JRI_CONVERTER_DIR}tgaToJri
 
 
-all: gameData ${JRI_GAME_GRAPHICS}
+all: ${JRI_CONVERTER} gameData ${JRI_GAME_GRAPHICS}
 	cp languages/*.txt gameData
 
 
@@ -90,9 +91,7 @@ clean:
 
 
 ${JRI_CONVERTER}:
-	pushd ${JRI_CONVERTER_DIR}
-	./compileConverters
-	popd
+	cd ${JRI_CONVERTER_DIR}; ./compileConverters
 
 
 # 
