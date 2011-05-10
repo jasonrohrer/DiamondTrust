@@ -109,8 +109,18 @@ void PickGameTypeState::stepState() {
                 }
             }
         }
+    else {
+        if( titleFade < 255 ) {
+            if( titleFade <= 255 - 8 ) {
+                titleFade += 8;
+                }
+            else {
+                titleFade = 255;
+                }
+            }
+        }
 
-    if( titleFade == 0 ) {
+    if( selectionMade && titleFade == 0 ) {
         stateDone = true;
         }
     }
@@ -143,7 +153,7 @@ void PickGameTypeState::drawState() {
 
     
     
-    if( !selectionMade ) {
+    if( !selectionMade && titleFade == 255 ) {
         
         aiButton->draw();
         wifiButton->draw();
@@ -162,6 +172,7 @@ void PickGameTypeState::enterState() {
     statusSubMessage = translate( "phaseSubStatus_gameType" ); 
     
     selectionMade = false;
+
     }
 
 

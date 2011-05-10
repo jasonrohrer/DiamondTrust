@@ -344,6 +344,8 @@ void gameInit() {
     doneButton = new Button( font16, translate( "button_done" ), 38, 87 );
     
     nextButton = new Button( font16, translate( "button_next" ), 38, 111 );
+
+    backButton = new Button( font16, translate( "button_back" ), 38, 174 );
     
     
 
@@ -440,6 +442,7 @@ void gameFree() {
     delete font16;
     delete doneButton;
     delete nextButton;
+    delete backButton;
 
     delete aiButton;
     delete wifiButton;
@@ -651,6 +654,27 @@ static void goToNextGameState() {
     currentGameState->enterState();
     }
 
+
+
+static void goToPreviousGameState() {
+    // inform state that it has been cancelled
+    currentGameState->backOutState();
+    
+
+    
+
+    // state BACK transition
+
+
+    if( currentGameState == setAILevelState ||
+        currentGameState == connectState ) {
+        // back to title
+        currentGameState = pickGameTypeState;
+        }
+                
+    currentGameState->enterState();
+    }
+
     
 
 void gameLoopTick() {
@@ -713,7 +737,24 @@ void gameLoopTick() {
         
         // don't pass clicks to done states
         if( !currentGameState->isStateDone() ) {
-            currentGameState->clickState( tx, ty );        
+            
+            char touchEaten = false;
+            
+            if( currentGameState->canStateBeBackedOut() ) {
+                
+                if( backButton->getPressed( tx, ty ) ) {
+                    touchEaten = true;
+                    
+                    goToPreviousGameState();
+                    // reset the frame counter after each BACK
+                    frameCounter = 0;
+                    }
+                }
+            
+            if( ! touchEaten ) {
+                // pass through to state
+                currentGameState->clickState( tx, ty );
+                }
             }
         else if( currentGameState != gameEndState ) {
         
@@ -809,5 +850,9 @@ void drawBottomScreen() {
     
         nextButton->draw();
         }
-    
+    else if( ! currentGameState->isStateDone() &&
+             currentGameState->canStateBeBackedOut() ) {
+        
+        backButton->draw();
+        }
     }

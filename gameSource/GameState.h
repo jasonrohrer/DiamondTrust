@@ -21,6 +21,15 @@ class GameState {
             return true;
             }
         
+        virtual char canStateBeBackedOut() {
+            return false;
+            }
+        
+        // empty default, so implementation not needed for states that
+        // don't need it
+        virtual void backOutState() {
+            };
+        
 
         virtual ~GameState() {};
         

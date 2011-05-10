@@ -53,6 +53,9 @@ class SetAILevelState : public GameState {
             return false;
             }
 
+        virtual char canStateBeBackedOut() {
+            return true;
+            }
         
         virtual ~SetAILevelState();
         
