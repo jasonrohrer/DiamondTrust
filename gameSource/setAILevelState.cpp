@@ -48,7 +48,10 @@ class SetAILevelState : public GameState {
             return stateDone;
             }
         
-        
+        virtual char needsNextButton() {
+            // auto-advance
+            return false;
+            }
 
         
         virtual ~SetAILevelState();

@@ -17,6 +17,10 @@ class GameState {
         
         virtual char isStateDone() = 0;
         
+        virtual char needsNextButton() {
+            return true;
+            }
+        
 
         virtual ~GameState() {};
         

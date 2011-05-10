@@ -664,11 +664,22 @@ void gameLoopTick() {
             // just finished
 
             if( currentGameState != gameEndState ) {
-                // change status sub message to tell player
-                // about pushing next button
-                statusSubMessage = translate( "subStatus_moveOn" );
+
+                if( currentGameState->needsNextButton() ) {
+                    
+                    // change status sub message to tell player
+                    // about pushing next button
+                    statusSubMessage = translate( "subStatus_moveOn" );
+                    
+                    // wait for next button before state change
+                    }
+                else {
+                    // move on instantly
+                    goToNextGameState();
+                    // reset the frame counter after each NEXT
+                    frameCounter = 0;
+                    }
                 
-                // wait for next button before state change
                 }
             
             }
@@ -734,8 +745,12 @@ void drawTopScreen() {
         
         char *headerString;
         
-        if( !currentGameState->isStateDone() &&
+        // Only show "Finished:" if NEXT button displayed
+        // avoids a flicker when auto-advancing to the next state
+        if( ( !currentGameState->isStateDone() || 
+              !currentGameState->needsNextButton() ) &&
             currentGameState != gameEndState ) {
+            
             headerString = translate( "status_next" );
             
             }
@@ -789,6 +804,7 @@ void drawBottomScreen() {
 
 
     if( currentGameState->isStateDone() 
+        && currentGameState->needsNextButton()
         && currentGameState != gameEndState ) {
     
         nextButton->draw();

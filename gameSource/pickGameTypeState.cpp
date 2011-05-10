@@ -47,6 +47,10 @@ class PickGameTypeState : public GameState {
             return stateDone;
             }
         
+        virtual char needsNextButton() {
+            // auto-advance
+            return false;
+            }
         
 
         
