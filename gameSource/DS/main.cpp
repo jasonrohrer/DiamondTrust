@@ -1872,6 +1872,17 @@ int checkConnectionStatus() {
     }
 
 
+void closeConnection() {
+    printOut( "closeConnection() called\n" );
+    
+    // FIXME:  need to call specific WM_End_____ call to start wind-down
+    // depending on what state we're in (see wireless_package sample code)
+
+    // Or maybe WM_Reset will do the trick.... takes us to IDLE, from
+    // which we can call the generic WM_End right away.
+    }
+
+
 void sendMessage( unsigned char *inMessage, unsigned int inLength,
                   unsigned char inChannel ) {
     printOut( "Putting message of %d bytes onto send fifo\n", inLength );

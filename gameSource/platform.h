@@ -185,6 +185,12 @@ void connectToServer( char *inAddress );
 int checkConnectionStatus();
 
 
+// shuts down all networking operations and returns to a pre-connection
+// state
+void closeConnection();
+
+
+
 // inMessage destroyed by caller
 void sendMessage( unsigned char *inMessage, unsigned int inLength,
                   unsigned char inChannel = 0 );

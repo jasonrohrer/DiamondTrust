@@ -54,8 +54,11 @@ class ConnectState : public GameState {
             return stateDone;
             }
         
-        
+        virtual char canStateBeBackedOut() {
+            return true;
+            }
 
+        virtual void backOutState();
         
         virtual ~ConnectState();
         
@@ -295,9 +298,17 @@ void ConnectState::enterState() {
     isParent = false;
     sentMessage = false;
     gotMessage = false;
+
+    connecting = false;
     }
 
 
+
+void ConnectState::backOutState() {
+    if( connecting ) {
+        closeConnection();
+        }
+    };
 
 
 
