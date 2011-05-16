@@ -1073,7 +1073,9 @@ char getTouch( int *outX, int *outY ) {
 // wireless stuff
 unsigned char wmBuffer[ WM_SYSTEM_BUF_SIZE ] ATTRIBUTE_ALIGN( 32 );
 
-int wmStatus = 0;
+char wmShouldStop = true;
+
+int wmStatus = -2;
 char mpRunning = false;
 
 // true for parent, false for child
@@ -1115,6 +1117,8 @@ static unsigned char *receiveBuffer = NULL;
 static void wmEndCallback( void *inArg ) {
     WMCallback *callbackArg = (WMCallback *)inArg;
     
+    printOut( "wmEndCallback received\n" );
+
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
         printOut( "Error returned to wmEndCallback\n" );
@@ -1129,6 +1133,9 @@ static void wmEndCallback( void *inArg ) {
             receiveBuffer = NULL;
             }
         }
+
+    // back to totally unconnected state
+    wmStatus = -2;
     }
 
 
@@ -1482,13 +1489,34 @@ static void wmResetCallback( void *inArg ) {
         WM_End( wmEndCallback );
         }
     else {
-        // reset only called from child
+        // reset only called, with this callback, from child
 
         // start connection process again to same parent
         printOut( "Trying to connect to parent again after reset\n" );
         startConnect();
         }
     
+    }
+
+
+static void wmResetToEndCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    printOut( "wmResetToEndCallback received\n" );
+    
+
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        printOut( "Error returned to wmResetToEndCallback\n" );
+        
+        }
+
+    printOut( "Trying to call WM_End\n" );
+    WMErrCode result = WM_End( wmEndCallback );
+
+    if( result != WM_ERRCODE_OPERATING ) {
+        printOut( "Error code on WM_End = %d\n", result );
+        }
     }
 
 
@@ -1612,7 +1640,12 @@ static void wmStartScanCallback( void *inArg ) {
         if( nextChannel >= 13 ) {
             nextChannel = 0;
             }
-        scanNextChannel();
+
+        if( !wmShouldStop ) {
+            // make sure we don't keep scanning loop going if we've been
+            // asked to stop
+            scanNextChannel();
+            }
         }
     }
 
@@ -1643,6 +1676,9 @@ void scanNextChannel() {
     scanParam.channel = (unsigned short)( nextChannel + 1 );
 
     DC_InvalidateRange( &scanBssDesc, sizeof(WMBssDesc) );
+    
+
+    //printOut( "Calling WM_StartScan for channel %d\n", nextChannel + 1 );
     
     WMErrCode result = 
         WM_StartScan( wmStartScanCallback, 
@@ -1814,6 +1850,9 @@ static void wmInitializeCallback( void *inArg ) {
             
 
             nextChannel = 0;
+
+            printOut( "Child starting first scanNextChannel() call\n" );
+            
             scanNextChannel();
             
             }        
@@ -1843,6 +1882,9 @@ char *getLocalAddress() {
 
 
 void acceptConnection() {
+    wmShouldStop = false;
+    wmStatus = 0;
+    
     isParent = true;
 
     printOut( "Getting TGID\n" );
@@ -1857,6 +1899,9 @@ void acceptConnection() {
 
 
 void connectToServer( char *inAddress ) {
+    wmShouldStop = false;
+    wmStatus = 0;
+
     // ignore address
     // prevent compiler warnings for unused
     inAddress = NULL;
@@ -1875,11 +1920,20 @@ int checkConnectionStatus() {
 void closeConnection() {
     printOut( "closeConnection() called\n" );
     
+    wmShouldStop = true;
+
+
     // FIXME:  need to call specific WM_End_____ call to start wind-down
     // depending on what state we're in (see wireless_package sample code)
 
     // Or maybe WM_Reset will do the trick.... takes us to IDLE, from
     // which we can call the generic WM_End right away.
+
+    printOut( "Trying to reset\n" );
+    WMErrCode result = WM_Reset( wmResetToEndCallback );
+    if( result != WM_ERRCODE_OPERATING ) {
+        printOut( "Error code on reset = %d\n", result );
+        }
     }
 
 

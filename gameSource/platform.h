@@ -182,11 +182,13 @@ void connectToServer( char *inAddress );
 // 1 if a connection has been established and is still up, 
 // 0 if still connecting, 
 // -1 on error
+// -2 when not connected at all (network operations terminated, or not started)
+//    this is the default before acceptConnection or connectToServer is called.
 int checkConnectionStatus();
 
 
 // shuts down all networking operations and returns to a pre-connection
-// state
+// state (checkConnectionStatus will return -2 after this operation completes)
 void closeConnection();
 
 
