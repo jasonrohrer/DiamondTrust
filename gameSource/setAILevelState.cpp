@@ -66,6 +66,7 @@ class SetAILevelState : public GameState {
 
 SetAILevelState::SetAILevelState() 
         : mMessage( NULL ) {
+    mStateName = "SetAILevelState";
     }
 
 SetAILevelState::~SetAILevelState() {

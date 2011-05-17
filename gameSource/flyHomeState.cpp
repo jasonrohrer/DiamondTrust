@@ -21,6 +21,10 @@ extern char *statusSubMessage;
 
 class FlyHomeState : public GameState {
     public:
+
+        FlyHomeState() {
+            mStateName = "FlyHomeState";
+            }
         
         virtual void clickState( int inX, int inY );
         

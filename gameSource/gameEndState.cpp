@@ -15,6 +15,10 @@ extern char *statusSubMessage;
 class GameEndState : public GameState {
     public:
         
+        GameEndState() {
+            mStateName = "GameEndState";
+            }
+        
         virtual void clickState( int inX, int inY );
         
 

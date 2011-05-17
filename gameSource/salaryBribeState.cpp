@@ -32,6 +32,10 @@ static int backupLastBribingUnit[ numUnits ];
 
 class SalaryBribeState : public GameState {
     public:
+
+        SalaryBribeState() {
+            mStateName = "SalaryBribeState";
+            }
         
         virtual void clickState( int inX, int inY );
         

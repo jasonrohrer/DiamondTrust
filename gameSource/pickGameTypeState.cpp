@@ -63,6 +63,7 @@ class PickGameTypeState : public GameState {
 
 PickGameTypeState::PickGameTypeState() 
         : mMessage( NULL ) {
+    mStateName = "PickGameTypeState";
     }
 
 PickGameTypeState::~PickGameTypeState() {

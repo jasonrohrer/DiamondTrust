@@ -428,11 +428,20 @@ void gameInit() {
     
     setMonthsLeft( 8 );
     
-
-    currentGameState = pickGameTypeState;
+    if( ! isAutoconnecting() ) {
+        currentGameState = pickGameTypeState;
+        }
+    else {
+        titleFade = 0;
+        currentGameState = connectState;
+        
+        // we skip thte pickGameTypeState, so set this here
+        networkOpponent = true;
+        }
+    
     //currentGameState = connectState;
     //currentGameState = sellDiamondsState;
-    currentGameState->enterState();
+    currentGameState->enterStateCall();
     }
 
 
@@ -651,7 +660,7 @@ static void goToNextGameState() {
         postSellTransition();
         }
                 
-    currentGameState->enterState();
+    currentGameState->enterStateCall();
     }
 
 
@@ -672,7 +681,7 @@ static void goToPreviousGameState() {
         currentGameState = pickGameTypeState;
         }
                 
-    currentGameState->enterState();
+    currentGameState->enterStateCall();
     }
 
     

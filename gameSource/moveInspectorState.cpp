@@ -25,6 +25,10 @@ extern char *statusSubMessage;
 
 class MoveInspectorState : public GameState {
     public:
+
+        MoveInspectorState() {
+            mStateName = "MoveInspectorState";
+            }
         
         virtual void clickState( int inX, int inY );
         

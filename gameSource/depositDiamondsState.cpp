@@ -15,6 +15,11 @@ extern char *statusSubMessage;
 class DepositDiamondsState : public GameState {
     public:
         
+        DepositDiamondsState() {
+            mStateName = "DepositDiamondsState";
+            }
+        
+
         virtual void clickState( int inX, int inY );
         
 

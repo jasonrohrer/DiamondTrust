@@ -55,7 +55,7 @@ class ConnectState : public GameState {
             }
         
         virtual char canStateBeBackedOut() {
-            return true;
+            return ! isAutoconnecting();
             }
 
         virtual void backOutState();
@@ -69,6 +69,8 @@ class ConnectState : public GameState {
 
 ConnectState::ConnectState() 
         : mMessage( NULL ) {
+
+    mStateName = "ConnectState";
     }
 
 ConnectState::~ConnectState() {
@@ -155,6 +157,10 @@ void ConnectState::clickState( int inX, int inY ) {
 
 
 void ConnectState::stepState() {
+    
+    
+
+
 
     if( connecting ) {
         if( titleFade > 0 ) {
@@ -293,13 +299,20 @@ void ConnectState::enterState() {
     stateDone = false;
 
     statusMessage = translate( "phaseStatus_connect" );
-    statusSubMessage = translate( "phaseSubStatus_parentOrChild" ); 
+    if( !isAutoconnecting() ) {
+        statusSubMessage = translate( "phaseSubStatus_parentOrChild" ); 
+        }
     
     isParent = false;
     sentMessage = false;
     gotMessage = false;
 
     connecting = false;
+
+    if( isAutoconnecting() ) {
+        // clone boot child?
+        connecting = true;
+        }
     }
 
 

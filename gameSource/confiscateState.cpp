@@ -15,6 +15,11 @@ extern char *statusSubMessage;
 class ConfiscateState : public GameState {
     public:
         
+        ConfiscateState() {
+            mStateName = "ConfiscateState";
+            }
+        
+
         virtual void clickState( int inX, int inY );
         
 

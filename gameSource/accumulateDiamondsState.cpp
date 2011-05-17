@@ -23,6 +23,11 @@ extern int titleSpriteID;
 class AccumulateDiamondsState : public GameState {
     public:
         
+        AccumulateDiamondsState() {
+            mStateName = "AccumulateDiamondsState";
+            }
+        
+
         virtual void clickState( int inX, int inY );
         
 

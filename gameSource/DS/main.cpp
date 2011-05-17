@@ -1213,6 +1213,11 @@ static void wmPortCallback( void *inArg ) {
                 channel = ( (unsigned char*)callbackArg->data )[4];
                 }
 
+            printOut( "Putting message of %d bytes onto Receive fifo, "
+                      "chan %d\n", 
+                      (unsigned int)callbackArg->length,
+                      channel );
+
             receiveFifo.addData( (unsigned char*)callbackArg->data, 
                                  (unsigned int)callbackArg->length,
                                  channel );
@@ -1872,7 +1877,7 @@ static void initWM() {
 
 
 char isAutoconnecting() {
-    return false;
+    return isCloneChild;
     }
 
 
@@ -1939,7 +1944,8 @@ void closeConnection() {
 
 void sendMessage( unsigned char *inMessage, unsigned int inLength,
                   unsigned char inChannel ) {
-    printOut( "Putting message of %d bytes onto send fifo\n", inLength );
+    printOut( "Putting message of %d bytes onto send fifo, "
+              "channel %d\n", inLength, inChannel );
     
     // add first 4 bytes, which is message length
     // must do this because DS data sharing doesn't seem to preserve

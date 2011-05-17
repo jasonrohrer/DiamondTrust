@@ -70,6 +70,10 @@ extern Font *font16;
 
 class SellDiamondsState : public GameState {
     public:
+
+        SellDiamondsState() {
+            mStateName = "SellDiamondsState";
+            }
         
         virtual void clickState( int inX, int inY );
         
