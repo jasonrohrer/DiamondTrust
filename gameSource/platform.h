@@ -143,6 +143,25 @@ char getTouch( int *outX, int *outY );
 
 
 
+// forces full game loop (update and draw) to run one time
+// Sometimes it is necessary to redraw the screen at specific times, like
+// half-way through gameInit() to show a LOADING message or progress bar, etc.
+//
+// NOTE that this will call gameLoopTick() and drawTopScreen/drawBottomScreen
+// SO... if calling this from inside gameInit or elsewhere, make sure
+// gameLoopTick (etc) can handle the partially-inited state. 
+//
+// NEVER call this from inside gameLoopTick, drawTopScreen, or drawBottomScreen
+// (will result in an infinite loop)
+void runGameLoopOnce();
+
+
+
+
+
+
+// Networking support
+
 
 // true if platform is auto-connecting to a server at startup
 // no need to acceptConnection or connectToServer
@@ -203,6 +222,7 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength,
 // result freed by caller
 unsigned char *getMessage( unsigned int *outLength,
                            unsigned char inChannel = 0 );
+
 
 
 

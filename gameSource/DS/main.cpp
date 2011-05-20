@@ -2643,68 +2643,76 @@ static void VBlankCallback() {
               OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
     
     while( true ){
-        G3X_Reset();
-
-        // camera
-        VecFx32 cameraPos = { 0, 0, 0 };
-        VecFx32 lookAt = { 0, 0, -FX32_ONE };
-        VecFx32 upVector = { 0, FX32_ONE, 0 };
-
-        G3_LookAt( &cameraPos, &upVector, &lookAt, NULL );
-
-        G3_PushMtx();
-
-        
-        G3_MtxMode( GX_MTXMODE_TEXTURE );
-        G3_Identity();
-        G3_MtxMode( GX_MTXMODE_POSITION_VECTOR );
-
-        
-        // reset fake z buffer coordinate
-        drawZ = farZ;
-        polyID = 0;
-        
-
-        if( isEvenFrame ) {
-            drawTopScreen();
-            //printOut( "Free bytes on heap after drawTop=%d\n",
-            //  OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
-            
-            // game loop every-other screen
-            gameLoopTick();
-            // same for network step
-            stepNetwork();
-
-            stepCloneBootParent();
-            
-            if( !isCloneChild ) {
-                checkForFileRequest();
-                }
-            }
-        else {
-            drawBottomScreen();
-            
-            //printOut( "Free bytes on heap after drawBottom=%d\n",
-            //         OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
-            }
-        G3_PopMtx( 1 );
-        
-        // swap buffers
-        OSIntrMode oldMode = OS_DisableInterrupts();
-        G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
-        shouldSwap = true;
-        OS_RestoreInterrupts( oldMode );
-        
-        
-        // interrupt will wake swapThread up
-        OS_WaitVBlankIntr();
-
-
-        // do one step of texture replacement here
-        textureReplacementStep();
+        runGameLoopOnce();
         }
     
 
     OS_Terminate();
     
     }
+
+
+
+
+void runGameLoopOnce() {
+    G3X_Reset();
+
+    // camera
+    VecFx32 cameraPos = { 0, 0, 0 };
+    VecFx32 lookAt = { 0, 0, -FX32_ONE };
+    VecFx32 upVector = { 0, FX32_ONE, 0 };
+
+    G3_LookAt( &cameraPos, &upVector, &lookAt, NULL );
+
+    G3_PushMtx();
+
+        
+    G3_MtxMode( GX_MTXMODE_TEXTURE );
+    G3_Identity();
+    G3_MtxMode( GX_MTXMODE_POSITION_VECTOR );
+
+        
+    // reset fake z buffer coordinate
+    drawZ = farZ;
+    polyID = 0;
+        
+
+    if( isEvenFrame ) {
+        drawTopScreen();
+        //printOut( "Free bytes on heap after drawTop=%d\n",
+        //  OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
+            
+        // game loop every-other screen
+        gameLoopTick();
+        // same for network step
+        stepNetwork();
+
+        stepCloneBootParent();
+            
+        if( !isCloneChild ) {
+            checkForFileRequest();
+            }
+        }
+    else {
+        drawBottomScreen();
+            
+        //printOut( "Free bytes on heap after drawBottom=%d\n",
+        //         OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
+        }
+    G3_PopMtx( 1 );
+        
+    // swap buffers
+    OSIntrMode oldMode = OS_DisableInterrupts();
+    G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
+    shouldSwap = true;
+    OS_RestoreInterrupts( oldMode );
+        
+        
+    // interrupt will wake swapThread up
+    OS_WaitVBlankIntr();
+
+
+    // do one step of texture replacement here
+    textureReplacementStep();
+    }
+
