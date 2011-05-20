@@ -1349,7 +1349,8 @@ static void wmStartParentCallback( void *inArg ) {
     
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         wmStatus = -1;
-        printOut( "Error returned to wmStartParentCallback\n" );
+        printOut( "Error returned to wmStartParentCallback: %d\n",
+                  callbackArg->errcode );
         WM_End( wmEndCallback );
         }
     else {
@@ -1532,7 +1533,8 @@ static void wmStartConnectCallback( void *inArg ) {
     if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
         // no longer a fatal error
         //wmStatus = -1;
-        printOut( "Error returned to wmStartConnectCallback\n" );
+        printOut( "Error returned to wmStartConnectCallback: %d\n",
+                  callbackArg->errcode );
 
         printOut( "Trying to reset\n" );
         WM_Reset( wmResetCallback );
@@ -1856,9 +1858,83 @@ static void wmInitializeCallback( void *inArg ) {
 
             nextChannel = 0;
 
-            printOut( "Child starting first scanNextChannel() call\n" );
-            
-            scanNextChannel();
+
+            if( !MB_IsMultiBootChild() ) {
+                printOut( "Child starting first scanNextChannel() call\n" );
+                scanNextChannel();
+                }
+            else{
+                printOut( "CloneBoot child Child reconnecting to parent "
+                          "by scanning only for that parent\n" );
+                
+                const MBParentBssDesc* parentBssDesc = 
+                    MB_GetMultiBootParentBssDesc();
+                
+                *(u16 *)(&scanParam.bssid[0]) = parentBssDesc->bssid[0];
+
+                *(u16 *)(&scanParam.bssid[2]) = parentBssDesc->bssid[1];
+
+                *(u16 *)(&scanParam.bssid[4]) = parentBssDesc->bssid[2];
+                
+                
+                scanNextChannel();
+
+                /*
+                  typedef	struct
+                  {
+                  u16         length;
+                  u16         rssi;
+                  u16    bssid[3];
+                  u16         ssidLength;
+                  u8              ssid[32];
+                  u16         capaInfo;
+                  struct
+                  {
+                  u16     basic;
+                  u16     support;
+                  } rateSet;
+                  u16         beaconPeriod;
+                  u16         dtimPeriod;
+                  u16         channel;
+                  u16         cfpPeriod;
+                  u16         cfpMaxDuration;
+                  } MBParentBssDesc;
+
+                */
+                
+                /*
+                  typedef struct WMBssDesc
+                  {
+                  u16         length;
+                  u16         rssi;
+                  u8          bssid[ WM_SIZE_BSSID ];
+                  u16         ssidLength;
+                  u8          ssid[WM_SIZE_SSID];
+                  u16         capaInfo;
+                  struct
+                  {
+                  u16     basic;
+                  u16     support;
+                  } rateSet;
+                  u16         beaconPeriod;
+                  u16         dtimPeriod;
+                  u16         channel;
+                  u16         cfpPeriod;
+                  u16         cfpMaxDuration;
+                  u16         gameInfoLength;
+                  u16         rsv;
+                  WMGameInfo  gameInfo;
+                  } WMBssDesc;
+                */
+                
+                /*
+                // copy the first part into our WMBssDesc
+                memcpy( &scanBssDesc, parentBssDesc, 
+                        sizeof( MBParentBssDesc ) );
+                
+                startConnect();
+                */
+                }                    
             
             }        
         }
