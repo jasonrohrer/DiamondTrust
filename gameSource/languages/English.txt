@@ -1,3 +1,5 @@
+status_loading "Loading"
+
 status_next  "Next:"
 status_finished  "Finished:"
 subStatus_moveOn "Press Next to continue"

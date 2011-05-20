@@ -20,6 +20,12 @@
 #include "opponent.h"
 
 
+// set to false when gameInit done
+// allows gameLoopTick and drawTopScreen/drawBottomScreen to execute special
+// behavior when everything hasn't been loaded yet
+static char stillLoading = true;
+
+
 int drawFrameCounter = false;
 int frameCounter = 0;
 
@@ -209,6 +215,19 @@ void gameInit() {
         delete [] textData;
         }
 
+    printOut( "Loading 8-pixel font\n" );
+    font8 = new Font( "font8.tga", 1, 4, false );
+
+    printOut( "Loading 16-pixel font\n" );
+    font16 = new Font( "font16_sans.tga", 2, 6, false );
+
+
+    // immediately display our Loading message, now that the Font is loaded
+    // call twice to ensure that both screens get drawn
+    runGameLoopOnce();
+    runGameLoopOnce();
+    
+
 
     // satellite top image and camera picture share a sprite set
     // because they are never on the screen at the same time
@@ -333,11 +352,6 @@ void gameInit() {
 
 
 
-    printOut( "Loading 8-pixel font\n" );
-    font8 = new Font( "font8.tga", 1, 4, false );
-
-    printOut( "Loading 16-pixel font\n" );
-    font16 = new Font( "font16_sans.tga", 2, 6, false );
     
     initButton();
 
@@ -442,6 +456,8 @@ void gameInit() {
     //currentGameState = connectState;
     //currentGameState = sellDiamondsState;
     currentGameState->enterStateCall();
+
+    stillLoading = false;
     }
 
 
@@ -687,6 +703,13 @@ static void goToPreviousGameState() {
     
 
 void gameLoopTick() {
+    if( stillLoading ) {
+        
+        // no tick
+        return;
+        }
+    
+
     stepSprites();
     stepOpponent();
     
@@ -788,6 +811,18 @@ void gameLoopTick() {
 
 void drawTopScreen() {
     
+    if( stillLoading ) {
+        printOut( "Drawing LOADING message on top screen\n" );
+        
+        font16->drawString( translate( "status_loading" ), 
+                            128, 
+                            163, white, alignCenter );
+        
+        // draw nothing else, because it's not loaded
+        return;
+        }
+    
+
     drawStats();
     
 
@@ -850,6 +885,12 @@ void drawTopScreen() {
 
 void drawBottomScreen() {
     
+    if( stillLoading ) {
+        // draw nothing here
+        return;
+        }
+    
+
     currentGameState->drawState();
 
 
