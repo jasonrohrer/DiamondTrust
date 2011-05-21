@@ -25,6 +25,12 @@
 // behavior when everything hasn't been loaded yet
 static char stillLoading = true;
 
+#define PROGRESS_LENGTH 58
+static char loadingProgress[ PROGRESS_LENGTH  + 1 ];
+
+#include "loading.h"
+
+
 
 int drawFrameCounter = false;
 int frameCounter = 0;
@@ -61,8 +67,8 @@ char pictureSendSpriteSet = false;
 
 
 
-Font *font8;
-Font *font16;
+Font *font8 = NULL;
+Font *font16 = NULL;
 
 
 
@@ -124,6 +130,14 @@ static char isInside( int inX, int inY,
 #include <stdlib.h>
 
 void gameInit() {
+
+    for( int i=0; i<PROGRESS_LENGTH; i++ ) {
+        loadingProgress[i] = '-';
+        }
+    loadingProgress[ PROGRESS_LENGTH ] = '\0';
+    
+    
+
 
     checkCloneFetch();
 
@@ -215,17 +229,21 @@ void gameInit() {
         delete [] textData;
         }
 
-    printOut( "Loading 8-pixel font\n" );
-    font8 = new Font( "font8.tga", 1, 4, false );
-
     printOut( "Loading 16-pixel font\n" );
     font16 = new Font( "font16_sans.tga", 2, 6, false );
 
+    // we can call this now that we have at least the big font
+    updateLoadingProgress();
 
-    // immediately display our Loading message, now that the Font is loaded
-    // call twice to ensure that both screens get drawn
-    runGameLoopOnce();
-    runGameLoopOnce();
+
+    printOut( "Loading 8-pixel font\n" );
+    font8 = new Font( "font8.tga", 1, 4, false );
+
+
+    // call agin with both fonts (first progress bar step)
+    updateLoadingProgress();
+    
+
     
 
 
@@ -240,6 +258,8 @@ void gameInit() {
     rgbaColor *satelliteRGBA = readTGAFile( "angola_satellite.tga",
                                             &satelliteW, &satelliteH );
 
+    updateLoadingProgress();
+
     if( satelliteRGBA == NULL
         ||
         satelliteW < 256 ) {
@@ -252,13 +272,18 @@ void gameInit() {
     satelliteTopSpriteID = 
         addSprite( satelliteRGBA, satelliteW, satelliteBottomHalfOffset,
                    satelliteAndPictureSet );
-    
+
+    updateLoadingProgress();
+
     rgbaColor *bottomHalfPointer = 
         &( satelliteRGBA[ satelliteBottomHalfOffset * satelliteW ] );
     
     satelliteBottomSpriteID = 
         addSprite( bottomHalfPointer, satelliteW, 
                    satelliteH - satelliteBottomHalfOffset );
+
+    updateLoadingProgress();
+
     // FIXME
     //satelliteTopSpriteID = satelliteBottomSpriteID;
     
@@ -273,6 +298,9 @@ void gameInit() {
                                         &titleW, &titleH );
 
     applyCornerTransparency( titleRGBA, titleW * titleH );
+
+    updateLoadingProgress();
+
 
     if( titleRGBA == NULL ) {
         
@@ -354,6 +382,7 @@ void gameInit() {
 
     
     initButton();
+    updateLoadingProgress();
 
     doneButton = new Button( font16, translate( "button_done" ), 38, 87 );
     
@@ -403,22 +432,27 @@ void gameInit() {
 
     printOut( "  ++++++  Init map\n" );
     initMap();
+    updateLoadingProgress();
 
     printOut( "  ++++++  Init units\n" );
     initUnits();
+    updateLoadingProgress();
 
     printOut( "  ++++++  Init bid picker\n" );
     initBidPicker();
+    updateLoadingProgress();
 
     printOut( "  ++++++  Init game stats\n" );
     initStats();
+    updateLoadingProgress();
 
     printOut( "  ++++++  Init flying diamonds\n" );
     initFlyingDiamonds();
+    updateLoadingProgress();
 
     printOut( "  ++++++  Init sale picker\n" );
     initSalePicker();
-    
+    updateLoadingProgress();
 
     setPlayerMoney( 0, 18 );
     setPlayerMoney( 1, 18 );    
@@ -812,12 +846,33 @@ void gameLoopTick() {
 void drawTopScreen() {
     
     if( stillLoading ) {
-        printOut( "Drawing LOADING message on top screen\n" );
+
+        if( font16 != NULL ) {
+            
+            printOut( "Drawing LOADING message on top screen\n" );
+            
+            font16->drawString( translate( "status_loading" ), 
+                                128, 
+                                163, white, alignCenter );
+            }
+        else {
+            printOut( "Large font not loaded, so not drawing "
+                      "LOADING message\n" );
+            }
         
-        font16->drawString( translate( "status_loading" ), 
-                            128, 
-                            163, white, alignCenter );
-        
+ 
+        if( font8 != NULL ) {
+            printOut( "Progress: %s\n", loadingProgress );
+
+            font8->drawString( loadingProgress, 
+                               12, 
+                               180, white, alignLeft );
+            }
+        else {
+            printOut( "Small font not loaded, so not drawing "
+                      "progress bar\n" );
+            }
+
         // draw nothing else, because it's not loaded
         return;
         }
@@ -904,5 +959,30 @@ void drawBottomScreen() {
              currentGameState->canStateBeBackedOut() ) {
         
         backButton->draw();
+        }
+    }
+
+
+
+
+void redrawLoadingProgress() {
+
+    // immediately display our Loading message and progress bar
+    // call twice to ensure that both screens get drawn
+    runGameLoopOnce();
+    runGameLoopOnce();
+    }
+
+void updateLoadingProgress() {
+
+    redrawLoadingProgress();
+
+    // add another tick to progress
+    for( int i=0; i<PROGRESS_LENGTH; i++ ) {
+        if( loadingProgress[i] == '-' ) {
+            loadingProgress[i] = ')';
+            printOut( "Setting new tick at %d\n", i );
+            break;
+            }
         }
     }

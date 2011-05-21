@@ -8,6 +8,8 @@
 #include "colors.h"
 #include "gameStats.h"
 
+#include "loading.h"
+
 #include "minorGems/util/stringUtils.h"
 
 
@@ -317,6 +319,8 @@ void initMap() {
         //printOut( "Done adding region sprite\n" );
         
         delete [] regionRGBA;
+
+        updateLoadingProgress();
         }
 
     // copy map w/ all region colors for click map
@@ -428,7 +432,9 @@ void initMap() {
                     mapPixelInts[j] = thisRegionColorInt;
                     }
                 }
-            } 
+            }
+        
+        updateLoadingProgress();
         }
    
     delete [] tagMap;
@@ -490,7 +496,13 @@ void initMap() {
                 lastSlicePointer = slicePointer;
                 }
             
+            // don't tick, but still need redraw between addSprite
+            // calls to avoid screen artifacts from too many texture memory
+            // transfers between vblanks
+            redrawLoadingProgress();
             }
+
+        updateLoadingProgress();
         }
     printOut( "Saved %d 16x16 blocks by looking for matches\n", matchCount );
 
@@ -520,6 +532,8 @@ void initMap() {
     rgbaColor *namesRGBA = readTGAFile( "map_names.tga",
                                         &namesW, &namesH );
 
+    updateLoadingProgress();
+    
     if( namesRGBA == NULL
         ||
         namesW < 256 ) {
@@ -532,12 +546,16 @@ void initMap() {
     
     mapNamesTopSpriteID = addSprite( namesRGBA, namesW, bottomHalfOffset );
 
+    updateLoadingProgress();
+
     bottomHalfPointer = 
         &( namesRGBA[ bottomHalfOffset * namesW ] );
     
     mapNamesBottomSpriteID = addSprite( bottomHalfPointer, namesW, 
                                         namesH - bottomHalfOffset );
 
+    updateLoadingProgress();
+    
     delete [] namesRGBA;
 
 
@@ -547,7 +565,9 @@ void initMap() {
     
     rgbaColor *paperRGBA = readTGAFile( "paper.tga",
                                         &paperW, &paperH );
-
+    
+    updateLoadingProgress();
+    
     if( paperRGBA == NULL
         ||
         paperW < 256 ) {
@@ -558,11 +578,15 @@ void initMap() {
 
     mapPaperTopSpriteID = addSprite( paperRGBA, paperW, bottomHalfOffset );
 
+    //updateLoadingProgress();
+
     bottomHalfPointer = 
         &( paperRGBA[ bottomHalfOffset * paperW ] );
     
     mapPaperBottomSpriteID = addSprite( bottomHalfPointer, paperW, 
                                         paperH - bottomHalfOffset );
+    
+    //updateLoadingProgress();
 
     delete [] paperRGBA;
 

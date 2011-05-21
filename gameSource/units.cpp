@@ -8,6 +8,8 @@
 #include "colors.h"
 #include "arrows.h"
 
+#include "loading.h"
+
 
 #include "minorGems/util/stringUtils.h"
 
@@ -339,6 +341,8 @@ void initUnits() {
     delete [] armMapRGBA;
     delete [] armSourceMapRGBA;
     
+    updateLoadingProgress();
+    
 
 
 
@@ -449,7 +453,7 @@ void initUnits() {
         
         }
     
-
+    updateLoadingProgress();
 
 
 
@@ -580,6 +584,8 @@ void initUnits() {
                     }
                 }
             }
+
+        updateLoadingProgress();
         }
 
              
