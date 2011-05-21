@@ -44,6 +44,7 @@ signal0.tga \
 signal1.tga \
 signal2.tga \
 signal3.tga \
+wirelessOn.tga \
 
 
 # not ideal!

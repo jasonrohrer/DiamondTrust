@@ -15,6 +15,12 @@ class Button {
         
         ~Button();
         
+
+        int getWidth();
+        
+        int getCenterX();
+        int getCenterY();
+        
         
         //void setVisible( char inIsVisible );
         

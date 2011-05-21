@@ -17,6 +17,9 @@ extern int satelliteBottomHalfOffset;
 extern int titleSpriteID;
 extern unsigned char titleFade;
 
+extern int wirelessOnSpriteID;
+
+
 
 extern Button *parentButton;
 extern Button *parentServeCloneDownloaButton;
@@ -253,6 +256,15 @@ void ConnectState::stepState() {
     }
 
 
+static void drawWirelessIconNextToButton( Button *inButton ) {
+    drawSprite( wirelessOnSpriteID,
+                inButton->getCenterX() + 
+                inButton->getWidth() / 2 + 4,
+                inButton->getCenterY() - 8, 
+                white );
+    }
+
+
 
 void ConnectState::drawState() {
     
@@ -279,14 +291,29 @@ void ConnectState::drawState() {
         }
     
     if( !connecting ) {
+
+        char showIcon = isCloneBootPossible();
         
         parentButton->draw();
 
+        if( showIcon ) {
+            drawWirelessIconNextToButton( parentButton );
+            }
+        
+
         if( parentServeCloneDownloaButton != NULL ) {
             parentServeCloneDownloaButton->draw();
+
+            if( showIcon ) {
+                drawWirelessIconNextToButton( parentServeCloneDownloaButton );
+                }
             }
         
         childButton->draw();
+
+        if( showIcon ) {
+            drawWirelessIconNextToButton( childButton );
+            }
         }
     
     }

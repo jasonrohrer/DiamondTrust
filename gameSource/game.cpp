@@ -44,6 +44,8 @@ unsigned char satelliteFade;
 int titleSpriteID;
 unsigned char titleFade;
 
+int wirelessOnSpriteID;
+
 
 // sprites for these have dimensions that are next-largest powers of 2
 // (256x128  and 128x64)
@@ -347,6 +349,8 @@ void gameInit() {
 
     delete [] titleRGBA;
     
+
+    wirelessOnSpriteID = loadSprite( "wirelessOn.tga", false );
 
 
     printOut( "Constructing camera picture sprites\n" );

@@ -92,6 +92,23 @@ Button::~Button() {
     }
 
 
+
+int Button::getWidth() {
+    return mW;
+    }
+
+
+
+int Button::getCenterX() {
+    return mX;
+    }
+
+int Button::getCenterY() {
+    return mY;
+    }
+
+
+
 char Button::getPressed( int inClickX, int inClickY ) {
     if( inClickY > mY - mClickRadiusY && inClickY < mY + mClickRadiusY
         &&
