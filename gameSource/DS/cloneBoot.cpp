@@ -227,6 +227,12 @@ int stepCloneBootParent() {
 
 
 
+char isCloneBootRunning() {
+    return cloneBootRunning;
+    }
+
+
+
 
 void checkForFileRequest() {
     

@@ -163,6 +163,12 @@ void runGameLoopOnce();
 // Networking support
 
 
+// returns 0, 1, 2, or 3
+// OR
+// returns -1 if signal strength should not currently be displayed
+int getSignalStrength();
+
+
 // true if platform is auto-connecting to a server at startup
 // no need to acceptConnection or connectToServer
 // check if connection ready with checkConnectionReady

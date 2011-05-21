@@ -72,6 +72,10 @@ Font *font16 = NULL;
 
 
 
+int satPhoneSpriteID = -1;
+
+int signalSpriteID[4];
+
 
 
 char *statusMessage = NULL;
@@ -234,6 +238,21 @@ void gameInit() {
 
     // we can call this now that we have at least the big font
     updateLoadingProgress();
+
+    
+    printOut( "Loading sat phone and signal meter\n" );
+    satPhoneSpriteID = loadSprite( "satPhone.tga", true );
+
+    for( int i=0; i<4; i++ ) {
+        char *fileName = autoSprintf( "signal%d.tga", i );
+        
+        signalSpriteID[i] = loadSprite( fileName, false );
+        
+        delete [] fileName;
+        }
+    
+    redrawLoadingProgress();
+
 
 
     printOut( "Loading 8-pixel font\n" );
@@ -844,6 +863,23 @@ void gameLoopTick() {
 
 
 void drawTopScreen() {
+
+    if( satPhoneSpriteID != -1 ) {
+        int sigStrength = getSignalStrength();
+        
+        if( sigStrength >= 0 && sigStrength <= 3 ) {
+            
+            int phoneX = 230;
+            int phoneY = 146;
+
+            drawSprite( satPhoneSpriteID, 
+                        phoneX, phoneY, white );
+            
+            drawSprite( signalSpriteID[ sigStrength ], 
+                        phoneX + 8, phoneY + 6, white );
+            }
+        }
+    
     
     if( stillLoading ) {
 

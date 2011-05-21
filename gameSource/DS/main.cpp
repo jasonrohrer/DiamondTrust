@@ -1952,6 +1952,22 @@ static void initWM() {
     }
 
 
+
+int getSignalStrength() {
+    
+
+    if( wmStatus != -2 || isCloneBootRunning() ) {
+        
+        return WM_GetLinkLevel();        
+        }
+    else {
+        return -1;
+        }
+    }
+
+
+
+
 char isAutoconnecting() {
     return isCloneChild;
     }

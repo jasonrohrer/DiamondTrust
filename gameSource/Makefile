@@ -39,6 +39,11 @@ rolodex_manilla16.tga \
 playerPictures.tga \
 enemyPictures.tga \
 sellingPanel.tga \
+satPhone.tga \
+signal0.tga \
+signal1.tga \
+signal2.tga \
+signal3.tga \
 
 
 # not ideal!

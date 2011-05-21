@@ -8,6 +8,8 @@
 int stepCloneBootParent();
 
 
+char isCloneBootRunning();
+
 
 // serve responses to file requests from children
 void checkForFileRequest();
