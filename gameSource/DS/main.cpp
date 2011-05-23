@@ -1713,24 +1713,41 @@ static void wmPortSendCallback( void *inArg ) {
         if( callbackArg->sentBitmap == callbackArg->destBitmap ) {
             
             printOut( "Data send successful\n" );
+
+            unsigned char channel = 0;
+            char lastMessageFlag = false;
+
+            if( callbackArg->length >= 6 ) {
+                // room for flags
+                channel = ( (unsigned char*)callbackArg->data )[4];
+                lastMessageFlag = ( (unsigned char*)callbackArg->data )[5];
+                }
+
             delete [] callbackArg->data;
             sendPending = false;
             
+            if( lastMessageFlag ) {
+                printOut( "Last message sent.  Auto-closing connection.\n" );
+                closeConnection();
+                }
+
             // next send will start during next network step
             }
         else {
             printOut( "Data send did not reach all recipients\n" );
 
             unsigned char channel = 0;
-            
-            if( callbackArg->length >= 5 ) {
-                // room for channel flag
+            char lastMessageFlag = false;
+
+            if( callbackArg->length >= 6 ) {
+                // room for flags
                 channel = ( (unsigned char*)callbackArg->data )[4];
+                lastMessageFlag = ( (unsigned char*)callbackArg->data )[5];
                 }
 
             // put back on send fifo in next position to try again
             sendFifo.pushData( (unsigned char *)( callbackArg->data ), 
-                               callbackArg->length, channel );
+                               callbackArg->length, channel, lastMessageFlag );
             sendPending = false;
             
             delete [] callbackArg->data;
@@ -1779,12 +1796,15 @@ void startNextSend() {
             printOut( "Pushing data back onto send fifo until later\n" );
             
             unsigned char channel = 0;
-            if( numBytes >= 5 ) {
-                // room for channel flag
+            char lastMessageFlag = false;
+            
+            if( numBytes >= 6 ) {
+                // room for flags
                 channel = data[4];
+                channel = data[5];
                 }
 
-            sendFifo.pushData( data, numBytes, channel );
+            sendFifo.pushData( data, numBytes, channel, lastMessageFlag );
 
             sendPending = false;
             
@@ -2035,7 +2055,7 @@ void closeConnection() {
 
 
 void sendMessage( unsigned char *inMessage, unsigned int inLength,
-                  unsigned char inChannel ) {
+                  unsigned char inChannel, char inLastMessageFlag ) {
     printOut( "Putting message of %d bytes onto send fifo, "
               "channel %d\n", inLength, inChannel );
     
@@ -2044,7 +2064,8 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength,
     // data length (sometimes longer than message that was sent, with
     // garbage bytes at end).
     // also add channel field
-    unsigned int sendSize = inLength + 4 + 1;
+    // also add last message flag field
+    unsigned int sendSize = inLength + 4 + 1 + 1;
     unsigned char *sendData = new unsigned char[ sendSize ];
                 
     sendData[0] = (unsigned char)( ( inLength >> 24 ) & 0xFF );
@@ -2053,15 +2074,29 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength,
     sendData[3] = (unsigned char)( ( inLength ) & 0xFF );
     
     sendData[4] = inChannel;
+    sendData[5] = inLastMessageFlag;
 
-    memcpy( &( sendData[5] ), inMessage, inLength );
+    memcpy( &( sendData[6] ), inMessage, inLength );
 
 
-    sendFifo.addData( sendData, sendSize, inChannel );
+    sendFifo.addData( sendData, sendSize, inChannel, inLastMessageFlag );
     delete [] sendData;
     
     // send will start during next network step
     }
+
+
+void sendMessage( unsigned char *inMessage, unsigned int inLength,
+                  unsigned char inChannel ) {
+    sendMessage( inMessage, inLength, inChannel, false );
+    }
+
+
+void sendLastMessage( unsigned char *inMessage, unsigned int inLength,
+                      unsigned char inChannel ) {
+    sendMessage( inMessage, inLength, inChannel, true );
+    }
+
 
 
 unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
@@ -2116,7 +2151,7 @@ unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
   //            messageLength );
     
     unsigned char *message = new unsigned char[ messageLength ];
-    memcpy( message, &( data[5] ), messageLength );
+    memcpy( message, &( data[6] ), messageLength );
     
     delete [] data;
     

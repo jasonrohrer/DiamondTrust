@@ -8,7 +8,8 @@
 
 
 void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes,
-                        unsigned char inChannel ) {
+                        unsigned char inChannel,
+                        char inLastMessageFlag ) {
     dataFifoElement *f = new dataFifoElement;
             
     f->next = mHead;
@@ -25,16 +26,18 @@ void DataFifo::addData( unsigned char *inData, unsigned int inNumBytes,
     mHead = f;
     f->numBytes = inNumBytes;
     f->channel = inChannel;
-    
+    f->lastMessageFlag = inLastMessageFlag; 
+   
     f->data = new unsigned char[ inNumBytes ];
-            
+    
     memcpy( f->data, inData, inNumBytes );
     }
 
 
 
 void DataFifo::pushData( unsigned char *inData, unsigned int inNumBytes,
-                         unsigned char inChannel ) {
+                         unsigned char inChannel,
+                         char inLastMessageFlag ) {
     dataFifoElement *f = new dataFifoElement;
             
     f->next = NULL;
@@ -51,6 +54,7 @@ void DataFifo::pushData( unsigned char *inData, unsigned int inNumBytes,
     mTail = f;
     f->numBytes = inNumBytes;
     f->channel = inChannel;
+    f->lastMessageFlag = inLastMessageFlag;
     
     f->data = new unsigned char[ inNumBytes ];
             
@@ -82,7 +86,8 @@ dataFifoElement *DataFifo::findMatch( char inMatchChannel,
 unsigned char *DataFifo::getData( unsigned int *outSize,
                                   char inMatchChannel,
                                   unsigned char inChannel,
-                                  unsigned char *outChannel ) {
+                                  unsigned char *outChannel,
+                                  char *outLastMessageFlag ) {
   
     
     dataFifoElement *match = findMatch( inMatchChannel, inChannel );
@@ -97,6 +102,11 @@ unsigned char *DataFifo::getData( unsigned int *outSize,
     *outSize = match->numBytes;
     *outChannel = match->channel;
     
+    if( outLastMessageFlag != NULL ) {
+        *outLastMessageFlag = match->lastMessageFlag;
+        }
+    
+
     if( match == mHead || match == mTail ) {    
         if( match == mHead ) {
             // new head
@@ -126,7 +136,8 @@ unsigned char *DataFifo::getData( unsigned int *outSize,
 unsigned char *DataFifo::peekData( unsigned int *outSize,
                                    char inMatchChannel,
                                    unsigned char inChannel,
-                                   unsigned char *outChannel ) {
+                                   unsigned char *outChannel,
+                                   char *outLastMessageFlag ) {
 
     dataFifoElement *match = findMatch( inMatchChannel, inChannel );
 
@@ -147,6 +158,10 @@ unsigned char *DataFifo::peekData( unsigned int *outSize,
     *outSize = match->numBytes;
     *outChannel = match->channel;
     
+    if( outLastMessageFlag != NULL ) {
+        *outLastMessageFlag = match->lastMessageFlag;
+        } 
+
     return returnData;
     }
 

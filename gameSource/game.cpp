@@ -728,6 +728,17 @@ static void goToNextGameState() {
         // beginning of next round
         postSellTransition();
         }
+    else if( currentGameState == gameEndState ) {
+
+        if( gameEndState->getParameter() ) {
+            // play again!
+            currentGameState = accumulateDiamondsState;
+            }
+        else {
+            // back to menu
+            currentGameState = pickGameTypeState;
+            }
+        }
                 
     currentGameState->enterStateCall();
     }
@@ -745,7 +756,9 @@ static void goToPreviousGameState() {
 
 
     if( currentGameState == setAILevelState ||
-        currentGameState == connectState ) {
+        currentGameState == connectState ||
+        currentGameState == gameEndState ) {
+
         // back to title
         currentGameState = pickGameTypeState;
         }
@@ -790,7 +803,15 @@ void gameLoopTick() {
                     }
                 
                 }
-            
+            else {
+                // play again!
+
+                // move on instantly
+                goToNextGameState();
+
+                // reset the frame counter after each NEXT
+                frameCounter = 0;
+                }
             }
         
         stateDone = true;

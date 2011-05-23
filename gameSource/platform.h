@@ -222,6 +222,11 @@ void closeConnection();
 void sendMessage( unsigned char *inMessage, unsigned int inLength,
                   unsigned char inChannel = 0 );
 
+// close the connection automatically after this message is sent
+void sendLastMessage( unsigned char *inMessage, unsigned int inLength,
+                      unsigned char inChannel = 0 );
+
+
 
 // poll for new incoming message
 // returns NULL if no message ready

@@ -11,7 +11,7 @@
 
 static gameState currentState;
 
-static unsigned char *externalEnemyMove;
+static unsigned char *externalEnemyMove = NULL;
 static unsigned int externalEnemyMoveLength;
 
 // to skip past camera data
@@ -367,6 +367,13 @@ void initAI() {
         }
     #endif
 
+
+    resetAI();
+    }
+
+
+void resetAI() {
+        
     currentState.monthsLeft = getMonthsLeft();
     currentState.nextMove = salaryBribe;
 
@@ -415,8 +422,12 @@ void initAI() {
     // accumulate to prepare for first move
     accumulateDiamonds( &currentState );
 
-    externalEnemyMove = NULL;
-
+    if( externalEnemyMove != NULL ) {
+        delete [] externalEnemyMove;
+        
+        externalEnemyMove = NULL;
+        }
+    
     moveDone = false;
 
     clearNextMove();

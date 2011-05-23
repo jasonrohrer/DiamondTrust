@@ -7,6 +7,7 @@ typedef struct dataFifoElement {
         unsigned char channel;
         dataFifoElement *next;
         dataFifoElement *previous;
+        char lastMessageFlag;
     } dataFifoElement;
 
 
@@ -27,11 +28,13 @@ class DataFifo {
         // inData copied internally
         // added to head, returned last
         void addData( unsigned char *inData, unsigned int inNumBytes,
-                      unsigned char inChannel );
+                      unsigned char inChannel, 
+                      char inLastMessageFlag = false );
         
         // added to tail, returned first
         void pushData( unsigned char *inData, unsigned int inNumBytes,
-                       unsigned char inChannel );
+                       unsigned char inChannel, 
+                       char inLastMessageFlag = false );
 
         
         // gets and removes next item
@@ -39,7 +42,8 @@ class DataFifo {
         // caller destroys
         unsigned char *getData( unsigned int *outSize, 
                                 char inMatchChannel, unsigned char inChannel,
-                                unsigned char *outChannel );
+                                unsigned char *outChannel,
+                                char *outLastMessageFlag = NULL );
         
         
         // peeks at copy of next item without removing
@@ -48,7 +52,8 @@ class DataFifo {
         unsigned char *peekData( unsigned int *outSize, 
                                  char inMatchChannel, 
                                  unsigned char inChannel,
-                                 unsigned char *outChannel );
+                                 unsigned char *outChannel,
+                                 char *outLastMessageFlag = NULL  );
 
 
         void clearData();

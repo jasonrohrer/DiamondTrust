@@ -3,6 +3,10 @@
 
 void initAI();
 
+// back to starting state
+void resetAI();
+
+
 void freeAI();
 
 // the number of candidate moves to test before picking best one

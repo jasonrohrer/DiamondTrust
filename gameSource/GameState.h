@@ -45,6 +45,15 @@ class GameState {
         virtual void backOutState() {
             };
         
+        
+        // default implementation
+        // some states return parameters indicating what happened during the 
+        // state
+        virtual int getParameter() {
+            return 0;
+            }
+        
+
 
         virtual ~GameState() {};
 

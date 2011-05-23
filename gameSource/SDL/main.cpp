@@ -1004,6 +1004,11 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength,
     sendFifo.addData( inMessage, inLength, inChannel );
     }
 
+void sendLastMessage( unsigned char *inMessage, unsigned int inLength,
+                      unsigned char inChannel ) {
+    sendFifo.addData( inMessage, inLength, inChannel, true );
+    }
+
 
 unsigned char *getMessage( unsigned int *outLength, unsigned char inChannel ) {
     unsigned char channel;
@@ -1049,9 +1054,11 @@ void stepNetwork() {
         // try sending next message
         unsigned int numBytes;
         unsigned char channel;
+        char lastMessageFlag;
         
         unsigned char *nextData = sendFifo.peekData( &numBytes, false, 0,
-                                                     &channel );
+                                                     &channel, 
+                                                     &lastMessageFlag );
             
         if( nextData != NULL ) {
             // first 5 bytes are size and channel
@@ -1087,6 +1094,11 @@ void stepNetwork() {
                 // remove from fifo
                 nextData = sendFifo.getData( &numBytes, false, 0, &channel );
                 delete [] nextData;
+
+                if( lastMessageFlag ) {
+                    closeConnection();
+                    return;
+                    }
                 }
             // else if -2, would block, try again next time
             }
