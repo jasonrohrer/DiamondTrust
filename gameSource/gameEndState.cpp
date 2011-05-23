@@ -1,4 +1,5 @@
 #include "GameState.h"
+#include "Button.h"
 #include "units.h"
 #include "map.h"
 #include "common.h"
@@ -6,6 +7,8 @@
 
 //static int activeUnit = -1;
 static char stateDone = false;
+
+extern Button *playAgainButton;
 
 extern char *statusMessage;
 extern char *statusSubMessage;
@@ -35,6 +38,10 @@ class GameEndState : public GameState {
             return stateDone;
             }
         
+        // back to go back to main menu
+        virtual char canStateBeBackedOut() {
+            return true;
+            }
         
 
         // destructor?
@@ -51,10 +58,18 @@ class GameEndState : public GameState {
 
 void GameEndState::clickState( int inX, int inY ) {
     
-    // no clicking!
+    if( playAgainButton->getPressed( inX, inY ) ) {
 
-    // avoid unused variable warnings
-    inX = inY;
+        resetStats();
+        resetMapDiamondCounts();
+        resetUnits();
+        // all units are home and empty
+
+        // leave inspector alone
+        
+        stateDone = true;
+        }
+
     }
 
 
@@ -71,6 +86,8 @@ void GameEndState::drawState() {
     startNewSpriteLayer();
     
     drawUnits();
+
+    playAgainButton->draw();
     }
 
 

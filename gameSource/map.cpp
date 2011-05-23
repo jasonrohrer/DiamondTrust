@@ -603,6 +603,11 @@ void initMap() {
                                 true );
 
 
+    resetMapDiamondCounts();
+    }
+
+
+void resetMapDiamondCounts() {
     mapRegionDiamondRate[ 0 ] = 0;
     mapRegionDiamondRate[ 1 ] = 0;
     
@@ -614,7 +619,7 @@ void initMap() {
     // last region swaps between 1 and 2 after each accumulation
     mapRegionDiamondRate[ 7 ] = 1;
 
-    for( i=0; i<numMapRegions; i++ ) {
+    for( int i=0; i<numMapRegions; i++ ) {
         mapRegionDiamondCount[i] = 0;
 
         mapRegionDiamondAccumulating[i] = false;

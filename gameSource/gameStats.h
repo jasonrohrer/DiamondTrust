@@ -4,6 +4,10 @@ void initStats();
 void freeStats();
 
 
+// sets stats back to defaults for start of game
+void resetStats();
+
+
 void setMonthsLeft( int inMonths );
 int getMonthsLeft();
 void decrementMonthsLeft();

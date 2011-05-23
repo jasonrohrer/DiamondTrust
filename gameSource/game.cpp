@@ -84,6 +84,11 @@ char *statusMessage = NULL;
 char *statusSubMessage = NULL;
 
 
+// false if connected to a game hosted elsewhere
+// (true even if this is an AI game)
+char isParent = true;
+
+
 // false for local AI opponent
 char networkOpponent;
 
@@ -119,6 +124,8 @@ Button *aiButton;
 Button *wifiButton;
 
 Button *backButton;
+
+Button *playAgainButton;
 
 
 
@@ -412,6 +419,9 @@ void gameInit() {
     nextButton = new Button( font16, translate( "button_next" ), 38, 111 );
 
     backButton = new Button( font16, translate( "button_back" ), 38, 174 );
+
+    playAgainButton = 
+        new Button( font16, translate( "button_play_again" ), 69, 111 );
     
     
 
@@ -477,27 +487,9 @@ void gameInit() {
     initSalePicker();
     updateLoadingProgress();
 
-    setPlayerMoney( 0, 18 );
-    setPlayerMoney( 1, 18 );    
 
-    setPlayerDiamonds( 0, 0 );
-    setPlayerDiamonds( 1, 0 );    
-
-    // FIXME:  testing
-    //setPlayerDiamonds( 0, 10 );
-    //setPlayerDiamonds( 1, 10 );    
-
-    // actually, it makes sense for players to start the game with a few
-    // diamonds (so that the SellDiamonds phase has an interesting decision
-    // right off the bat).  2 each allows full exploration of payoff matrix.
-    setPlayerDiamonds( 0, 2 );
-    setPlayerDiamonds( 1, 2 );    
-
-
-    // show opponent's money at start of game
-    setOpponentMoneyUnknown( false );
+    resetStats();
     
-    setMonthsLeft( 8 );
     
     if( ! isAutoconnecting() ) {
         currentGameState = pickGameTypeState;
@@ -506,7 +498,7 @@ void gameInit() {
         titleFade = 0;
         currentGameState = connectState;
         
-        // we skip thte pickGameTypeState, so set this here
+        // we skip the pickGameTypeState, so set this here
         networkOpponent = true;
         }
     
@@ -692,6 +684,10 @@ static void goToNextGameState() {
             }
         else {
             // set AI level here
+            
+            // we're "hosting" a game vs. the AI
+            isParent = true;
+            
             currentGameState = setAILevelState;
             }
         }

@@ -293,6 +293,35 @@ void freeStats() {
 
 
 
+void resetStats() {
+    setPlayerMoney( 0, 18 );
+    setPlayerMoney( 1, 18 );    
+
+    setPlayerDiamonds( 0, 0 );
+    setPlayerDiamonds( 1, 0 );    
+
+    // FIXME:  testing
+    //setPlayerDiamonds( 0, 10 );
+    //setPlayerDiamonds( 1, 10 );    
+
+    // actually, it makes sense for players to start the game with a few
+    // diamonds (so that the SellDiamonds phase has an interesting decision
+    // right off the bat).  2 each allows full exploration of payoff matrix.
+    setPlayerDiamonds( 0, 2 );
+    setPlayerDiamonds( 1, 2 );    
+
+
+    // show opponent's money at start of game
+    setOpponentMoneyUnknown( false );
+    
+    //setMonthsLeft( 8 );
+    // for testing
+    setMonthsLeft( 0 );
+    }
+
+
+
+
 void showSale( char inShow ) {
     showSaleFlag = inShow;
     if( showSaleFlag == true ) {

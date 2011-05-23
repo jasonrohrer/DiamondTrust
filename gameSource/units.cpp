@@ -476,17 +476,10 @@ void initUnits() {
         for( int a=0; a<5; a++ ) {
             gameUnit[ i ].mArmSpriteID[a] = unitArmSpriteIDs[i][a];
             }
-
-        gameUnit[ i ].mTotalSalary = 0;
-        gameUnit[ i ].mLastSalaryPayment = 0;
-
-        gameUnit[ i ].mTotalBribe = 0;
-        gameUnit[ i ].mLastBribePayment = 0;
-        gameUnit[ i ].mLastBribingUnit = -1;
-
-        gameUnit[ i ].mEnemyContactSinceBribeHidden = false;
         }
     
+    resetUnits();
+
     // inspector 
     // start in random producing region
     gameUnit[ 6 ].mRegion = (int)getRandom( numMapRegions - 2 ) + 2;
@@ -594,7 +587,22 @@ void initUnits() {
              
     }
 
+
+
+void resetUnits() {
     
+    for( int i=0; i<6; i++ ) {
+        gameUnit[ i ].mTotalSalary = 0;
+        gameUnit[ i ].mLastSalaryPayment = 0;
+
+        gameUnit[ i ].mTotalBribe = 0;
+        gameUnit[ i ].mLastBribePayment = 0;
+        gameUnit[ i ].mLastBribingUnit = -1;
+
+        gameUnit[ i ].mEnemyContactSinceBribeHidden = false;
+        }
+    }
+
 
 
 

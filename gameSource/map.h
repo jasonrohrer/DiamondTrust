@@ -9,6 +9,11 @@ void initMap();
 
 void freeMap();
 
+
+// back to beginning of game state
+void resetMapDiamondCounts();
+
+
 void drawMap();
 
 

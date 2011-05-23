@@ -27,7 +27,7 @@ extern Button *childButton;
 extern char *statusMessage;
 extern char *statusSubMessage;
 
-static char isParent;
+extern char isParent;
 static char sentMessage, gotMessage;
 
 

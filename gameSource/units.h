@@ -9,6 +9,10 @@
 
 void initUnits();
 
+// return them to game start state in terms of salaries and bribes
+void resetUnits();
+
+
 void freeUnits();
 
 // draws them on map
