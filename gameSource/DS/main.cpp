@@ -1081,6 +1081,10 @@ char mpRunning = false;
 // true for parent, false for child
 char isParent = false;
 
+// remains true until fist connection breaks
+char isFirstConnection = true;
+
+
 #define WM_DMA_NO  2
 #define LOCAL_GGID 0x003fff63
 
@@ -1133,6 +1137,9 @@ static void wmEndCallback( void *inArg ) {
             receiveBuffer = NULL;
             }
         }
+
+    // first connection (in case of child) is over
+    isFirstConnection = false;
 
     // back to totally unconnected state
     wmStatus = -2;
@@ -1720,7 +1727,8 @@ static void wmPortSendCallback( void *inArg ) {
             if( callbackArg->length >= 6 ) {
                 // room for flags
                 channel = ( (unsigned char*)callbackArg->data )[4];
-                lastMessageFlag = ( (unsigned char*)callbackArg->data )[5];
+                lastMessageFlag = 
+                    (char)( ( (unsigned char*)callbackArg->data )[5] );
                 }
 
             delete [] callbackArg->data;
@@ -1742,7 +1750,8 @@ static void wmPortSendCallback( void *inArg ) {
             if( callbackArg->length >= 6 ) {
                 // room for flags
                 channel = ( (unsigned char*)callbackArg->data )[4];
-                lastMessageFlag = ( (unsigned char*)callbackArg->data )[5];
+                lastMessageFlag = 
+                    (char)( ( (unsigned char*)callbackArg->data )[5] );
                 }
 
             // put back on send fifo in next position to try again
@@ -1801,7 +1810,7 @@ void startNextSend() {
             if( numBytes >= 6 ) {
                 // room for flags
                 channel = data[4];
-                channel = data[5];
+                lastMessageFlag = (char)( data[5] );
                 }
 
             sendFifo.pushData( data, numBytes, channel, lastMessageFlag );
@@ -1987,9 +1996,12 @@ int getSignalStrength() {
 
 
 
-
 char isAutoconnecting() {
-    return isCloneChild;
+    // only auto-connect to parent for first connection
+    
+    // after that, child can host games with others, or join others
+
+    return isCloneChild && isFirstConnection;
     }
 
 
@@ -2054,8 +2066,8 @@ void closeConnection() {
     }
 
 
-void sendMessage( unsigned char *inMessage, unsigned int inLength,
-                  unsigned char inChannel, char inLastMessageFlag ) {
+static void sendMessage( unsigned char *inMessage, unsigned int inLength,
+                         unsigned char inChannel, char inLastMessageFlag ) {
     printOut( "Putting message of %d bytes onto send fifo, "
               "channel %d\n", inLength, inChannel );
     
@@ -2074,7 +2086,7 @@ void sendMessage( unsigned char *inMessage, unsigned int inLength,
     sendData[3] = (unsigned char)( ( inLength ) & 0xFF );
     
     sendData[4] = inChannel;
-    sendData[5] = inLastMessageFlag;
+    sendData[5] = (unsigned char)inLastMessageFlag;
 
     memcpy( &( sendData[6] ), inMessage, inLength );
 

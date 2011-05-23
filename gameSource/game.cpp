@@ -86,7 +86,7 @@ char *statusSubMessage = NULL;
 
 // false if connected to a game hosted elsewhere
 // (true even if this is an AI game)
-char isParent = true;
+char isHost = true;
 
 
 // false for local AI opponent
@@ -698,7 +698,7 @@ static void goToNextGameState() {
             // set AI level here
             
             // we're "hosting" a game vs. the AI
-            isParent = true;
+            isHost = true;
             
             currentGameState = setAILevelState;
             }

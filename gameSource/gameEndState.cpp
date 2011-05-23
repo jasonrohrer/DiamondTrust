@@ -18,7 +18,7 @@ static char donePressed = false;
 extern Button *playAgainButton;
 extern Button *doneButton;
 
-extern char isParent;
+extern char isHost;
 extern char networkOpponent;
 
 
@@ -84,7 +84,7 @@ class GameEndState : public GameState {
         virtual char canStateBeBackedOut() {
             // but only from parent
             // and only after sat image faded back in
-            return isParent && satelliteFade == 255;
+            return isHost && satelliteFade == 255;
             }
         
 
@@ -118,12 +118,12 @@ void GameEndState::clickState( int inX, int inY ) {
             
             // no explaination needed for parent because Play Again button
             // is clear
-            if( !isParent ) {
+            if( !isHost ) {
                 statusSubMessage = translate( "phaseSubStatus_playAgainWait" );
                 }
             }
         }
-    else if( isParent && playAgainButton->getPressed( inX, inY ) ) {
+    else if( isHost && playAgainButton->getPressed( inX, inY ) ) {
 
         playingAgain = true;
         
@@ -161,7 +161,7 @@ void GameEndState::stepState() {
         return;                              
         }
 
-    if( !isParent ) {
+    if( !isHost ) {
 
         if( checkConnectionStatus() != 1 ) {
             
@@ -235,7 +235,7 @@ void GameEndState::drawState() {
     if( !donePressed ) {
         doneButton->draw();
         }
-    else if( isParent && satelliteFade == 255 && !stateDone ) {
+    else if( isHost && satelliteFade == 255 && !stateDone ) {
         playAgainButton->draw();
         }
     }
@@ -296,7 +296,7 @@ void GameEndState::enterState() {
 
 
 void GameEndState::backOutState() {
-    if( isParent ) {
+    if( isHost ) {
         playingAgain = false;
         
         if( networkOpponent ) {

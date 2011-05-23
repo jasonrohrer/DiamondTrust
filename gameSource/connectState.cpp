@@ -27,7 +27,7 @@ extern Button *childButton;
 extern char *statusMessage;
 extern char *statusSubMessage;
 
-extern char isParent;
+extern char isHost;
 static char sentMessage, gotMessage;
 
 
@@ -92,7 +92,7 @@ void ConnectState::clickState( int inX, int inY ) {
  
     if( ! connecting ) {
         if( parentButton->getPressed( inX, inY ) ) {
-            isParent = true;
+            isHost = true;
             
             acceptConnection();
             char *serverAddress = getLocalAddress();
@@ -124,7 +124,7 @@ void ConnectState::clickState( int inX, int inY ) {
         else if( parentServeCloneDownloaButton != NULL &&
                  parentServeCloneDownloaButton->getPressed( inX, inY ) ) {
             
-            isParent = true;
+            isHost = true;
             
             acceptCloneDownloadRequest();
             
@@ -142,7 +142,7 @@ void ConnectState::clickState( int inX, int inY ) {
             stepsSinceConnectTry = 0;
             }
         else if( childButton->getPressed( inX, inY ) ) {
-            isParent = false;
+            isHost = false;
 
             connectToServer( NULL );
 
@@ -196,7 +196,7 @@ void ConnectState::stepState() {
         
         if( checkConnectionStatus() == 1 ) {
             
-            if( isParent && ! sentMessage ) {
+            if( isHost && ! sentMessage ) {
                 // send inspector's starting region
                 unsigned char message[1];
                 message[0] = 
@@ -213,7 +213,7 @@ void ConnectState::stepState() {
                 // in case it hasn't already
                 titleFade = 0;
                 }
-            else if( !isParent && ! gotMessage ) {
+            else if( !isHost && ! gotMessage ) {
                 
                 unsigned int messageLength;
                 unsigned char *message = getMessage( &messageLength );
@@ -330,7 +330,7 @@ void ConnectState::enterState() {
         statusSubMessage = translate( "phaseSubStatus_parentOrChild" ); 
         }
     
-    isParent = false;
+    isHost = false;
     sentMessage = false;
     gotMessage = false;
 

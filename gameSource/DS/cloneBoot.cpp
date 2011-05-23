@@ -33,11 +33,15 @@ extern unsigned char wmBuffer[ WM_SYSTEM_BUF_SIZE ];
 static unsigned short tgid = 0;
 
 
+extern char isCloneChild;
+
+
 // implements clone booting parts of platform.h
 
 
 char isCloneBootPossible() {
-    return true;
+    // children cannot serve up clone boots (don't have original files)
+    return !isCloneChild;
     }
 
 
@@ -56,7 +60,7 @@ static char cloneBootStarted = false;
 // just send child the entire codebase
 #include <nitro/parent_begin.h>
 
-static char parentDummy = false;
+static char canServeCloneBoot = true;
 
 #include <nitro/parent_end.h>
 
