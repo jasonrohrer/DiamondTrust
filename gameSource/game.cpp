@@ -16,7 +16,7 @@
 #include "colors.h"
 #include "flyingDiamonds.h"
 #include "salePicker.h"
-
+#include "ai/ai.h"
 #include "opponent.h"
 
 
@@ -414,9 +414,9 @@ void gameInit() {
     initButton();
     updateLoadingProgress();
 
-    doneButton = new Button( font16, translate( "button_done" ), 38, 87 );
+    doneButton = new Button( font16, translate( "button_done" ), 38, 111 );
     
-    nextButton = new Button( font16, translate( "button_next" ), 38, 111 );
+    nextButton = new Button( font16, translate( "button_next" ), 38, 87 );
 
     backButton = new Button( font16, translate( "button_back" ), 38, 174 );
 
@@ -665,6 +665,18 @@ static void postMoveUnitsTransition() {
 
 
 
+static void resetToPlayAgain() {
+    resetStats();
+    resetMapDiamondCounts();
+    resetUnits();
+    // all units are home and empty
+    
+    // leave inspector alone
+
+    resetAI();
+    }
+
+
     
 // track whether current state has finished
 static char stateDone = false;
@@ -738,6 +750,8 @@ static void goToNextGameState() {
             // back to menu
             currentGameState = pickGameTypeState;
             }
+
+        resetToPlayAgain();
         }
                 
     currentGameState->enterStateCall();
@@ -760,6 +774,7 @@ static void goToPreviousGameState() {
         currentGameState == gameEndState ) {
 
         // back to title
+        resetToPlayAgain();
         currentGameState = pickGameTypeState;
         }
                 
@@ -945,11 +960,15 @@ void drawTopScreen() {
         // Only show "Finished:" if NEXT button displayed
         // avoids a flicker when auto-advancing to the next state
         if( ( !currentGameState->isStateDone() || 
-              !currentGameState->needsNextButton() ) &&
-            currentGameState != gameEndState ) {
+              !currentGameState->needsNextButton() ) ) {
             
-            headerString = translate( "status_next" );
-            
+            // hide Next label for game end state
+            if( currentGameState != gameEndState ) {
+                headerString = translate( "status_next" );
+                }
+            else {
+                headerString = "";
+                }
             }
         else if( currentGameState->isStateDone() ) {
             // state done

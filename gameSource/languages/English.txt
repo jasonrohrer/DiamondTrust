@@ -61,7 +61,7 @@ phaseStatus_connect  "Connect to opponent"
 phaseSubStatus_parentOrChild  "Host a game or join one started by your friend"
 phaseSubStatus_waitingConnect  "Waiting for a connection"
 phaseSubStatus_waitingConnectOn  "Waiting for a connection on "
-phaseSubStatus_connectingToParent  "Connecting to parent... "
+phaseSubStatus_connectingToParent  "Connecting to host... "
 phaseSubStatus_connectFailed  "Connection failed"
 
 
@@ -121,3 +121,4 @@ phaseStatus_youWin       "You win"
 phaseStatus_opponentWins "You lose"
 phaseStatus_tie "Tie game"
 
+phaseSubStatus_playAgainWait  "Waiting for host to play again..." 

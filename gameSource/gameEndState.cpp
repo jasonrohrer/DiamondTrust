@@ -2,6 +2,7 @@
 #include "Button.h"
 #include "units.h"
 #include "map.h"
+#include "colors.h"
 #include "ai/ai.h"
 #include "common.h"
 #include "gameStats.h"
@@ -11,8 +12,11 @@ static char stateDone = false;
 
 static char playingAgain = false;
 
+static char donePressed = false;
+
 
 extern Button *playAgainButton;
+extern Button *doneButton;
 
 extern char isParent;
 extern char networkOpponent;
@@ -20,6 +24,13 @@ extern char networkOpponent;
 
 extern char *statusMessage;
 extern char *statusSubMessage;
+
+
+extern int satelliteTopSpriteID;
+extern int satelliteBottomSpriteID;
+extern int satelliteBottomHalfOffset;
+extern unsigned char satelliteFade;
+
 
 
 // tells connected child whether we are playing again or not
@@ -72,7 +83,8 @@ class GameEndState : public GameState {
         // back to go back to main menu
         virtual char canStateBeBackedOut() {
             // but only from parent
-            return isParent;
+            // and only after sat image faded back in
+            return isParent && satelliteFade == 255;
             }
         
 
@@ -93,27 +105,27 @@ class GameEndState : public GameState {
 
 
 
-static void resetToPlayAgain() {
-    resetStats();
-    resetMapDiamondCounts();
-    resetUnits();
-    // all units are home and empty
-    
-    // leave inspector alone
 
-    resetAI();
-    }
 
 
 
 
 void GameEndState::clickState( int inX, int inY ) {
     
-    if( isParent && playAgainButton->getPressed( inX, inY ) ) {
+    if( !donePressed ) {
+        if( doneButton->getPressed( inX, inY ) ) {
+            donePressed = true;
+            
+            // no explaination needed for parent because Play Again button
+            // is clear
+            if( !isParent ) {
+                statusSubMessage = translate( "phaseSubStatus_playAgainWait" );
+                }
+            }
+        }
+    else if( isParent && playAgainButton->getPressed( inX, inY ) ) {
 
         playingAgain = true;
-        
-        resetToPlayAgain();
         
         if( networkOpponent ) {
             // playing again
@@ -130,7 +142,24 @@ void GameEndState::clickState( int inX, int inY ) {
 
 
 void GameEndState::stepState() {
-    // no stepping!
+    
+    if( !donePressed ) {
+        // wait for done press on child
+        return;
+        }
+
+    // fade satellite back in after Done
+    if( satelliteFade < 255 ) {
+        
+        if( satelliteFade <= 251 ) {
+            satelliteFade += 4;
+            }
+        else {
+            satelliteFade = 255;
+            }
+        // don't allow other actions yet
+        return;                              
+        }
 
     if( !isParent ) {
 
@@ -172,10 +201,6 @@ void GameEndState::stepState() {
                 }
 
             delete [] message;
-            
-            // going back to menu OR playing again
-            // reset for whatever next game we end up playing
-            resetToPlayAgain();    
 
             stateDone = true;
             }
@@ -191,7 +216,26 @@ void GameEndState::drawState() {
     
     drawUnits();
 
-    if( isParent  ) {
+     startNewSpriteLayer();
+    
+    if( satelliteFade > 0 ) {
+        
+        // draw fading satellite map on top
+        rgbaColor satelliteColor = white;
+        satelliteColor.a = satelliteFade;
+        
+        drawSprite( satelliteTopSpriteID, 
+                    0,0, satelliteColor );
+        drawSprite( satelliteBottomSpriteID, 
+                    0,satelliteBottomHalfOffset, satelliteColor );
+        }
+
+    startNewSpriteLayer();
+
+    if( !donePressed ) {
+        doneButton->draw();
+        }
+    else if( isParent && satelliteFade == 255 && !stateDone ) {
         playAgainButton->draw();
         }
     }
@@ -204,6 +248,8 @@ void GameEndState::enterState() {
     stateDone = false;
     playingAgain = false;
     
+    donePressed = false;
+
     int winner = 0;
     
     if( getPlayerDiamonds( 0 ) > getPlayerDiamonds( 1 ) ) {
@@ -240,8 +286,8 @@ void GameEndState::enterState() {
             break;
         }
     
-    statusSubMessage = "";
-    
+    statusSubMessage = "";    
+
     showUnitMoves( false );
     
     showAllUnitMoves( false );
@@ -251,11 +297,6 @@ void GameEndState::enterState() {
 
 void GameEndState::backOutState() {
     if( isParent ) {
-        // going back to menu
-        // reset for whatever next game we end up playing
-        resetToPlayAgain();    
-
-
         playingAgain = false;
         
         if( networkOpponent ) {
