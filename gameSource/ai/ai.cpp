@@ -367,7 +367,7 @@ void initAI() {
         }
     #endif
 
-    currentState.monthsLeft = 8;
+    currentState.monthsLeft = getMonthsLeft();
     currentState.nextMove = salaryBribe;
 
     currentState.ourMoney = makeRange( 18 );
