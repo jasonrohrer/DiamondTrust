@@ -107,6 +107,13 @@ int touchY = 0;
 
 
 
+void runGameLoopOnce() {
+    // just skip this on SDL, because it loads fast enough that it doesn't
+    // matter!
+    }
+
+
+
 
 int mainFunction( int inNumArgs, char **inArgs ) {
 
@@ -601,7 +608,7 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
     
     *outSize = f.getLength();
     
-    return (unsigned char*) f.readFileContents();
+    return f.readFileContents( outSize, false );
     }
 
 
@@ -868,6 +875,12 @@ char getTouch( int *outX, int *outY ) {
 int netStatus = 0;
 
 
+int getSignalStrength() {
+    // never show signal strength on SDL
+    return -1;
+    }
+
+
 
 char isAutoconnecting() {
     return false;
@@ -955,6 +968,23 @@ void connectToServer( char *inAddress ) {
 int checkConnectionStatus() {
     return netStatus;
     }
+
+
+
+void closeConnection() {
+    if( server != NULL ) {
+        delete server;
+        server = NULL;
+        }
+    if( connectionSock != NULL ) {
+        delete connectionSock;
+        connectionSock = NULL;
+        }
+    netStatus = 0;
+    }
+
+
+
 
 
 #include "DataFifo.h"
