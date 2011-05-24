@@ -29,6 +29,32 @@ int main( int inArgCount, char **inArgs ) {
 #include "minorGems/util/stringUtils.h"
 
 
+
+static char *screenShotPrefix = "screen";
+
+static void takeScreenShot();
+
+static char shouldTakeScreenshot = false;
+
+
+
+#ifdef USE_JPEG
+    #include "minorGems/graphics/converters/JPEGImageConverter.h"
+    static JPEGImageConverter screenShotConverter( 90 );
+    static const char *screenShotExtension = "jpg";
+#elif defined(USE_PNG)
+    #include "minorGems/graphics/converters/PNGImageConverter.h"
+    static PNGImageConverter screenShotConverter;
+    static const char *screenShotExtension = "png";
+#else
+    #include "minorGems/graphics/converters/TGAImageConverter.h"
+    static TGAImageConverter screenShotConverter;
+    static const char *screenShotExtension = "tga";
+#endif
+
+
+
+
 // callbacks, originally for GLUT, called by our SDL main loop below
 void callbackMotion( int inX, int inY );
 // ignore passive motion
@@ -419,6 +445,13 @@ void callbackDisplay() {
         
     glDrawArrays( GL_LINES, 0, 2 );
 
+    
+    if( shouldTakeScreenshot ) {
+        takeScreenShot();
+        shouldTakeScreenshot = false;
+        }
+    
+
     SDL_GL_SwapBuffers();
 	}
 
@@ -458,6 +491,10 @@ void callbackKeyboard( unsigned char inKey, int inX, int inY ) {
     // q or escape
     if( inKey == 'q' || inKey == 'Q' || inKey == 27 ) {
         exit( 0 );
+        }
+    
+    if( inKey == '=' ) {
+        shouldTakeScreenshot = true;
         }
     
 
@@ -844,6 +881,151 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 void startNewSpriteLayer() {
     // no layering necessary in SDL version
     }
+
+
+
+
+
+
+
+
+
+
+
+
+static int nextShotNumber = -1;
+static char shotDirExists = false;
+
+
+void takeScreenShot() {
+     
+    
+    File shotDir( NULL, "screenShots" );
+    
+    if( !shotDirExists && !shotDir.exists() ) {
+        shotDir.makeDirectory();
+        shotDirExists = shotDir.exists();
+        }
+    
+    if( nextShotNumber < 1 ) {
+        if( shotDir.exists() && shotDir.isDirectory() ) {
+        
+            int numFiles;
+            File **childFiles = shotDir.getChildFiles( &numFiles );
+
+            nextShotNumber = 1;
+
+            char *formatString = autoSprintf( "%s%%d.%s", screenShotPrefix,
+                                              screenShotExtension );
+
+            for( int i=0; i<numFiles; i++ ) {
+            
+                char *name = childFiles[i]->getFileName();
+                
+                int number;
+                
+                int numRead = sscanf( name, formatString, &number );
+                
+                if( numRead == 1 ) {
+                    
+                    if( number >= nextShotNumber ) {
+                        nextShotNumber = number + 1;
+                        }
+                    }
+                delete [] name;
+                
+                delete childFiles[i];
+                }
+            
+            delete [] formatString;
+            
+            delete [] childFiles;
+            }
+        }
+    
+
+    if( nextShotNumber < 1 ) {
+        return;
+        }
+    
+    char *fileName = autoSprintf( "%s%05d.%s", 
+                                  screenShotPrefix, nextShotNumber,
+                                  screenShotExtension );
+
+    
+
+    File *file = shotDir.getChildFile( fileName );
+    
+    delete [] fileName;
+
+
+    int numBytes = w * h * 3;
+    
+    unsigned char *rgbBytes = 
+        new unsigned char[ numBytes ];
+
+    // w and h might not be multiples of 4
+    GLint oldAlignment;
+    glGetIntegerv( GL_PACK_ALIGNMENT, &oldAlignment );
+                
+    glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+    
+    glReadPixels( 0, 0, w, h, 
+                  GL_RGB, GL_UNSIGNED_BYTE, rgbBytes );
+    
+    glPixelStorei( GL_PACK_ALIGNMENT, oldAlignment );
+
+    nextShotNumber++;
+    
+    
+
+    Image screenImage( w, h, 3, false );
+
+    double *channels[3];
+    int c;
+    for( c=0; c<3; c++ ) {
+        channels[c] = screenImage.getChannel( c );
+        }
+    
+    // image of screen is upside down
+    int outputRow = 0;
+    for( int y=h-1; y>=0; y-- ) {
+        for( int x=0; x<w; x++ ) {
+                        
+            int outputPixelIndex = outputRow * w + x;
+            
+            
+            int screenPixelIndex = y * w + x;
+            int byteIndex = screenPixelIndex * 3;
+                        
+            for( c=0; c<3; c++ ) {
+                channels[c][outputPixelIndex] =
+                    rgbBytes[ byteIndex + c ] / 255.0;
+                }
+            }
+        outputRow++;
+        }
+    
+    delete [] rgbBytes;
+
+
+    FileOutputStream tgaStream( file );
+    
+    screenShotConverter.formatImage( &screenImage, &tgaStream );
+
+    delete file;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

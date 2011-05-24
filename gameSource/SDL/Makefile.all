@@ -59,7 +59,7 @@ NEEDED_MINOR_GEMS_OBJECTS = \
  ${SHA1_O} \
  ${ENCODING_UTILS_O} \
  ${JRI_O} \
-
+ ${DIRECTORY_O} \
  
 
 
