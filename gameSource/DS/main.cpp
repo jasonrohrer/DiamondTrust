@@ -1543,8 +1543,14 @@ static void wmStartConnectCallback( void *inArg ) {
         printOut( "Error returned to wmStartConnectCallback: %d\n",
                   callbackArg->errcode );
 
-        printOut( "Trying to reset\n" );
-        WM_Reset( wmResetCallback );
+        if( !wmShouldStop ) {
+            printOut( "Trying to reset\n" );
+            WM_Reset( wmResetCallback );
+            }
+        else {
+            printOut( "Should stop anyway, resetting to end\n" );
+            WM_Reset( wmResetToEndCallback );
+            }
         }
     else {
         switch( callbackArg->state ) {
@@ -1565,18 +1571,23 @@ static void wmStartConnectCallback( void *inArg ) {
                 break;
                 
             case WM_STATECODE_DISCONNECTED:
-                
-                printOut( "Disconnected in wmStartConnect\n" );
-                
-                printOut( "Trying to connect again\n" );
-                
-                printOut( "Resetting connection\n" );
-                
                 // flag MP as not running here
                 mpRunning = false;
                 
-                WM_Reset( wmResetCallback );
+                printOut( "Disconnected in wmStartConnect\n" );
                 
+                if( !wmShouldStop ) {
+                    printOut( "Trying to connect again\n" );
+                
+                    printOut( "Resetting connection\n" );
+                    
+                    WM_Reset( wmResetCallback );
+                    }
+                else {
+                    printOut( "Should stop anyway, resetting to end\n" );
+                    WM_Reset( wmResetToEndCallback );
+                    }
+
                 //__callback(CHILD_DISCONNECTED, 0);
                 
                 break;
@@ -2065,7 +2076,7 @@ void closeConnection() {
     // Or maybe WM_Reset will do the trick.... takes us to IDLE, from
     // which we can call the generic WM_End right away.
 
-    printOut( "Trying to reset\n" );
+    printOut( "Trying to reset to end\n" );
     WMErrCode result = WM_Reset( wmResetToEndCallback );
     if( result != WM_ERRCODE_OPERATING ) {
         printOut( "Error code on reset = %d\n", result );
