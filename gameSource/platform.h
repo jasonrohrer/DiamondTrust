@@ -179,6 +179,9 @@ char isAutoconnecting();
 // the parent side, sent over the connection to the child)
 char isCloneBootPossible();
 
+char shouldShowDSWiFiIcons();
+
+
 
 // starts a parent server that waits for a connection and then serve
 // a clone boot executable over that connection

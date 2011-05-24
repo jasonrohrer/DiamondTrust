@@ -2005,6 +2005,13 @@ char isAutoconnecting() {
     }
 
 
+
+char shouldShowDSWiFiIcons() {
+    return true;
+    }
+
+
+
 char *getLocalAddress() {
     return NULL;
     }

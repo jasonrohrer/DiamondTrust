@@ -887,6 +887,11 @@ char isAutoconnecting() {
     }
 
 
+char shouldShowDSWiFiIcons() {
+    return false;
+    }
+
+
 
 #include "minorGems/network/HostAddress.h"
 

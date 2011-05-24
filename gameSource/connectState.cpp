@@ -292,7 +292,7 @@ void ConnectState::drawState() {
     
     if( !connecting ) {
 
-        char showIcon = isCloneBootPossible();
+        char showIcon = shouldShowDSWiFiIcons();
         
         parentButton->draw();
 
