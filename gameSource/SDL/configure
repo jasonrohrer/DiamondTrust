@@ -32,12 +32,12 @@ do
 
     # use ASCII comparison.
 
-	if [[ "$platformSelection" > "3" ]]
+	if [ "$platformSelection" -gt "3" ]
     then
         platformSelection=""
     fi
 
-    if [[ "$platformSelection" < "1" ]]
+    if [ "$platformSelection" -lt "1" ]
     then
         platformSelection=""
     fi
