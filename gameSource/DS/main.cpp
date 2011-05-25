@@ -1349,6 +1349,8 @@ static void startMP() {
     }
 
 
+static void wmResetToEndCallback( void *inArg );
+
 
 
 static void wmStartParentCallback( void *inArg ) {
@@ -1389,9 +1391,10 @@ static void wmStartParentCallback( void *inArg ) {
                 //parent_load_status();
                     
                 if( mpRunning ) {
-                    printOut( "Waiting for child to connect again\n" );
+                    printOut( "Shutting down network\n" );
                     mpRunning = false;
-                    WM_EndMP( wmEndMPCallback );
+                    wmStatus = -1;
+                    WM_Reset( wmResetToEndCallback );
                     }
                 
                 return;

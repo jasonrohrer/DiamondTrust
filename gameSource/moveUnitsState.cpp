@@ -511,7 +511,7 @@ void MoveUnitsState::stepState() {
     stepsSinceExecute ++;
     
     if( sentInitialMove && !gotInitialMove && stepsSinceSentMove > minSteps ) {
-        if( checkConnectionStatus() == -1 ) {
+        if( checkConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;
@@ -557,7 +557,7 @@ void MoveUnitsState::stepState() {
 
     if( sentMove && !gotMove && stepsSinceSentMove > minSteps ) {
         
-        if( checkConnectionStatus() == -1 ) {
+        if( checkConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;

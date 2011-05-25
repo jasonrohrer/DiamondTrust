@@ -134,7 +134,7 @@ void MoveInspectorState::stepState() {
     
     if( waiting && !gotMove && stepsWaiting > minSteps ) {
         
-        if( checkConnectionStatus() == -1 ) {
+        if( checkConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;

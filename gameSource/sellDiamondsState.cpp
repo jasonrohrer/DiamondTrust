@@ -530,7 +530,7 @@ void SellDiamondsState::stepState() {
 
 
     if( sentInitialMove && !gotInitialMove && stepsSinceSentMove > minSteps ) {
-        if( checkConnectionStatus() == -1 ) {
+        if( checkConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;
@@ -558,7 +558,7 @@ void SellDiamondsState::stepState() {
     if( gotInitialMove && sentMove && !gotMove && 
         stepsSinceSentMove > minSteps ) {
         
-        if( checkConnectionStatus() == -1 ) {
+        if( checkConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;

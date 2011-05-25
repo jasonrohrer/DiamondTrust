@@ -977,7 +977,7 @@ void drawTopScreen() {
             
             // hide Next label for game end state
             if( currentGameState != gameEndState && 
-                currentGameState != connectionBrokenState) {
+                currentGameState != connectionBrokenState ) {
                 
                 headerString = translate( "status_next" );
                 }
