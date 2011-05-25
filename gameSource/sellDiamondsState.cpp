@@ -718,7 +718,7 @@ void SellDiamondsState::drawState() {
         
         
         if( pickingSale ) {
-            drawSalePicker( 24, 137 );
+            drawSalePicker( 24, 161 );
             }    
         }
     
