@@ -15,6 +15,7 @@
 
 //static int activeUnit = -1;
 static char stateDone = false;
+static char connectionBroken = false;
 static char sentInitialMove = false;
 static char gotInitialMove = false;
 static char sentMove = false;
@@ -91,7 +92,9 @@ class SellDiamondsState : public GameState {
             return stateDone;
             }
         
-        
+        virtual char isConnectionBroken() {
+            return connectionBroken;
+            }
 
         // destructor?
         //virtual ~GameState();
@@ -528,8 +531,7 @@ void SellDiamondsState::stepState() {
 
     if( sentInitialMove && !gotInitialMove && stepsSinceSentMove > minSteps ) {
         if( checkConnectionStatus() == -1 ) {
-            statusSubMessage = 
-                translate( "phaseSubStatus_connectFailed" );
+            connectionBroken = true;
             stateDone = true;
             return;
             }
@@ -557,8 +559,7 @@ void SellDiamondsState::stepState() {
         stepsSinceSentMove > minSteps ) {
         
         if( checkConnectionStatus() == -1 ) {
-            statusSubMessage = 
-                translate( "phaseSubStatus_connectFailed" );
+            connectionBroken = true;
             stateDone = true;
             return;
             }

@@ -65,6 +65,9 @@ phaseSubStatus_connectingToParent  "Connecting to host... "
 phaseSubStatus_connectFailed  "Connection failed"
 
 
+phaseStatus_connectionFailed  "Connection failed"
+
+
 phaseStatus_accumulate  "Diamonds accumulate"
 phaseSubStatus_accumulate  "New month, regions produce more diamonds"
 

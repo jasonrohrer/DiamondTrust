@@ -9,6 +9,7 @@
 
 //static int activeUnit = -1;
 static char stateDone = false;
+static char connectionBroken = true;
 static char moving = false;
 static char waiting = false;
 static char sentMove = false;
@@ -46,7 +47,10 @@ class MoveInspectorState : public GameState {
             return stateDone;
             }
         
-        
+        virtual char isConnectionBroken() {
+            return connectionBroken;
+            }
+
 
         // destructor?
         //virtual ~GameState();
@@ -131,8 +135,7 @@ void MoveInspectorState::stepState() {
     if( waiting && !gotMove && stepsWaiting > minSteps ) {
         
         if( checkConnectionStatus() == -1 ) {
-            statusSubMessage = 
-                translate( "phaseSubStatus_connectFailed" );
+            connectionBroken = true;
             stateDone = true;
             return;
             }

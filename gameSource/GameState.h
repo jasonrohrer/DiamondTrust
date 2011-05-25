@@ -54,6 +54,14 @@ class GameState {
             }
         
 
+        // for states that can fail due to broken connections
+        virtual char isConnectionBroken() {
+            // default implementation for states that don't depend on
+            // connections
+            return false;
+            }
+        
+
 
         virtual ~GameState() {};
 

@@ -111,6 +111,7 @@ extern GameState *buyDiamondsState;
 extern GameState *sellDiamondsState;
 extern GameState *flyHomeState;
 extern GameState *gameEndState;
+extern GameState *connectionBrokenState;
 
 
 Button *doneButton;
@@ -689,7 +690,13 @@ int lastTouchX, lastTouchY;
 
 static void goToNextGameState() {
     // state transition
-    if( currentGameState == pickGameTypeState ) {
+
+    // special case if connection ever broken:
+    // go right to connectionBrokenState from ANY state
+    if( currentGameState->isConnectionBroken() ) {
+        currentGameState = connectionBrokenState;
+        }
+    else if( currentGameState == pickGameTypeState ) {
 
         if( networkOpponent ) {    
             currentGameState = connectState;
@@ -753,6 +760,12 @@ static void goToNextGameState() {
 
         resetToPlayAgain();
         }
+    else if( currentGameState == connectionBrokenState ) {
+        // back to menu
+        currentGameState = pickGameTypeState;
+        resetToPlayAgain();
+        }
+
                 
     currentGameState->enterStateCall();
     }
@@ -963,7 +976,9 @@ void drawTopScreen() {
               !currentGameState->needsNextButton() ) ) {
             
             // hide Next label for game end state
-            if( currentGameState != gameEndState ) {
+            if( currentGameState != gameEndState && 
+                currentGameState != connectionBrokenState) {
+                
                 headerString = translate( "status_next" );
                 }
             else {

@@ -14,6 +14,7 @@ TranslationManager.cpp \
 pickGameTypeState.cpp \
 setAILevelState.cpp \
 connectState.cpp \
+connectionBrokenState.cpp \
 accumulateDiamondsState.cpp \
 salaryBribeState.cpp \
 moveUnitsState.cpp \
