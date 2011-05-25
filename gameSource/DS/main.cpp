@@ -1391,11 +1391,12 @@ static void wmStartParentCallback( void *inArg ) {
                 //parent_load_status();
                     
                 if( mpRunning ) {
-                    printOut( "Shutting down network\n" );
                     mpRunning = false;
-                    wmStatus = -1;
-                    WM_Reset( wmResetToEndCallback );
                     }
+                printOut( "Shutting down network\n" );
+
+                wmStatus = -1;
+                WM_Reset( wmResetToEndCallback );
                 
                 return;
                     
@@ -1579,6 +1580,13 @@ static void wmStartConnectCallback( void *inArg ) {
                 
                 printOut( "Disconnected in wmStartConnect\n" );
                 
+                printOut( "Shutting down network\n" );
+
+                wmStatus = -1;
+                WM_Reset( wmResetToEndCallback );
+
+
+                /*
                 if( !wmShouldStop ) {
                     printOut( "Trying to connect again\n" );
                 
@@ -1590,7 +1598,7 @@ static void wmStartConnectCallback( void *inArg ) {
                     printOut( "Should stop anyway, resetting to end\n" );
                     WM_Reset( wmResetToEndCallback );
                     }
-
+                */
                 //__callback(CHILD_DISCONNECTED, 0);
                 
                 break;

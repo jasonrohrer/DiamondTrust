@@ -3,6 +3,7 @@
 #include "colors.h"
 #include "map.h"
 #include "units.h"
+#include "gameStats.h"
 #include "common.h"
 
 //static int activeUnit = -1;
@@ -128,8 +129,14 @@ void ConnectionBrokenState::enterState() {
         
     statusSubMessage = "";    
 
-    showUnitMoves( false );
+
+    // reset various displays on disconnect
+    showSale( false );
     
+    setActiveUnit( -1 );
+
+    showUnitMoves( false );
+
     showAllUnitMoves( false );
     }
 

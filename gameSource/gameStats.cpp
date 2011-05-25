@@ -314,9 +314,9 @@ void resetStats() {
     // show opponent's money at start of game
     setOpponentMoneyUnknown( false );
     
-    //setMonthsLeft( 8 );
+    setMonthsLeft( 8 );
     // for testing
-    setMonthsLeft( 0 );
+    //setMonthsLeft( 0 );
     }
 
 
