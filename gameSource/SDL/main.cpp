@@ -634,6 +634,18 @@ char mapSDLKeyToASCII( int inSDLKey ) {
 #include "minorGems/io/file/Path.h"
 
 unsigned char *readFile( char *inFileName, int *outSize ) {
+    /*
+     // check if data for this file is inline-included
+    unsigned char *inlinedData = readIncludedFile( inFileName, outSize );
+    
+    if( inlinedData != NULL ) {
+        return inlinedData;
+        }
+        
+    // else try other methods of reading file data
+    */
+
+
     // files are inside gameData directory
 
 
@@ -1189,7 +1201,7 @@ unsigned int nextIncomingBytesRecievedSoFar = 0;
 void sendMessage( unsigned char *inMessage, unsigned int inLength,
                   unsigned char inChannel ) {
     
-    if( wmStatus != 1 ) {
+    if( netStatus != 1 ) {
         printOut( "sendMessage called when network not running.  "
                   "Discarding message\n" );
         return;
