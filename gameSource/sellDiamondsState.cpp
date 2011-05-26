@@ -731,6 +731,8 @@ void SellDiamondsState::drawState() {
 
 void SellDiamondsState::enterState() {
     stateDone = false;
+    connectionBroken = false;
+    
     sentInitialMove = false;
     gotInitialMove = false;
     sentMove = false;

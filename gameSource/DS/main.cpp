@@ -1117,6 +1117,15 @@ static unsigned char *sendBuffer = NULL;
 static unsigned char *receiveBuffer = NULL;
 
 
+#include "DataFifo.h"
+
+
+DataFifo sendFifo;
+DataFifo receiveFifo;
+
+char sendPending = false;
+
+
 
 static void wmEndCallback( void *inArg ) {
     WMCallback *callbackArg = (WMCallback *)inArg;
@@ -1136,6 +1145,10 @@ static void wmEndCallback( void *inArg ) {
             delete [] receiveBuffer;
             receiveBuffer = NULL;
             }
+
+        sendFifo.clearData();
+        receiveFifo.clearData();
+        sendPending = false;
         }
 
     // first connection (in case of child) is over
@@ -1187,13 +1200,6 @@ static void wmEndMPCallback( void *inArg ) {
 
 
 
-#include "DataFifo.h"
-
-
-DataFifo sendFifo;
-DataFifo receiveFifo;
-
-char sendPending = false;
 
 
 
@@ -2097,6 +2103,13 @@ void closeConnection() {
 
 static void sendMessage( unsigned char *inMessage, unsigned int inLength,
                          unsigned char inChannel, char inLastMessageFlag ) {
+
+    if( wmStatus != 1 ) {
+        printOut( "sendMessage called when WM network not running.  "
+                  "Discarding message\n" );
+        return;
+        }
+    
     printOut( "Putting message of %d bytes onto send fifo, "
               "channel %d\n", inLength, inChannel );
     

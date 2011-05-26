@@ -664,6 +664,8 @@ void MoveUnitsState::drawState() {
 
 void MoveUnitsState::enterState() {
     stateDone = false;
+    connectionBroken = false;
+    
     sentInitialMove = false;
     gotInitialMove = false;
     sentMove = false;

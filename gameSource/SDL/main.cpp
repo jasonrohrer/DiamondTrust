@@ -1188,6 +1188,14 @@ unsigned int nextIncomingBytesRecievedSoFar = 0;
 
 void sendMessage( unsigned char *inMessage, unsigned int inLength,
                   unsigned char inChannel ) {
+    
+    if( wmStatus != 1 ) {
+        printOut( "sendMessage called when network not running.  "
+                  "Discarding message\n" );
+        return;
+        }
+
+    
     sendFifo.addData( inMessage, inLength, inChannel );
     }
 

@@ -133,11 +133,17 @@ void ConnectionBrokenState::enterState() {
     // reset various displays on disconnect
     showSale( false );
     
+    showInspectorPanel( false );
+    
     setActiveUnit( -1 );
 
     showUnitMoves( false );
 
     showAllUnitMoves( false );
+    
+    setAllUnitsNotSelectable();
+
+    setAllRegionsNotSelectable();
     }
 
 

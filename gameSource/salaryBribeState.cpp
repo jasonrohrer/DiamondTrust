@@ -454,6 +454,8 @@ void SalaryBribeState::drawState() {
 
 void SalaryBribeState::enterState() {
     stateDone = false;
+    connectionBroken = false;
+    
     sentMove = false;
     gotMove = false;
     

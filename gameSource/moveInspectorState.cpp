@@ -213,7 +213,8 @@ void MoveInspectorState::drawState() {
 
 void MoveInspectorState::enterState() {
     stateDone = false;
-
+    connectionBroken = false;
+    
     statusMessage = translate( "phaseStatus_moveInspector" );
             
     moving = false;
