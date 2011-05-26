@@ -633,8 +633,10 @@ char mapSDLKeyToASCII( int inSDLKey ) {
 #include "minorGems/io/file/File.h"
 #include "minorGems/io/file/Path.h"
 
+#include "../dataFiles.cpp"
+
 unsigned char *readFile( char *inFileName, int *outSize ) {
-    /*
+    
      // check if data for this file is inline-included
     unsigned char *inlinedData = readIncludedFile( inFileName, outSize );
     
@@ -643,7 +645,7 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
         }
         
     // else try other methods of reading file data
-    */
+    
 
 
     // files are inside gameData directory

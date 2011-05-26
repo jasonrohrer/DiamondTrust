@@ -129,6 +129,31 @@ print OUTFILE "};\n\n\n";
 
 
 
+# print some inlined C code to define the readIncludedFile utility function
+print OUTFILE <<END_OF_FUNCTION;
+
+unsigned char *readIncludedFile( char *inFileName, int *outSize ) {
+    for( int f=0; f<numIncludedDataFiles; f++ ) {
+        
+        if( strcmp( includedDataFileNames[f], inFileName ) == 0 ) {
+            // hit
+            int length = includedDataArrayLengths[ f ];
+            unsigned char *data = new unsigned char[ length ];
+            memcpy( data, includedDataArrays[ f ], (unsigned long)length );
+            
+            *outSize = length;
+            return data;
+            }
+        }
+    // no match
+    return NULL;    
+    }
+
+
+END_OF_FUNCTION
+
+
+
 
 
 ##
