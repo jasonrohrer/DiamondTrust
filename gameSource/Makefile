@@ -47,6 +47,11 @@ signal3.tga \
 wirelessOn.tga \
 
 
+LANGUAGE_FILES_SOURCE = $(wildcard languages/*.txt)
+# language file names without paths
+LANGUAGE_FILES = $(subst languages/,,$(LANGUAGE_FILES_SOURCE))
+
+
 
 # these are needed by a Clone Boot child before a connection is even 
 # established
@@ -60,7 +65,9 @@ signal0.tga \
 signal1.tga \
 signal2.tga \
 signal3.tga \
-English.txt \
+${LANGUAGE_FILES} \
+
+
 
 
 # not ideal!
@@ -103,13 +110,18 @@ PATH_FILES_TO_COMPILE_IN = $(patsubst %,gameData/%,$(FILES_TO_COMPILE_IN))
 JRI_FILES_TO_COMPILE_IN = ${PATH_FILES_TO_COMPILE_IN:.tga=.jri}
 
 
+# just the JRI files that are NON compiled in
+NON_COMPILED_IN_JRI_FILES = \
+$(filter-out $(JRI_FILES_TO_COMPILE_IN), $(JRI_GAME_GRAPHICS))
+
 
 JRI_CONVERTER_DIR = ../../minorGems/graphics/formats/jri/
 JRI_CONVERTER = ${JRI_CONVERTER_DIR}tgaToJri
 
 
-all: ${JRI_CONVERTER} gameData ${JRI_GAME_GRAPHICS} dataFiles.cpp
-	cp languages/*.txt gameData
+
+
+all: ${JRI_CONVERTER} gameData ${NON_COMPILED_IN_JRI_FILES} dataFiles.cpp
 
 
 gameData:
@@ -162,3 +174,18 @@ graphics/%_rotated.png: graphics/%.png
 
 dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN}
 	./compileFilesIn.pl dataFiles.cpp ${JRI_FILES_TO_COMPILE_IN}
+#	rm ${JRI_FILES_TO_COMPILE_IN}
+
+
+
+
+# 
+# Generic:
+#
+# Map all language files into gameData dir files
+#
+# $@   represents the gameData file
+# $<   represents the languages file
+#
+gameData/%.txt: languages/%.txt
+	cp $< $@
