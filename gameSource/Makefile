@@ -47,6 +47,22 @@ signal3.tga \
 wirelessOn.tga \
 
 
+
+# these are needed by a Clone Boot child before a connection is even 
+# established
+# So, we must compile them into the binary image as code.
+# Then, we can delete the files themselves from the gameData directory
+FILES_TO_COMPILE_IN = \
+font8.tga \
+font16_sans.tga \
+satPhone.tga \
+signal0.tga \
+signal1.tga \
+signal2.tga \
+signal3.tga \
+English.txt \
+
+
 # not ideal!
 #playerPictures.tga \
 #enemyPictures.tga \
@@ -80,11 +96,19 @@ PATH_GAME_GRAPHICS = $(patsubst %,gameData/%,$(GAME_GRAPHICS))
 
 JRI_GAME_GRAPHICS = ${PATH_GAME_GRAPHICS:.tga=.jri}
 
+
+# add path
+PATH_FILES_TO_COMPILE_IN = $(patsubst %,gameData/%,$(FILES_TO_COMPILE_IN))
+# change to JRI files instead of TGA versions
+JRI_FILES_TO_COMPILE_IN = ${PATH_FILES_TO_COMPILE_IN:.tga=.jri}
+
+
+
 JRI_CONVERTER_DIR = ../../minorGems/graphics/formats/jri/
 JRI_CONVERTER = ${JRI_CONVERTER_DIR}tgaToJri
 
 
-all: ${JRI_CONVERTER} gameData ${JRI_GAME_GRAPHICS}
+all: ${JRI_CONVERTER} gameData ${JRI_GAME_GRAPHICS} dataFiles.cpp
 	cp languages/*.txt gameData
 
 
@@ -132,3 +156,9 @@ gameData/%.jri: gameData/%.tga
 
 graphics/%_rotated.png: graphics/%.png
 	graphics/rotateAndSizeSprite.sh $< $@
+
+
+
+
+dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN}
+	./compileFilesIn.pl dataFiles.cpp ${JRI_FILES_TO_COMPILE_IN}
