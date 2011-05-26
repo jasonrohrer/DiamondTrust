@@ -74,7 +74,21 @@ void stepNetwork();
 char isCloneChild = false;
 
 
+#include "../dataFiles.cpp"
+
 unsigned char *readFile( char *inFileName, int *outSize ) {
+
+    // check if data for this file is inline-included
+    unsigned char *inlinedData = readIncludedFile( inFileName, outSize );
+    
+    if( inlinedData != NULL ) {
+        return inlinedData;
+        }
+        
+    // else try other methods of reading file data
+
+
+
     if( isCloneChild ) {
         // no local file system, send requests for files to parent
 

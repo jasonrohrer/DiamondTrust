@@ -20,7 +20,10 @@ $numFiles = $#ARGV;
 open( OUTFILE, ">$outFileName" ) or die;
 
 @dataArrayNames = ();
+@dataArrayLengths = ();
 
+
+print OUTFILE "const int numIncludedDataFiles = $numFiles;\n\n";
 
 
 print OUTFILE "const char *includedDataFileNames[$numFiles] = {\n";
@@ -46,6 +49,9 @@ print OUTFILE "};\n\n\n";
 
 
 
+
+
+
 print OUTFILE "// one array per file, with all data as hex\n\n";
 
 for( $i=0; $i<$numFiles; $i++ ) {
@@ -59,6 +65,8 @@ for( $i=0; $i<$numFiles; $i++ ) {
 	$fileData = readBinaryFile( $fileName );
 
 	$fileLength = length( $fileData );
+
+	push( @dataArrayLengths, $fileLength );
 
 
 	$dataArrayName = $dataArrayNames[$i];
@@ -94,6 +102,23 @@ for( $i=0; $i<$numFiles; $i++ ) {
 	$dataArrayName = $dataArrayNames[$i];
 	
 	print OUTFILE "$dataArrayName";
+
+	if( $i < $numFiles - 1 ) {
+		print OUTFILE ",";
+	}
+	print OUTFILE "\n";
+}
+print OUTFILE "};\n\n\n";
+
+
+
+print OUTFILE "const int includedDataArrayLengths[$numFiles] = {\n";
+
+for( $i=0; $i<$numFiles; $i++ ) {
+	
+	$dataArrayLength = $dataArrayLengths[$i];
+	
+	print OUTFILE "$dataArrayLength";
 
 	if( $i < $numFiles - 1 ) {
 		print OUTFILE ",";
