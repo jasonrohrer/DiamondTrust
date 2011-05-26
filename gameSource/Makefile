@@ -170,6 +170,10 @@ graphics/%_rotated.png: graphics/%.png
 	graphics/rotateAndSizeSprite.sh $< $@
 
 
+# don't rebuild these every time, unless needed
+# this special target is described here: 
+# http://www.gnu.org/s/hello/manual/make/Chained-Rules.html
+.INTERMEDIATE: ${JRI_FILES_TO_COMPILE_IN} 
 
 
 dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN} compileFilesIn.pl
