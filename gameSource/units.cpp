@@ -460,15 +460,6 @@ void initUnits() {
 
     // all player units start at home
 
-    // player
-    gameUnit[ 0 ].mRegion = 0;
-    gameUnit[ 1 ].mRegion = 0;
-    gameUnit[ 2 ].mRegion = 0;
-
-    // enemy
-    gameUnit[ 3 ].mRegion = 1;
-    gameUnit[ 4 ].mRegion = 1;
-    gameUnit[ 5 ].mRegion = 1;
 
     for( i=0; i<6; i++ ) {
         gameUnit[ i ].mSpriteID = unitSpriteIDs[ i ];
@@ -478,7 +469,7 @@ void initUnits() {
             }
         }
     
-    resetUnits();
+    
 
     // inspector 
     // start in random producing region
@@ -492,19 +483,9 @@ void initUnits() {
         gameUnit[ 6 ].mArmSpriteID[a] = unitArmSpriteIDs[6][a];
         }
 
+    resetUnits();
 
 
-
-    // destinations -- nowhere
-    // bids -- none
-    for( i=0; i<numUnits; i++ ) {
-        gameUnit[ i ].mDest = gameUnit[ i ].mRegion;
-        gameUnit[ i ].mBid = 0;
-        gameUnit[ i ].mExecutionStep = 0;
-
-        gameUnit[ i ].mNumDiamondsHeld = 0;
-        gameUnit[ i ].mTripCost = 0;
-        }
     
 
     activeUnitSprite = loadSprite( "activeUnitHalo.tga", true );
@@ -591,7 +572,19 @@ void initUnits() {
 
 void resetUnits() {
     
-    for( int i=0; i<6; i++ ) {
+    // player
+    gameUnit[ 0 ].mRegion = 0;
+    gameUnit[ 1 ].mRegion = 0;
+    gameUnit[ 2 ].mRegion = 0;
+
+    // enemy
+    gameUnit[ 3 ].mRegion = 1;
+    gameUnit[ 4 ].mRegion = 1;
+    gameUnit[ 5 ].mRegion = 1;
+
+    int i;
+    
+    for( i=0; i<6; i++ ) {
         gameUnit[ i ].mTotalSalary = 0;
         gameUnit[ i ].mLastSalaryPayment = 0;
 
@@ -600,6 +593,17 @@ void resetUnits() {
         gameUnit[ i ].mLastBribingUnit = -1;
 
         gameUnit[ i ].mEnemyContactSinceBribeHidden = false;
+        }
+
+    // destinations -- nowhere
+    // bids -- none
+    for( i=0; i<numUnits; i++ ) {
+        gameUnit[ i ].mDest = gameUnit[ i ].mRegion;
+        gameUnit[ i ].mBid = 0;
+        gameUnit[ i ].mExecutionStep = 0;
+
+        gameUnit[ i ].mNumDiamondsHeld = 0;
+        gameUnit[ i ].mTripCost = 0;
         }
     }
 
