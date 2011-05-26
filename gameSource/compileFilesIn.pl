@@ -64,7 +64,7 @@ for( $i=0; $i<$numFiles; $i++ ) {
 	$dataArrayName = $dataArrayNames[$i];
 
 	print OUTFILE "// for data file $fileNameShort :\n";
-	print OUTFILE "const unsigned char *$dataArrayName\[$fileLength\] = {\n";
+	print OUTFILE "const unsigned char $dataArrayName\[$fileLength\] = {\n";
 
 
 	$byteNumber = 0;
@@ -87,7 +87,7 @@ for( $i=0; $i<$numFiles; $i++ ) {
 
 
 
-print OUTFILE "const unsigned char **includedDataArrays[$numFiles] = {\n";
+print OUTFILE "const unsigned char *includedDataArrays[$numFiles] = {\n";
 
 for( $i=0; $i<$numFiles; $i++ ) {
 	

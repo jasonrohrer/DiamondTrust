@@ -172,7 +172,7 @@ graphics/%_rotated.png: graphics/%.png
 
 
 
-dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN}
+dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN} compileFilesIn.pl
 	./compileFilesIn.pl dataFiles.cpp ${JRI_FILES_TO_COMPILE_IN}
 #	rm ${JRI_FILES_TO_COMPILE_IN}
 
