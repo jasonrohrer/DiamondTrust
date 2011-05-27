@@ -189,6 +189,18 @@ char shouldShowDSWiFiIcons();
 // to wait for the clone child to auto-connect 
 void acceptCloneDownloadRequest();
 
+// -1 = error
+// 1 = waiting for initial connection
+// 2 = serving download to a child
+// 3 = waiting for reconnection
+int getCloneHostState();
+
+// gets the child's username as \0-terminated ASCII
+// only works from state 2
+const char *getCloneChildUserName();
+
+
+
 // for clone parent, cancels the clone hosting process completely
 // (kicks a downloading child, etc).
 // This will also cancel the "acceptConnection" process if download has

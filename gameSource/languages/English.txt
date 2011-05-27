@@ -65,6 +65,13 @@ phaseSubStatus_connectingToParent  "Connecting to host... "
 phaseSubStatus_connectFailed  "Connection failed"
 
 
+phaseSubStatus_sendingDownload "Transefering download to "
+phaseSubStatus_waitingReconnect "Waiting for child to reconnect"
+
+phaseSubStatus_waitAgainAfterFailedTransfer "Transfer failed, waiting for a new connection "
+
+
+
 phaseStatus_connectionFailed  "Connection failed"
 
 

@@ -55,6 +55,30 @@ static char cloneBootStarted = false;
 static char cloneBootCanceled = false;
 static char cloneBootStartingOver = false;
 
+static char childUserNameSet = false;
+static char cloneChildUserName[ MB_USER_NAME_LENGTH  + 1 ];
+
+
+static int cloneHostState = 0;
+
+int getCloneHostState() {
+    if( cloneBootError ) {
+        return -1;
+        }
+    
+    return cloneHostState;
+    }
+
+
+const char *getCloneChildUserName() {
+    if( childUserNameSet ) {
+        return cloneChildUserName;
+        }
+    else {
+        return "";
+        }
+    }
+
 
 
 // FOR NOW:
@@ -163,7 +187,12 @@ void acceptCloneDownloadRequest() {
     cloneBootStarted = false;
     cloneBootCanceled = false;
     cloneBootStartingOver = false;
+
+    cloneHostState = 1;
+
+    childUserNameSet = false;
     
+
     printOut( "Getting TGID\n" );
     
     tgid = WM_GetNextTgid();
@@ -210,10 +239,14 @@ int stepCloneBootParent() {
                 
                 // start child download
                 MBP_StartDownloadAll();
+
+                
                 }
             break;
         case MBP_STATE_DATASENDING:
-            // FIXME:  show status
+            cloneHostState = 2;
+
+
 
             // all completed download?
             if( MBP_IsBootableAll() ) {
@@ -221,13 +254,45 @@ int stepCloneBootParent() {
                 MBP_StartRebootAll();
                 }
             else {
+
+                u16 downloadingBMP = 
+                    MBP_GetChildBmp( MBP_BMPTYPE_DOWNLOADING );
+
+                if( downloadingBMP != 0 && 
+                    ! childUserNameSet ) {
+
+                    // a child is downloading, an its name hasn't been
+                    // retreived yet
+
+                    u16 childAID = 1;
+                    
+                    // look for "1" bit position of child in BMP
+                    while( ( downloadingBMP >> childAID ) & 1 
+                           == 0 ) {
+                        childAID ++;
+                        }
+                    
+
+                    const MBPChildInfo *childInfo = 
+                        MBP_GetChildInfo( childAID );
+                    
+                    MBUserInfo userInfo = childInfo->user;
+                    
+                    for( int i=0; i<userInfo.nameLength; i++ ) {
+
+                        // convert from unicode to ASCII
+                        cloneChildUserName[i] = (char)( userInfo.name[i] );
+                        }
+                    cloneChildUserName[ userInfo.nameLength ] = '\0';
+                    childUserNameSet = true;
+                    }
+                
+
                 // there's a bug in MBP that doesn't properly handle
                 // case where child drops out mid-download
                 // After that happens, MBP kicks all future children
                 
                 // so, we need to look for these and handle them as errors
-                u16 downloadingBMP = 
-                    MBP_GetChildBmp( MBP_BMPTYPE_DOWNLOADING );
 
                 if( downloadingBMP == 0 ) {
                     printOut( "Detected Clone Child download failure before "
@@ -242,11 +307,13 @@ int stepCloneBootParent() {
                 }
             break;
         case MBP_STATE_REBOOTING:
-            // FIXME:  show status  
             break;
         case MBP_STATE_COMPLETE:
             // done with success, child is booted
 
+
+            cloneHostState = 3;
+            
             // shut down WM so we can accept a fresh connection
             WM_End( wmEndCallback );
             break;
@@ -263,6 +330,8 @@ int stepCloneBootParent() {
             if( cloneBootStartingOver ) {
                 printOut( "MBP Stopped, trying to start over\n" );
                 cloneBootStartingOver = false;
+                cloneHostState = 1;
+                
                 // use same settings again
                 MBP_Init( LOCAL_GGID, tgid );
                 }

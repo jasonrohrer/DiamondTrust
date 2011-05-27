@@ -90,6 +90,9 @@ ConnectState::~ConnectState() {
 static char connecting = false;
 static char servingCloneBoot = false;
 
+static int lastCloneHostState = 0;
+
+
 
 static void childStartConnect() {
 
@@ -202,7 +205,61 @@ void ConnectState::stepState() {
                 translate( "phaseSubStatus_connectFailed" );
             return;
             }
+
+        if( isHost && servingCloneBoot && 
+            ( checkConnectionStatus() == -2 || 
+              checkConnectionStatus() == 0 ) ) {
+            // hasn't gotten a real connection from child yet
+            
+            // check and display status
+
+            int cloneState = getCloneHostState();
+                
+            if( lastCloneHostState != cloneState ) {
+                // message change
+
+                switch( cloneState ) {
+                    case -1:
+                        statusSubMessage = 
+                            translate( "phaseSubStatus_connectFailed" );
+                        break;
+                    case 0:
+                    case 1:
+
+                        if( lastCloneHostState == 2 ) {
+                            // download in progress, but failed?
+                            statusSubMessage = translate(
+                               "phaseSubStatus_waitAgainAfterFailedTransfer" );
+                            }
+                        else {
+                            // still waiting for first connection
+                            statusSubMessage = 
+                                translate( "phaseSubStatus_waitingConnect" );
+                            }
+                        break;
+                    case 2:
+                        if( mMessage != NULL ) {
+                            delete [] mMessage;
+                            }
+                        mMessage = 
+                            autoSprintf( 
+                                "%s%s",
+                                translate( "phaseSubStatus_sendingDownload" ), 
+                                getCloneChildUserName() );
+                        statusSubMessage = mMessage;
+                        break;
+                    case 3:
+                        statusSubMessage = 
+                            translate( "phaseSubStatus_waitingReconnect" );
+                        break;
+                    }
+
+                lastCloneHostState = cloneState;
+                }
+            }
         
+
+
         if( checkConnectionStatus() == 0 ) {
             // still trying
             return;
@@ -350,6 +407,7 @@ void ConnectState::enterState() {
 
     connecting = false;
     servingCloneBoot = false;
+    lastCloneHostState = 0;
     
 
     if( isAutoconnecting() ) {
