@@ -52,6 +52,7 @@ static short channel = -1;
 static char cloneBootRunning = false;
 static char cloneBootError = false;
 static char cloneBootStarted = false;
+static char cloneBootCanceled = false;
 
 
 
@@ -95,12 +96,27 @@ static void wmEndCallback( void *inArg ) {
         printOut( "Error returned to wmEndCallback\n" );
         }
     else {
+        printOut( "Clone boot parent got wmEndCallback\n" );
+
         // done with multiboot
 
         cloneBootRunning = false;
 
-        // start accepting connections to transfer data to child
-        acceptConnection();
+
+        if( cloneBootCanceled ) {
+            // do nothing, canceled
+
+            printOut( "wmEnd after manual cancel, doing nothing\n" );
+            }
+        else {
+            printOut( "wmEnd after successful multiboot, "
+                      "accepting a connection\n" );
+
+            // got here after a successful multiboot!
+
+            // start accepting connections to transfer data to child
+            acceptConnection();
+            }
         }
     }
 
@@ -145,6 +161,7 @@ void acceptCloneDownloadRequest() {
     cloneBootRunning = true;
     cloneBootError = false;
     cloneBootStarted = false;
+    cloneBootCanceled = false;
     
     printOut( "Getting TGID\n" );
     
@@ -220,14 +237,41 @@ int stepCloneBootParent() {
             // cancel in progress, do nothing
             break;
         case MBP_STATE_STOP:
-            // only hit this on error
-            cloneBootError = true;
+            if( !cloneBootCanceled ) {
+                // only hit this on error
+                cloneBootError = true;
+                }
+            else {
+                // canceled
+                // shut down WM for good
+                WM_End( wmEndCallback );
+                }
             break;
         }
     
     
     return 1;
     }
+
+
+void cancelCloneHosting() {
+    printOut( "Got cancelCloneHosting request\n" );
+    
+    if( cloneBootRunning ) {
+        printOut( "Clone Boot still running, trying to cancel it\n" );
+
+        // still running MB, cancel it
+        cloneBootCanceled = true;
+        MBP_Cancel();
+        }
+    else {
+        // not doing MB anymore?  Maybe accepting a connection?
+        printOut( "Clone Boot already done, "
+                  "trying to close connection instead\n" );
+        closeConnection();
+        }
+    }
+
 
 
 

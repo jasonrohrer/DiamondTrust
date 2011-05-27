@@ -88,9 +88,10 @@ ConnectState::~ConnectState() {
     }
 
 static char connecting = false;
+static char servingCloneBoot = false;
 
 
-static void childStarConnect() {
+static void childStartConnect() {
 
     isHost = false;
     
@@ -158,10 +159,12 @@ void ConnectState::clickState( int inX, int inY ) {
             
             statusSubMessage = mMessage;
             connecting = true;
+            servingCloneBoot = true;
+            
             stepsSinceConnectTry = 0;
             }
         else if( childButton->getPressed( inX, inY ) ) {
-            childStarConnect();
+            childStartConnect();
             }
         }
     
@@ -346,10 +349,12 @@ void ConnectState::enterState() {
     gotMessage = false;
 
     connecting = false;
+    servingCloneBoot = false;
+    
 
     if( isAutoconnecting() ) {
         // clone boot child?
-        childStarConnect();
+        childStartConnect();
         }
     }
 
@@ -357,7 +362,14 @@ void ConnectState::enterState() {
 
 void ConnectState::backOutState() {
     if( connecting ) {
-        closeConnection();
+
+        if( servingCloneBoot ) {
+            cancelCloneHosting();
+            }
+        else {
+            // just close the connection directly
+            closeConnection();
+            }
         }
     };
 

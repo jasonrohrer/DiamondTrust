@@ -185,7 +185,16 @@ char shouldShowDSWiFiIcons();
 
 // starts a parent server that waits for a connection and then serve
 // a clone boot executable over that connection
+// After serving successfully, parent immediately goes into "acceptConnection"
+// to wait for the clone child to auto-connect 
 void acceptCloneDownloadRequest();
+
+// for clone parent, cancels the clone hosting process completely
+// (kicks a downloading child, etc).
+// This will also cancel the "acceptConnection" process if download has
+// already been served.
+void cancelCloneHosting();
+
 
 
 // called at beginning of gameInit to check if this is a clone boot
