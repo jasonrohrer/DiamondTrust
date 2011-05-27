@@ -53,7 +53,7 @@ static char cloneBootRunning = false;
 static char cloneBootError = false;
 static char cloneBootStarted = false;
 static char cloneBootCanceled = false;
-
+static char cloneBootStartingOver = false;
 
 
 
@@ -162,6 +162,7 @@ void acceptCloneDownloadRequest() {
     cloneBootError = false;
     cloneBootStarted = false;
     cloneBootCanceled = false;
+    cloneBootStartingOver = false;
     
     printOut( "Getting TGID\n" );
     
@@ -219,6 +220,26 @@ int stepCloneBootParent() {
                 // start boot process
                 MBP_StartRebootAll();
                 }
+            else {
+                // there's a bug in MBP that doesn't properly handle
+                // case where child drops out mid-download
+                // After that happens, MBP kicks all future children
+                
+                // so, we need to look for these and handle them as errors
+                u16 downloadingBMP = 
+                    MBP_GetChildBmp( MBP_BMPTYPE_DOWNLOADING );
+
+                if( downloadingBMP == 0 ) {
+                    printOut( "Detected Clone Child download failure before "
+                              "bootable.\n" );
+                    printOut( "Canceling Clone Boot process to start over\n" );
+
+                    // our only recourse here is to cancel the whole thing
+                    // and start over
+                    cloneBootStartingOver = true;
+                    MBP_Cancel();
+                    }
+                }
             break;
         case MBP_STATE_REBOOTING:
             // FIXME:  show status  
@@ -230,6 +251,8 @@ int stepCloneBootParent() {
             WM_End( wmEndCallback );
             break;
         case MBP_STATE_ERROR:
+            printOut( "MBP error received by Clone Parent\n" );
+            
             // cancel MB before reporting error
             MBP_Cancel();
             break;
@@ -237,7 +260,12 @@ int stepCloneBootParent() {
             // cancel in progress, do nothing
             break;
         case MBP_STATE_STOP:
-            if( !cloneBootCanceled ) {
+            if( cloneBootStartingOver ) {
+                printOut( "MBP Stopped, trying to start over\n" );
+                // use same settings again
+                MBP_Init( LOCAL_GGID, tgid );
+                }
+            else if( !cloneBootCanceled ) {
                 // only hit this on error
                 cloneBootError = true;
                 }
