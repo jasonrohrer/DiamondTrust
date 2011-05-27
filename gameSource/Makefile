@@ -58,13 +58,7 @@ LANGUAGE_FILES = $(subst languages/,,$(LANGUAGE_FILES_SOURCE))
 # So, we must compile them into the binary image as code.
 # Then, we can delete the files themselves from the gameData directory
 FILES_TO_COMPILE_IN = \
-font8.tga \
-font16_sans.tga \
-satPhone.tga \
-signal0.tga \
-signal1.tga \
-signal2.tga \
-signal3.tga \
+${GAME_GRAPHICS} \
 ${LANGUAGE_FILES} \
 
 
