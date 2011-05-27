@@ -262,6 +262,7 @@ int stepCloneBootParent() {
         case MBP_STATE_STOP:
             if( cloneBootStartingOver ) {
                 printOut( "MBP Stopped, trying to start over\n" );
+                cloneBootStartingOver = false;
                 // use same settings again
                 MBP_Init( LOCAL_GGID, tgid );
                 }
