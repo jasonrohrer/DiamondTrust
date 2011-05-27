@@ -25,7 +25,13 @@ void checkCloneFetch() {
 
     printOut( "Multiboot child started\n" );
 
-    printOut( "Trying to connect back to server...\n" );
+    //printOut( "Trying to connect back to server...\n" );
+
+    printOut( "Waiting until game loads to auto-connect to parent\n" );
+    return;
+    
+
+
 
     // connect to server so that we can get files from it
     connectToServer( NULL );

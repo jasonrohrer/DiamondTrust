@@ -58,7 +58,11 @@ class ConnectState : public GameState {
             }
         
         virtual char canStateBeBackedOut() {
-            return ! isAutoconnecting();
+            //return ! isAutoconnecting();
+            // allow back button even when autoconnecting as a cloneboot child,
+            // so that child doesn't get stuck if parent drops out after
+            // serving the ROM.
+            return true;
             }
 
         virtual void backOutState();
@@ -84,6 +88,21 @@ ConnectState::~ConnectState() {
     }
 
 static char connecting = false;
+
+
+static void childStarConnect() {
+
+    isHost = false;
+    
+    connectToServer( NULL );
+    
+    
+    statusSubMessage = 
+        translate( "phaseSubStatus_connectingToParent" );
+    connecting = true;
+    stepsSinceConnectTry = 0;
+    }
+    
 
 
 
@@ -142,15 +161,7 @@ void ConnectState::clickState( int inX, int inY ) {
             stepsSinceConnectTry = 0;
             }
         else if( childButton->getPressed( inX, inY ) ) {
-            isHost = false;
-
-            connectToServer( NULL );
-
-                   
-            statusSubMessage = 
-                translate( "phaseSubStatus_connectingToParent" );
-            connecting = true;
-            stepsSinceConnectTry = 0;
+            childStarConnect();
             }
         }
     
@@ -338,7 +349,7 @@ void ConnectState::enterState() {
 
     if( isAutoconnecting() ) {
         // clone boot child?
-        connecting = true;
+        childStarConnect();
         }
     }
 
