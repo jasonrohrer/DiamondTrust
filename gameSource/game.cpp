@@ -261,10 +261,6 @@ void gameInit() {
         delete [] fileName;
         }
     
-    redrawLoadingProgress();
-
-
-
     printOut( "Loading 8-pixel font\n" );
     font8 = new Font( "font8.tga", 1, 4, false );
 
@@ -1055,19 +1051,11 @@ void drawBottomScreen() {
 
 
 
-
-void redrawLoadingProgress() {
-
-    // immediately display our Loading message and progress bar
-    // call twice to ensure that both screens get drawn
-    runGameLoopOnce();
-    runGameLoopOnce();
-    }
-
 void updateLoadingProgress() {
 
-    redrawLoadingProgress();
-
+    runGameLoopOnce();
+    runGameLoopOnce();
+    
     // add another tick to progress
     for( int i=0; i<PROGRESS_LENGTH; i++ ) {
         if( loadingProgress[i] == '-' ) {

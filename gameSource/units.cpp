@@ -451,7 +451,6 @@ void initUnits() {
             }
         delete [] vehicleRGBA;
         
-        redrawLoadingProgress();
         }
     
     updateLoadingProgress();
@@ -552,8 +551,6 @@ void initUnits() {
                                       start.x, start.y, end.x, end.y );
                             
                             buildArrow( start, end );
-
-                            redrawLoadingProgress();
                             }
                         
                         }

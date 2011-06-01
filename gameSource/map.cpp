@@ -495,11 +495,6 @@ void initMap() {
                 lastSpriteID = mapBackgroundSliceSpriteIDs[c][s];
                 lastSlicePointer = slicePointer;
                 }
-            
-            // don't tick, but still need redraw between addSprite
-            // calls to avoid screen artifacts from too many texture memory
-            // transfers between vblanks
-            redrawLoadingProgress();
             }
 
         updateLoadingProgress();

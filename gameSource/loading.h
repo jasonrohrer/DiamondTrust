@@ -4,8 +4,3 @@
 void updateLoadingProgress();
 
 
-// JUST redraw the screens (don't add tick to progress bar).
-void redrawLoadingProgress();
-
-
-
