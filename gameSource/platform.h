@@ -118,7 +118,11 @@ int addSprite256( unsigned char *inDataBytes, int inWidth, int inHeight,
 //
 // inReplaceSafe turns on a safe mode that reduces the chance of conflicts with
 // the platform's texturing system.  If artifacts are visible (due to memory
-//   access contention), try using safe mode.
+//   access contention), try using safe mode.  Note that safe mode may result
+//   in asynchronous texture transfer which returns to caller before the
+//   texture has been fully added.  Non-safe mode, like texture add calls,
+//   blocks until texture is fully added (and may stall screen redraws until
+//   texture add is complete on some platforms). 
 void replaceSprite256( int inSpriteID, 
                        unsigned char *inDataRGBA, int inWidth, int inHeight,
                        char inReplaceSafe = false );

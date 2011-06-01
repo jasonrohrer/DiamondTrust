@@ -394,13 +394,33 @@ static void addPalette( textureInfo *inT,
     
 
     DC_FlushRange( textureColors, paletteBytes );
+
+    int vCount = GX_GetVCount();
+        
+    // palettes are always small enough to load entirely in just a few
+    // vlines 256 entries max, 16 bits each... 512 bytes total
+    // 213 is the last safe vline, so give a buffer of 4 vlines to be safe
+    // (cover DMA overhead)
+    if( vCount < 191 || vCount > 209 ) {
+        // not in safe blanking region
+        OS_WaitVBlankIntr();
+        }
+    vCount = GX_GetVCount();
+    
     
     GX_BeginLoadTexPltt();
     GX_LoadTexPltt( textureColors,
                     inT->paletteSlotAddress,
                     paletteBytes );
     GX_EndLoadTexPltt();
+    
+    int endVCount = GX_GetVCount();
 
+    if( endVCount > 213 || endVCount < 191 ) {
+        printOut( "*** WARNING: texture palette DMA ended "
+                  "outside of VBlank\n" );
+        }
+    
 
     unsigned int offset = paletteBytes;
     
@@ -435,13 +455,62 @@ static void replaceTextureData( textureInfo *inT,
 
     DC_FlushRange( dataPointer, inNumBytes );
 
-    GX_BeginLoadTex();
+
+    unsigned int numBytesLeft = inNumBytes;
+    unsigned int numDone = 0;
     
-    GX_LoadTex( dataPointer, 
-                inT->slotAddress + inByteOffset,
-                inNumBytes );
+    while( numBytesLeft > 0 ) {
+
+        int vCount = GX_GetVCount();
+        
+        if( vCount < 191 || vCount > 213 ) {
+            // not in safe blanking region
+            OS_WaitVBlankIntr();
+            }
+        vCount = GX_GetVCount();
+        
+        int vLinesLeft = 213 - vCount;
+        
+        // account for some overhead in transfer to be safe
+        vLinesLeft -= 2;
+        
+        // measurements showed that something like this was safe
+        // theoretical limit is 2840 bytes per vline (assuming 32-bit DMA mode)
+        unsigned int bytesPerVLine = 2000;
+
+        if( vLinesLeft > 0 ) {
+            
+
+
+            unsigned int maxTransferSize = bytesPerVLine * vLinesLeft;
+        
+            unsigned int numToTransfer = numBytesLeft;
+        
+            if( numToTransfer > maxTransferSize ) {
+                numToTransfer = maxTransferSize;
+                }
+        
+
+            GX_BeginLoadTex();
     
-    GX_EndLoadTex();
+            GX_LoadTex( &( dataPointer[ numDone ] ), 
+                        inT->slotAddress + inByteOffset + numDone,
+                        numToTransfer );
+            
+            GX_EndLoadTex();
+
+            int endVCount = GX_GetVCount();
+
+            if( endVCount > 213 || endVCount < 191 ) {
+                printOut( "*** WARNING: texture data DMA ended "
+                          "outside of VBlank\n" );
+                }
+
+            
+            numDone += numToTransfer;
+            numBytesLeft -= numToTransfer;
+            }
+        }
     }
 
 
