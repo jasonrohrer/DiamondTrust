@@ -1470,5 +1470,24 @@ char isCloneBootPossible() {
 void acceptCloneDownloadRequest() {
     }
 
+
+int getCloneHostState() {
+    return -1;
+    }
+
+
+const char *getCloneChildUserName() {
+    return "";
+    }
+
+
+
+void cancelCloneHosting() {
+    }
+
+
+
 void checkCloneFetch() {
     }
+
+
