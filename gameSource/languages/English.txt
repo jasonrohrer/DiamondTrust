@@ -72,7 +72,7 @@ phaseSubStatus_waitAgainAfterFailedTransfer "Transfer failed, waiting for a new 
 
 
 
-phaseStatus_connectionFailed  "Connection failed"
+phaseStatus_connectionFailed  "Connection lost"
 
 
 phaseStatus_accumulate  "Diamonds accumulate"
