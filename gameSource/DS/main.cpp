@@ -2875,9 +2875,10 @@ void runGameLoopOnce() {
         // same for network step
         stepNetwork();
 
-        stepCloneBootParent();
             
         if( !isCloneChild ) {
+            stepCloneBootParent();
+
             checkForFileRequest();
             }
         }

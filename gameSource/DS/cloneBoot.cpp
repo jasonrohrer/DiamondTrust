@@ -39,6 +39,7 @@ extern char isCloneChild;
 // implements clone booting parts of platform.h
 
 
+// from platform.h
 char isCloneBootPossible() {
     // children cannot serve up clone boots (don't have original files)
     return !isCloneChild;
@@ -61,6 +62,7 @@ static char cloneChildUserName[ MB_USER_NAME_LENGTH  + 1 ];
 
 static int cloneHostState = 0;
 
+// from platform.h
 int getCloneHostState() {
     if( cloneBootError ) {
         return -1;
@@ -70,6 +72,7 @@ int getCloneHostState() {
     }
 
 
+// from platform.h
 const char *getCloneChildUserName() {
     if( childUserNameSet ) {
         return cloneChildUserName;
@@ -81,13 +84,7 @@ const char *getCloneChildUserName() {
 
 
 
-// FOR NOW:
-// just send child the entire codebase
-#include <nitro/parent_begin.h>
 
-static char canServeCloneBoot = true;
-
-#include <nitro/parent_end.h>
 
 
 // game info sent out to child
@@ -207,6 +204,46 @@ void acceptCloneDownloadRequest() {
         }
     
     }
+
+
+// from platform.h
+void cancelCloneHosting() {
+    printOut( "Got cancelCloneHosting request\n" );
+    
+    if( cloneBootRunning ) {
+        printOut( "Clone Boot still running, trying to cancel it\n" );
+
+        // still running MB, cancel it
+        cloneBootCanceled = true;
+        MBP_Cancel();
+        }
+    else {
+        // not doing MB anymore?  Maybe accepting a connection?
+        printOut( "Clone Boot already done, "
+                  "trying to close connection instead\n" );
+        closeConnection();
+        }
+    }
+
+
+
+
+// from platform.h
+char isCloneBootRunning() {
+    return cloneBootRunning;
+    }
+
+
+
+
+
+// these two functions are NOT in platform.h and are DS-specific
+// therefore, safe to stick them in PARENT region only, because we can
+// control when they are called.
+
+#include <nitro/parent_begin.h>
+
+
 
 
 
@@ -352,30 +389,6 @@ int stepCloneBootParent() {
     }
 
 
-void cancelCloneHosting() {
-    printOut( "Got cancelCloneHosting request\n" );
-    
-    if( cloneBootRunning ) {
-        printOut( "Clone Boot still running, trying to cancel it\n" );
-
-        // still running MB, cancel it
-        cloneBootCanceled = true;
-        MBP_Cancel();
-        }
-    else {
-        // not doing MB anymore?  Maybe accepting a connection?
-        printOut( "Clone Boot already done, "
-                  "trying to close connection instead\n" );
-        closeConnection();
-        }
-    }
-
-
-
-
-char isCloneBootRunning() {
-    return cloneBootRunning;
-    }
 
 
 
@@ -464,4 +477,8 @@ void checkForFileRequest() {
         delete [] fileName;
         }
     }
+
+
+
+#include <nitro/parent_end.h>
 
