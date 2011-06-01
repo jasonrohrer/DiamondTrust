@@ -514,7 +514,8 @@ void gameFree() {
     delete doneButton;
     delete nextButton;
     delete backButton;
-
+    delete playAgainButton;
+    
     delete aiButton;
     delete wifiButton;
     

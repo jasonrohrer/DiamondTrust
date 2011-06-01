@@ -1240,11 +1240,19 @@ void stepNetwork() {
                 printOut( "Got connection\n" );
                 
                 netStatus = 1;
+
+                // only one connection at a time
+                // don't need to keep server around
+                delete server;
+                server = NULL;
                 }
             else if( !timedOut ) {
                 // error
                 netStatus = -1;
                 printOut( "Incoming connection error\n");
+
+                delete server;
+                server = NULL;
                 }
             }        
         else if( connectionSock != NULL ) {
@@ -1254,6 +1262,8 @@ void stepNetwork() {
                 
                 if( netStatus == -1 ) {
                     printOut( "Error connecting to server\n");
+                    delete connectionSock;
+                    connectionSock = NULL;
                     }
                 }
             }
@@ -1295,6 +1305,10 @@ void stepNetwork() {
                 // error
                 netStatus = -1;
                 printOut( "Send error\n");
+                
+                delete connectionSock;
+                connectionSock = NULL;
+                
                 return;
                 }
             else if( numSent == (int)sendSize ) {
@@ -1330,6 +1344,10 @@ void stepNetwork() {
                 // error
                 netStatus = -1;
                 printOut( "Receive error\n");
+                
+                delete connectionSock;
+                connectionSock = NULL;
+
                 return;
                 }
             else if( numRecv == 5 ) {
@@ -1345,6 +1363,10 @@ void stepNetwork() {
                     printOut( "Huge message size of %u received\n",
                               nextIncomingMessageSize );
                     netStatus = -1;
+
+                    delete connectionSock;
+                    connectionSock = NULL;
+
                     return;
                     }                
 
@@ -1372,6 +1394,10 @@ void stepNetwork() {
                 // error
                 netStatus = -1;
                 printOut( "Receive error\n");
+
+                delete connectionSock;
+                connectionSock = NULL;
+                
                 return;
                 }
             else if( numRecv > 0 ) {
