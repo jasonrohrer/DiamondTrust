@@ -293,6 +293,21 @@ void snapPicture( unsigned char *inBuffer );
 
 
 
+// Sound support
+
+
+// For ensuring that data can be safely shared with the audio callback, so
+// that the audio callback isn't called when data is being modified
+
+// ensures that the audio callback (below) will not be called
+void lockAudio();
+
+// allows the audio callback to be called again
+void unlockAudio();
+
+
+
+
 
 
 
@@ -316,6 +331,15 @@ void gameLoopTick();
 // all drawSprite must occur in these functions.
 void drawTopScreen();
 void drawBottomScreen();
+
+
+typedef signed short int s16;
+
+// gets the next audio samples for a given mono channel 
+// up to 16 channels are possible
+void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer, 
+                                int inNumSamples );
+
 
 
 #endif

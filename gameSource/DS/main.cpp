@@ -2609,6 +2609,83 @@ static void VBlankCallback() {
 
 
 
+// sound data structures
+
+#define SOUND_BUFFER_PAGESIZE 512 * 32
+// each buffer has two pages for double-buffering
+#define SOUND_BUFFER_SIZE SOUND_BUFFER_PAGESIZE * 2
+
+
+static s16 soundBuffer[16][SOUND_BUFFER_SIZE] ATTRIBUTE_ALIGN(32);
+static int soundBufferPage[16];
+
+
+int soundSampleRate = 44100;
+int soundTimerValue = SND_TIMER_CLOCK / soundSampleRate;
+u32 soundAlarmPeriod = soundTimerValue * SOUND_BUFFER_PAGESIZE / 32U;
+
+
+
+
+// we can't fill sound buffers right in the Alarm callback, because
+// it bogs down the interrupt handler (and even causes screen artifacts!)
+// so, we need to pass buffer processing off to a thread that can
+// run separately from the interrupt handler
+#define SOUND_THREAD_STACK_SIZE  1024
+#define SOUND_THREAD_PRIORITY  12
+
+OSThread soundThread;
+unsigned int soundThreadStack[ SOUND_THREAD_STACK_SIZE /
+                               sizeof( unsigned int ) ];
+
+static OSMessageQueue soundMessageQueue;
+static OSMessage soundMessageBuffer[1];
+
+static void soundThreadProcess( void *inData ) {
+    
+    inData = NULL;
+    
+
+    OSMessage message;
+
+    OS_InitMessageQueue( &soundMessageQueue, soundMessageBuffer, 1 );
+
+    while( true ) {
+        // wait for a message from the Alarm callback
+        OS_ReceiveMessage( &soundMessageQueue, &message, OS_MESSAGE_BLOCK );
+        
+        for( int i=0; i<16; i++ ) {
+            s16 *buffer = soundBuffer[i];
+        
+            if( soundBufferPage[i] == 0 ) {
+                soundBufferPage[i] = 1;
+                }
+            else if( soundBufferPage[i] == 1 ) {
+                // jump int buffer to second page
+                buffer = &( buffer[ SOUND_BUFFER_PAGESIZE ] );
+
+                soundBufferPage[i] = 0;
+                }
+            
+            getAudioSamplesForChannel( i, buffer, SOUND_BUFFER_PAGESIZE );
+            }
+        }
+    }
+
+
+
+
+
+
+
+static void SoundAlarmCallback( void *inArg ) {
+    //printOut( "Alarm called\n" );
+
+    OS_SendMessage( &soundMessageQueue, (OSMessage)inArg, OS_MESSAGE_NOBLOCK );
+    }
+
+
+
 
 
 #ifdef SDK_TWL
@@ -2700,6 +2777,11 @@ static void VBlankCallback() {
         OS_EnableIrqMask( OS_IE_NDMA1 );
         }
 #endif
+
+    SND_Init();
+    
+    // we're going to use all 16 channels for PCM
+    SND_LockChannel(0xFFFF, 0);
 
     
     G3X_Init();
@@ -2829,6 +2911,46 @@ static void VBlankCallback() {
     
     printOut( "Free bytes on heap after init=%d\n",
               OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
+
+
+
+
+
+    // start sound processes
+    printOut( "Starting sound process\n" );
+
+    OS_CreateThread( &soundThread, soundThreadProcess, NULL, 
+                     soundThreadStack + 
+                     SOUND_THREAD_STACK_SIZE / sizeof(unsigned int), 
+                     SOUND_THREAD_STACK_SIZE,
+                     SOUND_THREAD_PRIORITY );
+    OS_WakeupThreadDirect( &soundThread );
+
+    
+    for( int i=0; i<16; i++ ) {
+        
+        SND_SetupChannelPcm( i, SND_WAVE_FORMAT_PCM16,
+                             soundBuffer[i],
+                             SND_CHANNEL_LOOP_REPEAT, 0, 
+                             SOUND_BUFFER_SIZE / sizeof(u32), 
+                             // volume max
+                             127,
+                             SND_CHANNEL_DATASHIFT_NONE, soundTimerValue, 
+                             // pan center
+                             64 );
+        soundBufferPage[i] = 0;
+        memset( soundBuffer[i], 0, SOUND_BUFFER_SIZE * sizeof(s16) );
+        }
+    
+    // one alarm callback for all channels
+    int alarmNumber = 0;
+    SND_SetupAlarm( alarmNumber, 
+                    soundAlarmPeriod, soundAlarmPeriod, SoundAlarmCallback, 
+                    NULL );
+    SND_StartTimer( 0xFFFF, 0, (unsigned int)( 1 << alarmNumber ), 0 );
+
+    SND_FlushCommand( SND_COMMAND_NOBLOCK );
+    
     
     while( true ){
         runGameLoopOnce();
