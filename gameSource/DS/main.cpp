@@ -2611,13 +2611,16 @@ static void VBlankCallback() {
 
 // sound data structures
 
+#define MAX_SOUND_CHANNELS 16
+
 #define SOUND_BUFFER_PAGESIZE 512 * 32
 // each buffer has two pages for double-buffering
 #define SOUND_BUFFER_SIZE SOUND_BUFFER_PAGESIZE * 2
 
 
-static s16 soundBuffer[16][SOUND_BUFFER_SIZE] ATTRIBUTE_ALIGN(32);
-static int soundBufferPage[16];
+static s16 soundBuffer[MAX_SOUND_CHANNELS]
+                      [SOUND_BUFFER_SIZE] ATTRIBUTE_ALIGN(32);
+static int soundBufferPage[MAX_SOUND_CHANNELS];
 
 
 int soundSampleRate = 44100;
@@ -2654,7 +2657,7 @@ static void soundThreadProcess( void *inData ) {
         // wait for a message from the Alarm callback
         OS_ReceiveMessage( &soundMessageQueue, &message, OS_MESSAGE_BLOCK );
         
-        for( int i=0; i<16; i++ ) {
+        for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
             s16 *buffer = soundBuffer[i];
         
             if( soundBufferPage[i] == 0 ) {
@@ -2780,8 +2783,6 @@ static void SoundAlarmCallback( void *inArg ) {
 
     SND_Init();
     
-    // we're going to use all 16 channels for PCM
-    SND_LockChannel(0xFFFF, 0);
 
     
     G3X_Init();
@@ -2927,12 +2928,22 @@ static void SoundAlarmCallback( void *inArg ) {
     OS_WakeupThreadDirect( &soundThread );
 
     
-    for( int i=0; i<16; i++ ) {
-        
+    u32 channelMask = 0;
+
+    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {        
+        // add a 1 in the mask here
+        channelMask = channelMask | ( 0x1 << i );        
+        }
+
+
+    SND_LockChannel( channelMask, 0 );
+
+    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
+
         SND_SetupChannelPcm( i, SND_WAVE_FORMAT_PCM16,
                              soundBuffer[i],
                              SND_CHANNEL_LOOP_REPEAT, 0, 
-                             SOUND_BUFFER_SIZE / sizeof(u32), 
+                             ( SOUND_BUFFER_SIZE * sizeof(s16) ) / sizeof(u32),
                              // volume max
                              127,
                              SND_CHANNEL_DATASHIFT_NONE, soundTimerValue, 
@@ -2947,7 +2958,7 @@ static void SoundAlarmCallback( void *inArg ) {
     SND_SetupAlarm( alarmNumber, 
                     soundAlarmPeriod, soundAlarmPeriod, SoundAlarmCallback, 
                     NULL );
-    SND_StartTimer( 0xFFFF, 0, (unsigned int)( 1 << alarmNumber ), 0 );
+    SND_StartTimer( channelMask, 0, (unsigned int)( 1 << alarmNumber ), 0 );
 
     SND_FlushCommand( SND_COMMAND_NOBLOCK );
     
@@ -3021,6 +3032,12 @@ void runGameLoopOnce() {
         
     // interrupt will wake swapThread up
     OS_WaitVBlankIntr();
+
+
+    // receive ARM7 command replies
+    while( SND_RecvCommandReply( SND_COMMAND_NOBLOCK ) != NULL ) {
+        }
+            
 
 
     // do one step of texture replacement here
