@@ -63,14 +63,19 @@ unsigned int maxMutationsPerMove = 1;
 // this worked during testing on the PC
 //int maxSimulationsPerStepAI = 100;
 // too long for the DSi
+
 // now that we have sound thread, we can handle even less!
+// Also, didn't realize it, but 4 AI sims/step was causing FPS slowdown when
+// drawing more complicated screens
 //int simulationsPerStepSlowMode = 4;
-int simulationsPerStepSlowMode = 3;
+int simulationsPerStepSlowMode = 2;
 
 
 int maxSimulationsPerStepAI = simulationsPerStepSlowMode;
 
-int simulationsPerStepFastMode = 1000;
+// problem!  This starves audio thread
+//int simulationsPerStepFastMode = 1000;
+int simulationsPerStepFastMode = 6;
 
 void toggleAICPUMode( char inFullSpeed ) {
     if( inFullSpeed ) {
