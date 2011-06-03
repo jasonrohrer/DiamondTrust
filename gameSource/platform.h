@@ -46,6 +46,11 @@ void printOut( const char *inFormatString, ... );
 
 unsigned int getSecondsSinceEpoc();
 
+// gets a system-specific millisecond count
+// (may be milliseconds since system up)
+unsigned int getSystemMilliseconds();
+
+
 
 #include "minorGems/graphics/rgbaColor.h"
 

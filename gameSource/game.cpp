@@ -907,8 +907,34 @@ void gameLoopTick() {
 
 
 
+unsigned int frameBatchStartTime = 0;
+
+unsigned int frameBatchCount = 0;
+
+
 
 void drawTopScreen() {
+      
+    if( frameBatchStartTime == 0 ) {
+        frameBatchStartTime = getSystemMilliseconds();
+        frameBatchCount = 0;
+        }
+    
+    
+    frameBatchCount++;
+    
+
+    if( frameBatchCount == 100 ) {
+        unsigned int endTime = getSystemMilliseconds();
+        
+        printOut( "Frame rate (per 10 seconds):  %d\n", 
+                  10 * 1000 * 100 / ( endTime - 
+                                 frameBatchStartTime ) );
+        // next batch 
+        frameBatchStartTime = endTime;
+        frameBatchCount = 0;
+        }
+    
 
     if( satPhoneSpriteID != -1 ) {
         int sigStrength = getSignalStrength();

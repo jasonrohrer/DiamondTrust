@@ -212,6 +212,13 @@ unsigned int getSecondsSinceEpoc() {
     }
 
 
+unsigned int getSystemMilliseconds() {
+    return (unsigned int)( OS_TicksToMilliSeconds( OS_GetTick() ) );
+    }
+
+
+
+
 //#define MAX_TEXTURES  512
 #define MAX_TEXTURES  1024
 
@@ -2611,7 +2618,7 @@ static void VBlankCallback() {
 
 // sound data structures
 
-#define MAX_SOUND_CHANNELS 16
+#define MAX_SOUND_CHANNELS 8
 
 #define SOUND_BUFFER_PAGESIZE 512 * 32
 // each buffer has two pages for double-buffering
@@ -2635,7 +2642,10 @@ u32 soundAlarmPeriod = soundTimerValue * SOUND_BUFFER_PAGESIZE / 32U;
 // so, we need to pass buffer processing off to a thread that can
 // run separately from the interrupt handler
 #define SOUND_THREAD_STACK_SIZE  1024
-#define SOUND_THREAD_PRIORITY  12
+//#define SOUND_THREAD_PRIORITY  12
+// our main thread runs at 16, and it gets starved by sound thread
+// never want our FPS to drop because of sound.
+#define SOUND_THREAD_PRIORITY  17
 
 OSThread soundThread;
 unsigned int soundThreadStack[ SOUND_THREAD_STACK_SIZE /
@@ -2705,6 +2715,7 @@ static void SoundAlarmCallback( void *inArg ) {
     OS_Printf( "Main starting\n" );
 
     RTC_Init();
+    OS_InitTick();
 
     FX_Init();
     TP_Init();
@@ -2773,8 +2784,7 @@ static void SoundAlarmCallback( void *inArg ) {
 
 #ifdef SDK_TWL
     // needed by camera
-    if( isCameraSupported() ) {    
-        OS_InitTick();
+    if( isCameraSupported() ) {
         OS_InitAlarm();
         MI_InitNDmaConfig();
         OS_EnableIrqMask( OS_IE_NDMA1 );
@@ -2938,6 +2948,9 @@ static void SoundAlarmCallback( void *inArg ) {
 
     SND_LockChannel( channelMask, 0 );
 
+    int stereoSpread = 127 / MAX_SOUND_CHANNELS;
+    
+
     for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
 
         SND_SetupChannelPcm( i, SND_WAVE_FORMAT_PCM16,
@@ -2945,13 +2958,14 @@ static void SoundAlarmCallback( void *inArg ) {
                              SND_CHANNEL_LOOP_REPEAT, 0, 
                              ( SOUND_BUFFER_SIZE * sizeof(s16) ) / sizeof(u32),
                              // volume max
-                             127,
+                             127 / 16,
                              SND_CHANNEL_DATASHIFT_NONE, soundTimerValue, 
-                             // pan center
-                             64 );
+                             // spread channels across pan
+                             stereoSpread * i  );
         soundBufferPage[i] = 0;
         memset( soundBuffer[i], 0, SOUND_BUFFER_SIZE * sizeof(s16) );
         }
+    
     
     // one alarm callback for all channels
     int alarmNumber = 0;
