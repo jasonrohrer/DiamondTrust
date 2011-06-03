@@ -300,6 +300,7 @@ void snapPicture( unsigned char *inBuffer );
 
 // Sound support
 
+// these cannot be called until after gameInit has returned.
 
 // For ensuring that data can be safely shared with the audio callback, so
 // that the audio callback isn't called when data is being modified
@@ -311,6 +312,15 @@ void lockAudio();
 void unlockAudio();
 
 
+// 8 possible channels
+
+// Volume in range [0..127]
+// All volumes start out at 0 by default 
+void setSoundChannelVolume( int inChannelNumber, int inVolume );
+
+// Pan in range [0..127] where 0 is left, 64 is center, and 127 is right
+// All pans start out at 64 by default
+void setSoundChannelPan( int inChannelNumber, int inPan );
 
 
 
@@ -341,7 +351,8 @@ void drawBottomScreen();
 typedef signed short int s16;
 
 // gets the next audio samples for a given mono channel 
-// up to 16 channels are possible
+// up to 8 channels are possible
+// sample rate is 22050 Hz
 void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer, 
                                 int inNumSamples );
 

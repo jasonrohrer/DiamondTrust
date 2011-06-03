@@ -2948,8 +2948,8 @@ static void SoundAlarmCallback( void *inArg ) {
 
 
     SND_LockChannel( channelMask, 0 );
-
-    int stereoSpread = 127 / MAX_SOUND_CHANNELS;
+    
+    //int stereoSpread = 127 / MAX_SOUND_CHANNELS;
     
 
     for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
@@ -2958,11 +2958,11 @@ static void SoundAlarmCallback( void *inArg ) {
                              soundBuffer[i],
                              SND_CHANNEL_LOOP_REPEAT, 0, 
                              ( SOUND_BUFFER_SIZE * sizeof(s16) ) / sizeof(u32),
-                             // volume max
-                             127 / 16,
+                             // volume off by default
+                             0,
                              SND_CHANNEL_DATASHIFT_NONE, soundTimerValue, 
-                             // spread channels across pan
-                             stereoSpread * i  );
+                             // panned center by default
+                             64  );
         soundBufferPage[i] = 0;
         memset( soundBuffer[i], 0, SOUND_BUFFER_SIZE * sizeof(s16) );
         }
@@ -3059,3 +3059,24 @@ void runGameLoopOnce() {
     textureReplacementStep();
     }
 
+
+
+
+
+void setSoundChannelVolume( int inChannelNumber, int inVolume ) {
+    SND_SetChannelVolume(
+        (unsigned int)( 0x1 << inChannelNumber ),
+        inVolume,
+        SND_CHANNEL_DATASHIFT_NONE );
+
+    SND_FlushCommand( SND_COMMAND_NOBLOCK );
+    }
+
+
+void setSoundChannelPan( int inChannelNumber, int inPan ) {
+    SND_SetChannelPan(
+        (unsigned int)( 0x1 << inChannelNumber ),
+        inPan );
+
+    SND_FlushCommand( SND_COMMAND_NOBLOCK );
+    }

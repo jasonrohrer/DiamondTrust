@@ -69,6 +69,10 @@ char pictureSendSpriteSet = false;
 
 
 
+int globalSoundVolume = 0;
+
+
+
 Font *font8 = NULL;
 Font *font16 = NULL;
 
@@ -800,6 +804,16 @@ void gameLoopTick() {
         return;
         }
     
+
+    if( globalSoundVolume < 127 ) {
+        globalSoundVolume++;
+        
+        for( int c=0; c<8; c++ ) {
+            setSoundChannelVolume( c, globalSoundVolume );
+            }
+        }
+    
+
 
     stepSprites();
     stepOpponent();
