@@ -2618,9 +2618,10 @@ static void VBlankCallback() {
 
 // sound data structures
 
-#define MAX_SOUND_CHANNELS 8
+#define MAX_SOUND_CHANNELS 10
 
-#define SOUND_BUFFER_PAGESIZE 512 * 32
+//#define SOUND_BUFFER_PAGESIZE 512 * 32
+#define SOUND_BUFFER_PAGESIZE 1024 * 32
 // each buffer has two pages for double-buffering
 #define SOUND_BUFFER_SIZE SOUND_BUFFER_PAGESIZE * 2
 
@@ -2630,7 +2631,7 @@ static s16 soundBuffer[MAX_SOUND_CHANNELS]
 static int soundBufferPage[MAX_SOUND_CHANNELS];
 
 
-int soundSampleRate = 44100;
+int soundSampleRate = 22050;
 int soundTimerValue = SND_TIMER_CLOCK / soundSampleRate;
 u32 soundAlarmPeriod = soundTimerValue * SOUND_BUFFER_PAGESIZE / 32U;
 

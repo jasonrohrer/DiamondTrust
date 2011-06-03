@@ -63,7 +63,9 @@ unsigned int maxMutationsPerMove = 1;
 // this worked during testing on the PC
 //int maxSimulationsPerStepAI = 100;
 // too long for the DSi
-int simulationsPerStepSlowMode = 4;
+// now that we have sound thread, we can handle even less!
+//int simulationsPerStepSlowMode = 4;
+int simulationsPerStepSlowMode = 3;
 
 
 int maxSimulationsPerStepAI = simulationsPerStepSlowMode;

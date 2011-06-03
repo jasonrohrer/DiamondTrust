@@ -12,9 +12,12 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                                 int inNumSamples ) {
     // for now, return silence
 
-    for( int i=0; i<inNumSamples; i++ ) {
-        inBuffer[i] = 0;
+    if( inChannelNumber == 0 ) {    
+        for( int i=0; i<inNumSamples; i++ ) {
+            inBuffer[i] = 0;
+            }
         }
+    
 
     /*
     if( false && inChannelNumber == 0 ) {
