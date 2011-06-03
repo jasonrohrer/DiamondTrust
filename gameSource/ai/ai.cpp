@@ -75,7 +75,7 @@ int maxSimulationsPerStepAI = simulationsPerStepSlowMode;
 
 // problem!  This starves audio thread
 //int simulationsPerStepFastMode = 1000;
-int simulationsPerStepFastMode = 6;
+int simulationsPerStepFastMode = 9;
 
 void toggleAICPUMode( char inFullSpeed ) {
     if( inFullSpeed ) {
