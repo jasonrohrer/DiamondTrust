@@ -2618,10 +2618,10 @@ static void VBlankCallback() {
 
 // sound data structures
 
-#define MAX_SOUND_CHANNELS 10
+#define MAX_SOUND_CHANNELS 8
 
-//#define SOUND_BUFFER_PAGESIZE 512 * 32
-#define SOUND_BUFFER_PAGESIZE 1024 * 32
+#define SOUND_BUFFER_PAGESIZE 512 * 32
+//#define SOUND_BUFFER_PAGESIZE 1024 * 32
 // each buffer has two pages for double-buffering
 #define SOUND_BUFFER_SIZE SOUND_BUFFER_PAGESIZE * 2
 
