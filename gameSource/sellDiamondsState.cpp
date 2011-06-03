@@ -7,6 +7,7 @@
 #include "gameStats.h"
 #include "Font.h"
 #include "colors.h"
+#include "opponent.h"
 
 
 #include "minorGems/util/stringUtils.h"
@@ -530,7 +531,7 @@ void SellDiamondsState::stepState() {
 
 
     if( sentInitialMove && !gotInitialMove && stepsSinceSentMove > minSteps ) {
-        if( checkConnectionStatus() != 1 ) {
+        if( checkOpponentConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;
@@ -558,7 +559,7 @@ void SellDiamondsState::stepState() {
     if( gotInitialMove && sentMove && !gotMove && 
         stepsSinceSentMove > minSteps ) {
         
-        if( checkConnectionStatus() != 1 ) {
+        if( checkOpponentConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;

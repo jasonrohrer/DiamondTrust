@@ -5,6 +5,7 @@
 #include "common.h"
 #include "bidPicker.h"
 #include "gameStats.h"
+#include "opponent.h"
 
 
 //static int activeUnit = -1;
@@ -134,7 +135,7 @@ void MoveInspectorState::stepState() {
     
     if( waiting && !gotMove && stepsWaiting > minSteps ) {
         
-        if( checkConnectionStatus() != 1 ) {
+        if( checkOpponentConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;

@@ -5,6 +5,7 @@
 #include "common.h"
 #include "bidPicker.h"
 #include "gameStats.h"
+#include "opponent.h"
 
 
 //static int activeUnit = -1;
@@ -261,7 +262,7 @@ void SalaryBribeState::stepState() {
     
     if( sentMove && !gotMove && stepsSinceSentMove > minSteps ) {
         
-        if( checkConnectionStatus() != 1 ) {
+        if( checkOpponentConnectionStatus() != 1 ) {
             connectionBroken = true;
             stateDone = true;
             return;
