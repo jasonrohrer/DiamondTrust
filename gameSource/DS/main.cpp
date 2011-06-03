@@ -15,6 +15,7 @@
 #include "measureChannel.h"
 #include "cloneBoot.h"
 #include "minorGems/util/SimpleVector.h"
+#include "minorGems/util/stringUtils.h"
 
 // implement plaform functions
 
@@ -154,6 +155,7 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
 
 
     FSFile file;
+    FS_InitFile( &file );
     
     if( FS_OpenFileEx( &file, inFileName, FS_FILEMODE_R ) ) {
         unsigned int length = FS_GetLength( &file );
@@ -181,6 +183,98 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
         }
     
     }
+
+
+
+
+char isDirectory( char *inFileName ) {
+    FSFile file;
+    FS_InitFile( &file );
+
+    char returnVal = false;
+    
+    if( FS_FindDir( &file, inFileName ) ) {
+        returnVal = true;
+        
+        FS_CloseDirectory( &file );
+        }
+    
+    return returnVal;
+    }
+
+
+
+char **listDirectory( char *inFileName, int *outNumEntries ) {
+    FSFile file;
+    FS_InitFile( &file );
+    
+    char returnVal = false;
+    
+    if( FS_FindDir( &file, inFileName ) ) {
+            
+        FSDirEntry dirEntry;
+        
+        SimpleVector<char *> dirFileNames;
+        
+        while( FS_ReadDir( &file, &dirEntry ) ) {
+            
+            char *name = autoSprintf( "%s/%s", inFileName, dirEntry.name );
+            
+            dirFileNames.push_back( name );
+            }
+        
+        *outNumEntries = dirFileNames.size();
+        return dirFileNames.getElementArray();
+        
+        FS_CloseDirectory( &file );
+        }
+    
+    return NULL;
+    }
+
+    
+
+FileHandle openFile( char *inFileName, int *outSize ) {
+
+    FSFile *file = new FSFile;
+    FS_InitFile( file );
+    
+    if( FS_OpenFileEx( file, inFileName, FS_FILEMODE_R ) ) {
+        
+        *outSize = (int)FS_GetLength( file );
+
+        return file;
+        }
+    
+
+    delete file;
+
+    return NULL;
+    }
+
+
+
+int readFile( FileHandle inFile, unsigned char *inBuffer, int inBytesToRead ) {
+    FSFile *file = (FSFile *)inFile;
+
+    return FS_ReadFile( file, inBuffer, inBytesToRead );
+    }
+
+
+
+void closeFile( FileHandle inFile ) {
+    FSFile *file = (FSFile *)inFile;
+    
+    FS_CloseFile( file );
+    
+    delete file;
+    }
+
+
+
+
+
+
 
 
 
