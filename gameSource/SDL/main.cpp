@@ -93,7 +93,7 @@ void freeNetwork();
 void cleanUpAtExit() {
     printf( "Exiting...\n" );
 
-    //SDL_CloseAudio();
+    SDL_CloseAudio();
     
     gameFree();    
     freeSprites();
@@ -102,8 +102,86 @@ void cleanUpAtExit() {
 
 
 
+
+#define MAX_SOUND_CHANNELS 8
+
+static double channelVolume[MAX_SOUND_CHANNELS];
+static double channelPan[MAX_SOUND_CHANNELS];
+
+
 void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
-    //getSoundSamples( inStream, inLengthToFill );
+    
+    SDL_LockAudio();
+    
+    //printf( "Audio callback called\n" );
+    
+    // sum all 8 channels
+
+    
+    // stream has stereo, 16-bit samples
+    int numSamplesToFill = inLengthToFill / 4;
+    
+
+    // each channel has mono, 16-bit samples
+    s16 *sumBufferL = new s16[ numSamplesToFill ];
+    s16 *sumBufferR = new s16[ numSamplesToFill ];
+    
+    memset( sumBufferL, 0, numSamplesToFill );
+    memset( sumBufferR, 0, numSamplesToFill );
+
+
+    s16 *sampleBuffer = new s16[ numSamplesToFill ];
+    
+
+    for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
+
+        getAudioSamplesForChannel( c, sampleBuffer, numSamplesToFill );
+        
+        double volume = channelVolume[c];
+        double pan = channelPan[c];
+        
+        // apply constant power law for stereo
+        double p = M_PI * pan / 2;
+
+        double rightVolume = sin( p );
+        double leftVolume = cos( p );
+        
+
+        for( int s=0; s<numSamplesToFill; s++ ) {
+            
+            // avoid volume overflow with all channels together
+            double monoSample = sampleBuffer[ s ] / (double)MAX_SOUND_CHANNELS;
+
+            monoSample *= volume;
+
+            double leftSample = monoSample * leftVolume;
+            double rightSample = monoSample * rightVolume;
+
+
+            // fast float-to-int conversion
+            sumBufferL[s] += (s16)lrint( leftSample );
+            sumBufferR[s] += (s16)lrint( rightSample );
+            }
+        }
+    
+    
+    // now copy samples into Uint8 buffer
+    int streamPosition = 0;
+    for( int i=0; i != numSamplesToFill; i++ ) {
+        Sint16 intSampleL = sumBufferL[i];
+        Sint16 intSampleR = sumBufferR[i];
+        
+        inStream[ streamPosition ] = (Uint8)( intSampleL & 0xFF );
+        inStream[ streamPosition + 1 ] = (Uint8)( ( intSampleL >> 8 ) & 0xFF );
+        
+        inStream[ streamPosition + 2 ] = (Uint8)( intSampleR & 0xFF );
+        inStream[ streamPosition + 3 ] = (Uint8)( ( intSampleR >> 8 ) & 0xFF );
+        
+        streamPosition += 4;
+        }
+
+    
+    SDL_UnlockAudio();
     }
 
 
@@ -205,13 +283,14 @@ int mainFunction( int inNumArgs, char **inArgs ) {
 
 
     
+    gameInit();
 
 
 
     SDL_AudioSpec audioFormat;
 
     /* Set 16-bit stereo audio at 22Khz */
-    //audioFormat.freq = gameSoundSampleRate;
+    audioFormat.freq = 22050;
     audioFormat.format = AUDIO_S16;
     audioFormat.channels = 2;
     audioFormat.samples = 512;        /* A good value for games */
@@ -221,19 +300,25 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     audioFormat.userdata = NULL;
 
     /* Open the audio device and start playing sound! */
-    /*
-      // Audio disabled for now
+    
     if( SDL_OpenAudio( &audioFormat, NULL ) < 0 ) {
         printf( "Unable to open audio: %s\n", SDL_GetError() );
         }
-    */
+    
+
+    // defaults
+    for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {    
+        channelVolume[c] = 0;
+        channelPan[c] = 0.5;
+        }
+    
 
 
     // set pause to 0 to start audio
-    //SDL_PauseAudio(0);
+    SDL_PauseAudio(0);
 
 
-    gameInit();
+    
     
     // to free frame drawer, stop audio, etc
     atexit( cleanUpAtExit );
@@ -664,6 +749,80 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
 
 
 
+char isDirectory( char *inFileName ) {
+    File f( new Path( "gameData" ), inFileName );
+    
+    return f.isDirectory();
+    }
+
+
+
+char **listDirectory( char *inFileName, int *outNumEntries ) {
+
+    File f( new Path( "gameData" ), inFileName );
+
+    if( ! f.isDirectory() ) {
+        return NULL;
+        }
+    
+
+    int numChildFiles;
+    
+    File **childFiles = f.getChildFiles( &numChildFiles );
+
+    SimpleVector<char*> childNames;
+    
+    for( int i=0; i<numChildFiles; i++ ) {
+        File *childFile = childFiles[i];
+    
+        char *childName = childFile->getFileName();
+        
+        char *childFullName =
+            autoSprintf( "%s/%s", inFileName, childName );
+        
+        delete [] childName;
+
+        childNames.push_back( childFullName );
+
+        delete childFile;
+        }
+    delete [] childFiles;
+
+    
+    return childNames.getElementArray();
+    }
+
+
+
+FileHandle openFile( char *inFileName, int *outSize ) {
+    File f( new Path( "gameData" ), inFileName );
+
+    char *fullName = f.getFullFileName();
+    
+    FILE *file = fopen( fullName, "rb" );
+    
+    delete [] fullName;
+    
+    return file;
+    }
+
+
+
+int readFile( FileHandle inFile, unsigned char *inBuffer, int inBytesToRead ) {
+    return fread( inBuffer, 1, inBytesToRead, (FILE*)inFile );
+    }
+
+
+void closeFile( FileHandle inFile ) {
+    fclose( (FILE*)inFile );
+    }
+
+
+
+
+
+
+
 #include <stdarg.h>
 
 void printOut( const char *inFormatString, ... ) {
@@ -682,6 +841,23 @@ void printOut( const char *inFormatString, ... ) {
 
 unsigned int getSecondsSinceEpoc() {
     return time( NULL );
+    }
+
+
+
+#include "minorGems/system/Time.h"
+
+static char baseTimeSet = false;
+static unsigned long baseSeconds, baseMilliseconds;
+
+unsigned int getSystemMilliseconds() {
+    
+    if( !baseTimeSet ) {
+        Time::getCurrentTime( &baseSeconds, &baseMilliseconds );
+        return 0;
+        }
+
+    return Time::getMillisecondsSince( baseSeconds, baseMilliseconds );
     }
 
 
@@ -1517,3 +1693,24 @@ void checkCloneFetch() {
     }
 
 
+
+
+
+
+
+void setSoundChannelVolume( int inChannelNumber, int inVolume ) {
+    SDL_LockAudio();
+    
+    channelVolume[inChannelNumber] = inVolume / 127.0;
+    
+    SDL_UnlockAudio();
+    }
+
+
+void setSoundChannelPan( int inChannelNumber, int inPan ) {
+    SDL_LockAudio();
+
+    channelPan[inChannelNumber] = inPan / 127.0;
+
+    SDL_UnlockAudio();
+    }
