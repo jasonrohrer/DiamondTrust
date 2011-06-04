@@ -3,6 +3,9 @@
 #include "platform.h"
 
 
+#include <stdio.h>
+
+
 typedef struct wavInfo {
         int numChannels;
         int bitsPerSample;

@@ -799,6 +799,9 @@ FileHandle openFile( char *inFileName, int *outSize ) {
 
     char *fullName = f.getFullFileName();
     
+    *outSize = f.getLength();
+    
+
     FILE *file = fopen( fullName, "rb" );
     
     delete [] fullName;

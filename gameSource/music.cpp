@@ -1,6 +1,39 @@
-
-
 #include "platform.h"
+
+#include "music.h"
+#include "wav.h"
+
+
+wavInfo info;
+    
+FileHandle wavHandle;
+
+void initMusic() {
+    wavHandle = openWavFile( "gong.wav", &info );
+
+    if( wavHandle != NULL ) {
+        
+        if( info.numChannels != 1 || info.bitsPerSample != 16 ) {
+            printOut( "Only mono, 16-bit WAV files supported\n" );
+            printOut( "(not  %d chan, %d-bit, %d rate, %d samples )\n",
+                  info.numChannels, info.bitsPerSample, 
+                  info.sampleRate, info.numSamples );
+            closeFile( wavHandle );
+            wavHandle = NULL;
+            }
+        }
+    
+    
+    }
+
+
+
+void freeMusic() {
+    if( wavHandle != NULL ) {
+        closeFile( wavHandle );
+        }
+    }
+
 
 
 
@@ -12,10 +45,35 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                                 int inNumSamples ) {
     // for now, return silence
 
-    if( inChannelNumber == 0 ) {    
+    if( inChannelNumber == 0 && wavHandle != NULL ) { 
+        
+   
+        int sampleIndex = sampleIndices[inChannelNumber];
+
+        unsigned char oneSampleBuffer[2];
+
         for( int i=0; i<inNumSamples; i++ ) {
-            inBuffer[i] = 0;
+            
+            readFile( wavHandle, oneSampleBuffer, 2 );
+            
+            inBuffer[i] = oneSampleBuffer[0] | oneSampleBuffer[1] << 8;
+            
+
+            sampleIndex += 1;
+            
+            // wrap
+            if( sampleIndex >= info.numSamples ) {
+                sampleIndex = 0;
+                
+                // re-open wav file
+                closeFile( wavHandle );
+                wavHandle = openWavFile( "gong.wav", &info );
+                }
+
+
+            //inBuffer[i] = 0;
             }
+        sampleIndices[0] = sampleIndex;
         }
     
 

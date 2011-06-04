@@ -18,6 +18,7 @@
 #include "salePicker.h"
 #include "ai/ai.h"
 #include "opponent.h"
+#include "music.h"
 
 
 // set to false when gameInit done
@@ -491,6 +492,11 @@ void gameInit() {
 
     resetStats();
     
+
+
+    initMusic();
+    
+
     
     if( ! isAutoconnecting() ) {
         currentGameState = pickGameTypeState;
@@ -539,6 +545,8 @@ void gameFree() {
     freeSalePicker();
 
     freeOpponent();
+
+    freeMusic();
     }
 
 

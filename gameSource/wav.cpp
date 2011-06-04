@@ -1,6 +1,5 @@
 #include "wav.h"
 #include <string.h>
-#include <stdio.h>
 
 
 static unsigned int bytesToInt( unsigned char inBuffer[4] ) {
