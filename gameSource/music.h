@@ -1,0 +1,6 @@
+
+
+void initMusic();
+
+
+void freeMusic();
