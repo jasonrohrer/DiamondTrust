@@ -22,12 +22,17 @@ int numSongParts;
 char **songPartNames = NULL;
 
 
+int gridStepLength = 0;
+
+
 
 typedef struct channelStream {
         
         // false if channel is silent
         char filePlaying;
         
+        unsigned int totalNumSamplesPlayed;
+
 
         char *wavFileName;
         
@@ -35,6 +40,9 @@ typedef struct channelStream {
         wavInfo info;
         
         int fileSamplePosition;
+
+        int startSampleDelay;
+        
     } channelStreaml;
         
 
@@ -100,6 +108,7 @@ void initMusic() {
         s->wavFileName = NULL;
         s->wavFile = NULL;
         s->filePlaying = false;
+        s->totalNumSamplesPlayed = 0;
         }
 
 
@@ -240,6 +249,67 @@ void freeMusic() {
 
 
 
+void addTrack( int inChannelNumber, int inDelay ) {
+    
+    int partPick = inChannelNumber;
+    
+    char *actDir = songActDirNames[ currentSongAct ];
+    char *partName = songPartNames[ partPick ];
+                    
+    char *partDir = autoSprintf( "%s/%s", actDir, partName );
+                    
+    if( isDirectory( partDir ) ) {
+                        
+        int numPartFiles;
+        char **partFiles = 
+            listDirectory( partDir, &numPartFiles );
+                        
+        if( numPartFiles > 0 ) {
+                            
+            int partFilePick = 
+                getRandom( numPartFiles );
+                            
+                            
+            channelStream *s = &( songStreams[partPick] );
+                            
+            s->wavFileName = 
+                stringDuplicate( partFiles[ partFilePick ] );
+                            
+            s->wavFile = 
+                openWavFile( s->wavFileName, &( s->info ) );
+            s->fileSamplePosition = 0;
+            s->startSampleDelay = inDelay;
+            s->filePlaying = true;
+
+            printOut( "Adding loop %s on channel %d with delay %d\n", 
+                      s->wavFileName, partPick, inDelay );
+
+                            
+            if( s->info.numSamples > gridStepLength ) {
+                // an even longer loop encountered
+                // use this as our grid step
+
+                gridStepLength = s->info.numSamples;
+                printOut( "New longer grid step discovered:  %d\n", 
+                          gridStepLength );
+                }
+
+            }
+        deleteArrayOfStrings( &partFiles, numPartFiles );
+        }
+    else {
+        printOut( "Part %s not found in song act %s\n",
+                  partName, actDir );
+        }
+                    
+    delete [] partDir;
+    }
+
+
+
+
+
+
 static int sampleIndices[16] = { 0 };
 
 #include "wihaho.pcm16.c"
@@ -250,11 +320,61 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
     channelStream *s = &( songStreams[inChannelNumber] );
 
+
+    if( ! s->filePlaying && inChannelNumber < numSongParts ) {
+    
+        if( gridStepLength == 0
+            ||
+            s->totalNumSamplesPlayed / gridStepLength <
+            ( s->totalNumSamplesPlayed + inNumSamples ) / gridStepLength ) {
+        
+            // a grid step occurs in THIS buffer
+    
+            
+            int delay = 0;
+            if( gridStepLength > 0 ) {
+                delay = gridStepLength - 
+                    ( s->totalNumSamplesPlayed % gridStepLength );
+                }
+            
+            // consider adding a new track
+            if( getRandom( 100 ) > 50 ) {
+                addTrack( inChannelNumber, delay );
+                }
+            }
+        
+        }
+    
+
+
+
     if( s->filePlaying ) {
         //printOut( "%d playing %s\n", inChannelNumber, s->wavFileName );
         
         // keep looping through file until we've filled the requested buffer
         while( inNumSamples > 0 ) {
+
+            if( s->startSampleDelay > 0 ) {
+                
+                // stick more silence in before this loop actually starts 
+                // playing
+                
+                int numToGet = inNumSamples;
+                
+                if( numToGet > s->startSampleDelay ) {
+                    numToGet = s->startSampleDelay;
+                    }
+                
+                memset( inBuffer, 0, numToGet * 2 );
+                
+                s->startSampleDelay -= numToGet;
+            
+                inBuffer = &( inBuffer[numToGet] );
+            
+            
+                inNumSamples -= numToGet;
+                }
+            
             
             int numToGet = inNumSamples;
 
@@ -286,69 +406,10 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
     else {
         // silence
         memset( inBuffer, 0, inNumSamples * sizeof( s16 ) );
-
         
-        // consider adding a new track
-
-        if( getRandom( 100 ) > 95 ) {
-            //printOut( "Adding a new track to the mix\n" );
-            
-            int partPick = getRandom( numSongParts );
-            
-            if( partPick < MAX_SOUND_CHANNELS ) {
-
-
-                // room for this part
-
-                if( ! songStreams[ partPick ].filePlaying ) {
-                    // empty channel waiting
-                    
-                    char *actDir = songActDirNames[ currentSongAct ];
-                    char *partName = songPartNames[ partPick ];
-                    
-                    char *partDir = autoSprintf( "%s/%s", actDir, partName );
-                    
-                    if( isDirectory( partDir ) ) {
-                        
-                        int numPartFiles;
-                        char **partFiles = 
-                            listDirectory( partDir, &numPartFiles );
-                        
-                        if( numPartFiles > 0 ) {
-                            
-                            int partFilePick = 
-                                getRandom( numPartFiles );
-                            
-                            
-                            channelStream *s = &( songStreams[partPick] );
-                            
-                            s->wavFileName = 
-                                stringDuplicate( partFiles[ partFilePick ] );
-                            
-                            s->wavFile = 
-                                openWavFile( s->wavFileName, &( s->info ) );
-                            s->fileSamplePosition = 0;
-                            s->filePlaying = true;
-
-                            printOut( "Adding loop %s on channel %d\n", 
-                                      s->wavFileName, partPick );
-
-
-                            }
-                        deleteArrayOfStrings( &partFiles, numPartFiles );
-                        }
-                    else {
-                        printOut( "Part %s not found in song act %s\n",
-                                  partName, actDir );
-                        }
-                    
-                    delete [] partDir;
-                    }
-                }
-            }
         }
-    
 
+    s->totalNumSamplesPlayed += inNumSamples;
 
     return;
     
