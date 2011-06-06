@@ -375,11 +375,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             
             // consider adding a new track
             if( getRandom( 100 ) > 10 ) {
-                addTrack( inChannelNumber, delay );
-                
-                printOut( "  Add info:  total=%d, this adds %d, gridStep=%d\n",
-                          s->totalNumSamplesPlayed, inNumSamples, 
-                          gridStepLength );
+                addTrack( inChannelNumber, delay );                
                 }
             }
         
