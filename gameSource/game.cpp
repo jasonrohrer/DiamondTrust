@@ -813,6 +813,20 @@ void gameLoopTick() {
         }
     
 
+    if( globalSoundVolume == 0 ) {
+        
+        // set up pan for all channels
+        
+        for( int c=0; c<8; c++ ) {
+            // spread channels around center
+            int pan = 64 + ( c - 4 ) * 6;
+            
+            printOut( "Setting channel %d pan to %d\n", c, pan );
+            
+            setSoundChannelPan( c, pan  );
+            }
+        
+        }
     if( globalSoundVolume < 127 ) {
         globalSoundVolume++;
         
