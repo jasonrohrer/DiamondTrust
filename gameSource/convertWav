@@ -9,6 +9,6 @@ fi
 
 sndfile-convert -pcm16 $1 TEMP_$1
 
-sox TEMP_$1 -r 22050 -c 1 $1
+sox TEMP_$1 -r 22050 -c 1 $1 avg resample
 
 rm TEMP_$1
