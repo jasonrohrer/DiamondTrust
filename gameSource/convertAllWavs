@@ -22,5 +22,5 @@ done
 for file in $( find . -name "*.wav" )
 do
   echo "Converting $file..."
-  #./convertWav $file
+  ./convertWav "$file"
 done 

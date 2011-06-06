@@ -7,8 +7,10 @@ then
 fi
 
 
-sndfile-convert -pcm16 $1 TEMP_$1
+tempFile="$1.temp.wav"
 
-sox TEMP_$1 -r 22050 -c 1 $1 avg resample
+sndfile-convert -pcm16 "$1" "$tempFile"
 
-rm TEMP_$1
+sox "$tempFile" -r 22050 -c 1 "$1" avg resample
+
+rm "$tempFile"
