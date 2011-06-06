@@ -857,6 +857,7 @@ unsigned int getSystemMilliseconds() {
     
     if( !baseTimeSet ) {
         Time::getCurrentTime( &baseSeconds, &baseMilliseconds );
+        baseTimeSet = true;
         return 0;
         }
 
