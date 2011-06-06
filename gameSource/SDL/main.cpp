@@ -786,7 +786,8 @@ char **listDirectory( char *inFileName, int *outNumEntries ) {
         delete childFile;
         }
     delete [] childFiles;
-
+    
+    *outNumEntries = childNames.size();
     
     return childNames.getElementArray();
     }
