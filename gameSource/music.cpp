@@ -264,6 +264,40 @@ void addTrack( int inChannelNumber, int inDelay ) {
         char **partFiles = 
             listDirectory( partDir, &numPartFiles );
                         
+        
+        // also consider files for this part that are in first act
+        // (they can be used throughout song)
+        
+        char *firstPartDir = autoSprintf( "%s/%s", 
+                                          songActDirNames[0], partName );
+        
+        if( isDirectory( firstPartDir ) ) {
+            // add into mix of possible parts to chose from
+            
+            SimpleVector<char *> fullPartFileVector;
+            
+            fullPartFileVector.appendArray( partFiles, numPartFiles );
+            
+            int numFirstPartFiles;
+            
+            char **firstPartFiles = listDirectory( firstPartDir,
+                                                   &numFirstPartFiles );
+            
+            if( numFirstPartFiles > 0 ) {
+                fullPartFileVector.appendArray( firstPartFiles, 
+                                                numFirstPartFiles );
+                
+                }
+            delete [] firstPartFiles;
+            
+            delete [] partFiles;
+            
+            partFiles = fullPartFileVector.getElementArray();
+            numPartFiles = fullPartFileVector.size();
+            }
+            
+
+
         if( numPartFiles > 0 ) {
                             
             int partFilePick = 
@@ -338,7 +372,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 }
             
             // consider adding a new track
-            if( getRandom( 100 ) > 50 ) {
+            if( getRandom( 100 ) > 10 ) {
                 addTrack( inChannelNumber, delay );
                 }
             }
