@@ -58,6 +58,37 @@ static void deleteArrayOfStrings( char ***inArray, int inNumStrings ) {
 
 
 
+static void sortStrings( char ***inArray, int inNumStrings ) {
+    
+    char **array = *( inArray );
+    
+    // slow bubble sort, but it doesn't matter for such small sets
+
+    
+    char sorted = false;
+    
+    while( ! sorted ) {
+        sorted = true;
+
+        for( int i=0; i<inNumStrings-1; i++ ) {
+            
+            if( strcmp( array[i], array[i+1] ) > 0 ) {
+                
+                // swap
+                char *temp = array[i+1];
+            
+                array[i+1] = array[i];
+            
+                array[i] = temp;
+                sorted = false;
+                }
+            }
+        }
+    }
+
+
+
+
 
 
 void initMusic() {
@@ -80,18 +111,23 @@ void initMusic() {
     char **songList = listDirectory( "music", &numSongs );
     
     if( numSongs > 0 ) {
-        int songPick = getRandom( numSongs - 1 );
+        int songPick = getRandom( numSongs );
 
         currentSongDirName = stringDuplicate( songList[ songPick ] );
 
         
         
-        char **songActDirNames = listDirectory( currentSongDirName, 
-                                                &numSongActs );
+        songActDirNames = listDirectory( currentSongDirName, 
+                                         &numSongActs );
+
+        
+        
 
         currentSongAct = 0;
         
         if( numSongActs > 1 ) {
+            sortStrings( &songActDirNames, numSongActs );
+                    
             // first act is common tracks for all acts
             currentSongAct = 1;
             }
@@ -118,7 +154,7 @@ void initMusic() {
                 char found;
                 
                 char *songPartName = 
-                    replaceOnce( songPartDirNames[i], path, "", &found );
+                    replaceOnce( songPartDirNames[p], path, "", &found );
                 
                 delete [] path;
                 
@@ -141,7 +177,7 @@ void initMusic() {
                     }                
 
                 delete [] songPartName;
-                delete [] songPartDirNames;
+                delete [] songPartDirNames[p];
                 }
             delete [] songPartDirNames;            
             }
@@ -215,6 +251,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
     channelStream *s = &( songStreams[inChannelNumber] );
 
     if( s->filePlaying ) {
+        //printOut( "%d playing %s\n", inChannelNumber, s->wavFileName );
         
         // keep looping through file until we've filled the requested buffer
         while( inNumSamples > 0 ) {
@@ -254,11 +291,13 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
         // consider adding a new track
 
         if( getRandom( 100 ) > 95 ) {
-            printOut( "Adding a new track to the mix\n" );
+            //printOut( "Adding a new track to the mix\n" );
             
-            int partPick = getRandom( numSongParts - 1 );
+            int partPick = getRandom( numSongParts );
             
             if( partPick < MAX_SOUND_CHANNELS ) {
+
+
                 // room for this part
 
                 if( ! songStreams[ partPick ].filePlaying ) {
@@ -277,10 +316,11 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                         
                         if( numPartFiles > 0 ) {
                             
-                            int partFilePick = getRandom( numPartFiles - 1 );
+                            int partFilePick = 
+                                getRandom( numPartFiles );
                             
                             
-                            channelStream *s = &( songStreams[partFilePick] );
+                            channelStream *s = &( songStreams[partPick] );
                             
                             s->wavFileName = 
                                 stringDuplicate( partFiles[ partFilePick ] );
@@ -289,6 +329,11 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                                 openWavFile( s->wavFileName, &( s->info ) );
                             s->fileSamplePosition = 0;
                             s->filePlaying = true;
+
+                            printOut( "Adding loop %s on channel %d\n", 
+                                      s->wavFileName, partPick );
+
+
                             }
                         deleteArrayOfStrings( &partFiles, numPartFiles );
                         }
