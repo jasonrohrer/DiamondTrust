@@ -351,6 +351,8 @@ static int sampleIndices[16] = { 0 };
 void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer, 
                                 int inNumSamples ) {
 
+    int numSamplesRequested = inNumSamples;
+
 
     channelStream *s = &( songStreams[inChannelNumber] );
 
@@ -374,6 +376,10 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             // consider adding a new track
             if( getRandom( 100 ) > 10 ) {
                 addTrack( inChannelNumber, delay );
+                
+                printOut( "  Add info:  total=%d, this adds %d, gridStep=%d\n",
+                          s->totalNumSamplesPlayed, inNumSamples, 
+                          gridStepLength );
                 }
             }
         
@@ -433,7 +439,28 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 s->fileSamplePosition = 0;
                 
                 closeFile( s->wavFile );
-                s->wavFile = openWavFile( s->wavFileName, &( s->info ) );
+                s->wavFile = NULL;
+                delete [] s->wavFileName;
+
+                // consider dropping out
+                if( getRandom( 100 ) < 50 ) {
+                    printOut( "Track %d dropping out\n", inChannelNumber );
+                    
+                    s->filePlaying = false;
+
+                    // fill rest with silence
+                    memset( inBuffer, 0, inNumSamples * 2 );
+                    inNumSamples = 0;
+                    }
+                else {
+                    // consider switching to a different loop for this part
+
+                    // no delay, because it can start right NOW
+                    addTrack( inChannelNumber, 0 );
+                    }
+                
+                
+                //s->wavFile = openWavFile( s->wavFileName, &( s->info ) );
                 }
             }
         }
@@ -443,8 +470,12 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
         
         }
 
-    s->totalNumSamplesPlayed += inNumSamples;
-
+    s->totalNumSamplesPlayed += numSamplesRequested;
+    
+    if( inChannelNumber == 0 ) {
+        //printOut( "Total played %d\n", s->totalNumSamplesPlayed );
+        }
+    
     return;
     
 
