@@ -292,7 +292,7 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     audioFormat.freq = 22050;
     audioFormat.format = AUDIO_S16;
     audioFormat.channels = 2;
-    audioFormat.samples = 1024;        /* A good value for games */
+    audioFormat.samples = 4096;        /* avoid artifacts, ever */
     //audioFormat.samples = 1024;        
     //audioFormat.samples = 2048;        
     audioFormat.callback = audioCallback;
