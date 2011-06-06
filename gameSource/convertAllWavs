@@ -1,0 +1,26 @@
+#!/bin/bash
+
+list=`find . -name "*.wav"`
+
+
+# set input field separator to newline for "find" output that contains
+# spaces in file names
+IFS="
+"
+
+
+# first, remove hidden files
+
+for file in $( find . -type f -name ".*" )
+do
+  echo "Deleting hidden file $file..."
+  rm $file
+done 
+
+
+
+for file in $( find . -name "*.wav" )
+do
+  echo "Converting $file..."
+  #./convertWav $file
+done 

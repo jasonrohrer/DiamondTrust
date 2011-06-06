@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$#" -lt "1" ]
+then
+  echo "Usage:   convertWav file.wav"
+  exit 1
+fi
+
+
+sndfile-convert -pcm16 $1 TEMP_$1
+
+sox TEMP_$1 -r 22050 -c 1 $1
+
+rm TEMP_$1
