@@ -103,7 +103,6 @@ void cleanUpAtExit() {
 
 
 
-#define MAX_SOUND_CHANNELS 8
 
 static double channelVolume[MAX_SOUND_CHANNELS];
 static double channelPan[MAX_SOUND_CHANNELS];

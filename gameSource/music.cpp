@@ -4,34 +4,201 @@
 #include "wav.h"
 
 
-wavInfo info;
-    
-FileHandle wavHandle;
+#include "minorGems/util/stringUtils.h"
+#include "minorGems/util/SimpleVector.h"
 
-void initMusic() {
-    wavHandle = openWavFile( "gong.wav", &info );
 
-    if( wavHandle != NULL ) {
+
+char *currentSongDirName = NULL;
+
+
+int numSongActs;
+char **songActDirNames = NULL;
+
+int currentSongAct;
+
+
+int numSongParts;
+char **songPartNames = NULL;
+
+
+
+typedef struct channelStream {
         
-        if( info.numChannels != 1 || info.bitsPerSample != 16 ) {
-            printOut( "Only mono, 16-bit WAV files supported\n" );
-            printOut( "(not  %d chan, %d-bit, %d rate, %d samples )\n",
-                  info.numChannels, info.bitsPerSample, 
-                  info.sampleRate, info.numSamples );
-            closeFile( wavHandle );
-            wavHandle = NULL;
-            }
+        // false if channel is silent
+        char filePlaying;
+        
+
+        char *wavFileName;
+        
+        FileHandle wavFile;
+        wavInfo info;
+        
+        int fileSamplePosition;
+    } channelStreaml;
+        
+
+
+channelStream songStreams[ MAX_SOUND_CHANNELS ];
+
+
+
+
+static void deleteArrayOfStrings( char ***inArray, int inNumStrings ) {
+    
+    char **array = *( inArray );
+
+    for( int i=0; i<inNumStrings; i++ ) {
+        delete [] array[i];
         }
+    delete [] array;
     
-    
+    *inArray = NULL;
     }
 
 
 
-void freeMusic() {
-    if( wavHandle != NULL ) {
-        closeFile( wavHandle );
+
+
+void initMusic() {
+    // all channels start not playing
+    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
+        
+        channelStream *s = &( songStreams[i] );
+
+        s->wavFileName = NULL;
+        s->wavFile = NULL;
+        s->filePlaying = false;
         }
+
+
+
+    // pick a song at random
+
+    int numSongs;
+    
+    char **songList = listDirectory( "music", &numSongs );
+    
+    if( numSongs > 0 ) {
+        int songPick = getRandom( numSongs - 1 );
+
+        currentSongDirName = stringDuplicate( songList[ songPick ] );
+
+        
+        
+        char **songActDirNames = listDirectory( currentSongDirName, 
+                                                &numSongActs );
+
+        currentSongAct = 0;
+        
+        if( numSongActs > 1 ) {
+            // first act is common tracks for all acts
+            currentSongAct = 1;
+            }
+
+        
+
+        printOut( "Available song parts:\n" );
+        
+        // look through all acts and get union of all possible part names
+        SimpleVector<char *> allPartNames;
+        
+        for( int i=0; i<numSongActs; i++ ) {
+            
+            
+            int numParts;
+            
+            char **songPartDirNames = listDirectory( songActDirNames[i], 
+                                                     &numParts );
+            
+            for( int p=0; p<numParts; p++ ) {
+
+                char *path = autoSprintf( "%s/", songActDirNames[i] );
+                
+                char found;
+                
+                char *songPartName = 
+                    replaceOnce( songPartDirNames[i], path, "", &found );
+                
+                delete [] path;
+                
+                // check if it's already present in vector
+
+                char hit = false;
+                for( int q=0; q<allPartNames.size(); q++ ) {
+                
+                    if( strcmp( *( allPartNames.getElement(q) ),
+                                songPartName ) == 0 ) {
+                        hit = true;
+                        break;
+                        }                    
+                    }
+                
+                if( !hit ) {
+                    allPartNames.push_back( stringDuplicate( songPartName ) );
+
+                    printOut( "  %s\n", songPartName );
+                    }                
+
+                delete [] songPartName;
+                delete [] songPartDirNames;
+                }
+            delete [] songPartDirNames;            
+            }
+        
+        numSongParts = allPartNames.size();
+        songPartNames = allPartNames.getElementArray();
+
+        if( numSongParts > MAX_SOUND_CHANNELS ) {
+            printOut( "Warning:  more parts than available channels\n" );
+            }
+
+        }
+    else {
+        printOut( "ERROR:  no songs present!\n" );
+        }
+
+    deleteArrayOfStrings( &songList, numSongs );
+    }
+
+
+
+
+
+
+void freeMusic() {
+
+    if( currentSongDirName != NULL ) {
+        delete [] currentSongDirName;
+        }
+    
+    if( songActDirNames != NULL ) {
+        deleteArrayOfStrings( &songActDirNames, numSongActs );
+        }
+
+
+    if( songPartNames != NULL ) {
+        deleteArrayOfStrings( &songPartNames, numSongParts );
+        }
+
+
+
+    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
+        
+        channelStream *s = &( songStreams[i] );
+
+        if( s->filePlaying  ) {
+            closeFile( s->wavFile );
+            s->wavFile = NULL;
+            s->filePlaying = false;
+
+            delete [] s->wavFileName;
+            s->wavFileName = NULL;
+            }        
+        }
+    
+
+
     }
 
 
@@ -43,6 +210,107 @@ static int sampleIndices[16] = { 0 };
 
 void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer, 
                                 int inNumSamples ) {
+
+
+    channelStream *s = &( songStreams[inChannelNumber] );
+
+    if( s->filePlaying ) {
+        
+        // keep looping through file until we've filled the requested buffer
+        while( inNumSamples > 0 ) {
+            
+            int numToGet = inNumSamples;
+
+            int numSamplesLeft = s->info.numSamples - s->fileSamplePosition;
+            
+            if( numToGet > numSamplesLeft ) {
+                numToGet = numSamplesLeft;
+                }
+            
+            readFile( s->wavFile, (unsigned char *)inBuffer, numToGet * 2 );
+            
+            s->fileSamplePosition += numToGet;
+            
+            inBuffer = &( inBuffer[numToGet] );
+            
+            
+            inNumSamples -= numToGet;
+            
+            
+            if( s->fileSamplePosition == s->info.numSamples ) {
+                // at end of file, wrap back
+                s->fileSamplePosition = 0;
+                
+                closeFile( s->wavFile );
+                s->wavFile = openWavFile( s->wavFileName, &( s->info ) );
+                }
+            }
+        }
+    else {
+        // silence
+        memset( inBuffer, 0, inNumSamples * sizeof( s16 ) );
+
+        
+        // consider adding a new track
+
+        if( getRandom( 100 ) > 95 ) {
+            printOut( "Adding a new track to the mix\n" );
+            
+            int partPick = getRandom( numSongParts - 1 );
+            
+            if( partPick < MAX_SOUND_CHANNELS ) {
+                // room for this part
+
+                if( ! songStreams[ partPick ].filePlaying ) {
+                    // empty channel waiting
+                    
+                    char *actDir = songActDirNames[ currentSongAct ];
+                    char *partName = songPartNames[ partPick ];
+                    
+                    char *partDir = autoSprintf( "%s/%s", actDir, partName );
+                    
+                    if( isDirectory( partDir ) ) {
+                        
+                        int numPartFiles;
+                        char **partFiles = 
+                            listDirectory( partDir, &numPartFiles );
+                        
+                        if( numPartFiles > 0 ) {
+                            
+                            int partFilePick = getRandom( numPartFiles - 1 );
+                            
+                            
+                            channelStream *s = &( songStreams[partFilePick] );
+                            
+                            s->wavFileName = 
+                                stringDuplicate( partFiles[ partFilePick ] );
+                            
+                            s->wavFile = 
+                                openWavFile( s->wavFileName, &( s->info ) );
+                            s->fileSamplePosition = 0;
+                            s->filePlaying = true;
+                            }
+                        deleteArrayOfStrings( &partFiles, numPartFiles );
+                        }
+                    else {
+                        printOut( "Part %s not found in song act %s\n",
+                                  partName, actDir );
+                        }
+                    
+                    delete [] partDir;
+                    }
+                }
+            }
+        }
+    
+
+
+    return;
+    
+
+
+    /*
+
     // for now, return silence
 
     if( inChannelNumber == 0 && wavHandle != NULL ) { 
@@ -75,7 +343,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             }
         sampleIndices[0] = sampleIndex;
         }
-    
+    */    
 
     /*
     if( false && inChannelNumber == 0 ) {

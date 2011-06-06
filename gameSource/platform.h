@@ -335,6 +335,8 @@ void unlockAudio();
 
 // 8 possible channels
 
+#define MAX_SOUND_CHANNELS 8
+
 // Volume in range [0..127]
 // All volumes start out at 0 by default 
 void setSoundChannelVolume( int inChannelNumber, int inVolume );
