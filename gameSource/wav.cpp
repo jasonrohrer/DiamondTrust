@@ -5,16 +5,17 @@
 static unsigned int bytesToInt( unsigned char inBuffer[4] ) {
     // little endian in a wav file
 
-    return
-        inBuffer[0] | inBuffer[1] << 8 | inBuffer[2] << 16 | inBuffer[3] << 24;
+    return (unsigned int) (
+        inBuffer[0] | inBuffer[1] << 8 | 
+        inBuffer[2] << 16 | inBuffer[3] << 24 );
     }
 
 
 static unsigned short bytesToShort( unsigned char inBuffer[2] ) {
     // little endian in a wav file
 
-    return
-        inBuffer[0] | inBuffer[1];
+    return (unsigned short) (
+        inBuffer[0] | inBuffer[1] );
     }
 
 
@@ -120,7 +121,7 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
     // 4 bytes encoding sample rate
     bytesLeftInFile -= readFile( handle, chunkBuffer, 4 );
     
-    info.sampleRate = bytesToInt( chunkBuffer );
+    info.sampleRate = (int)bytesToInt( chunkBuffer );
 
 
     // 4 bytes of ByteRate (ignore)
@@ -154,7 +155,7 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
     // size of data chunk in bytes
     bytesLeftInFile -= readFile( handle, chunkBuffer, 4 );
     
-    int dataLength = bytesToInt( chunkBuffer );
+    unsigned int dataLength = bytesToInt( chunkBuffer );
     
     if( bytesLeftInFile < dataLength ) {
         printOut( "Not enough room for data chunk in WAV file %s\n", 
@@ -166,7 +167,7 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
     int bytesPerFullSample = ( info.bitsPerSample / 8 ) * info.numChannels;
     
 
-    info.numSamples = dataLength / bytesPerFullSample;
+    info.numSamples = (int)( dataLength / bytesPerFullSample );
     
     
     *outWavInfo = info;

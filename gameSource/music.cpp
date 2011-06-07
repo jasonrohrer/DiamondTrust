@@ -120,7 +120,7 @@ void initMusic() {
     char **songList = listDirectory( "music", &numSongs );
     
     if( numSongs > 0 ) {
-        int songPick = getRandom( numSongs );
+        int songPick = (int)getRandom( (unsigned int)numSongs );
 
         currentSongDirName = stringDuplicate( songList[ songPick ] );
 
@@ -249,7 +249,7 @@ void freeMusic() {
 
 
 
-void addTrack( int inChannelNumber, int inDelay ) {
+static void addTrack( int inChannelNumber, int inDelay ) {
     
     int partPick = inChannelNumber;
     
@@ -257,6 +257,10 @@ void addTrack( int inChannelNumber, int inDelay ) {
     char *partName = songPartNames[ partPick ];
                     
     char *partDir = autoSprintf( "%s/%s", actDir, partName );
+
+
+    SimpleVector<char *> fullPartFileVector;
+
                     
     if( isDirectory( partDir ) ) {
                         
@@ -265,78 +269,78 @@ void addTrack( int inChannelNumber, int inDelay ) {
             listDirectory( partDir, &numPartFiles );
                         
         
-        // also consider files for this part that are in first act
-        // (they can be used throughout song)
-        
-        char *firstPartDir = autoSprintf( "%s/%s", 
-                                          songActDirNames[0], partName );
-        
-        if( isDirectory( firstPartDir ) ) {
-            // add into mix of possible parts to chose from
-            
-            SimpleVector<char *> fullPartFileVector;
-            
-            fullPartFileVector.appendArray( partFiles, numPartFiles );
-            
-            int numFirstPartFiles;
-            
-            char **firstPartFiles = listDirectory( firstPartDir,
-                                                   &numFirstPartFiles );
-            
-            if( numFirstPartFiles > 0 ) {
-                fullPartFileVector.appendArray( firstPartFiles, 
-                                                numFirstPartFiles );
-                
-                }
-            delete [] firstPartFiles;
-            
-            delete [] partFiles;
-            
-            partFiles = fullPartFileVector.getElementArray();
-            numPartFiles = fullPartFileVector.size();
-            }
-            
-
-
         if( numPartFiles > 0 ) {
-                            
-            int partFilePick = 
-                getRandom( numPartFiles );
-                            
-                            
-            channelStream *s = &( songStreams[partPick] );
-                            
-            s->wavFileName = 
-                stringDuplicate( partFiles[ partFilePick ] );
-                            
-            s->wavFile = 
-                openWavFile( s->wavFileName, &( s->info ) );
-            s->fileSamplePosition = 0;
-            s->startSampleDelay = inDelay;
-            s->filePlaying = true;
-
-            printOut( "Adding loop %s on channel %d with delay %d\n", 
-                      s->wavFileName, partPick, inDelay );
-
-                            
-            if( s->info.numSamples > gridStepLength ) {
-                // an even longer loop encountered
-                // use this as our grid step
-
-                gridStepLength = s->info.numSamples;
-                printOut( "New longer grid step discovered:  %d\n", 
-                          gridStepLength );
-                }
-
+            fullPartFileVector.appendArray( partFiles, numPartFiles );
             }
-        deleteArrayOfStrings( &partFiles, numPartFiles );
+        
+        delete [] partFiles;
+        }
+    delete [] partDir;
+
+    
+    
+    // also consider files for this part that are in first act
+    // (they can be used throughout song)
+    
+    char *firstPartDir = autoSprintf( "%s/%s", 
+                                      songActDirNames[0], partName );
+        
+    if( isDirectory( firstPartDir ) ) {
+        // add into mix of possible parts to chose from
+                    
+        int numFirstPartFiles;
+        
+        char **firstPartFiles = listDirectory( firstPartDir,
+                                               &numFirstPartFiles );
+            
+        if( numFirstPartFiles > 0 ) {
+            fullPartFileVector.appendArray( firstPartFiles, 
+                                            numFirstPartFiles );        
+            }
+        
+        delete [] firstPartFiles;
+        }
+        
+    char **partFiles = fullPartFileVector.getElementArray();
+    int numPartFiles = fullPartFileVector.size();
+            
+
+
+    if( numPartFiles > 0 ) {
+                            
+        int partFilePick = (int)getRandom( (unsigned int)numPartFiles );
+                            
+        
+        channelStream *s = &( songStreams[partPick] );
+        
+        s->wavFileName = 
+            stringDuplicate( partFiles[ partFilePick ] );
+        
+        s->wavFile = openWavFile( s->wavFileName, &( s->info ) );
+        s->fileSamplePosition = 0;
+        s->startSampleDelay = inDelay;
+        s->filePlaying = true;
+        
+        printOut( "Adding loop %s on channel %d with delay %d\n", 
+                  s->wavFileName, partPick, inDelay );
+        
+                            
+        if( s->info.numSamples > gridStepLength ) {
+            // an even longer loop encountered
+            // use this as our grid step
+            
+            gridStepLength = s->info.numSamples;
+            printOut( "New longer grid step discovered:  %d\n", 
+                      gridStepLength );
+            }
+
         }
     else {
-        printOut( "Part %s not found in song act %s\n",
+        printOut( "Part %s not found in song act %s (or in base act)\n",
                   partName, actDir );
         }
-                    
-    delete [] partDir;
+
+    deleteArrayOfStrings( &partFiles, numPartFiles );                    
     }
 
 
@@ -368,8 +372,9 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             
             int delay = 0;
             if( gridStepLength > 0 && s->totalNumSamplesPlayed > 0 ) {
-                delay = gridStepLength - 
-                    ( s->totalNumSamplesPlayed % gridStepLength );
+                delay = (int)( 
+                    gridStepLength - 
+                    ( s->totalNumSamplesPlayed % gridStepLength ) );
                 }
             
             // consider adding a new track
@@ -400,7 +405,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                     numToGet = s->startSampleDelay;
                     }
                 
-                memset( inBuffer, 0, numToGet * 2 );
+                memset( inBuffer, 0, (unsigned int)( numToGet * 2 ) );
                 
                 s->startSampleDelay -= numToGet;
             
@@ -444,7 +449,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                     s->filePlaying = false;
 
                     // fill rest with silence
-                    memset( inBuffer, 0, inNumSamples * 2 );
+                    memset( inBuffer, 0, (unsigned int)( inNumSamples * 2 ) );
                     inNumSamples = 0;
                     }
                 else {
