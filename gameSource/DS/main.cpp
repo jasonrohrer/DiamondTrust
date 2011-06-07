@@ -2736,7 +2736,9 @@ u32 soundAlarmPeriod = soundTimerValue * SOUND_BUFFER_PAGESIZE / 32U;
 // it bogs down the interrupt handler (and even causes screen artifacts!)
 // so, we need to pass buffer processing off to a thread that can
 // run separately from the interrupt handler
-#define SOUND_THREAD_STACK_SIZE  1024
+
+// larger stack for deeper function calls, like opening files 
+#define SOUND_THREAD_STACK_SIZE  2048
 //#define SOUND_THREAD_PRIORITY  12
 // our main thread runs at 16, and it gets starved by sound thread
 // never want our FPS to drop because of sound.
