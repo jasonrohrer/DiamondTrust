@@ -358,6 +358,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
     
         if( gridStepLength == 0
             ||
+            s->totalNumSamplesPlayed == 0
+            ||
             s->totalNumSamplesPlayed / gridStepLength <
             ( s->totalNumSamplesPlayed + inNumSamples ) / gridStepLength ) {
         
@@ -365,13 +367,13 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
     
             
             int delay = 0;
-            if( gridStepLength > 0 ) {
+            if( gridStepLength > 0 && s->totalNumSamplesPlayed > 0 ) {
                 delay = gridStepLength - 
                     ( s->totalNumSamplesPlayed % gridStepLength );
                 }
             
             // consider adding a new track
-            if( getRandom( 100 ) > 10 ) {
+            if( getRandom( 100 ) > 30 ) {
                 addTrack( inChannelNumber, delay );                
                 }
             }
