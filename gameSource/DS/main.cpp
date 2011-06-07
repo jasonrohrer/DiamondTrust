@@ -222,11 +222,12 @@ char **listDirectory( char *inFileName, int *outNumEntries ) {
             
             dirFileNames.push_back( name );
             }
-        
+
+        FS_CloseDirectory( &file );
+
         *outNumEntries = dirFileNames.size();
         return dirFileNames.getElementArray();
         
-        FS_CloseDirectory( &file );
         }
     
     return NULL;
