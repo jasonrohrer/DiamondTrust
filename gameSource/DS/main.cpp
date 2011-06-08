@@ -258,7 +258,31 @@ FileHandle openFile( char *inFileName, int *outSize ) {
 int readFile( FileHandle inFile, unsigned char *inBuffer, int inBytesToRead ) {
     FSFile *file = (FSFile *)inFile;
 
-    return FS_ReadFile( file, inBuffer, inBytesToRead );
+    // split large read up to allow vblank interrupt and other stuff to run
+
+    int maxReadSize = 512;
+    
+    if( inBytesToRead <= maxReadSize ) {
+        return FS_ReadFile( file, inBuffer, inBytesToRead );
+        }
+    else {
+        int totalRead = 0;
+
+        while( inBytesToRead > 0 ) {
+            int numToRead = inBytesToRead;
+            
+            if( numToRead > maxReadSize ) {
+                numToRead = maxReadSize;
+                }
+            
+            totalRead += FS_ReadFile( file, inBuffer, numToRead );
+            
+            inBuffer = &( inBuffer[ numToRead ] );
+            inBytesToRead -= numToRead;
+            }
+        return totalRead;
+        }
+    
     }
 
 
