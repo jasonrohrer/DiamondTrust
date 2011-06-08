@@ -107,8 +107,31 @@ void cleanUpAtExit() {
 static double channelVolume[MAX_SOUND_CHANNELS];
 static double channelPan[MAX_SOUND_CHANNELS];
 
+static char soundTryingToRun = false;
+
+
+char isSoundTryingToRun() {
+    return soundTryingToRun;
+    }
+
+
+char callbackCount = 0;
+
 
 void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
+    
+    if( false && callbackCount < 10 ) {
+        memset( inStream, 0, inLengthToFill );
+        callbackCount ++;
+        return;
+        }
+    
+
+
+    unsigned int startMS = getSystemMilliseconds();
+    
+
+    soundTryingToRun = true;
     
     SDL_LockAudio();
     
@@ -181,6 +204,16 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
 
     
     SDL_UnlockAudio();
+
+    soundTryingToRun = false;
+
+
+    unsigned int netMS = getSystemMilliseconds() - startMS;
+    
+    if( netMS > 20 ) {
+        printOut( "Audio callback took %d ms\n", netMS );
+        }
+    
     }
 
 
@@ -292,7 +325,7 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     audioFormat.freq = 22050;
     audioFormat.format = AUDIO_S16;
     audioFormat.channels = 2;
-    audioFormat.samples = 4096;        /* avoid artifacts, ever */
+    audioFormat.samples = 8192;        /* avoid artifacts, ever */
     //audioFormat.samples = 1024;        
     //audioFormat.samples = 2048;        
     audioFormat.callback = audioCallback;
@@ -300,8 +333,13 @@ int mainFunction( int inNumArgs, char **inArgs ) {
 
     /* Open the audio device and start playing sound! */
     
-    if( SDL_OpenAudio( &audioFormat, NULL ) < 0 ) {
+    SDL_AudioSpec actualFormat;
+
+    if( SDL_OpenAudio( &audioFormat, &actualFormat ) < 0 ) {
         printf( "Unable to open audio: %s\n", SDL_GetError() );
+        }
+    else {
+        printf( "Opened audio with buffer size %d\n", actualFormat.samples );
         }
     
 
