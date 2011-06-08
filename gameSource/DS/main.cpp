@@ -2772,6 +2772,14 @@ OSThread soundThread;
 unsigned int soundThreadStack[ SOUND_THREAD_STACK_SIZE /
                                sizeof( unsigned int ) ];
 
+static char soundTryingToRun = false;
+
+
+char isSoundTryingToRun() {
+    return soundTryingToRun;
+    }
+
+
 static OSMessageQueue soundMessageQueue;
 static OSMessage soundMessageBuffer[1];
 
@@ -2786,6 +2794,7 @@ static void soundThreadProcess( void *inData ) {
 
     while( true ) {
         // wait for a message from the Alarm callback
+        soundTryingToRun = false;
         OS_ReceiveMessage( &soundMessageQueue, &message, OS_MESSAGE_BLOCK );
         
         for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
@@ -2814,7 +2823,8 @@ static void soundThreadProcess( void *inData ) {
 
 static void SoundAlarmCallback( void *inArg ) {
     //printOut( "Alarm called\n" );
-
+    
+    soundTryingToRun = true;
     OS_SendMessage( &soundMessageQueue, (OSMessage)inArg, OS_MESSAGE_NOBLOCK );
     }
 

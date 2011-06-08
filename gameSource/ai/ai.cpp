@@ -668,7 +668,9 @@ void stepAI() {
         
         int gamesThisStep = 0;
         
-        while( !moveDone && gamesThisStep < maxSimulationsPerStepAI ) {
+        while( !moveDone && gamesThisStep < maxSimulationsPerStepAI &&
+               // don't starve sound callback with too much AI processing
+               !isSoundTryingToRun() ) {
             gamesThisStep++;
             
             // simulate one game for our next candidate

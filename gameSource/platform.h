@@ -345,6 +345,12 @@ void setSoundChannelVolume( int inChannelNumber, int inVolume );
 // All pans start out at 64 by default
 void setSoundChannelPan( int inChannelNumber, int inPan );
 
+// true if the sound callback is trying to run
+// can be used by process-intensive routines (like AI) to break up processing
+// so that the sound callback doesn't get starved
+char isSoundTryingToRun();
+
+
 
 
 
