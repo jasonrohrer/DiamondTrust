@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+if [ "$#" -lt "1" ]
+then
+  echo "Usage:   trimAllWavs newSampleLength"
+  exit 1
+fi
+
+
+
+# set input field separator to newline for "find" output that contains
+# spaces in file names
+IFS="
+"
+
+
+
+for file in $( find . -name "*.wav" )
+do
+  echo "Trimming $file..."
+  ./trimWav "$file" $1
+done 

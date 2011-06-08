@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ "$#" -lt "2" ]
+then
+  echo "Usage:   trimWav file.wav newSampleLength"
+  exit 1
+fi
+
+
+tempFile="$1.temp.wav"
+
+sndfile-convert -pcm16 "$1" "$tempFile"
+
+sox "$1" "$tempFile" trim 0s $2s
+
+cp "$tempFile" "$1"
+
+rm "$tempFile"
