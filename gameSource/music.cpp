@@ -479,3 +479,15 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
     return;
 
     }
+
+
+
+
+void nextSongAct() {    
+    lockAudio();
+    if( currentSongAct < numSongActs - 1 ) {
+        currentSongAct ++;
+        }
+    unlockAudio();
+    }
+

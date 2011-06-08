@@ -1768,3 +1768,16 @@ void setSoundChannelPan( int inChannelNumber, int inPan ) {
 
     SDL_UnlockAudio();
     }
+
+
+
+void lockAudio() {
+    SDL_LockAudio();
+    }
+
+
+
+void unlockAudio() {
+    SDL_UnlockAudio();
+    }
+
