@@ -105,6 +105,8 @@ void cleanUpAtExit() {
 
 
 static double channelVolume[MAX_SOUND_CHANNELS];
+// smooth out volume changes given our large buffer size
+static double lastReachedChannelVolume[MAX_SOUND_CHANNELS];
 static double channelPan[MAX_SOUND_CHANNELS];
 
 static char soundTryingToRun = false;
@@ -159,7 +161,8 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
 
         getAudioSamplesForChannel( c, sampleBuffer, numSamplesToFill );
         
-        double volume = channelVolume[c];
+        double targetVolume = channelVolume[c];
+        double currentVolume = lastReachedChannelVolume[c];
         double pan = channelPan[c];
         
         // apply constant power law for stereo
@@ -168,13 +171,16 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
         double rightVolume = sin( p );
         double leftVolume = cos( p );
         
+        double volumeChangeRate = 
+            ( targetVolume - currentVolume ) / numSamplesToFill;
+
 
         for( int s=0; s<numSamplesToFill; s++ ) {
             
             // avoid volume overflow with all channels together
             double monoSample = sampleBuffer[ s ] / (double)MAX_SOUND_CHANNELS;
 
-            monoSample *= volume;
+            monoSample *= currentVolume;
 
             double leftSample = monoSample * leftVolume;
             double rightSample = monoSample * rightVolume;
@@ -183,7 +189,12 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
             // fast float-to-int conversion
             sumBufferL[s] += (s16)lrint( leftSample );
             sumBufferR[s] += (s16)lrint( rightSample );
+
+            currentVolume += volumeChangeRate;
             }
+
+        // avoid round-off errors in sum
+        lastReachedChannelVolume[c] = channelVolume[c];
         }
     
     
@@ -346,6 +357,7 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     // defaults
     for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {    
         channelVolume[c] = 0;
+        lastReachedChannelVolume[c] = 0;
         channelPan[c] = 0.5;
         }
     
