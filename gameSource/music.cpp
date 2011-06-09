@@ -491,3 +491,49 @@ void nextSongAct() {
     unlockAudio();
     }
 
+
+
+int getSongAct() {    
+    int returnValue;
+    
+    lockAudio();
+    returnValue = currentSongAct;
+    unlockAudio();
+    
+    return returnValue;
+    }
+
+
+
+
+char **getTrackInfoStrings( int *outNumTracks ) {
+    char **strings = new char*[MAX_SOUND_CHANNELS];
+    
+    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
+        
+        channelStream *s = &( songStreams[i] );
+
+        if( s->filePlaying ) {
+            strings[i] = autoSprintf( 
+                "%d:  %s (%d.%d/%d.%d)", i, s->wavFileName,
+                s->fileSamplePosition / 22050, 
+                s->fileSamplePosition / 2205 - 
+                  10 * ( s->fileSamplePosition / 22050 ), 
+                s->info.numSamples / 22050,
+                s->info.numSamples / 2205 - 
+                  10 * ( s->info.numSamples / 22050 ) );
+            }
+        else {
+            strings[i] = autoSprintf( "%d:  OFF", i );
+            }
+        
+        }
+    
+    *outNumTracks = MAX_SOUND_CHANNELS;
+
+    return strings;
+    }
+
+
+
+

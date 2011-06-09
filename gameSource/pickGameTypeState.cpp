@@ -21,7 +21,7 @@ extern unsigned char titleFade;
 
 extern Button *nextSongActButton;
 
-static const char allowManualSongActSwitching = true;
+extern char allowManualSongActSwitching;
 
 
 

@@ -32,6 +32,11 @@ static char loadingProgress[ PROGRESS_LENGTH  + 1 ];
 #include "loading.h"
 
 
+// show extra info about song that's playing, along with a "next act" button,
+// on the title screen, for debugging and testing
+char allowManualSongActSwitching = true;
+
+
 
 int drawFrameCounter = false;
 int frameCounter = 0;
@@ -1094,6 +1099,41 @@ void drawTopScreen() {
     if( currentGameState != pickGameTypeState ) {
         // start counter as soon as player touches first button
         frameCounter++;
+        }
+
+    if( allowManualSongActSwitching ) {
+        char *actString = autoSprintf( "Act: %d", getSongAct() );
+        
+        font8->drawString( actString, 5, 35, white, alignLeft );
+
+        delete [] actString;
+
+        int numPartStrings;
+        
+        char **partStrings = getTrackInfoStrings( &numPartStrings );
+        
+        for( int i=0; i<numPartStrings; i++ ) {
+            
+            rgbaColor fontColor = white;
+            
+            if( i % 2 != 0 ) {
+                fontColor = gray;
+                }
+
+            char found;
+            
+            char *shortPartString = replaceOnce( 
+                partStrings[i], 
+                "music/", "", &found );
+
+            font8->drawString( shortPartString, 
+                                5, 49 + 12 * i, fontColor, alignLeft );
+            
+            delete [] shortPartString;
+            delete [] partStrings[i];
+            }
+
+        delete [] partStrings;
         }
     
     }
