@@ -23,7 +23,7 @@ int main( int inArgCount, char **inArgs ) {
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <GL/gl.h>
+#include "minorGems/graphics/openGL/glInclude.h"
 
 
 #include "minorGems/util/stringUtils.h"
