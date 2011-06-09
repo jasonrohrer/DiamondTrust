@@ -301,6 +301,8 @@ static void addTrack( int inChannelNumber, int inDelay ) {
         delete [] firstPartFiles;
         }
         
+    delete [] firstPartDir;
+    
     char **partFiles = fullPartFileVector.getElementArray();
     int numPartFiles = fullPartFileVector.size();
             

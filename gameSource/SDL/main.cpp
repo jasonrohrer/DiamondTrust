@@ -213,6 +213,9 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
         streamPosition += 4;
         }
 
+    delete [] sumBufferL;
+    delete [] sumBufferR;
+    delete [] sampleBuffer;
     
     SDL_UnlockAudio();
 
