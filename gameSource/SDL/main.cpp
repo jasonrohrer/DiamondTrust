@@ -90,15 +90,6 @@ void freeSprites();
 void freeNetwork();
 
 
-void cleanUpAtExit() {
-    printf( "Exiting...\n" );
-
-    SDL_CloseAudio();
-    
-    gameFree();    
-    freeSprites();
-    freeNetwork();
-    }
 
 
 
@@ -118,6 +109,28 @@ char isSoundTryingToRun() {
 
 
 char callbackCount = 0;
+
+// don't make and destroy these every callback (slow!)
+static int sampleBufferSize = 0;
+static s16 *sumBufferL = NULL;
+static s16 *sumBufferR = NULL;
+static s16 *sampleBuffer = NULL;
+
+
+static void freeAudioBuffers() {
+    if( sumBufferL != NULL ) {
+        delete [] sumBufferL;
+        sumBufferL = NULL;
+        }
+    if( sumBufferR != NULL ) {
+        delete [] sumBufferR;
+        sumBufferR = NULL;
+        }
+    if( sampleBuffer != NULL ) {
+        delete [] sampleBuffer;
+        sampleBuffer = NULL;
+        }
+    }
 
 
 void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
@@ -146,16 +159,29 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
     int numSamplesToFill = inLengthToFill / 4;
     
 
-    // each channel has mono, 16-bit samples
-    s16 *sumBufferL = new s16[ numSamplesToFill ];
-    s16 *sumBufferR = new s16[ numSamplesToFill ];
     
-    memset( sumBufferL, 0, numSamplesToFill );
-    memset( sumBufferR, 0, numSamplesToFill );
+    if( numSamplesToFill != sampleBufferSize ) {
+        // need to make new buffers
+
+        // destroy old?
+        freeAudioBuffers();
+        
+
+        // each channel has mono, 16-bit samples
+        sumBufferL = new s16[ numSamplesToFill ];
+        sumBufferR = new s16[ numSamplesToFill ];
+        
+        sampleBuffer = new s16[ numSamplesToFill ];
+
+        sampleBufferSize = numSamplesToFill;
+        }    
 
 
-    s16 *sampleBuffer = new s16[ numSamplesToFill ];
-    
+    // clear to prepare for sum
+    memset( sumBufferL, 0, numSamplesToFill * sizeof( s16 ) );
+    memset( sumBufferR, 0, numSamplesToFill * sizeof( s16 ) );
+
+
 
     for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
 
@@ -213,9 +239,6 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
         streamPosition += 4;
         }
 
-    delete [] sumBufferL;
-    delete [] sumBufferR;
-    delete [] sampleBuffer;
     
     SDL_UnlockAudio();
 
@@ -229,6 +252,22 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
         }
     
     }
+
+
+
+void cleanUpAtExit() {
+    printf( "Exiting...\n" );
+
+    SDL_CloseAudio();
+
+    freeAudioBuffers();
+    
+    gameFree();    
+    freeSprites();
+    freeNetwork();
+    }
+
+
 
 
 
