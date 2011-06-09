@@ -126,6 +126,10 @@ Button *parentButton;
 Button *parentServeCloneDownloaButton;
 Button *childButton;
 
+// for testing
+Button *nextSongActButton;
+
+
 Button *aiButton;
 Button *wifiButton;
 
@@ -454,6 +458,13 @@ void gameInit() {
     childButton = new Button( font16, translate( "button_child" ),
                                                  128,
                                                  146 );
+
+
+    nextSongActButton = new Button( font16, translate( "button_nextSongAct" ),
+                                    38, 87 );
+
+
+
 
 
     aiButton = new Button( font16, translate( "button_ai" ),

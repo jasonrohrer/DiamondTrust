@@ -13,6 +13,10 @@ button_back "Back"
 button_play_again "Play Again"
 
 
+
+button_nextSongAct "fwd"
+
+
 button_ai "Single Player"
 button_wifi "WiFi Game"
 

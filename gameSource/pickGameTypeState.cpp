@@ -4,6 +4,7 @@
 #include "gameStats.h"
 #include "units.h"
 #include "colors.h"
+#include "music.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -16,6 +17,12 @@ extern int satelliteBottomHalfOffset;
 
 extern int titleSpriteID;
 extern unsigned char titleFade;
+
+
+extern Button *nextSongActButton;
+
+static const char allowManualSongActSwitching = true;
+
 
 
 extern Button *aiButton;
@@ -92,6 +99,10 @@ void PickGameTypeState::clickState( int inX, int inY ) {
             networkOpponent = true;
             initOpponent( false );
             }
+        else if( allowManualSongActSwitching &&
+                 nextSongActButton->getPressed( inX, inY ) ) {
+            nextSongAct();
+            }
         }
     }
 
@@ -158,6 +169,10 @@ void PickGameTypeState::drawState() {
         
         aiButton->draw();
         wifiButton->draw();
+        
+        if( allowManualSongActSwitching ) {
+            nextSongActButton->draw();
+            }
         }
     
     }
