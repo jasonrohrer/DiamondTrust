@@ -99,14 +99,10 @@ JRI_GAME_GRAPHICS = ${PATH_GAME_GRAPHICS:.tga=.jri}
 
 
 # add path
-PATH_FILES_TO_COMPILE_IN = $(patsubst %,gameData/%,$(FILES_TO_COMPILE_IN))
+PATH_FILES_TO_COMPILE_IN = $(patsubst %,gameDataSource/%,$(FILES_TO_COMPILE_IN))
 # change to JRI files instead of TGA versions
 JRI_FILES_TO_COMPILE_IN = ${PATH_FILES_TO_COMPILE_IN:.tga=.jri}
 
-
-# just the JRI files that are NON compiled in
-NON_COMPILED_IN_JRI_FILES = \
-$(filter-out $(JRI_FILES_TO_COMPILE_IN), $(JRI_GAME_GRAPHICS))
 
 
 JRI_CONVERTER_DIR = ../../minorGems/graphics/formats/jri/
@@ -115,11 +111,14 @@ JRI_CONVERTER = ${JRI_CONVERTER_DIR}tgaToJri
 
 
 
-all: ${JRI_CONVERTER} gameData ${NON_COMPILED_IN_JRI_FILES} dataFiles.cpp
+all: ${JRI_CONVERTER} gameDataSource gameData dataFiles.cpp
 
 
 gameData:
 	mkdir gameData
+
+gameDataSource:
+	mkdir gameDataSource
 
 clean:
 	rm -f ${PATH_GAME_GRAPHICS}
@@ -138,7 +137,7 @@ ${JRI_CONVERTER}:
 # $@   represents the name.tga file
 # $<   represents the name.png file
 #
-gameData/%.tga: graphics/%.png
+gameDataSource/%.tga: graphics/%.png
 	convert $< $@
 
 
@@ -151,7 +150,7 @@ gameData/%.tga: graphics/%.png
 # $@   represents the name.jri file
 # $<   represents the name.tga file
 #
-gameData/%.jri: gameData/%.tga
+gameDataSource/%.jri: gameDataSource/%.tga
 	${JRI_CONVERTER} $< $@
 	rm $<
 
@@ -167,12 +166,11 @@ graphics/%_rotated.png: graphics/%.png
 # don't rebuild these every time, unless needed
 # this special target is described here: 
 # http://www.gnu.org/s/hello/manual/make/Chained-Rules.html
-.INTERMEDIATE: ${JRI_FILES_TO_COMPILE_IN} 
+#.INTERMEDIATE: ${JRI_FILES_TO_COMPILE_IN} 
 
 
 dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN} compileFilesIn.pl
 	./compileFilesIn.pl dataFiles.cpp ${JRI_FILES_TO_COMPILE_IN}
-	rm ${JRI_FILES_TO_COMPILE_IN}
 
 
 
@@ -185,5 +183,5 @@ dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN} compileFilesIn.pl
 # $@   represents the gameData file
 # $<   represents the languages file
 #
-gameData/%.txt: languages/%.txt
+gameDataSource/%.txt: languages/%.txt
 	cp $< $@
