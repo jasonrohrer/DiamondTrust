@@ -25,19 +25,16 @@ mkdir mac/DiamondTrust/gameData
 
 cp ../gameSource/gameData/*.tga mac/DiamondTrust/gameData
 cp ../gameSource/gameData/*.txt mac/DiamondTrust/gameData
+cp -r ../gameSource/gameData/music mac/DiamondTrust/gameData
 
 
 
 cp -r macOSX/DiamondTrust.app mac/DiamondTrust/DiamondTrust.app
+mkdir mac/DiamondTrust/DiamondTrust.app/Contents/MacOS
 cp ../gameSource/DiamondTrust mac/DiamondTrust/DiamondTrust.app/Contents/MacOS
 
-rm -r mac/DiamondTrust/DiamondTrust.app/CVS
-rm -r mac/DiamondTrust/DiamondTrust.app/Contents/CVS
-rm -r mac/DiamondTrust/DiamondTrust.app/Contents/MacOS/CVS
-rm -r mac/DiamondTrust/DiamondTrust.app/Contents/Resources/CVS
-rm -r mac/DiamondTrust/DiamondTrust.app/Contents/Frameworks/CVS
-
 # install SDL framework
+mkdir mac/DiamondTrust/DiamondTrust.app/Contents/Frameworks
 cp -r $3 mac/DiamondTrust/DiamondTrust.app/Contents/Frameworks/
 
 cd mac
