@@ -21,11 +21,25 @@
 
 
 void* operator new ( std::size_t inSizeInBytes ) {
+    if( inSizeInBytes == 0 ) {
+        // return a 1-byte region here, since 0-allocs crash on the DS
+        // this ensures that the delete operator works without case-checking
+        // (instead of returning NULL)
+        inSizeInBytes = 1;
+        }
+
     return OS_Alloc( inSizeInBytes );
     }
 
 
 void* operator new[] ( std::size_t inSizeInBytes ) {
+    if( inSizeInBytes == 0 ) {
+        // return a 1-byte region here, since 0-allocs crash on the DS
+        // this ensures that the delete operator works without case-checking
+        // (instead of returning NULL)
+        inSizeInBytes = 1;
+        }
+    
     return OS_Alloc( inSizeInBytes );
     }
 
@@ -2783,6 +2797,9 @@ char isSoundTryingToRun() {
 static OSMessageQueue soundMessageQueue;
 static OSMessage soundMessageBuffer[1];
 
+static OSMutex soundMutex;
+
+
 static void soundThreadProcess( void *inData ) {
     
     inData = NULL;
@@ -2796,6 +2813,8 @@ static void soundThreadProcess( void *inData ) {
         // wait for a message from the Alarm callback
         soundTryingToRun = false;
         OS_ReceiveMessage( &soundMessageQueue, &message, OS_MESSAGE_BLOCK );
+        
+        lockAudio();
         
         for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
             s16 *buffer = soundBuffer[i];
@@ -2812,6 +2831,8 @@ static void soundThreadProcess( void *inData ) {
             
             getAudioSamplesForChannel( i, buffer, SOUND_BUFFER_PAGESIZE );
             }
+
+        unlockAudio();
         }
     }
 
@@ -3061,6 +3082,9 @@ static void SoundAlarmCallback( void *inArg ) {
     // start sound processes
     printOut( "Starting sound process\n" );
 
+    OS_InitMutex( &soundMutex );
+
+
     OS_CreateThread( &soundThread, soundThreadProcess, NULL, 
                      soundThreadStack + 
                      SOUND_THREAD_STACK_SIZE / sizeof(unsigned int), 
@@ -3209,4 +3233,14 @@ void setSoundChannelPan( int inChannelNumber, int inPan ) {
         inPan );
 
     SND_FlushCommand( SND_COMMAND_NOBLOCK );
+    }
+
+
+void lockAudio() {
+    OS_LockMutex( &soundMutex );    
+    }
+
+
+void unlockAudio() {
+    OS_UnlockMutex( &soundMutex );    
     }
