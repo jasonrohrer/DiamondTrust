@@ -340,6 +340,8 @@ static void addTrack( int inChannelNumber, int inDelay ) {
     else {
         printOut( "Part %s not found in song act %s (or in base act)\n",
                   partName, actDir );
+        
+        songStreams[partPick].filePlaying = false;
         }
 
     deleteArrayOfStrings( &partFiles, numPartFiles );                    
@@ -459,6 +461,22 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
                     // no delay, because it can start right NOW
                     addTrack( inChannelNumber, 0 );
+
+                    if( ! s->filePlaying ) {
+                        // adding a track on this channel failed?
+                        // maybe an act change has happened and we no
+                        // longer have loops to play on this channel
+                        printOut( 
+                            "Track %d dropping out because of act change\n", 
+                            inChannelNumber );
+                        
+                        // fill rest with silence
+                        memset( inBuffer, 
+                                0, (unsigned int)( inNumSamples * 2 ) );
+                        
+                        inNumSamples = 0;
+                        }
+                    
                     }
                 
                 
