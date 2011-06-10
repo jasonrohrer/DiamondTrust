@@ -3078,58 +3078,63 @@ static void SoundAlarmCallback( void *inArg ) {
 
 
 
+    // for now, no sound process at all on a clone
+    if( ! isThisAClone() ) {
+        
+        // start sound processes
+        printOut( "Starting sound process\n" );
 
-    // start sound processes
-    printOut( "Starting sound process\n" );
-
-    OS_InitMutex( &soundMutex );
+        OS_InitMutex( &soundMutex );
 
 
-    OS_CreateThread( &soundThread, soundThreadProcess, NULL, 
-                     soundThreadStack + 
-                     SOUND_THREAD_STACK_SIZE / sizeof(unsigned int), 
-                     SOUND_THREAD_STACK_SIZE,
-                     SOUND_THREAD_PRIORITY );
-    OS_WakeupThreadDirect( &soundThread );
+        OS_CreateThread( &soundThread, soundThreadProcess, NULL, 
+                         soundThreadStack + 
+                         SOUND_THREAD_STACK_SIZE / sizeof(unsigned int), 
+                         SOUND_THREAD_STACK_SIZE,
+                         SOUND_THREAD_PRIORITY );
+        OS_WakeupThreadDirect( &soundThread );
 
     
-    u32 channelMask = 0;
+        u32 channelMask = 0;
 
-    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {        
-        // add a 1 in the mask here
-        channelMask = channelMask | ( 0x1 << i );        
+        for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {        
+            // add a 1 in the mask here
+            channelMask = channelMask | ( 0x1 << i );        
+            }
+
+
+        SND_LockChannel( channelMask, 0 );
+    
+        //int stereoSpread = 127 / MAX_SOUND_CHANNELS;
+    
+
+        for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
+
+            SND_SetupChannelPcm( i, SND_WAVE_FORMAT_PCM16,
+                                 soundBuffer[i],
+                                 SND_CHANNEL_LOOP_REPEAT, 0, 
+                                 ( SOUND_BUFFER_SIZE * sizeof(s16) ) / 
+                                    sizeof(u32),
+                                 // volume off by default
+                                 0,
+                                 SND_CHANNEL_DATASHIFT_NONE, soundTimerValue, 
+                                 // panned center by default
+                                 64  );
+            soundBufferPage[i] = 0;
+            memset( soundBuffer[i], 0, SOUND_BUFFER_SIZE * sizeof(s16) );
+            }
+    
+    
+        // one alarm callback for all channels
+        int alarmNumber = 0;
+        SND_SetupAlarm( alarmNumber, soundAlarmPeriod, 
+                        soundAlarmPeriod, SoundAlarmCallback, NULL );
+
+        SND_StartTimer( channelMask, 0, 
+                        (unsigned int)( 1 << alarmNumber ), 0 );
+
+        SND_FlushCommand( SND_COMMAND_NOBLOCK );
         }
-
-
-    SND_LockChannel( channelMask, 0 );
-    
-    //int stereoSpread = 127 / MAX_SOUND_CHANNELS;
-    
-
-    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
-
-        SND_SetupChannelPcm( i, SND_WAVE_FORMAT_PCM16,
-                             soundBuffer[i],
-                             SND_CHANNEL_LOOP_REPEAT, 0, 
-                             ( SOUND_BUFFER_SIZE * sizeof(s16) ) / sizeof(u32),
-                             // volume off by default
-                             0,
-                             SND_CHANNEL_DATASHIFT_NONE, soundTimerValue, 
-                             // panned center by default
-                             64  );
-        soundBufferPage[i] = 0;
-        memset( soundBuffer[i], 0, SOUND_BUFFER_SIZE * sizeof(s16) );
-        }
-    
-    
-    // one alarm callback for all channels
-    int alarmNumber = 0;
-    SND_SetupAlarm( alarmNumber, 
-                    soundAlarmPeriod, soundAlarmPeriod, SoundAlarmCallback, 
-                    NULL );
-    SND_StartTimer( channelMask, 0, (unsigned int)( 1 << alarmNumber ), 0 );
-
-    SND_FlushCommand( SND_COMMAND_NOBLOCK );
     
     
     while( true ){

@@ -100,6 +100,10 @@ static void sortStrings( char ***inArray, int inNumStrings ) {
 
 
 void initMusic() {
+
+    
+    
+
     // all channels start not playing
     for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
         
@@ -109,6 +113,13 @@ void initMusic() {
         s->wavFile = NULL;
         s->filePlaying = false;
         s->totalNumSamplesPlayed = 0;
+        }
+
+
+    // no music on clones
+    // but at least init all channels to not playing above
+    if( isThisAClone() ) {
+        return;
         }
 
 
@@ -212,6 +223,12 @@ void initMusic() {
 
 
 void freeMusic() {
+
+    // no music on clones
+    if( isThisAClone() ) {
+        return;
+        }
+
 
     if( currentSongDirName != NULL ) {
         delete [] currentSongDirName;
