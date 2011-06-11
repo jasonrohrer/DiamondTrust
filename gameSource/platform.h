@@ -209,6 +209,11 @@ char isAutoconnecting();
 // the parent side, sent over the connection to the child)
 char isCloneBootPossible();
 
+// returns true if we are running as a clone
+// certain large data files, such as music, may not be available to clones 
+char isThisAClone();
+
+
 char shouldShowDSWiFiIcons();
 
 

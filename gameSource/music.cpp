@@ -100,6 +100,10 @@ static void sortStrings( char ***inArray, int inNumStrings ) {
 
 
 void initMusic() {
+
+    
+    
+
     // all channels start not playing
     for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
         
@@ -109,6 +113,13 @@ void initMusic() {
         s->wavFile = NULL;
         s->filePlaying = false;
         s->totalNumSamplesPlayed = 0;
+        }
+
+
+    // no music on clones
+    // but at least init all channels to not playing above
+    if( isThisAClone() ) {
+        return;
         }
 
 
@@ -212,6 +223,12 @@ void initMusic() {
 
 
 void freeMusic() {
+
+    // no music on clones
+    if( isThisAClone() ) {
+        return;
+        }
+
 
     if( currentSongDirName != NULL ) {
         delete [] currentSongDirName;
@@ -340,6 +357,8 @@ static void addTrack( int inChannelNumber, int inDelay ) {
     else {
         printOut( "Part %s not found in song act %s (or in base act)\n",
                   partName, actDir );
+        
+        songStreams[partPick].filePlaying = false;
         }
 
     deleteArrayOfStrings( &partFiles, numPartFiles );                    
@@ -459,6 +478,22 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
                     // no delay, because it can start right NOW
                     addTrack( inChannelNumber, 0 );
+
+                    if( ! s->filePlaying ) {
+                        // adding a track on this channel failed?
+                        // maybe an act change has happened and we no
+                        // longer have loops to play on this channel
+                        printOut( 
+                            "Track %d dropping out because of act change\n", 
+                            inChannelNumber );
+                        
+                        // fill rest with silence
+                        memset( inBuffer, 
+                                0, (unsigned int)( inNumSamples * 2 ) );
+                        
+                        inNumSamples = 0;
+                        }
+                    
                     }
                 
                 

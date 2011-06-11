@@ -51,3 +51,9 @@ void checkCloneFetch() {
 
     //OS_Panic( "Multi-boot child panic\n" );
     }
+
+
+
+char isThisAClone() {
+    return isCloneChild;
+    }
