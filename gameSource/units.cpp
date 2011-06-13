@@ -1301,9 +1301,25 @@ int getChosenUnit( int inClickX, int inClickY ) {
                 inClickX > pos.x - unitSpriteW / 2 &&
                 inClickX < pos.x + unitSpriteW / 2 ) {
                 
-                // hit
+                // hit on unit's sprite
                 return i;
                 }
+
+            if( gameUnit[i].mShowSalaryPayment ) {
+                
+                intPair salaryPos = getUnitSalaryPosition( i );
+                
+                if( inClickY > salaryPos.y - 7 &&
+                    inClickY < salaryPos.y + 7 &&
+                    inClickX > salaryPos.x - 14 &&
+                    inClickX < salaryPos.x + 14 ) {
+                    
+                    // hit on unit's salary display
+                    return i;
+                    }
+                }
+            
+                        
             }
         }
                     
