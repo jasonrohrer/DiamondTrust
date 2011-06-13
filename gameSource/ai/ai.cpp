@@ -952,3 +952,13 @@ unsigned char *getAIMove( unsigned int *outMoveLength ) {
     return ourMove;
     }
 
+
+
+
+int getAIProgress( int inMaxProgress ) {
+
+    int maxSimulations = maxNumSimulationsPerMove * maxNumMovesToTest;
+
+    return 
+        totalMoveSimulationsForThisChoice * inMaxProgress / maxSimulations;
+    }

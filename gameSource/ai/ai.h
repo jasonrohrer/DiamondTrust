@@ -27,6 +27,13 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength );
 void stepAI();
 
 
+
+// get AI progress to completion of picking move, where inMaxProgress
+// will be the maximum possible progress value returned
+int getAIProgress( int inMaxProgress );
+
+
+
 // returns NULL if move not ready yet
 unsigned char *getAIMove( unsigned int *outMoveLength );
 

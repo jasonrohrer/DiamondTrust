@@ -103,6 +103,8 @@ char isHost = true;
 char networkOpponent;
 
 
+char isWaitingOnOpponent = false;
+
 
 
 
@@ -861,6 +863,9 @@ void gameLoopTick() {
     
     
     if( currentGameState->isStateDone() ) {
+        // state never ends while we're still waiting for a response!
+        isWaitingOnOpponent = false;
+        
         if( !stateDone ) {
             // just finished
 
@@ -1084,7 +1089,35 @@ void drawTopScreen() {
                                128, 
                                180, white, alignCenter );
             }
-        
+
+        if( isWaitingOnOpponent && ! networkOpponent ) {
+            
+            int progress = getAIProgress( PROGRESS_LENGTH );
+
+            if( progress > 0 ) {
+                // After AI finishes, we wait until state is done
+                // before isWaitingOnOpponent resets
+                // don't show an empty bar after AI finishes!
+
+
+                // show a progress bar for the AI
+                
+                char progressString[ PROGRESS_LENGTH + 1 ];
+                
+                progressString[ PROGRESS_LENGTH ] = '\0';
+                
+
+                // looks the same as the loading bar
+                memset( progressString, '-', PROGRESS_LENGTH + 1 );
+                
+                memset( progressString, ')', progress );
+                
+                
+                font8->drawString( progressString, 
+                                   12, 
+                                   120, white, alignLeft );
+                }
+            }
         }
 
     if( drawFrameCounter ) {

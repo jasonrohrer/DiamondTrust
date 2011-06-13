@@ -28,6 +28,9 @@ extern char *statusMessage;
 extern char *statusSubMessage;
 
 
+extern char isWaitingOnOpponent;
+
+
 static int backupLastBribingUnit[ numUnits ];
 
 
@@ -272,6 +275,8 @@ void SalaryBribeState::stepState() {
         unsigned int messageLength;
         unsigned char *message = getOpponentMessage( &messageLength );
         //printOut( "trying to receive message\n" );
+
+        isWaitingOnOpponent = true;
         
         if( message != NULL ) {
             // got move!
