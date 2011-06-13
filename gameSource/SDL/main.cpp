@@ -1765,6 +1765,13 @@ char isCloneBootPossible() {
     return false;
     }
 
+
+char isThisAClone() {
+    // never a clone on SDL
+    return false;
+    }
+
+
 void acceptCloneDownloadRequest() {
     }
 
