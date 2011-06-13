@@ -1722,7 +1722,7 @@ void freeNetwork() {
 
 
 char isCameraSupported() {
-    return true;
+    return false;
     }
 
 
