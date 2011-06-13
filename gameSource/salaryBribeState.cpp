@@ -279,6 +279,8 @@ void SalaryBribeState::stepState() {
         isWaitingOnOpponent = true;
         
         if( message != NULL ) {
+            isWaitingOnOpponent = false;
+        
             // got move!
 
             gotMove = true;

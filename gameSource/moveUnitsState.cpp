@@ -125,6 +125,8 @@ static int getMoveMessage() {
     isWaitingOnOpponent = true;
     
     if( message != NULL ) {
+        isWaitingOnOpponent = false;
+        
         // got move!            
 
         // unpack it

@@ -186,6 +186,8 @@ static int getMoveMessage() {
     isWaitingOnOpponent = true;
 
     if( message != NULL ) {
+        isWaitingOnOpponent = false;
+        
         // got move!            
 
         // unpack it
@@ -470,10 +472,8 @@ void SellDiamondsState::stepState() {
         unsigned int messageLength;
         unsigned char *message = getOpponentMessage( &messageLength );
         
-        isWaitingOnOpponent = true;
-
         if( message != NULL ) {
-            
+        
             if( messageLength != 300 ) {
                 printOut( "Bad partial image message length from opponent\n" );
                 stateDone = true;
