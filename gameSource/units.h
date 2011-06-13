@@ -46,7 +46,7 @@ int getActiveUnit();
 
 
 // -1 if no unit hit
-int getChosenUnit( int inClickX, int inClickY );
+int getChosenUnit( int inClickX, int inClickY, char inOnlySelectable=true );
 
 
 int getUnitRegion( int inUnit );

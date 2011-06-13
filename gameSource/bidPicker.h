@@ -13,7 +13,8 @@ int getPickerBid();
 void drawBidPicker( int inCenterX, int inCenterY );
 
 
-void clickBidPicker( int inX, int inY );
+// returns true if it received a click
+char clickBidPicker( int inX, int inY );
 
 
 char isBidDone();

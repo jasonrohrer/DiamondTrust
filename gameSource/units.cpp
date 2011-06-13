@@ -1290,9 +1290,10 @@ void setPlayerUnitsSelectable( char inSelectable ) {
 
 
 
-int getChosenUnit( int inClickX, int inClickY ) {
+int getChosenUnit( int inClickX, int inClickY, char inOnlySelectable ) {
     for( int i=0; i<numUnits; i++ ) {
-        if( gameUnit[i].mSelectable ) {
+        if( ! inOnlySelectable || 
+            gameUnit[i].mSelectable ) {
 
             intPair pos = getUnitPositionInRegion( gameUnit[i].mRegion, i );
 
@@ -1305,7 +1306,8 @@ int getChosenUnit( int inClickX, int inClickY ) {
                 return i;
                 }
 
-            if( gameUnit[i].mShowSalaryPayment ) {
+            if( gameUnit[i].mShowSalaryPayment ||
+                gameUnit[i].mShowBribePayment ) {
                 
                 intPair salaryPos = getUnitSalaryPosition( i );
                 

@@ -69,6 +69,33 @@ class SalaryBribeState : public GameState {
     };
 
 
+
+static char isUnitPayable( int inUnit ) {
+    if( inUnit < numPlayerUnits &&
+        getUnitRegion( inUnit ) == 0 ) {
+        // player unit that's home
+        return true;
+        }
+    if( inUnit >= numPlayerUnits && 
+        inUnit < 2 * numPlayerUnits ) {
+        
+        int unitRegion = getUnitRegion( inUnit );
+
+        // is some player unit in this opponent's region?
+        for( int i=0; i<numPlayerUnits; i++ ) {
+            if( getUnitRegion( i ) == unitRegion ) {
+                return true;
+                }
+            }
+        }
+    
+    return false;
+    }
+
+
+
+
+
 // returns num payable
 static int setPayableUnitsSelectable() {
     int numPayable = 0;
@@ -121,8 +148,11 @@ void SalaryBribeState::clickState( int inX, int inY ) {
             printOut( "Error: Picking salary with no active unit!\n" );
             return;
             }        
+
+
+
         int oldBid = getPickerBid();
-        clickBidPicker( inX, inY );
+        char pickerClicked = clickBidPicker( inX, inY );
         int newBid = getPickerBid();
         
 
@@ -134,6 +164,7 @@ void SalaryBribeState::clickState( int inX, int inY ) {
             setPickerBid( newBid );
             }
         
+
         // update money
         addPlayerMoney( 0, - (newBid - oldBid) );
         
@@ -157,7 +188,29 @@ void SalaryBribeState::clickState( int inX, int inY ) {
                 }
             }
 
-        if( isBidDone() ) {
+
+        // check for a unit change INSTEAD of a picker-click
+        // don't worry about if it's selectable, since none are
+        // while we're picking a salary/bribe
+        
+        char unitChange = false;
+
+        if( ! pickerClicked ) {
+
+            int newChosenUnit = getChosenUnit( inX, inY, false );
+            printOut( "New unit = %d\n", newChosenUnit );
+
+            if( newChosenUnit != -1 && newChosenUnit != activeUnit &&
+                isUnitPayable( newChosenUnit ) ) {
+                unitChange = true;
+                }
+            }
+        
+
+
+
+
+        if( isBidDone() || unitChange ) {
             pickingSalary = false;
             pickingBribe = false;
             u->mShowSalaryPayment = false;
@@ -168,9 +221,15 @@ void SalaryBribeState::clickState( int inX, int inY ) {
             statusSubMessage = translate( "phaseSubStatus_pickAgent" );
                 
             setActiveUnit( -1 );
+
+            activeUnit = -1;
             }
     
-        return;
+        if( ! unitChange ) {
+            return;
+            }
+        // else move on to next case below to handle change of picked unit
+
         }
 
     
