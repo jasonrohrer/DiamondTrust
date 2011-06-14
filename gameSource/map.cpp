@@ -669,8 +669,15 @@ void drawMap() {
     rgbaColor regionColor = white;
     
     int i;
-    for( i=0; i<numMapRegions; i++ ) {
 
+    int someSelectable = false;
+    for( i=0; i<numMapRegions; i++ ) {
+        someSelectable = someSelectable || mapRegionSelectable[i];
+        }
+    
+    for( i=0; i<numMapRegions; i++ ) {
+        regionColor = white;
+        
         // transparent so border shows when not flashing
         // fades out following background
         
@@ -680,16 +687,22 @@ void drawMap() {
             (unsigned char)( 64 + ( 64 * getMonthsLeft() ) / 8 );
 
 
-        if( mapRegionSelectable[i] ) {
-            // darker so flashing more visible
-            regionColor.a = 192;
+        // darken non-selectable ones
+        if( someSelectable && ! mapRegionSelectable[i] ) {
+            regionColor.r = 32;
+            regionColor.g = 32;
+            regionColor.b = 32;
+
+            // make sure the darkening is visible, even late in the game
+            // ignore fade-out when it comes to darkened regions
+            regionColor.a = 128;
             }
         
         
         drawSprite( mapRegionSpriteID[i], 
                     mapRegionOffset[i].x, mapRegionOffset[i].y,
                     regionColor,
-                    mapRegionSelectable[ i ] );
+                    false );
         }
     
     startNewSpriteLayer();
