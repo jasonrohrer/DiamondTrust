@@ -13,6 +13,7 @@
 
 #include "minorGems/util/stringUtils.h"
 
+#include <assert.h>
 
 
 
@@ -612,12 +613,16 @@ void freeUnits() {
 
 
 Unit *getUnit( int inUnit ) {
+    assert( inUnit >= 0 );
+    
     return &( gameUnit[ inUnit ] );
     }
 
 
 
 static char getUnitMoveVisible( int inUnit ) {
+    assert( inUnit >= 0 );
+
     if( inUnit < numPlayerUnits ) {
         return true;
         }
@@ -636,6 +641,8 @@ static char getUnitMoveVisible( int inUnit ) {
 
 
 static intPair getUnitCurrentPosition( int inUnit ) {
+    assert( inUnit >= 0 );
+
     int i=inUnit;
     
     intPair start = getUnitPositionInRegion( gameUnit[i].mRegion, i );
@@ -667,6 +674,8 @@ static intPair getUnitCurrentPosition( int inUnit ) {
 
 
 static int getHomeRegion( int inUnit ) {
+    assert( inUnit >= 0 );
+
     if( inUnit < numPlayerUnits ) {
         return 0;
         }
@@ -678,6 +687,8 @@ static int getHomeRegion( int inUnit ) {
 
 
 static char isBribeStatusVisible( int inUnit ) {
+    assert( inUnit >= 0 );
+
     int i = inUnit;
     char visible = false;
     
@@ -717,6 +728,8 @@ static char isBribeStatusVisible( int inUnit ) {
 
 static void drawUnitSprite( int inUnit, intPair inPos, 
                             unsigned char inAlpha = 255 ) {
+    assert( inUnit >= 0 );
+
     int i = inUnit;
     
     rgbaColor c;
@@ -787,6 +800,8 @@ static void drawUnitSprite( int inUnit, intPair inPos,
 
 static void drawUnitBribedMarker( int inUnit, intPair inPos, 
                                   unsigned char inAlpha = 255  ) {
+    assert( inUnit >= 0 );
+
     int i = inUnit;
 
     // color of marker (opposite)
@@ -1189,6 +1204,8 @@ void drawUnits() {
 
 
 void drawUnit( int inUnit, int inX, int inY ) {
+    assert( inUnit >= 0 );
+
     intPair pos = { inX, inY };
     drawUnitSprite( inUnit, pos );
     
@@ -1201,6 +1218,8 @@ void drawUnit( int inUnit, int inX, int inY ) {
 
 
 void drawUnitBribe( int inUnit, int inX, int inY ) {
+    assert( inUnit >= 0 );
+    
     int i = inUnit;
     
     intPair end = { inX, inY };
@@ -1243,6 +1262,8 @@ static int getArmHoldDownTime() {
 
 
 void setUnitSelectable( int inUnit, char inSelectable ) {
+    assert( inUnit >= 0 );
+
     int i = inUnit;
     
     char oldSelectable = gameUnit[ i ].mSelectable;
@@ -1380,39 +1401,55 @@ int getChosenInspectorBribeMarker( int inClickX, int inClickY ) {
 
 
 int getUnitRegion( int inUnit ) {
+    assert( inUnit >= 0 );
+
     return gameUnit[ inUnit ].mRegion;
     }
 
 
 void setUnitDestination( int inUnit, int inRegion ) {
+    assert( inUnit >= 0 );
+
     gameUnit[ inUnit ].mDest = inRegion;
     }
 
 
 int getUnitDestination( int inUnit ) {
+    assert( inUnit >= 0 );
+    
     return gameUnit[ inUnit ].mDest;
     }
 
 
 void setUnitBid( int inUnit, int inBid ) {
+    assert( inUnit >= 0 );
+    
     gameUnit[ inUnit ].mBid = inBid;
     }
 
 int getUnitBid( int inUnit ) {
+    assert( inUnit >= 0 );
+    
     return gameUnit[ inUnit ].mBid;
     }
 
 
 void setUnitInspectorBribe( int inUnit, int inBribe ) {
+    assert( inUnit >= 0 );
+    
     gameUnit[ inUnit ].mInspectorBribe = inBribe;
     }
 
 int getUnitInspectorBribe( int inUnit ) {
+    assert( inUnit >= 0 );
+    
     return gameUnit[ inUnit ].mInspectorBribe;
     }
 
 
 void showInspectorBribe( int inUnit, char inShow ) {
+    assert( inUnit >= 0 );
+    
     gameUnit[ inUnit ].mShowInspectorBribe = inShow;
     }
 
@@ -1421,6 +1458,8 @@ void showInspectorBribe( int inUnit, char inShow ) {
 
 
 intPair getUnitBidPosition( int inUnit ) {
+    assert( inUnit >= 0 );
+    
     intPair end = 
         getDiamondPositionInRegion( gameUnit[inUnit].mDest );
 
@@ -1439,6 +1478,8 @@ intPair getUnitBidPosition( int inUnit ) {
 
 
 intPair getUnitInspectorBribePosition( int inUnit ) {
+    assert( inUnit >= 0 );
+    
     // inspector pos
     intPair end = 
         getUnitPositionInRegion( gameUnit[inUnit].mDest, numUnits - 1 );
@@ -1459,6 +1500,8 @@ intPair getUnitInspectorBribePosition( int inUnit ) {
 
 
 intPair getUnitSalaryPosition( int inUnit ) {
+    assert( inUnit >= 0 );
+
     // to right of unit
     intPair end = 
         getUnitPositionInRegion( gameUnit[inUnit].mRegion, inUnit );
@@ -1471,6 +1514,8 @@ intPair getUnitSalaryPosition( int inUnit ) {
             
 
 intPair getUnitBribePosition( int inUnit ) {
+    assert( inUnit >= 0 );
+
     // same as for salary
     return getUnitSalaryPosition( inUnit );
     }
