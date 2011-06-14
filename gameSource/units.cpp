@@ -1329,6 +1329,56 @@ int getChosenUnit( int inClickX, int inClickY, char inOnlySelectable ) {
     }
 
 
+
+int getChosenBidMarker( int inClickX, int inClickY ) {
+    for( int i=0; i<numUnits; i++ ) {
+        if( getUnitMoveVisible( i ) &&
+            gameUnit[i].mDest != getHomeRegion( i ) ) {
+            
+            intPair bidPos = getUnitBidPosition( i );
+
+            if( inClickY > bidPos.y - 7 &&
+                inClickY < bidPos.y + 7 &&
+                inClickX > bidPos.x - 14 &&
+                inClickX < bidPos.x + 14 ) {
+                
+                // hit on unit's bid display
+                return i;
+                }
+            }
+        }
+    return -1;
+    }
+
+
+
+int getChosenInspectorBribeMarker( int inClickX, int inClickY ) {
+    for( int i=0; i<numUnits; i++ ) {
+
+        if( getUnitMoveVisible( i ) &&
+            gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
+            &&
+            gameUnit[i].mShowInspectorBribe ) {
+            
+            intPair bribePos = getUnitInspectorBribePosition( i );
+            
+            if( inClickY > bribePos.y - 7 &&
+                inClickY < bribePos.y + 7 &&
+                inClickX > bribePos.x - 14 &&
+                inClickX < bribePos.x + 14 ) {
+                
+                // hit on unit's bribe display
+                return i;
+                }
+            }
+        }
+    return -1;
+    }
+
+
+
+
+
 int getUnitRegion( int inUnit ) {
     return gameUnit[ inUnit ].mRegion;
     }

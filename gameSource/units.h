@@ -49,6 +49,15 @@ int getActiveUnit();
 int getChosenUnit( int inClickX, int inClickY, char inOnlySelectable=true );
 
 
+// returns unit that owns bid/bribe marker
+// -1 if no unit hit
+int getChosenBidMarker( int inClickX, int inClickY );
+
+int getChosenInspectorBribeMarker( int inClickX, int inClickY );
+
+
+
+
 int getUnitRegion( int inUnit );
 
 

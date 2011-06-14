@@ -202,6 +202,53 @@ void MoveUnitsState::clickState( int inX, int inY ) {
 
     int activeUnit = getActiveUnit();
 
+
+    int hitBidMarkerUnit = getChosenBidMarker( inX, inY );
+    
+
+    if( hitBidMarkerUnit != -1 && 
+        ( hitBidMarkerUnit != activeUnit || 
+          ( hitBidMarkerUnit == activeUnit && ! pickingBid ) ) ) {
+        
+        // instantly switch to adjusting bid for this unit
+        
+
+        if( hitBidMarkerUnit != activeUnit ) {
+            // make sure we don't abandon active unit half-way through
+            // picking bid/bribe combo in inspector's region
+            // (because bribe is invisible while picking bribe to avoid
+            //  confusion---don't leave it invisible upon abandoning!)
+            if( getUnitDestination( activeUnit ) == 
+                getUnitRegion( numUnits - 1 ) ) {
+                
+                showInspectorBribe( activeUnit, true );
+                }
+            }
+        
+            
+        setActiveUnit( hitBidMarkerUnit );
+        
+        
+        activeUnit = getActiveUnit();
+
+        // keep old bid for adjustment
+        int oldBid = getUnitBid( activeUnit );
+        setPickerBid( oldBid );
+        
+        showInspectorBribe( activeUnit, false );
+        
+        pickingBid = true;
+        pickingBribe = false;
+
+        setAllRegionsNotSelectable();
+        setAllUnitsNotSelectable();
+        }
+    
+
+
+
+
+
     if( pickingBid ) {
         
         if( activeUnit == -1 ) {
