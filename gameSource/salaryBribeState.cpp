@@ -198,8 +198,7 @@ void SalaryBribeState::clickState( int inX, int inY ) {
         if( ! pickerClicked ) {
 
             int newChosenUnit = getChosenUnit( inX, inY, false );
-            printOut( "New unit = %d\n", newChosenUnit );
-
+            
             if( newChosenUnit != -1 && newChosenUnit != activeUnit &&
                 isUnitPayable( newChosenUnit ) ) {
                 unitChange = true;
