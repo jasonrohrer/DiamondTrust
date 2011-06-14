@@ -203,7 +203,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
     int activeUnit = getActiveUnit();
 
 
-    char considerSwitchingActiveMarker = true;
+    char considerSwitchingActive = true;
     
 
     if( ( pickingBribe || pickingBid )
@@ -212,18 +212,21 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         
         // give picker widget priority, because sometimes it overlaps
         // with other bid/bribe markers
-        considerSwitchingActiveMarker = false;
+        considerSwitchingActive = false;
         }
     
 
-
+    
 
 
     int hitBidMarkerUnit = getChosenBidMarker( inX, inY );
     int hitBribeMarkerUnit = getChosenInspectorBribeMarker( inX, inY );
     
+    // also consider switching active unit (when none might be selectable
+    int newActiveUnit = getChosenUnit( inX, inY, false );
 
-    if( considerSwitchingActiveMarker &&
+
+    if( considerSwitchingActive &&
         hitBidMarkerUnit != -1 && 
         ( hitBidMarkerUnit != activeUnit || 
           ( hitBidMarkerUnit == activeUnit && ! pickingBid ) ) ) {
@@ -236,7 +239,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             // picking bid/bribe combo in inspector's region
             // (because bribe is invisible while picking bribe to avoid
             //  confusion---don't leave it invisible upon abandoning!)
-            if( getUnitDestination( activeUnit ) == 
+            if( activeUnit != -1 &&
+                getUnitDestination( activeUnit ) == 
                 getUnitRegion( numUnits - 1 ) ) {
                 
                 showInspectorBribe( activeUnit, true );
@@ -261,7 +265,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         setAllRegionsNotSelectable();
         setAllUnitsNotSelectable();
         }
-    else if( considerSwitchingActiveMarker &&
+    else if( considerSwitchingActive &&
              hitBribeMarkerUnit != -1 && 
              ( hitBribeMarkerUnit != activeUnit || 
                ( hitBribeMarkerUnit == activeUnit && ! pickingBribe ) ) ) {
@@ -286,7 +290,59 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         setAllRegionsNotSelectable();
         setAllUnitsNotSelectable();
         }    
+    else if( activeUnit != -1 &&
+             considerSwitchingActive &&
+             newActiveUnit != -1 &&
+             newActiveUnit < numPlayerUnits &&
+             newActiveUnit != activeUnit &&
+             // not at home, where more than one unit can land
+             // which makes trying to click home as a destination, when
+             // other units are there, confusing if those units suddenly
+             // become selected
+             // BUT, if we're picking a bid or a bribe already, then
+             // we're not picking a destination, so it's okay to switch
+             // to a home-region unit
+             ( pickingBid || 
+               pickingBribe ||
+               getUnitRegion( activeUnit ) != 0 ) ) {
+        
+        
+        // instantly switch to moving this unit
+        
+        
 
+        if( newActiveUnit != activeUnit ) {
+
+
+            // we KNOW that active unit isn't -1 here, because we
+            // checked it above
+
+            // make sure we don't abandon active unit half-way through
+            // picking bid/bribe combo in inspector's region
+            // (because bribe is invisible while picking bribe to avoid
+            //  confusion---don't leave it invisible upon abandoning!)
+            if( getUnitDestination( activeUnit ) == 
+                getUnitRegion( numUnits - 1 ) ) {
+                
+                showInspectorBribe( activeUnit, true );
+                }
+            }
+        
+
+        // can handle setup for a new active unit in case below
+        // by simply turning off active unit here
+        setActiveUnit( -1 );
+        activeUnit = -1;
+        
+        setPlayerUnitsSelectable( true );
+        //showInspectorBribe( activeUnit, false );
+        
+        pickingBid = false;
+        pickingBribe = false;
+
+        setAllRegionsNotSelectable();
+        }
+    
 
 
 
