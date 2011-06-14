@@ -77,14 +77,10 @@ void drawBidPicker( int inCenterX, int inCenterY ) {
 
 char clickBidPicker( int inX, int inY ) {
     
-    if( intAbs( inY - lastCenter.y ) > 28 ) {
-        // off top or bottom by a large margin 
+    if( ! bidPickerHit( inX, inY ) ) {
         return false;
         }
-    if( intAbs( inX - lastCenter.x ) > 12 ) {
-        // off left or right by a large margin
-        return false;
-        }
+        
     
     // only consider y values, make it as easy to click as possible    
     if( lastCenter.y - inY > 8 ) {
@@ -102,6 +98,25 @@ char clickBidPicker( int inX, int inY ) {
 
     return true;
     }
+
+
+
+char bidPickerHit( int inX, int inY ) {
+    if( intAbs( inY - lastCenter.y ) > 28 ) {
+        // off top or bottom by a large margin 
+        return false;
+        }
+    if( intAbs( inX - lastCenter.x ) > 12 ) {
+        // off left or right by a large margin
+        return false;
+        }
+    
+    return true;
+    }
+
+
+
+
 
 
 char isBidDone() {

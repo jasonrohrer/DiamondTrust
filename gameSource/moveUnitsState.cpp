@@ -203,10 +203,28 @@ void MoveUnitsState::clickState( int inX, int inY ) {
     int activeUnit = getActiveUnit();
 
 
-    int hitBidMarkerUnit = getChosenBidMarker( inX, inY );
+    char considerSwitchingActiveMarker = true;
     
 
-    if( hitBidMarkerUnit != -1 && 
+    if( ( pickingBribe || pickingBid )
+        &&
+        bidPickerHit( inX, inY ) ) {
+        
+        // give picker widget priority, because sometimes it overlaps
+        // with other bid/bribe markers
+        considerSwitchingActiveMarker = false;
+        }
+    
+
+
+
+
+    int hitBidMarkerUnit = getChosenBidMarker( inX, inY );
+    int hitBribeMarkerUnit = getChosenInspectorBribeMarker( inX, inY );
+    
+
+    if( considerSwitchingActiveMarker &&
+        hitBidMarkerUnit != -1 && 
         ( hitBidMarkerUnit != activeUnit || 
           ( hitBidMarkerUnit == activeUnit && ! pickingBid ) ) ) {
         
@@ -243,7 +261,35 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         setAllRegionsNotSelectable();
         setAllUnitsNotSelectable();
         }
-    
+    else if( considerSwitchingActiveMarker &&
+             hitBribeMarkerUnit != -1 && 
+             ( hitBribeMarkerUnit != activeUnit || 
+               ( hitBribeMarkerUnit == activeUnit && ! pickingBribe ) ) ) {
+        
+        // instantly switch to adjusting bribe for this unit
+        
+            
+        setActiveUnit( hitBribeMarkerUnit );
+        
+        
+        activeUnit = getActiveUnit();
+
+        // keep old bribe for adjustment
+        int oldBribe = getUnitInspectorBribe( activeUnit );
+        setPickerBid( oldBribe );
+        
+        showInspectorBribe( activeUnit, true );
+        
+        pickingBid = false;
+        pickingBribe = true;
+
+        setAllRegionsNotSelectable();
+        setAllUnitsNotSelectable();
+        }    
+
+
+
+
 
 
 
