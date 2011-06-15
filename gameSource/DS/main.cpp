@@ -311,6 +311,18 @@ void closeFile( FileHandle inFile ) {
 
 
 
+void fileSeek( FileHandle inFile, int inAbsolutePosition ) {
+    FSFile *file = (FSFile *)inFile;
+
+    BOOL result = FS_SeekFile( file, inAbsolutePosition, FS_SEEK_SET );
+    
+    if( ! result ) {
+        printOut( "FS_SeekFile failed\n" );
+        }
+    }
+
+
+
 
 
 
