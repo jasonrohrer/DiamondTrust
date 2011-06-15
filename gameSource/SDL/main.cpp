@@ -405,8 +405,8 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     audioFormat.format = AUDIO_S16;
     audioFormat.channels = 2;
     //audioFormat.samples = 8192;        /* avoid artifacts, ever */
-    //audioFormat.samples = 1024;        
-    audioFormat.samples = 512;        
+    audioFormat.samples = 1024;        
+    //audioFormat.samples = 512;        
     //audioFormat.samples = 2048;        
     audioFormat.callback = audioCallback;
     audioFormat.userdata = NULL;
