@@ -1110,7 +1110,7 @@ void drawTopScreen() {
                 // looks the same as the loading bar
                 memset( progressString, '-', PROGRESS_LENGTH + 1 );
                 
-                memset( progressString, ')', progress );
+                memset( progressString, ')', (unsigned int)progress );
                 
                 
                 font8->drawString( progressString, 
