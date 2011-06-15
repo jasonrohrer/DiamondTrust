@@ -150,6 +150,8 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
     
     SDL_LockAudio();
     
+    unsigned int netMSA = getSystemMilliseconds() - startMS;
+
     //printf( "Audio callback called\n" );
     
     // sum all 8 channels
@@ -176,17 +178,26 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
         sampleBufferSize = numSamplesToFill;
         }    
 
+    unsigned int netMSB = getSystemMilliseconds() - startMS;
+
 
     // clear to prepare for sum
     memset( sumBufferL, 0, numSamplesToFill * sizeof( s16 ) );
     memset( sumBufferR, 0, numSamplesToFill * sizeof( s16 ) );
 
 
+    unsigned int netMSC = getSystemMilliseconds() - startMS;
+
+
+    unsigned int channTimes[ MAX_SOUND_CHANNELS ];
+    unsigned int channTimesB[ MAX_SOUND_CHANNELS ];
 
     for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
 
         getAudioSamplesForChannel( c, sampleBuffer, numSamplesToFill );
         
+        channTimes[c] = getSystemMilliseconds() - startMS;
+
         double targetVolume = channelVolume[c];
         double currentVolume = lastReachedChannelVolume[c];
         double pan = channelPan[c];
@@ -221,9 +232,13 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
 
         // avoid round-off errors in sum
         lastReachedChannelVolume[c] = channelVolume[c];
+
+        channTimesB[c] = getSystemMilliseconds() - startMS;
         }
     
-    
+    unsigned int netMSD = getSystemMilliseconds() - startMS;
+
+
     // now copy samples into Uint8 buffer
     int streamPosition = 0;
     for( int i=0; i != numSamplesToFill; i++ ) {
@@ -239,8 +254,11 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
         streamPosition += 4;
         }
 
+    unsigned int netMSE = getSystemMilliseconds() - startMS;
+
     
     SDL_UnlockAudio();
+
 
     soundTryingToRun = false;
 
@@ -248,7 +266,15 @@ void audioCallback( void *inUserData, Uint8 *inStream, int inLengthToFill ) {
     unsigned int netMS = getSystemMilliseconds() - startMS;
     
     if( netMS > 20 ) {
-        printOut( "Audio callback took %d ms\n", netMS );
+        printOut( "Audio callback took %d ms "
+                  "(A:%d, B:%d, C:%d, (", netMS,
+                  netMSA, netMSB, netMSC, netMSD );
+
+        for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
+            printOut( "%d[%d,%d], ", c, channTimes[c], channTimesB[c] );
+            }
+        printOut( " ), E:%d\n", netMSE );
+        
         }
     
     }
@@ -378,8 +404,9 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     audioFormat.freq = 22050;
     audioFormat.format = AUDIO_S16;
     audioFormat.channels = 2;
-    audioFormat.samples = 8192;        /* avoid artifacts, ever */
+    //audioFormat.samples = 8192;        /* avoid artifacts, ever */
     //audioFormat.samples = 1024;        
+    audioFormat.samples = 512;        
     //audioFormat.samples = 2048;        
     audioFormat.callback = audioCallback;
     audioFormat.userdata = NULL;
@@ -886,6 +913,19 @@ char **listDirectory( char *inFileName, int *outNumEntries ) {
 
 
 
+// this article says you need 8 extra bytes for a hash table
+// http://www.theillien.com/Sys_Admin_v12/html/v11/i04/a6.htm
+#define FILE_STREAM_BUFFER_SIZE  16384 + 8
+
+typedef struct FileStream {
+        FILE *file;
+        
+        char readBuffer[ FILE_STREAM_BUFFER_SIZE ];
+    } FileStream;
+
+
+
+
 FileHandle openFile( char *inFileName, int *outSize ) {
     File f( new Path( "gameData" ), inFileName );
 
@@ -895,21 +935,40 @@ FileHandle openFile( char *inFileName, int *outSize ) {
     
 
     FILE *file = fopen( fullName, "rb" );
-    
+
     delete [] fullName;
+
     
-    return file;
+    FileStream *stream = new FileStream;
+
+    stream->file = file;
+    int result = setvbuf( stream->file, stream->readBuffer, _IOFBF, 
+                          FILE_STREAM_BUFFER_SIZE );
+    
+    if( result != 0 ) {
+        printOut( "setvbuf failed for file %s\n", inFileName );
+        }
+
+    return stream;
     }
 
 
 
 int readFile( FileHandle inFile, unsigned char *inBuffer, int inBytesToRead ) {
-    return fread( inBuffer, 1, inBytesToRead, (FILE*)inFile );
+    FILE *file = ((FileStream*)inFile)->file;
+    
+    return fread( inBuffer, 1, inBytesToRead, file );
     }
 
 
 void closeFile( FileHandle inFile ) {
-    fclose( (FILE*)inFile );
+    FileStream *stream = (FileStream*)inFile;
+    
+    FILE *file = stream->file;
+
+    fclose( file );
+
+    delete stream;
     }
 
 

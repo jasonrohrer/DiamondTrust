@@ -335,7 +335,18 @@ static void addTrack( int inChannelNumber, int inDelay ) {
         s->wavFileName = 
             stringDuplicate( partFiles[ partFilePick ] );
         
+        unsigned int startMS = getSystemMilliseconds();
+        
         s->wavFile = openWavFile( s->wavFileName, &( s->info ) );
+        
+        unsigned int netMS = getSystemMilliseconds() - startMS;
+        
+        if( netMS > 5 ) {
+            printOut( "Opening %s for channel %d took %dms\n",
+                      s->wavFileName, inChannelNumber, netMS );
+            }
+        
+
         s->fileSamplePosition = 0;
         s->startSampleDelay = inDelay;
         s->filePlaying = true;
@@ -445,8 +456,18 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 numToGet = numSamplesLeft;
                 }
             
+            unsigned int startMS = getSystemMilliseconds();
+
             readFile( s->wavFile, (unsigned char *)inBuffer, numToGet * 2 );
             
+            unsigned int netMS = getSystemMilliseconds() - startMS;
+        
+            if( netMS > 5 ) {
+                printOut( "Reading from wav file for channel %d took %dms\n",
+                          inChannelNumber, netMS );
+                }
+
+
             s->fileSamplePosition += numToGet;
             
             inBuffer = &( inBuffer[numToGet] );
@@ -459,7 +480,18 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 // at end of file, wrap back
                 s->fileSamplePosition = 0;
                 
+                unsigned int startMS = getSystemMilliseconds();
+                
                 closeFile( s->wavFile );
+                
+                unsigned int netMS = getSystemMilliseconds() - startMS;
+                
+                if( netMS > 5 ) {
+                    printOut( "Closing wav file for channel %d took %dms\n",
+                              inChannelNumber, netMS );
+                    }
+
+
                 s->wavFile = NULL;
                 delete [] s->wavFileName;
 

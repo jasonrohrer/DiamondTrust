@@ -24,7 +24,16 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
     
     int fileSize;
     
+    unsigned int startMS = getSystemMilliseconds();
+        
     FileHandle handle = openFile( inFilePath, &fileSize );
+    
+    unsigned int netMS = getSystemMilliseconds() - startMS;
+    
+    if( netMS > 5 ) {
+        printOut( "   openFile operation took %dms\n", netMS );
+        }
+
     
     if( handle == NULL ) {
         return NULL;
