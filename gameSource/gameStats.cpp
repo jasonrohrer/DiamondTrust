@@ -743,8 +743,10 @@ void drawStats() {
     
 
     // don't show panel for inspector
-    // delay showing panel until picture sprite loaded into RAM
-    if( activeUnit >= 0 && activeUnit < numUnits - 1 && pictureSpriteReady ) {
+    // delay showing PICTURE on panel until picture sprite loaded into RAM
+    // BUT, draw rest of panel, to avoid panel flicker when switching instantly
+    // from one active unit to another.
+    if( activeUnit >= 0 && activeUnit < numUnits - 1  ) {
         
         Unit *u = getUnit( activeUnit );
         
@@ -781,7 +783,10 @@ void drawStats() {
 
         drawDiamondCounter( 34, 14 + panelTop, u->mNumDiamondsHeld );
         
-        drawSprite( pictureSpriteID, 11, 86, white );
+        // wait for it to load into RAM
+        if( pictureSpriteReady ) {    
+            drawSprite( pictureSpriteID, 11, 86, white );
+            }
         
 
         int xOffset, x, y;
