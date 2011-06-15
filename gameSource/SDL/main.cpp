@@ -973,6 +973,19 @@ void closeFile( FileHandle inFile ) {
 
 
 
+void fileSeek( FileHandle inFile, int inAbsolutePosition ) {
+    FILE *file = ((FileStream*)inFile)->file;
+    
+    int result = fseek( file, inAbsolutePosition, SEEK_SET );
+    
+    if( result != 0 ) {
+        printOut( "fseek failed\n" );
+        }
+    }
+
+
+
+
 
 
 

@@ -25,6 +25,40 @@ char **songPartNames = NULL;
 int gridStepLength = 0;
 
 
+typedef struct wavStream {
+        char *wavFileName;
+        
+        FileHandle wavFile;
+        wavInfo info;
+    } wavStream;
+
+
+// for performance, keep all possible wav files open and ready to go
+// so they are opened and buffered all the time
+SimpleVector<wavStream> wavBank;
+
+
+wavStream *findBankStreamByFileName( char *inWavFileName ) {
+    for( int i=0; i<wavBank.size(); i++ ) {
+        wavStream *s = wavBank.getElement( i );
+    
+        if( strcmp( s->wavFileName, inWavFileName ) == 0 ) {
+            return s;
+            }
+        }
+    
+    return NULL;
+    }
+
+
+
+void rewindWavBankStream( wavStream *inStream ) {
+    fileSeek( inStream->wavFile, inStream->info.startOfDataInFile );
+    }
+
+
+
+
 
 typedef struct channelStream {
         
@@ -33,11 +67,8 @@ typedef struct channelStream {
         
         unsigned int totalNumSamplesPlayed;
 
-
-        char *wavFileName;
-        
-        FileHandle wavFile;
-        wavInfo info;
+        // a pointer to a wavStream in our wavBank
+        wavStream *wavBankStream;
         
         int fileSamplePosition;
 
@@ -109,8 +140,8 @@ void initMusic() {
         
         channelStream *s = &( songStreams[i] );
 
-        s->wavFileName = NULL;
-        s->wavFile = NULL;
+        s->wavBankStream = NULL;
+        
         s->filePlaying = false;
         s->totalNumSamplesPlayed = 0;
         }
@@ -196,6 +227,55 @@ void initMusic() {
                     printOut( "  %s\n", songPartName );
                     }                
 
+
+
+                
+                // add all WAV files in this part to our streamBank
+                // open them and get them ready to go
+                
+                
+                int numWavFiles;
+                char **wavFileNames = listDirectory( songPartDirNames[p],
+                                                     &numWavFiles );
+                
+                for( int w=0; w<numWavFiles; w++ ) {
+                    char *wavName = wavFileNames[w];
+
+                    int nameLength = strlen( wavName );
+                    
+                    if( nameLength > 4 ) {
+                        char *suffix = &( wavName[ nameLength - 4 ] );
+                    
+                        if( strcmp( suffix, ".wav" ) == 0 ) {
+                            // a wav file
+
+
+                            wavStream stream;
+                            
+                            stream.wavFileName = 
+                                stringDuplicate( wavFileNames[w] );
+                            
+
+                            stream.wavFile =
+                                openWavFile( stream.wavFileName, 
+                                             &( stream.info ) );
+
+                            
+                            wavBank.push_back( stream );
+                            }
+                        }
+                    
+                    
+                    delete [] wavFileNames[w];
+                    }
+                delete [] wavFileNames;
+
+                
+
+
+
+
+
                 delete [] songPartName;
                 delete [] songPartDirNames[p];
                 }
@@ -208,6 +288,19 @@ void initMusic() {
         if( numSongParts > MAX_SOUND_CHANNELS ) {
             printOut( "Warning:  more parts than available channels\n" );
             }
+        
+
+        printOut( "\n\nThe following WAV files have been opened and "
+                  "are ready to go:\n" );
+        
+        for( int i=0; i<wavBank.size(); i++ ) {
+            wavStream *s = wavBank.getElement( i );
+
+            printOut( "  %s\n", s->wavFileName );
+            }
+        
+        printOut( "\n\n" );
+        
 
         }
     else {
@@ -250,16 +343,21 @@ void freeMusic() {
         channelStream *s = &( songStreams[i] );
 
         if( s->filePlaying  ) {
-            closeFile( s->wavFile );
-            s->wavFile = NULL;
+            s->wavBankStream = NULL;
+            
             s->filePlaying = false;
-
-            delete [] s->wavFileName;
-            s->wavFileName = NULL;
             }        
         }
     
 
+    for( int i=0; i<wavBank.size(); i++ ) {
+        wavStream *s = wavBank.getElement( i );
+        
+        closeFile( s->wavFile );
+        
+        delete [] s->wavFileName;
+        }
+    wavBank.deleteAll();
 
     }
 
@@ -331,35 +429,24 @@ static void addTrack( int inChannelNumber, int inDelay ) {
                             
         
         channelStream *s = &( songStreams[partPick] );
-        
-        s->wavFileName = 
-            stringDuplicate( partFiles[ partFilePick ] );
-        
-        unsigned int startMS = getSystemMilliseconds();
-        
-        s->wavFile = openWavFile( s->wavFileName, &( s->info ) );
-        
-        unsigned int netMS = getSystemMilliseconds() - startMS;
-        
-        if( netMS > 5 ) {
-            printOut( "Opening %s for channel %d took %dms\n",
-                      s->wavFileName, inChannelNumber, netMS );
-            }
-        
+
+        // already rewound if it's not assigned to a channel
+        s->wavBankStream = 
+            findBankStreamByFileName( partFiles[ partFilePick ] );
 
         s->fileSamplePosition = 0;
         s->startSampleDelay = inDelay;
         s->filePlaying = true;
         
         printOut( "Adding loop %s on channel %d with delay %d\n", 
-                  s->wavFileName, partPick, inDelay );
+                  s->wavBankStream->wavFileName, partPick, inDelay );
         
                             
-        if( s->info.numSamples > gridStepLength ) {
+        if( s->wavBankStream->info.numSamples > gridStepLength ) {
             // an even longer loop encountered
             // use this as our grid step
             
-            gridStepLength = s->info.numSamples;
+            gridStepLength = s->wavBankStream->info.numSamples;
             printOut( "New longer grid step discovered:  %d\n", 
                       gridStepLength );
             }
@@ -450,7 +537,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             
             int numToGet = inNumSamples;
 
-            int numSamplesLeft = s->info.numSamples - s->fileSamplePosition;
+            int numSamplesLeft = s->wavBankStream->info.numSamples - 
+                s->fileSamplePosition;
             
             if( numToGet > numSamplesLeft ) {
                 numToGet = numSamplesLeft;
@@ -458,7 +546,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             
             unsigned int startMS = getSystemMilliseconds();
 
-            readFile( s->wavFile, (unsigned char *)inBuffer, numToGet * 2 );
+            readFile( s->wavBankStream->wavFile, 
+                      (unsigned char *)inBuffer, numToGet * 2 );
             
             unsigned int netMS = getSystemMilliseconds() - startMS;
         
@@ -476,24 +565,23 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             inNumSamples -= numToGet;
             
             
-            if( s->fileSamplePosition == s->info.numSamples ) {
+            if( s->fileSamplePosition == s->wavBankStream->info.numSamples ) {
                 // at end of file, wrap back
                 s->fileSamplePosition = 0;
                 
                 unsigned int startMS = getSystemMilliseconds();
                 
-                closeFile( s->wavFile );
+                rewindWavBankStream( s->wavBankStream );
                 
                 unsigned int netMS = getSystemMilliseconds() - startMS;
                 
                 if( netMS > 5 ) {
-                    printOut( "Closing wav file for channel %d took %dms\n",
+                    printOut( "Rewinding wav file for channel %d took %dms\n",
                               inChannelNumber, netMS );
                     }
 
 
-                s->wavFile = NULL;
-                delete [] s->wavFileName;
+                s->wavBankStream = NULL;
 
                 // consider dropping out
                 if( getRandom( 100 ) < 50 ) {
@@ -584,13 +672,13 @@ char **getTrackInfoStrings( int *outNumTracks ) {
 
         if( s->filePlaying ) {
             strings[i] = autoSprintf( 
-                "%d:  %s (%d.%d/%d.%d)", i, s->wavFileName,
+                "%d:  %s (%d.%d/%d.%d)", i, s->wavBankStream->wavFileName,
                 s->fileSamplePosition / 22050, 
                 s->fileSamplePosition / 2205 - 
                   10 * ( s->fileSamplePosition / 22050 ), 
-                s->info.numSamples / 22050,
-                s->info.numSamples / 2205 - 
-                  10 * ( s->info.numSamples / 22050 ) );
+                s->wavBankStream->info.numSamples / 22050,
+                s->wavBankStream->info.numSamples / 2205 - 
+                  10 * ( s->wavBankStream->info.numSamples / 22050 ) );
             }
         else {
             strings[i] = autoSprintf( "%d:  OFF", i );

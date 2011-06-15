@@ -50,6 +50,9 @@ int readFile( FileHandle inFile, unsigned char *inBuffer, int inBytesToRead );
 void closeFile( FileHandle inFile );
 
 
+// seeks to a particular byte position in a file
+void fileSeek( FileHandle inFile, int inAbsolutePosition );
+
 
 
 

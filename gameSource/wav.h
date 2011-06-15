@@ -11,6 +11,10 @@ typedef struct wavInfo {
         int bitsPerSample;
         int sampleRate;
         int numSamples;
+
+        // number of bytes to skip in the file to get to the data
+        int startOfDataInFile;
+
     } wavInfo;
 
 

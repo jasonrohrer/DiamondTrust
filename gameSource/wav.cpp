@@ -177,6 +177,9 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
     
 
     info.numSamples = (int)( dataLength / bytesPerFullSample );
+
+    
+    info.startOfDataInFile = fileSize - bytesLeftInFile;
     
     
     *outWavInfo = info;
