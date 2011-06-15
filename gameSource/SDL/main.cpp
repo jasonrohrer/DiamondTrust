@@ -913,74 +913,90 @@ char **listDirectory( char *inFileName, int *outNumEntries ) {
 
 
 
-// this article says you need 8 extra bytes for a hash table
-// http://www.theillien.com/Sys_Admin_v12/html/v11/i04/a6.htm
-#define FILE_STREAM_BUFFER_SIZE  16384 + 8
-
+// decided that the ONLY way to make realtime file IO work in conjuction
+// with audio streams is to slurp each necessary file into RAM before
+// starting the audio thread.  Ugly in terms of RAM usage, but if we're only
+// playing one song at a time, it's not that bad to pre-load all those loops.
+//
+// HOWEVER, this would be impossible on the DS due to RAM constraints, and
+// is also not necessary because DS card reads have more consistent latency 
+// than HD access.
+//
+// SO... we'll hide this RAM caching here, in the file reading interface.
+// Whenever a file is OPEN, it has been cached in RAM.
+//
+// The music player already keeps all current loop files open from previous
+// attempts at optimization.
+//
+// So, switching songs should involve CLOSING all the open files (to free
+// RAM in the SDL implemenation) and then opening another batch of files.
+// As long as the audio buffer has been set to silence before this happens,
+// we should be fine even if opening the next batch of files takes a while.
+// (On SDL, audio runs in a separate thread, so opening these files shouldn't
+//  slow down the game... on the DS, opening the next batch of files shouldn't
+//  be slow in the first place.)
 typedef struct FileStream {
-        FILE *file;
+        int fileSize;
         
-        char readBuffer[ FILE_STREAM_BUFFER_SIZE ];
+        int filePosition;
+        
+        unsigned char *fileData;
+        
     } FileStream;
 
 
 
 
 FileHandle openFile( char *inFileName, int *outSize ) {
-    File f( new Path( "gameData" ), inFileName );
 
-    char *fullName = f.getFullFileName();
-    
-    *outSize = f.getLength();
-    
-
-    FILE *file = fopen( fullName, "rb" );
-
-    delete [] fullName;
-
-    
     FileStream *stream = new FileStream;
-
-    stream->file = file;
-    int result = setvbuf( stream->file, stream->readBuffer, _IOFBF, 
-                          FILE_STREAM_BUFFER_SIZE );
     
-    if( result != 0 ) {
-        printOut( "setvbuf failed for file %s\n", inFileName );
-        }
+    stream->fileData = readFile( inFileName, &( stream->fileSize ) );
 
+    if( stream->fileData == NULL ) {
+        delete stream;
+        return NULL;
+        }
+    
+    stream->filePosition = 0;
+    
     return stream;
     }
 
 
 
 int readFile( FileHandle inFile, unsigned char *inBuffer, int inBytesToRead ) {
-    FILE *file = ((FileStream*)inFile)->file;
+    FileStream *stream = (FileStream*)inFile;
+
+    int bytesLeft = stream->fileSize - stream->filePosition;
     
-    return fread( inBuffer, 1, inBytesToRead, file );
+    if( bytesLeft < inBytesToRead ) {
+        inBytesToRead = bytesLeft;
+        }
+    
+    memcpy( inBuffer, &( stream->fileData[ stream->filePosition ] ),
+            inBytesToRead );
+    
+    stream->filePosition += inBytesToRead;
+    
+    return inBytesToRead;
     }
 
 
 void closeFile( FileHandle inFile ) {
     FileStream *stream = (FileStream*)inFile;
     
-    FILE *file = stream->file;
-
-    fclose( file );
-
+    delete [] stream->fileData;
+    
     delete stream;
     }
 
 
 
 void fileSeek( FileHandle inFile, int inAbsolutePosition ) {
-    FILE *file = ((FileStream*)inFile)->file;
-    
-    int result = fseek( file, inAbsolutePosition, SEEK_SET );
-    
-    if( result != 0 ) {
-        printOut( "fseek failed\n" );
-        }
+    FileStream *stream = (FileStream*)inFile;
+
+    stream->filePosition = inAbsolutePosition;
     }
 
 
