@@ -2,6 +2,7 @@
 
 #include "music.h"
 #include "wav.h"
+#include "crcHash.h"
 
 
 #include "minorGems/util/stringUtils.h"
@@ -20,6 +21,27 @@ int currentSongAct;
 
 int numSongParts;
 char **songPartNames = NULL;
+
+
+// songActFilesPerPart[a][p] = number of available files for part p in act a
+int **songActFilesPerPart = NULL;
+
+// the full file paths of ALL files (including base act-0 files)
+// songActPartFileBanks[a][p] = an array of 
+//   strings of length songActFilesPerPart[a][p]
+char ****songActPartFileBanks = NULL;
+
+
+// musicState[p] tells what file index # part p should be playing
+// during act changes, there may not actually be enough files for the part
+//  to accomodate this file index.  If so, it should wrap around.
+//
+// -1 for a silent track
+int *musicState = NULL;
+
+char *lastStateString = NULL;
+
+
 
 
 int gridStepLength = 0;
@@ -124,6 +146,88 @@ static void sortStrings( char ***inArray, int inNumStrings ) {
             }
         }
     }
+
+
+
+
+
+
+// returns new array of new strings destroyed by caller
+static char **getAllFilesForActAndPart( int inAct, int inPart, 
+                                        int *outNumFiles ) {
+    
+    int partPick = inPart;
+    
+    char *actDir = songActDirNames[ inAct ];
+    char *partName = songPartNames[ partPick ];
+                    
+    char *partDir = autoSprintf( "%s/%s", actDir, partName );
+
+
+    SimpleVector<char *> fullPartFileVector;
+
+                    
+    if( isDirectory( partDir ) ) {
+                        
+        int numPartFiles;
+        char **partFiles = 
+            listDirectory( partDir, &numPartFiles );
+                        
+        
+        if( numPartFiles > 0 ) {
+            fullPartFileVector.appendArray( partFiles, numPartFiles );
+            }
+        
+        delete [] partFiles;
+        }
+    delete [] partDir;
+
+    
+    
+
+
+    // also consider files for this part that are in first act
+    // (they can be used throughout song)
+
+    // but DON'T do this if inAct IS the first act (common act 0)
+    // (don't want doubles)
+
+    if( inAct != 0 ) {
+        
+    
+        char *firstPartDir = autoSprintf( "%s/%s", 
+                                          songActDirNames[0], partName );
+        
+        if( isDirectory( firstPartDir ) ) {
+            // add into mix of possible parts to chose from
+                    
+            int numFirstPartFiles;
+        
+            char **firstPartFiles = listDirectory( firstPartDir,
+                                                   &numFirstPartFiles );
+            
+            if( numFirstPartFiles > 0 ) {
+                fullPartFileVector.appendArray( firstPartFiles, 
+                                                numFirstPartFiles );        
+                }
+        
+            delete [] firstPartFiles;
+            }
+        
+        delete [] firstPartDir;
+        }
+    
+    
+    *outNumFiles = fullPartFileVector.size();
+
+
+    return fullPartFileVector.getElementArray();
+    }
+
+
+
+
+
 
 
 
@@ -302,6 +406,40 @@ void initMusic() {
         printOut( "\n\n" );
         
 
+
+
+
+        // now set up full file banks for each part/act
+        songActFilesPerPart = new int*[ numSongActs ];
+        songActPartFileBanks = new char***[ numSongActs ];
+ 
+        for( int a=0; a<numSongActs; a++ ) {
+            printOut( "Act %d:\n", a );
+            
+            songActFilesPerPart[a] = new int[ numSongParts ];
+            songActPartFileBanks[a] = new char**[ numSongParts ];
+            
+            for( int p=0; p<numSongParts; p++ ) {
+                printOut( "  Part %d:\n", p );
+                
+                songActPartFileBanks[a][p] = 
+                    getAllFilesForActAndPart( 
+                        a, p, &( songActFilesPerPart[a][p] ) );
+                
+                for( int f=0; f<songActFilesPerPart[a][p]; f++ ) {
+                    printOut( "    Loop %d:  %s\n", f, 
+                              songActPartFileBanks[a][p][f] );
+                    }
+                }
+            }
+
+
+        // set up an intial music state
+        musicState = new int[ numSongParts];
+        setMusicState( "START STATE" );
+
+
+
         }
     else {
         printOut( "ERROR:  no songs present!\n" );
@@ -359,6 +497,32 @@ void freeMusic() {
         }
     wavBank.deleteAll();
 
+
+
+    for( int a=0; a<numSongActs; a++ ) {
+        
+        
+        for( int p=0; p<numSongParts; p++ ) {
+            deleteArrayOfStrings( &( songActPartFileBanks[a][p] ),
+                                  songActFilesPerPart[a][p] );
+            }
+        delete [] songActFilesPerPart[a];
+        delete [] songActPartFileBanks[a];
+        }
+    delete [] songActFilesPerPart;
+    delete [] songActPartFileBanks;
+
+    songActFilesPerPart = NULL;
+    songActPartFileBanks = NULL;
+
+    delete [] musicState;
+    musicState = NULL;
+
+    if( lastStateString != NULL ) {
+        delete [] lastStateString;
+        lastStateString = NULL;
+        }
+
     }
 
 
@@ -370,63 +534,20 @@ static void addTrack( int inChannelNumber, int inDelay ) {
     
     char *actDir = songActDirNames[ currentSongAct ];
     char *partName = songPartNames[ partPick ];
-                    
-    char *partDir = autoSprintf( "%s/%s", actDir, partName );
 
+    int numPartFiles = songActFilesPerPart[currentSongAct][partPick];
 
-    SimpleVector<char *> fullPartFileVector;
-
-                    
-    if( isDirectory( partDir ) ) {
-                        
-        int numPartFiles;
-        char **partFiles = 
-            listDirectory( partDir, &numPartFiles );
-                        
+    char **partFiles = songActPartFileBanks[currentSongAct][partPick];
         
-        if( numPartFiles > 0 ) {
-            fullPartFileVector.appendArray( partFiles, numPartFiles );
-            }
-        
-        delete [] partFiles;
-        }
-    delete [] partDir;
-
-    
-    
-    // also consider files for this part that are in first act
-    // (they can be used throughout song)
-    
-    char *firstPartDir = autoSprintf( "%s/%s", 
-                                      songActDirNames[0], partName );
-        
-    if( isDirectory( firstPartDir ) ) {
-        // add into mix of possible parts to chose from
-                    
-        int numFirstPartFiles;
-        
-        char **firstPartFiles = listDirectory( firstPartDir,
-                                               &numFirstPartFiles );
-            
-        if( numFirstPartFiles > 0 ) {
-            fullPartFileVector.appendArray( firstPartFiles, 
-                                            numFirstPartFiles );        
-            }
-        
-        delete [] firstPartFiles;
-        }
-        
-    delete [] firstPartDir;
-    
-    char **partFiles = fullPartFileVector.getElementArray();
-    int numPartFiles = fullPartFileVector.size();
             
 
 
     if( numPartFiles > 0 ) {
                             
-        int partFilePick = (int)getRandom( (unsigned int)numPartFiles );
-                            
+        // wrap around in case musicState indexes a file greater than the 
+        // max availabel (might happen after an act change if music state
+        // hasn't been updated yet)
+        int partFilePick = musicState[partPick] % numPartFiles;
         
         channelStream *s = &( songStreams[partPick] );
 
@@ -458,8 +579,6 @@ static void addTrack( int inChannelNumber, int inDelay ) {
         
         songStreams[partPick].filePlaying = false;
         }
-
-    deleteArrayOfStrings( &partFiles, numPartFiles );                    
     }
 
 
@@ -497,7 +616,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 }
             
             // consider adding a new track
-            if( getRandom( 100 ) > 30 ) {
+            if( musicState[inChannelNumber] != -1 ) {
                 addTrack( inChannelNumber, delay );                
                 }
             }
@@ -584,7 +703,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 s->wavBankStream = NULL;
 
                 // consider dropping out
-                if( getRandom( 100 ) < 50 ) {
+                if( musicState[inChannelNumber] == -1 ) {
                     printOut( "Track %d dropping out\n", inChannelNumber );
                     
                     s->filePlaying = false;
@@ -645,6 +764,14 @@ void nextSongAct() {
     if( currentSongAct < numSongActs - 1 ) {
         currentSongAct ++;
         }
+
+    if( lastStateString != NULL ) {
+        // redo music state to ensure a new mix after act changes
+        setMusicState( lastStateString );
+        }
+    
+    
+
     unlockAudio();
     }
 
@@ -690,6 +817,92 @@ char **getTrackInfoStrings( int *outNumTracks ) {
 
     return strings;
     }
+
+
+
+
+
+
+void setMusicState( char *inStateString ) {
+    // convert to int hash so we can use it to seed a deterministic
+    // random process
+
+    // add our act number into it so that different acts with the same
+    // state string produce different mixes
+    char *fullStringToHash = autoSprintf( "%s%d", inStateString, 
+                                          currentSongAct );
+    
+    unsigned int hash = crcHash( (unsigned char*)fullStringToHash, 
+                                 strlen( fullStringToHash ) );
+    
+    delete [] fullStringToHash;
+
+
+    
+    char *oldLastStateString = lastStateString;
+    
+    lastStateString = stringDuplicate( inStateString );
+    
+    if( oldLastStateString != NULL ) {
+        delete [] oldLastStateString;
+        }
+    
+    
+
+
+    randState state = startCustomRand( hash );
+    
+    randState *s = &state;
+    
+
+
+    int numPlaying = 0;
+    
+    for( int p=0; p<numSongParts; p++ ) {
+        // turn all off to start
+        musicState[p] = -1;
+        }
+    
+
+
+    // keep adding parts until at least one is playing
+
+    while( numPlaying == 0 ) {
+        
+        // go through all parts and flip a fair coin to decide if it is playing
+        // thus, on average, half of our tracks are playing
+        
+        // rarest to have ALL playing.
+        // rarest to have ONE playing.
+        
+        for( int p=0; p<numSongParts; p++ ) {
+    
+            if( // currently off
+                musicState[p] == -1 &&
+                // win a fair coin flip
+                getRandom( s, 100 ) > 50 ) {
+                
+                int numFilesThisAct = songActFilesPerPart[currentSongAct][p];
+                
+                if( numFilesThisAct > 0 ) {
+                    // pick one
+                    musicState[p] = getRandom( s, numFilesThisAct );
+
+                    numPlaying ++;
+                    }
+                }
+            }
+        }
+
+    }
+
+
+
+
+char *getLastMusicState() {
+    return lastStateString;
+    }
+
 
 
 

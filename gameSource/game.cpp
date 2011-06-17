@@ -135,6 +135,7 @@ Button *childButton;
 
 // for testing
 Button *nextSongActButton;
+Button *songRerollButton;
 
 
 Button *aiButton;
@@ -488,6 +489,9 @@ void gameInit() {
     nextSongActButton = new Button( font16, translate( "button_nextSongAct" ),
                                     38, 87 );
 
+    songRerollButton = new Button( font16, translate( "button_songReroll" ),
+                                    128, 87 );
+
 
 
 
@@ -563,7 +567,8 @@ void gameFree() {
     delete playAgainButton;
     
     delete nextSongActButton;
-
+    delete songRerollButton;
+    
     delete aiButton;
     delete wifiButton;
     
@@ -1160,7 +1165,14 @@ void drawTopScreen() {
         }
 
     if( allowManualSongActSwitching ) {
-        char *actString = autoSprintf( "Act: %d", getSongAct() );
+        char *stateString = getLastMusicState();
+        
+        if( stateString == NULL ) {
+            stateString = "";
+            }
+        
+        char *actString = autoSprintf( "Act: %d    Seed string: '%s' ", 
+                                       getSongAct(), stateString );
         
         font8->drawString( actString, 5, 35, white, alignLeft );
 

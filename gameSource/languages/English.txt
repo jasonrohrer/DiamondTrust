@@ -15,6 +15,8 @@ button_play_again "Play Again"
 
 
 button_nextSongAct "fwd"
+button_songReroll "rand"
+
 
 
 button_ai "Single Player"

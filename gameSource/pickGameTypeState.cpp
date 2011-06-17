@@ -20,6 +20,7 @@ extern unsigned char titleFade;
 
 
 extern Button *nextSongActButton;
+extern Button *songRerollButton;
 
 extern char allowManualSongActSwitching;
 
@@ -99,9 +100,22 @@ void PickGameTypeState::clickState( int inX, int inY ) {
             networkOpponent = true;
             initOpponent( false );
             }
-        else if( allowManualSongActSwitching &&
-                 nextSongActButton->getPressed( inX, inY ) ) {
-            nextSongAct();
+        else if( allowManualSongActSwitching ) {
+            if( nextSongActButton->getPressed( inX, inY ) ) {
+                nextSongAct();
+                }
+            else if( songRerollButton->getPressed( inX, inY ) ) {   
+                
+                char newState[12];
+                
+                newState[11] = '\0';
+                
+                for( int i=0; i<11; i++ ) {
+                    newState[i] = 'a' + getRandom( 26 );
+                    }
+                
+                setMusicState( newState );
+                }
             }
         }
     }
@@ -172,6 +186,7 @@ void PickGameTypeState::drawState() {
         
         if( allowManualSongActSwitching ) {
             nextSongActButton->draw();
+            songRerollButton->draw();
             }
         }
     
