@@ -178,17 +178,35 @@ void gameInit() {
     // how long the user waits before pressing NEXT
     setRandomSeed( 23423983, 23783294 );
     
-    printOut( "Testing getRandom:\n" );
+    printOut( "Testing GLOBAL getRandom (const seed):\n" );
     for( int i=0; i<10; i++ ) {
         printOut( "%d\n", getRandom( 400 ) );
         }
     
+    // test customRand to make sure it doesn't interfere with global one
+    setRandomSeed( 23423983, 23783294 );
+    
+    randState rState = startCustomRand( 23423 );
+    
+    printOut( "Testing CUSTOM getRandom:\n" );
+    for( int i=0; i<10; i++ ) {
+        printOut( "%d\n", getRandom( &rState, 400 ) );
+        }
+
+    printOut( "Testing GLOBAL getRandom again (const seed):\n" );
+    for( int i=0; i<10; i++ ) {
+        printOut( "%d\n", getRandom( 400 ) );
+        }
+
+
+
+
     printOut( "Testing getSecondsSinceEpoc: %d\n", getSecondsSinceEpoc() );
     
     printOut( "Setting new random seed based on time\n" );
     setRandomSeed( getSecondsSinceEpoc(), getSecondsSinceEpoc() + 2378923 );
     
-    printOut( "Testing getRandom again:\n" );
+    printOut( "Testing GLOBAL getRandom again (with time seed):\n" );
     for( int i=0; i<10; i++ ) {
         printOut( "%d\n", getRandom( 400 ) );
         }
