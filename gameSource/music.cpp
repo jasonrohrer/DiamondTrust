@@ -699,40 +699,56 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                               inChannelNumber, netMS );
                     }
 
+                
 
-                s->wavBankStream = NULL;
+                // ONLY consider dropping out or changing on a FULL
+                // grid step boundary
+                // If we drop out part-way through a grid step, if we're the 
+                // only loop playing during a musicState transition, we
+                // may leave silence, because the next state's parts
+                // will only come IN on a full grid step
 
-                // consider dropping out
-                if( musicState[inChannelNumber] == -1 ) {
-                    printOut( "Track %d dropping out\n", inChannelNumber );
+                // otherwise, we simply rewind our wav and keep going
+                if( s->totalNumSamplesPlayed / gridStepLength <
+                    ( s->totalNumSamplesPlayed + numSamplesRequested ) 
+                       / gridStepLength ) {
                     
-                    s->filePlaying = false;
+                    
+                    s->wavBankStream = NULL;
 
-                    // fill rest with silence
-                    memset( inBuffer, 0, (unsigned int)( inNumSamples * 2 ) );
-                    inNumSamples = 0;
-                    }
-                else {
-                    // consider switching to a different loop for this part
-
-                    // no delay, because it can start right NOW
-                    addTrack( inChannelNumber, 0 );
-
-                    if( ! s->filePlaying ) {
-                        // adding a track on this channel failed?
-                        // maybe an act change has happened and we no
-                        // longer have loops to play on this channel
-                        printOut( 
-                            "Track %d dropping out because of act change\n", 
-                            inChannelNumber );
+                    // consider dropping out
+                    if( musicState[inChannelNumber] == -1 ) {
+                        printOut( "Track %d dropping out\n", inChannelNumber );
+                        
+                        s->filePlaying = false;
                         
                         // fill rest with silence
-                        memset( inBuffer, 
-                                0, (unsigned int)( inNumSamples * 2 ) );
-                        
+                        memset( inBuffer, 0, 
+                                (unsigned int)( inNumSamples * 2 ) );
                         inNumSamples = 0;
                         }
-                    
+                    else {
+                        // consider switching to a different loop for this part
+
+                        // no delay, because it can start right NOW
+                        addTrack( inChannelNumber, 0 );
+                        
+                        if( ! s->filePlaying ) {
+                            // adding a track on this channel failed?
+                            // maybe an act change has happened and we no
+                            // longer have loops to play on this channel
+                            printOut( 
+                                "Track %d dropping out because "
+                                "of act change\n", 
+                                inChannelNumber );
+                        
+                            // fill rest with silence
+                            memset( inBuffer, 
+                                    0, (unsigned int)( inNumSamples * 2 ) );
+                            
+                            inNumSamples = 0;
+                            }
+                        }
                     }
                 
                 
