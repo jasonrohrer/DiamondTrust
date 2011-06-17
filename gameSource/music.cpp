@@ -175,6 +175,8 @@ static char **getAllFilesForActAndPart( int inAct, int inPart,
                         
         
         if( numPartFiles > 0 ) {
+            sortStrings( &partFiles, numPartFiles );
+            
             fullPartFileVector.appendArray( partFiles, numPartFiles );
             }
         
@@ -207,6 +209,8 @@ static char **getAllFilesForActAndPart( int inAct, int inPart,
                                                    &numFirstPartFiles );
             
             if( numFirstPartFiles > 0 ) {
+                sortStrings( &firstPartFiles, numFirstPartFiles );
+
                 fullPartFileVector.appendArray( firstPartFiles, 
                                                 numFirstPartFiles );        
                 }
@@ -266,6 +270,8 @@ void initMusic() {
     char **songList = listDirectory( "music", &numSongs );
     
     if( numSongs > 0 ) {
+        sortStrings( &songList, numSongs );
+        
         int songPick = (int)getRandom( (unsigned int)numSongs );
 
         currentSongDirName = stringDuplicate( songList[ songPick ] );
@@ -301,6 +307,11 @@ void initMusic() {
             
             char **songPartDirNames = listDirectory( songActDirNames[i], 
                                                      &numParts );
+            
+
+            if( numParts > 1 ) {
+                sortStrings( &songPartDirNames, numParts );
+                }
             
             for( int p=0; p<numParts; p++ ) {
 
@@ -342,6 +353,10 @@ void initMusic() {
                 char **wavFileNames = listDirectory( songPartDirNames[p],
                                                      &numWavFiles );
                 
+                if( numWavFiles > 1 ) {
+                    sortStrings( &wavFileNames, numWavFiles );
+                    }
+
                 for( int w=0; w<numWavFiles; w++ ) {
                     char *wavName = wavFileNames[w];
 
