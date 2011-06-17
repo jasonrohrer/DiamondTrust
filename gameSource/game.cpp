@@ -837,9 +837,14 @@ void gameLoopTick() {
         
         // set up pan for all channels
         
+        // every-other channel is either leftish or rightish
+        // we don't know how many total channels we're going to have
+        int panFlip = -1;
+
         for( int c=0; c<8; c++ ) {
-            // spread channels around center
-            int pan = 64 + ( c - 4 ) * 6;
+            int pan = 64 + panFlip * 16;
+
+            panFlip *= -1;
             
             printOut( "Setting channel %d pan to %d\n", c, pan );
             
