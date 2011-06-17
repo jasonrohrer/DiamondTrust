@@ -37,6 +37,8 @@ opponent.cpp \
 random.cpp \
 music.cpp \
 wav.cpp \
+crcHash.cpp \
+
 
 
 
