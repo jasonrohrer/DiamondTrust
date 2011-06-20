@@ -44,12 +44,12 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
             
         int pixelsPerChar = mSpriteWidth * mSpriteWidth;
             
+        rgbaColor *charRGBA = new rgbaColor[ pixelsPerChar ];
+
         for( int i=0; i<128; i++ ) {
             int yOffset = ( i / 16 ) * mSpriteWidth;
             int xOffset = ( i % 16 ) * mSpriteWidth;
-                
-            rgbaColor *charRGBA = new rgbaColor[ pixelsPerChar ];
-                
+                                
             for( int y=0; y<mSpriteWidth; y++ ) {
                 for( int x=0; x<mSpriteWidth; x++ ) {
                         
@@ -124,9 +124,9 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
                     }
                 }
                 
-
-            delete [] charRGBA;
+            
             }
+        delete [] charRGBA;
                         
         delete [] spriteRGBA;
         }
