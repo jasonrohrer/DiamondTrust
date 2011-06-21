@@ -3,7 +3,9 @@
 
 
 #include "platform.h"
+#include "RGBAFilter.h"
 
+#include <stdlib.h>
 
 enum TextAlignment {
     alignCenter = 0,
@@ -17,8 +19,11 @@ class Font {
     public:
         
         // file contains TGA with 16x16 ascii table
+        //
+        // inFilter filters whole font image BEFORE characters are split
+        // from it.  Defaults to NULL
         Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
-              char inFixedWidth );
+              char inFixedWidth, RGBAFilter *inFilter=NULL );
         
         ~Font();
         

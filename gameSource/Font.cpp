@@ -6,7 +6,7 @@
 
 
 Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
-            char inFixedWidth )
+            char inFixedWidth, RGBAFilter *inFilter  )
         : mCharSpacing( inCharSpacing ), mSpaceWidth( inSpaceWidth ),
           mFixedWidth( inFixedWidth ) {
     
@@ -37,7 +37,11 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
             spriteRGBA[i].g = r;
             spriteRGBA[i].b = r;
             }
-            
+        
+        if( inFilter != NULL ) {
+            inFilter->filter( spriteRGBA, width, height );
+            }
+        
                         
                 
         mSpriteWidth = width / 16;
@@ -98,10 +102,10 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
                 for( int y=0; y<mSpriteWidth; y++ ) {
                     for( int x=0; x<mSpriteWidth; x++ ) {
                             
-                        unsigned char r = 
-                            charRGBA[ y * mSpriteWidth + x ].r;
+                        unsigned char a = 
+                            charRGBA[ y * mSpriteWidth + x ].a;
                             
-                        if( r > 0 ) {
+                        if( a > 0 ) {
                             someInk = true;
 
                             if( x < farthestLeft ) {

@@ -19,6 +19,8 @@
 #include "ai/ai.h"
 #include "opponent.h"
 #include "music.h"
+#include "DotMatrixRGBAFilter.h"
+
 
 
 // set to false when gameInit done
@@ -279,7 +281,8 @@ void gameInit() {
         }
 
     printOut( "Loading 16-pixel font\n" );
-    font16 = new Font( "font16_sans.tga", 2, 6, false );
+    DotMatrixRGBAFilter fontFilter;
+    font16 = new Font( "font16_jcr.tga", 2, 6, false, &fontFilter );
 
     // we can call this now that we have at least the big font
     updateLoadingProgress();

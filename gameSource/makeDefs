@@ -38,6 +38,7 @@ random.cpp \
 music.cpp \
 wav.cpp \
 crcHash.cpp \
+DotMatrixRGBAFilter.cpp \
 
 
 
@@ -85,4 +86,6 @@ s/^gameState\.o/\.\.\/ai\/gameState\.o/; \
 s/^opponent\.o/\.\.\/opponent\.o/; \
 s/^random\.o/\.\.\/random\.o/; \
 s/^music\.o/\.\.\/music\.o/; \
+s/^wav\.o/\.\.\/wav\.o/; \
+s/^DotMatrixRGBAFilter\.o/\.\.\/DotMatrixRGBAFilter\.o/; \
 '

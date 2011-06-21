@@ -8,7 +8,7 @@ buttonRightEnd.tga \
 buttonMiddle.tga \
 angola_map.tga \
 font8.tga \
-font16_sans.tga \
+font16_jcr.tga \
 playerUnits.tga \
 enemyUnits.tga \
 inspectorUnit.tga \
