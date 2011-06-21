@@ -460,6 +460,8 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     }
 
 
+
+
 void runGameLoopOnce() {
         stepNetwork();
         
@@ -592,6 +594,12 @@ void runGameLoopOnce() {
             frameBatchCount = 0;
             }
         
+    }
+
+
+
+void platformSleep( unsigned int inTargetMilliseconds ) {
+    SDL_Delay( inTargetMilliseconds );
     }
 
 

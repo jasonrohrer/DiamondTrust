@@ -191,6 +191,11 @@ void runGameLoopOnce();
 
 
 
+void platformSleep( unsigned int inTargetMilliseconds );
+
+
+
+
 
 
 // Networking support

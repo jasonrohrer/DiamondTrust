@@ -33,6 +33,12 @@ static char stillLoading = true;
 static char loadingProgress[ PROGRESS_LENGTH  + 1 ];
 static int currentLoadingProgress = 0;
 
+
+static char creditShown[3] = { false, false, false };
+static unsigned int creditStartTime[3];
+
+
+
 #include "loading.h"
 
 
@@ -1245,6 +1251,12 @@ void drawBottomScreen() {
 
             if( currentLoadingProgress < PROGRESS_LENGTH / 3 ) {
                 
+                if( !creditShown[0] ) {
+                    creditShown[0] = true;
+                    creditStartTime[0] = getSystemMilliseconds();
+                    }
+                
+
                 // + 19
                 font16->drawString( translate( "credit_1a" ), 
                                     128, 
@@ -1257,6 +1269,12 @@ void drawBottomScreen() {
                 }
             else if( currentLoadingProgress < 2 * PROGRESS_LENGTH / 3 ) {
                 
+                if( !creditShown[1] ) {
+                    creditShown[1] = true;
+                    creditStartTime[1] = getSystemMilliseconds();
+                    }
+
+
                 // + 19
                 font16->drawString( translate( "credit_2b" ), 
                                     128, 
@@ -1268,6 +1286,11 @@ void drawBottomScreen() {
                                    102, black, alignCenter );
                 }
             else {
+
+                if( !creditShown[2] ) {
+                    creditShown[2] = true;
+                    creditStartTime[2] = getSystemMilliseconds();
+                    }
                 
                 // + 19
                 font16->drawString( translate( "credit_3b" ), 
@@ -1317,4 +1340,18 @@ void updateLoadingProgress() {
             break;
             }
         }
+
+    if( currentLoadingProgress >= PROGRESS_LENGTH / 3 ) {
+        // stall so credit can be shown long enough
+        while( getSystemMilliseconds() - creditStartTime[0] < 5000 ) {
+            platformSleep( 10 );
+            }
+        }
+    if( currentLoadingProgress >= 2 * PROGRESS_LENGTH / 3 ) {
+        // stall so credit can be shown long enough
+        while( getSystemMilliseconds() - creditStartTime[1] < 5000 ) {
+            platformSleep( 10 );
+            }
+        }
+
     }
