@@ -285,7 +285,12 @@ void gameInit() {
     DotMatrixRGBAFilter fontFilter;
     font16 = new Font( "font16_jcr.tga", 2, 6, false, &fontFilter );
 
+    printOut( "  ++++++  Init green bar paper\n" );
+    initGreenBarPaper();
+
+
     // we can call this now that we have at least the big font
+    // AND the greenbar to go behind it
     updateLoadingProgress();
 
     
@@ -533,8 +538,6 @@ void gameInit() {
     initSalePicker();
     updateLoadingProgress();
 
-    printOut( "  ++++++  Init green bar paper\n" );
-    initGreenBarPaper();
     
 
 
@@ -1055,9 +1058,13 @@ void drawTopScreen() {
             
             printOut( "Drawing LOADING message on top screen\n" );
             
+            drawGreenBarPaper( 148, 191 );
+            
+            startNewSpriteLayer();
+
             font16->drawString( translate( "status_loading" ), 
                                 128, 
-                                163, white, alignCenter );
+                                166, white, alignCenter );
             }
         else {
             printOut( "Large font not loaded, so not drawing "
@@ -1070,7 +1077,7 @@ void drawTopScreen() {
 
             font8->drawString( loadingProgress, 
                                12, 
-                               180, white, alignLeft );
+                               183, black, alignLeft );
             }
         else {
             printOut( "Small font not loaded, so not drawing "
@@ -1115,6 +1122,8 @@ void drawTopScreen() {
         
 
         drawGreenBarPaper( 148, 191 );
+
+        startNewSpriteLayer();
 
         font16->drawString( headerString, 
                             128, 
