@@ -39,6 +39,7 @@ music.cpp \
 wav.cpp \
 crcHash.cpp \
 DotMatrixRGBAFilter.cpp \
+greenBarPaper.cpp \
 
 
 
@@ -88,4 +89,5 @@ s/^random\.o/\.\.\/random\.o/; \
 s/^music\.o/\.\.\/music\.o/; \
 s/^wav\.o/\.\.\/wav\.o/; \
 s/^DotMatrixRGBAFilter\.o/\.\.\/DotMatrixRGBAFilter\.o/; \
+s/^greenBarPaper\.o/\.\.\/greenBarPaper\.o/; \
 '

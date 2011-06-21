@@ -20,6 +20,7 @@
 #include "opponent.h"
 #include "music.h"
 #include "DotMatrixRGBAFilter.h"
+#include "greenBarPaper.h"
 
 
 
@@ -532,6 +533,10 @@ void gameInit() {
     initSalePicker();
     updateLoadingProgress();
 
+    printOut( "  ++++++  Init green bar paper\n" );
+    initGreenBarPaper();
+    
+
 
     resetStats();
     
@@ -589,7 +594,8 @@ void gameFree() {
     freeStats();
     freeFlyingDiamonds();
     freeSalePicker();
-
+    freeGreenBarPaper();
+    
     freeOpponent();
 
     freeMusic();
@@ -1107,18 +1113,21 @@ void drawTopScreen() {
             headerString = "";
             }
         
+
+        drawGreenBarPaper( 148, 191 );
+
         font16->drawString( headerString, 
                             128, 
-                            148, white, alignCenter );
+                            151, white, alignCenter );
         
         font16->drawString( statusMessage, 
                             128, 
-                            163, white, alignCenter );
+                            166, white, alignCenter );
 
         if( statusSubMessage != NULL ) {
             font8->drawString( statusSubMessage, 
                                128, 
-                               180, white, alignCenter );
+                               183, black, alignCenter );
             }
 
         if( isWaitingOnOpponent && ! networkOpponent ) {
