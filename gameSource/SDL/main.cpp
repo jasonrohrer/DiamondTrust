@@ -322,11 +322,12 @@ int touchY = 0;
 
 
 
-void runGameLoopOnce() {
-    // just skip this on SDL, because it loads fast enough that it doesn't
-    // matter!
-    }
+static Uint32 lastFrameDoneTime;
 
+static Uint32 frameBatchStartTime;
+    
+static int frameBatchSize = 100;
+static int frameBatchCount = 0;
 
 
 
@@ -442,19 +443,24 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     atexit( cleanUpAtExit );
 
 
-    Uint32 lastFrameDoneTime = SDL_GetTicks();
+    lastFrameDoneTime = SDL_GetTicks();
 
-    Uint32 frameBatchStartTime = SDL_GetTicks();
+    frameBatchStartTime = SDL_GetTicks();
     
-    int frameBatchSize = 100;
-    int frameBatchCount = 0;
-    
+        
     
 
     
     // main loop
     while( true ) {
-        
+        runGameLoopOnce();
+        }
+
+    return 0;
+    }
+
+
+void runGameLoopOnce() {
         stepNetwork();
         
         gameLoopTick();
@@ -586,11 +592,9 @@ int mainFunction( int inNumArgs, char **inArgs ) {
             frameBatchCount = 0;
             }
         
-        }
-
-
-    return 0;    
     }
+
+
 
 
 
