@@ -31,6 +31,7 @@ static char stillLoading = true;
 
 #define PROGRESS_LENGTH 58
 static char loadingProgress[ PROGRESS_LENGTH  + 1 ];
+static int currentLoadingProgress = 0;
 
 #include "loading.h"
 
@@ -169,7 +170,7 @@ void gameInit() {
         loadingProgress[i] = '-';
         }
     loadingProgress[ PROGRESS_LENGTH ] = '\0';
-    
+    currentLoadingProgress = 0;
     
 
 
@@ -1233,7 +1234,53 @@ void drawTopScreen() {
 void drawBottomScreen() {
     
     if( stillLoading ) {
-        // draw nothing here
+        // draw credits?
+
+        if( font16 != NULL && font8 != NULL ) {
+
+            drawGreenBarPaper( 96, 191 );
+            
+            startNewSpriteLayer();
+
+
+            if( currentLoadingProgress < PROGRESS_LENGTH / 3 ) {
+                
+                // + 19
+                font16->drawString( translate( "credit_1a" ), 
+                                    128, 
+                                    115, black, alignCenter );
+                
+                // + 17 more
+                font8->drawString( translate( "credit_1b" ), 
+                                   128, 
+                                   132, black, alignCenter );
+                }
+            else if( currentLoadingProgress < 2 * PROGRESS_LENGTH / 3 ) {
+                
+                // + 19
+                font16->drawString( translate( "credit_2b" ), 
+                                    128, 
+                                    115, black, alignCenter );
+                
+                // + above
+                font8->drawString( translate( "credit_2a" ), 
+                                   128, 
+                                   102, black, alignCenter );
+                }
+            else {
+                
+                // + 19
+                font16->drawString( translate( "credit_3b" ), 
+                                    128, 
+                                    115, black, alignCenter );
+                
+                // above
+                font8->drawString( translate( "credit_3a" ), 
+                                   128, 
+                                   102, black, alignCenter );
+                }
+            }
+
         return;
         }
     
@@ -1266,6 +1313,7 @@ void updateLoadingProgress() {
         if( loadingProgress[i] == '-' ) {
             loadingProgress[i] = ')';
             printOut( "Setting new tick at %d\n", i );
+            currentLoadingProgress = i;
             break;
             }
         }

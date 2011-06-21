@@ -138,3 +138,16 @@ phaseStatus_opponentWins "You lose"
 phaseStatus_tie "Tie game"
 
 phaseSubStatus_playAgainWait  "Waiting for host to play again..." 
+
+
+
+credit_1a "INDIEPUB"
+credit_1b "presents"
+
+
+credit_2a "a game by"
+credit_2b "JASON ROHRER"
+
+
+credit_3a "with interactive music by"
+credit_3b "TOM BAILEY"
