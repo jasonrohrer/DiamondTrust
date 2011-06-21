@@ -51,6 +51,16 @@ int loadSprite( char *inFileName, int *outW, int *outH,
 int loadSprite( char *inFileName, char inCornerTransparent = false );
 
 
+// breaks an image file up into part-sprites to save space in texture ram
+// parts specified by inOffsets and inSizes
+// outSpriteIDs must be allocated by the caller
+// all parameters destroyed by caller
+void loadTiledSprites( char *inFileName, int inNumParts,
+                       int *outSpriteIDs, 
+                       intPair *inOffsets, intPair *inSizes,
+                       char inCornerTransparent );
+
+
 void applyCornerTransparency( rgbaColor *inImage, int inNumPixels );
 
 

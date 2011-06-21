@@ -204,6 +204,48 @@ int loadSprite( char *inFileName, int *outW, int *outH,
 
 
 
+void loadTiledSprites( char *inFileName, int inNumParts,
+                       int *outSpriteIDs, 
+                       intPair *inOffsets, intPair *inSizes,
+                       char inCornerTransparent ) {
+
+    int w, h;
+    
+    rgbaColor *spriteRGBA = readTGAFile( inFileName, &w, &h );
+
+    if( spriteRGBA == NULL ) {
+        
+        printOut( "Reading sprite from %s failed.\n", inFileName );
+        return;
+        }
+    
+    if( inCornerTransparent ) {    
+        applyCornerTransparency( spriteRGBA, w * h );
+        }
+    
+
+    for( int p=0; p<inNumParts; p++ ) {
+        intPair offset = inOffsets[p];
+        intPair size = inSizes[p];
+        
+        rgbaColor *partRGBA = extractRegion( spriteRGBA, 
+                                             w, h,
+                                             offset.x, offset.y,
+                                             size.x, size.y );
+        outSpriteIDs[p] = addSprite( partRGBA, size.x, size.y );
+    
+        delete [] partRGBA;
+        }
+
+    delete [] spriteRGBA;
+
+    }
+
+
+
+
+
+
 void applyCornerTransparency( rgbaColor *inImage, int inNumPixels ) {
     // use corner color as transparency
     inImage[0].a = 0;
