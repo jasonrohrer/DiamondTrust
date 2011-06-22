@@ -60,11 +60,11 @@ phaseSubStatus_gameType  "Play against AI or over local WiFi"
 
 
 phaseStatus_aiLevel  "Set AI level"
-phaseSubStatus_aiLevel  "Higher levels give AI more time to pick better moves"
+phaseSubStatus_aiLevel  "High levels give AI longer to find a good move"
 
 
 phaseStatus_connect  "Connect to opponent"
-phaseSubStatus_parentOrChild  "Host a game or join one started by your friend"
+phaseSubStatus_parentOrChild  "Host a game or join one started by a friend"
 phaseSubStatus_waitingConnect  "Waiting for a connection"
 phaseSubStatus_waitingConnectOn  "Waiting for a connection on "
 phaseSubStatus_connectingToParent  "Searching for a host..."
@@ -74,7 +74,7 @@ phaseSubStatus_connectFailed  "Connection failed"
 phaseSubStatus_sendingDownload "Transferring download to "
 phaseSubStatus_waitingReconnect "Waiting for child to reconnect"
 
-phaseSubStatus_waitAgainAfterFailedTransfer "Transfer failed, waiting for a new connection "
+phaseSubStatus_waitAgainAfterFailedTransfer "Transfer failed, waiting for a new connection"
 
 
 
