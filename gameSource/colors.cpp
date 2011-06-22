@@ -31,3 +31,6 @@ rgbaColor inspectorPanelColor = { 204, 204, 255, 255 };
 
 // rgbaColor diamondPurple = { 128, 0, 192, 255 };
 rgbaColor diamondPurple = {0, 0, 0, 255 };
+
+
+rgbaColor buttonInkColor = { 64, 64, 64, 255 };

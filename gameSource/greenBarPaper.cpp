@@ -25,6 +25,10 @@ static intPair greenBarPartSizes[9] =
     {16, 32} };
 
 
+rgbaColor greenBarWhite = { 209, 209, 209, 255 };
+rgbaColor greenBarGreen = { 162, 196, 172, 255 };
+
+
 
 
 void initGreenBarPaper() {
@@ -160,4 +164,62 @@ void drawGreenBarPaper( int inSheetTopY, int inBottomY ) {
 
 
     }
+
+
+
+
+static rgbaColor blendColors( rgbaColor inA, rgbaColor inB, 
+                              unsigned char inAWeight ) {
+    
+    unsigned int aWeight = inAWeight;
+    unsigned int bWeight = 255 - inAWeight;
+
+    rgbaColor returnColor;
+    
+    returnColor.r = 
+        (unsigned char)( ( inA.r * aWeight + inB.r * bWeight ) / 255 );
+    returnColor.g = 
+        (unsigned char)( ( inA.g * aWeight + inB.g * bWeight ) / 255 );
+    returnColor.b = 
+        (unsigned char)( ( inA.b * aWeight + inB.b * bWeight ) / 255 );
+    returnColor.a = 
+        (unsigned char)( ( inA.a * aWeight + inB.a * bWeight ) / 255 );
+    
+    return returnColor;
+    }
+
+
+
+
+rgbaColor getGreenBarInkColor( int inFontY, int inMonthsLeft, 
+                               char inSmallFont ) {
+    
+    rgbaColor paperColor = greenBarWhite;
+    
+    int lineNumber = inFontY / 16;
+    
+    if( lineNumber < 10 && lineNumber % 2 == 1 ) {
+        // odd line, not one of last 2 lines
+        paperColor = greenBarGreen;
+        }
+    
+    
+    rgbaColor baseInkColor = black;
+    
+    int maxBlackWeight = 192;
+    int minBlackWeight = 64;
+    
+    if( inSmallFont ) {
+        // don't let small font get as light
+        minBlackWeight = 128;
+        maxBlackWeight = 255;
+        }
+    
+    int blackWeight = ( (maxBlackWeight - minBlackWeight) * inMonthsLeft / 8 ) 
+        + minBlackWeight;
+    
+
+    return blendColors( baseInkColor, paperColor, (unsigned char)blackWeight );
+    }
+
 

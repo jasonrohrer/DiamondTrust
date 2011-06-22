@@ -24,3 +24,5 @@ extern rgbaColor inspectorPanelColor;
 
 extern rgbaColor diamondPurple;
 
+
+extern rgbaColor buttonInkColor;

@@ -154,5 +154,5 @@ void Button::draw() {
     
     startNewSpriteLayer();
 
-    mFont->drawString( mText, mTextX, mTextY, black, alignCenter );
+    mFont->drawString( mText, mTextX, mTextY, buttonInkColor, alignCenter );
     }

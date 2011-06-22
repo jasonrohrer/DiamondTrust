@@ -1060,6 +1060,7 @@ void drawTopScreen() {
     
     
     if( stillLoading ) {
+        int monthsLeftForLoading = 4;
 
         if( font16 != NULL ) {
             
@@ -1071,7 +1072,11 @@ void drawTopScreen() {
 
             font16->drawString( translate( "status_loading" ), 
                                 128, 
-                                166, white, alignCenter );
+                                166, 
+                                getGreenBarInkColor( 166, 
+                                                     monthsLeftForLoading, 
+                                                     false ), 
+                                alignCenter );
             }
         else {
             printOut( "Large font not loaded, so not drawing "
@@ -1084,7 +1089,11 @@ void drawTopScreen() {
 
             font8->drawString( loadingProgress, 
                                12, 
-                               183, black, alignLeft );
+                               183,
+                               getGreenBarInkColor( 183, 
+                                                    monthsLeftForLoading, 
+                                                    true ), 
+                               alignLeft );
             }
         else {
             printOut( "Small font not loaded, so not drawing "
@@ -1134,16 +1143,28 @@ void drawTopScreen() {
 
         font16->drawString( headerString, 
                             128, 
-                            151, white, alignCenter );
+                            151, 
+                            getGreenBarInkColor( 151, 
+                                                 getMonthsLeft(), 
+                                                 false ), 
+                            alignCenter );
         
         font16->drawString( statusMessage, 
                             128, 
-                            166, white, alignCenter );
+                            166, 
+                            getGreenBarInkColor( 166, 
+                                                 getMonthsLeft(), 
+                                                 false ), 
+                            alignCenter );
 
         if( statusSubMessage != NULL ) {
             font8->drawString( statusSubMessage, 
                                128, 
-                               183, black, alignCenter );
+                               183,
+                               getGreenBarInkColor( 183, 
+                                                    getMonthsLeft(), 
+                                                    true ), 
+                               alignCenter );
             }
 
         if( isWaitingOnOpponent && ! networkOpponent ) {
@@ -1249,6 +1270,8 @@ void drawBottomScreen() {
             startNewSpriteLayer();
 
 
+            int monthsLeftForCredits = 4;
+
             if( currentLoadingProgress < PROGRESS_LENGTH / 3 ) {
                 
                 if( !creditShown[0] ) {
@@ -1260,12 +1283,20 @@ void drawBottomScreen() {
                 // + 19
                 font16->drawString( translate( "credit_1a" ), 
                                     128, 
-                                    115, black, alignCenter );
+                                    115, 
+                                    getGreenBarInkColor( 115, 
+                                                         monthsLeftForCredits, 
+                                                         false ), 
+                                    alignCenter );
                 
                 // + 17 more
                 font8->drawString( translate( "credit_1b" ), 
                                    128, 
-                                   132, black, alignCenter );
+                                   132, 
+                                   getGreenBarInkColor( 132, 
+                                                        monthsLeftForCredits, 
+                                                        true ),
+                                   alignCenter );
                 }
             else if( currentLoadingProgress < 2 * PROGRESS_LENGTH / 3 ) {
                 
@@ -1278,12 +1309,20 @@ void drawBottomScreen() {
                 // + 19
                 font16->drawString( translate( "credit_2b" ), 
                                     128, 
-                                    115, black, alignCenter );
+                                    115,
+                                    getGreenBarInkColor( 115, 
+                                                         monthsLeftForCredits, 
+                                                         false ), 
+                                    alignCenter );
                 
                 // + above
                 font8->drawString( translate( "credit_2a" ), 
                                    128, 
-                                   102, black, alignCenter );
+                                   102, 
+                                   getGreenBarInkColor( 102, 
+                                                        monthsLeftForCredits, 
+                                                        true ),
+                                   alignCenter );
                 }
             else {
 
@@ -1295,12 +1334,20 @@ void drawBottomScreen() {
                 // + 19
                 font16->drawString( translate( "credit_3b" ), 
                                     128, 
-                                    115, black, alignCenter );
+                                    115,
+                                    getGreenBarInkColor( 115, 
+                                                         monthsLeftForCredits, 
+                                                         false ), 
+                                    alignCenter );
                 
                 // above
                 font8->drawString( translate( "credit_3a" ), 
                                    128, 
-                                   102, black, alignCenter );
+                                   102, 
+                                   getGreenBarInkColor( 102, 
+                                                        monthsLeftForCredits, 
+                                                        true ),
+                                   alignCenter );
                 }
             }
 
