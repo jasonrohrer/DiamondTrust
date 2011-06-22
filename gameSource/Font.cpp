@@ -49,6 +49,8 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
         int pixelsPerChar = mSpriteWidth * mSpriteWidth;
             
         rgbaColor *charRGBA = new rgbaColor[ pixelsPerChar ];
+        
+        int maxNumeralWidth = 0;
 
         for( int i=0; i<128; i++ ) {
             int yOffset = ( i / 16 ) * mSpriteWidth;
@@ -125,11 +127,41 @@ Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
                 else {
                     mCharLeftEdgeOffset[i] = farthestLeft;
                     mCharWidth[i] = farthestRight - farthestLeft + 1;
+
+                    
+                    }
+
+                if( i >= '0' && i <= '9' ) {
+                    // a numeral
+                    if( mCharWidth[i] > maxNumeralWidth ) {
+                        maxNumeralWidth = mCharWidth[i];
+                        }
                     }
                 }
                 
             
             }
+
+        // make sure all numerals are same width (same as widest numeral)
+        for( int i='0'; i<='9'; i++ ) {
+            if( mCharWidth[i] < maxNumeralWidth ) {
+                // pad on LEFT side to keep compact spacing for 2-digit
+                // numbers
+                
+                int extra = maxNumeralWidth - mCharWidth[i];
+
+                if( extra < 2 ) {
+                    mCharLeftEdgeOffset[i] -= extra;
+                    }
+                else {
+                    // try to split up extra to keep character centered
+                    mCharLeftEdgeOffset[i] -= extra / 2;
+                    }
+                mCharWidth[i] = maxNumeralWidth;
+                }
+            
+            }
+
         delete [] charRGBA;
                         
         delete [] spriteRGBA;
