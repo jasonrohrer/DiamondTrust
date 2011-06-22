@@ -62,6 +62,8 @@ phaseSubStatus_gameType  "Play against AI or over local WiFi"
 phaseStatus_aiLevel  "Set AI level"
 phaseSubStatus_aiLevel  "High levels give AI longer to find a good move"
 
+level "level"
+
 
 phaseStatus_connect  "Connect to opponent"
 phaseSubStatus_parentOrChild  "Host a game or join one started by a friend"

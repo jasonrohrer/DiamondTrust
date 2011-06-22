@@ -139,8 +139,9 @@ void SetAILevelState::drawState() {
 
         int aiLevel = ( getAINumMovesToTest() - 4 ) / 4 + 1;
         
-
-        char *levelString = autoSprintf( "level %d", aiLevel );
+        
+        char *levelString = autoSprintf( "%s %d", 
+                                         translate( "level" ), aiLevel );
 
         // shadow
         rgbaColor shadowColor = black;
@@ -154,7 +155,7 @@ void SetAILevelState::drawState() {
         
         font16->drawString( levelString, 
                             167, 
-                            52, white, alignLeft );
+                            52, black, alignLeft );
         
         delete [] levelString;
         }
