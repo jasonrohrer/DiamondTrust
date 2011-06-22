@@ -22,3 +22,6 @@ all: gridPage.ps
 
 clean: 
 	rm *.pdf *.ps *.dvi *.log *.aux
+
+
+gridPage.dvi: grid.eps
