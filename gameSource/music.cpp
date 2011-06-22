@@ -60,7 +60,7 @@ typedef struct wavStream {
 SimpleVector<wavStream> wavBank;
 
 
-wavStream *findBankStreamByFileName( char *inWavFileName ) {
+static wavStream *findBankStreamByFileName( char *inWavFileName ) {
     for( int i=0; i<wavBank.size(); i++ ) {
         wavStream *s = wavBank.getElement( i );
     
@@ -74,7 +74,7 @@ wavStream *findBankStreamByFileName( char *inWavFileName ) {
 
 
 
-void rewindWavBankStream( wavStream *inStream ) {
+static void rewindWavBankStream( wavStream *inStream ) {
     fileSeek( inStream->wavFile, inStream->info.startOfDataInFile );
     }
 
@@ -360,7 +360,7 @@ void initMusic() {
                 for( int w=0; w<numWavFiles; w++ ) {
                     char *wavName = wavFileNames[w];
 
-                    int nameLength = strlen( wavName );
+                    int nameLength = (int)strlen( wavName );
                     
                     if( nameLength > 4 ) {
                         char *suffix = &( wavName[ nameLength - 4 ] );
@@ -917,7 +917,8 @@ void setMusicState( char *inStateString ) {
                 
                 if( numFilesThisAct > 0 ) {
                     // pick one
-                    musicState[p] = getRandom( s, numFilesThisAct );
+                    musicState[p] = 
+                        (int)getRandom( s, (unsigned int)numFilesThisAct );
 
                     numPlaying ++;
                     }

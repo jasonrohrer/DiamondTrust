@@ -19,7 +19,7 @@ void DotMatrixRGBAFilter::filter( rgbaColor *inPixels,
     // avoid using too many colors (increases texture size
     
     for( int y=0; y<inHeight; y++ ) {
-        unsigned char inkDarkness = 127  * getRandom( 3 );
+        unsigned char inkDarkness = (unsigned char)( 127  * getRandom( 3 ) );
         
         int p = y * inWidth;
             

@@ -2,6 +2,7 @@
 
 // modified by Jason Rohrer, 2011
 
+#include "crcHash.h"
 
 //#include <stdio.h>
 //#include <stddef.h>

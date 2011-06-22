@@ -111,7 +111,7 @@ void PickGameTypeState::clickState( int inX, int inY ) {
                 newState[11] = '\0';
                 
                 for( int i=0; i<11; i++ ) {
-                    newState[i] = 'a' + getRandom( 26 );
+                    newState[i] = (char)( 'a' + getRandom( 26 ) );
                     }
                 
                 setMusicState( newState );

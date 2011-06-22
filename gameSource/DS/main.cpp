@@ -2880,6 +2880,7 @@ static void SoundAlarmCallback( void *inArg ) {
 
     RTC_Init();
     OS_InitTick();
+    OS_InitAlarm();
 
     FX_Init();
     TP_Init();
@@ -2949,7 +2950,6 @@ static void SoundAlarmCallback( void *inArg ) {
 #ifdef SDK_TWL
     // needed by camera
     if( isCameraSupported() ) {
-        OS_InitAlarm();
         MI_InitNDmaConfig();
         OS_EnableIrqMask( OS_IE_NDMA1 );
         }
@@ -3230,6 +3230,10 @@ void runGameLoopOnce() {
     textureReplacementStep();
     }
 
+
+void platformSleep( unsigned int inTargetMilliseconds ) {
+    OS_Sleep( inTargetMilliseconds );
+    }
 
 
 

@@ -171,8 +171,8 @@ void drawGreenBarPaper( int inSheetTopY, int inBottomY ) {
 static rgbaColor blendColors( rgbaColor inA, rgbaColor inB, 
                               unsigned char inAWeight ) {
     
-    unsigned int aWeight = inAWeight;
-    unsigned int bWeight = 255 - inAWeight;
+    int aWeight = inAWeight;
+    int bWeight = 255 - inAWeight;
 
     rgbaColor returnColor;
     
