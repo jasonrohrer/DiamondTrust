@@ -323,7 +323,7 @@ void gameInit() {
     
     BluePenRGBAFilter penFontFilter;
     font16Hand = 
-        new Font( "font16_handwriting.tga", 2, 6, false, &penFontFilter );
+        new Font( "font16_handwriting2.tga", 2, 6, false, &penFontFilter );
     
 
 

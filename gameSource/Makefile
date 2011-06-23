@@ -9,7 +9,7 @@ buttonMiddle.tga \
 angola_map.tga \
 font8.tga \
 font16_jcr.tga \
-font16_handwriting.tga \
+font16_handwriting2.tga \
 playerUnits.tga \
 enemyUnits.tga \
 inspectorUnit.tga \
