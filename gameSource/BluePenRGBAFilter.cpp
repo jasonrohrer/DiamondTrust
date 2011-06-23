@@ -3,7 +3,10 @@
 #include "colors.h"
 #include "common.h"
 
-static rgbaColor darkBlueInk = {43, 51, 130, 255};
+//static rgbaColor darkBlueInk = {43, 51, 130, 255}
+//static rgbaColor darkBlueInk = {0, 0, 130, 255};
+//static rgbaColor darkBlueInk = {0, 0, 192, 255};
+static rgbaColor darkBlueInk = {43, 51, 192, 255};
 
 
 
