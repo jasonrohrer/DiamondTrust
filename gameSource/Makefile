@@ -47,6 +47,7 @@ signal2.tga \
 signal3.tga \
 wirelessOn.tga \
 greenBarSheet.tga \
+aiLevelSheet.tga \
 
 
 LANGUAGE_FILES_SOURCE = $(wildcard languages/*.txt)

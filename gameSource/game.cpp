@@ -86,6 +86,9 @@ char pictureSendSpriteSet = false;
 
 
 
+int aiLevelSheetSpriteID;
+
+
 int globalSoundVolume = 0;
 
 
@@ -387,6 +390,9 @@ void gameInit() {
         printOut( "Reading title file failed.\n" );
         return;
         }
+
+    aiLevelSheetSpriteID = 
+        loadSprite( "aiLevelSheet.tga", true );
 
     /*
     // split into 3 parts to save texture memory

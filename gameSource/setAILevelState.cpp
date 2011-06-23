@@ -4,6 +4,8 @@
 #include "salePicker.h"
 #include "colors.h"
 #include "ai/ai.h"
+#include "greenBarPaper.h"
+#include "gameStats.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -15,6 +17,7 @@ extern int satelliteTopSpriteID;
 extern int satelliteBottomSpriteID;
 extern int satelliteBottomHalfOffset;
 
+extern int aiLevelSheetSpriteID;
 
 
 extern Button *doneButton;
@@ -135,27 +138,34 @@ void SetAILevelState::drawState() {
     if( waitingForDone ) {
         doneButton->draw();
         
-        drawSalePicker( 150, 58 );
+
+        // shadow of paper
+        rgbaColor shadowColor = black;
+        shadowColor.a = 64;
+        
+        drawSprite( aiLevelSheetSpriteID, 121, 52, shadowColor );
+
+        startNewSpriteLayer();
+        
+        drawSprite( aiLevelSheetSpriteID, 123, 50, white );
+
+
+
+        startNewSpriteLayer();
+
+        drawSalePicker( 113, 58 );
 
         int aiLevel = ( getAINumMovesToTest() - 4 ) / 4 + 1;
         
         
         char *levelString = autoSprintf( "%s %d", 
                                          translate( "level" ), aiLevel );
-
-        // shadow
-        rgbaColor shadowColor = black;
-        shadowColor.a = 128;
         
         font16->drawString( levelString, 
-                            168, 
-                            53, shadowColor, alignLeft );
-
-        startNewSpriteLayer();
-        
-        font16->drawString( levelString, 
-                            167, 
-                            52, black, alignLeft );
+                            145, 
+                            52,
+                            getGreenBarInkColor( 0, getMonthsLeft(), false ), 
+                            alignLeft );
         
         delete [] levelString;
         }
