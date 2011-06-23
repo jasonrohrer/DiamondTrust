@@ -18,7 +18,10 @@ void DotMatrixRGBAFilter::filter( rgbaColor *inPixels,
     // for each scanline, vary darkness slighly
     // avoid using too many colors (increases texture size)
     
-    for( int y=0; y<inHeight; y++ ) {
+    // repeat same pattern of varying darkness for each row of characters
+    // (every 16 pixels)
+
+    for( int y=0; y<16; y++ ) {
 
         // pick a value from {63, 159, 255}
         // never pure black
@@ -27,16 +30,21 @@ void DotMatrixRGBAFilter::filter( rgbaColor *inPixels,
 
 
         
-        int p = y * inWidth;
+        for( int r=0; r*16<inHeight; r++ ) {
             
-        for( int x=0; x<inWidth; x++ ) {
+
+            int p = ( r * 16 + y ) * inWidth;
             
-            inPixels[p].r = inkDarkness;
-            inPixels[p].g = inkDarkness;
-            inPixels[p].b = inkDarkness;
-            
-            p++;
+            for( int x=0; x<inWidth; x++ ) {
+                
+                inPixels[p].r = inkDarkness;
+                inPixels[p].g = inkDarkness;
+                inPixels[p].b = inkDarkness;
+                
+                p++;
+                }
             }
+        
         }
     
 
