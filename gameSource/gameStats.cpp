@@ -537,16 +537,15 @@ static void drawSellStats( int inX, int inY, int inPlayer ) {
     
 
     y += 17;
+
+
+    // because fonts can vary in width (just switched to handwriting, which
+    // is narrower), fix the xOffset to a good value (to put diamond sell count
+    // and money earned in the next column of the ledger) instead of basing
+    // it on font measurements
+    xOffset = 85;
     
-    xOffset = font16Hand->measureString( translate( "stats_selling" ) );
-    int otherOffset = 
-        font16Hand->measureString( translate( "stats_earning" ) );
-    if( otherOffset > xOffset ) {
-        xOffset = otherOffset;
-        }
-    
-    xOffset += 20;
-    
+
     font16Hand->drawString( translate( "stats_selling" ), 
                             inX, 
                             y - 8,
