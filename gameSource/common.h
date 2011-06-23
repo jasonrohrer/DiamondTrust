@@ -97,6 +97,12 @@ inline void setColor( rgbaColor *inColor,
     }
 
 
+
+rgbaColor blendColors( rgbaColor inA, rgbaColor inB, 
+                       unsigned char inAWeight );
+
+
+
                       
 inline void printColor( rgbaColor inC ) {
     printOut( "(%d,%d,%d,%d)", inC.r, inC.g, inC.b, inC.a );

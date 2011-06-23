@@ -122,6 +122,11 @@ static intPair unitInfoPanelPartSizes[5] =
   { {256,8}, {256,64}, {8,128}, {8,128}, {8,8} };
 //static int unitPanelW, unitPanelH;
 
+// color to use for paper-based fonts that are on top of rolodex card
+static rgbaColor unitInfoPanelPaperColor = { 223, 223, 167, 255 };
+
+
+
 static int pictureSprites[2][3];
 static int pictureSpriteW, pictureSpriteH;
 
@@ -329,6 +334,7 @@ static rgbaColor panelColors[3] = { playerPanelColor, enemyPanelColor,
 
 
 extern Font *font16;
+extern Font *font16Hand;
 extern Font *font8;
 
 
@@ -365,7 +371,7 @@ static void drawDiamondCounter( int inX, int inY, int inCount ) {
 static void drawMoneyValue16( int inX, int inY, int inValue, 
                             rgbaColor inColor, char inValueHidden ) {
 
-    font16->drawString( "$", inX, inY - 1, inColor, alignLeft );
+    font16Hand->drawString( "$", inX, inY - 1, inColor, alignLeft );
     
     char *moneyString;
         
@@ -390,7 +396,7 @@ static void drawMoneyValue16( int inX, int inY, int inValue,
         }
     
     
-    font16->drawString( moneyString, 
+    font16Hand->drawString( moneyString, 
                         inX + 37, 
                         inY,
                         inColor, 
@@ -476,7 +482,8 @@ static void drawPanelContents( int inX, int inPlayer ) {
     
             
     
-    drawMoneyValue16( inX, baseY + 12, money[ inPlayer ], black, !showMoney );
+    drawMoneyValue16( inX, baseY + 12, money[ inPlayer ], 
+                      panelColors[inPlayer], !showMoney );
 
     inX += 64;
     drawDiamondCounter( inX, baseY + panelH / 2 + 3, diamonds[ inPlayer ] );
@@ -531,40 +538,42 @@ static void drawSellStats( int inX, int inY, int inPlayer ) {
 
     y += 17;
     
-    xOffset = font16->measureString( translate( "stats_selling" ) );
+    xOffset = font16Hand->measureString( translate( "stats_selling" ) );
     int otherOffset = 
-        font16->measureString( translate( "stats_earning" ) );
+        font16Hand->measureString( translate( "stats_earning" ) );
     if( otherOffset > xOffset ) {
         xOffset = otherOffset;
         }
     
     xOffset += 20;
     
-    font16->drawString( translate( "stats_selling" ), 
-                        inX, 
-                        y - 8,
-                        black, 
-                        alignLeft );
+    font16Hand->drawString( translate( "stats_selling" ), 
+                            inX, 
+                            y - 8,
+                            panelColors[inPlayer], 
+                            alignLeft );
     
     
     drawDiamondCounter( inX + xOffset + 8, y - 1, selling[inPlayer] );
 
     y += 12;
-    font16->drawString( translate( "stats_earning" ), 
-                        inX, 
-                        y,
-                        black, 
-                        alignLeft );
+    font16Hand->drawString( translate( "stats_earning" ), 
+                            inX, 
+                            y,
+                            panelColors[inPlayer], 
+                            alignLeft );
     
     
     
     if( selling[inPlayer] == 0 ) {
-        drawMoneyValue16( inX + xOffset - 9, y, noSaleFlatRate, black, false );
+        drawMoneyValue16( inX + xOffset - 9, y, noSaleFlatRate, 
+                          panelColors[inPlayer], false );
         }
     else {
 
         drawMoneyValue16( inX + xOffset - 9, y, 
-                          getPlayerEarnings( inPlayer ), black, 
+                          getPlayerEarnings( inPlayer ), 
+                          panelColors[inPlayer], 
                           !revealSaleFlag );
         }
     }
@@ -772,9 +781,9 @@ void drawStats() {
             }
         
 
-        xOffset = font16->measureString( translate( "stats_salary" ) );
+        xOffset = font16Hand->measureString( translate( "stats_salary" ) );
         int otherOffset = 
-            font16->measureString( translate( "stats_bribes" ) );
+            font16Hand->measureString( translate( "stats_bribes" ) );
         if( otherOffset > xOffset ) {
             xOffset = otherOffset;
             }
@@ -784,11 +793,11 @@ void drawStats() {
         x = 10;
         y = 27 + panelTop;
         
-        font16->drawString( translate( "stats_salary" ), 
-                            x, 
-                            y,
-                            black, 
-                            alignLeft );
+        font16Hand->drawString( translate( "stats_salary" ), 
+                                x, 
+                                y,
+                                unitInfoPanelPaperColor, 
+                                alignLeft );
 
         char hideSalary = false;
         if( activeUnit >= numPlayerUnits ) {
@@ -800,16 +809,16 @@ void drawStats() {
         
         drawMoneyValue16( x + xOffset, y, 
                           u->mTotalSalary + u->mLastSalaryPayment, 
-                          black, hideSalary );
+                          unitInfoPanelPaperColor, hideSalary );
         
 
 
         y += 20;
         
-        font16->drawString( translate( "stats_bribes" ), 
+        font16Hand->drawString( translate( "stats_bribes" ), 
                             x, 
                             y,
-                            black, 
+                            unitInfoPanelPaperColor, 
                             alignLeft );
 
         char hideBribe = false;
@@ -837,7 +846,7 @@ void drawStats() {
         
         drawMoneyValue16( x + xOffset, y, 
                           u->mTotalBribe + u->mLastBribePayment, 
-                          black, hideBribe );
+                          unitInfoPanelPaperColor, hideBribe );
 
         if( ! hideBribe && u->mLastBribingUnit >= 0 ) {            
             x = 242;
@@ -847,11 +856,11 @@ void drawStats() {
             x -= 12;
             y = 7 + panelTop;
 
-            font16->drawString( translate( "stats_bribedBy" ), 
-                                x, 
-                                y,
-                                black, 
-                                alignRight );
+            font16Hand->drawString( translate( "stats_bribedBy" ), 
+                                    x, 
+                                    y,
+                                    unitInfoPanelPaperColor, 
+                                    alignRight );
             }
         
 
@@ -879,11 +888,11 @@ void drawStats() {
             if( bribedCount > 0 ) {
                 
             
-                font16->drawString( translate( "stats_bribing" ), 
-                                    230, 
-                                    27 + panelTop,
-                                    black, 
-                                    alignRight );
+                font16Hand->drawString( translate( "stats_bribing" ), 
+                                        230, 
+                                        27 + panelTop,
+                                        unitInfoPanelPaperColor, 
+                                        alignRight );
                 x = 193;
                 y = 61 + panelTop;
                 
@@ -927,11 +936,11 @@ void drawStats() {
         
         
         
-        font16->drawString( translate( "stats_inspectorBlocking" ), 
-                            128,
-                            11 + panelTop,
-                            black, 
-                            alignCenter );
+        font16Hand->drawString( translate( "stats_inspectorBlocking" ), 
+                                128,
+                                11 + panelTop,
+                                unitInfoPanelPaperColor, 
+                                alignCenter );
         
         //int width = 
         //    font16->measureString( translate( "stats_inspectorBlocking" ) );
@@ -954,11 +963,12 @@ void drawStats() {
             }
         
         if( someFound ) {
-            font16->drawString( translate( "stats_inspectorConfiscating" ), 
-                                128, 
-                                28 + panelTop,
-                                black, 
-                                alignCenter );
+            font16Hand->drawString( 
+                translate( "stats_inspectorConfiscating" ), 
+                128, 
+                28 + panelTop,
+                unitInfoPanelPaperColor, 
+                alignCenter );
             
             
             int x = 96;

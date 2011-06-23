@@ -21,6 +21,7 @@
 #include "music.h"
 #include "DotMatrixRGBAFilter.h"
 #include "greenBarPaper.h"
+#include "BluePenRGBAFilter.h"
 
 
 
@@ -44,7 +45,7 @@ static unsigned int creditStartTime[3];
 
 // show extra info about song that's playing, along with a "next act" button,
 // on the title screen, for debugging and testing
-char allowManualSongActSwitching = true;
+char allowManualSongActSwitching = false;
 
 
 
@@ -91,6 +92,7 @@ int globalSoundVolume = 0;
 
 Font *font8 = NULL;
 Font *font16 = NULL;
+Font *font16Hand = NULL;
 
 
 
@@ -319,7 +321,9 @@ void gameInit() {
     // call agin with both fonts (first progress bar step)
     updateLoadingProgress();
     
-
+    BluePenRGBAFilter penFontFilter;
+    font16Hand = 
+        new Font( "font16_handwriting.tga", 2, 6, false, &penFontFilter );
     
 
 
@@ -579,6 +583,7 @@ void gameInit() {
 void gameFree() {
     delete font8;
     delete font16;
+    delete font16Hand;
     delete doneButton;
     delete nextButton;
     delete backButton;
