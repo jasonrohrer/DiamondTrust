@@ -19,9 +19,9 @@ void BluePenRGBAFilter::filter( rgbaColor *inPixels,
     int numPixels = inWidth * inHeight;
     
     for( int p=0; p<numPixels; p++ ) {
-        inPixels[p].r = 255 - inPixels[p].r;
-        inPixels[p].g = 255 - inPixels[p].g;
-        inPixels[p].b = 255 - inPixels[p].b;
+        inPixels[p].r = (unsigned char)( 255 - inPixels[p].r );
+        inPixels[p].g = (unsigned char)( 255 - inPixels[p].g );
+        inPixels[p].b = (unsigned char)( 255 - inPixels[p].b );
         }
     
     // next, blend between dark blue and white based on pixel's gray color
