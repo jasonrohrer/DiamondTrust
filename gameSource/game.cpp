@@ -1053,22 +1053,7 @@ void drawTopScreen() {
         }
     
 
-    if( satPhoneSpriteID != -1 ) {
-        int sigStrength = getSignalStrength();
-        
-        if( sigStrength >= 0 && sigStrength <= 3 ) {
-            
-            int phoneX = 230;
-            int phoneY = 146;
 
-            drawSprite( satPhoneSpriteID, 
-                        phoneX, phoneY, white );
-            
-            drawSprite( signalSpriteID[ sigStrength ], 
-                        phoneX + 8, phoneY + 6, white );
-            }
-        }
-    
     
     if( stillLoading ) {
         int monthsLeftForLoading = 4;
@@ -1207,6 +1192,29 @@ void drawTopScreen() {
                 }
             }
         }
+
+
+
+    if( satPhoneSpriteID != -1 ) {
+        int sigStrength = getSignalStrength();
+        
+        if( sigStrength >= 0 && sigStrength <= 3 ) {
+            
+            int phoneX = 224;
+            int phoneY = 105;
+
+            startNewSpriteLayer();
+
+            drawSprite( satPhoneSpriteID, 
+                        phoneX, phoneY, white );
+            
+            drawSprite( signalSpriteID[ sigStrength ], 
+                        phoneX + 8, phoneY + 6, white );
+            }
+        }
+    
+
+
 
     if( drawFrameCounter ) {
         
