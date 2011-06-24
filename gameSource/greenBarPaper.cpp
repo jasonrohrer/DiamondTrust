@@ -34,7 +34,7 @@ rgbaColor greenBarGreen = { 162, 196, 172, 255 };
 void initGreenBarPaper() {
     loadTiledSprites( "greenBarSheet.tga", 9,
                       greenBarSprites, 
-                      greenBarPartOffsets, greenBarPartSizes, false );
+                      greenBarPartOffsets, greenBarPartSizes, true );
     }
 
 
