@@ -298,11 +298,12 @@ void cleanUpAtExit() {
 
 
 int w = 256;
-int h = 384;
+// two 192-high screens, 2 pixel boundary between
+int h = 386;
 
 int blowupFactor = 1;
 
-int bottomScreenYOffset = 192;
+int bottomScreenYOffset = 194;
 int singleScreenH = 192;
 
 
@@ -633,7 +634,7 @@ void callbackDisplay() {
     
     glMatrixMode(GL_MODELVIEW);
 
-    glViewport( 0, blowupFactor * (h - singleScreenH), 
+    glViewport( 0, blowupFactor * bottomScreenYOffset, 
                 blowupFactor * w, blowupFactor * singleScreenH );
     
     
@@ -648,16 +649,32 @@ void callbackDisplay() {
 
 
     // separating line:
-    glColor4ub( 255, 255, 255, 255 );
-    const GLfloat lineVertices[] = {
-        0, 0,
-        w * blowupFactor, 0 
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho( 0, w, h, 0, -1.0f, 1.0f);
+    
+    
+    glMatrixMode(GL_MODELVIEW);
+    glViewport( 0, 0, 
+                blowupFactor * w, blowupFactor * h );
+    
+
+    glColor4ub( 96, 96, 96, 255 );
+    GLfloat lineVertices[] = {
+        0, bottomScreenYOffset - 1,
+        w * blowupFactor, bottomScreenYOffset - 1 
         };
     
     glVertexPointer( 2, GL_FLOAT, 0, lineVertices );
     glEnableClientState( GL_VERTEX_ARRAY );
     
         
+    glDrawArrays( GL_LINES, 0, 2 );
+
+    lineVertices[1] = bottomScreenYOffset - 2;
+    lineVertices[3] = bottomScreenYOffset - 2;
+    
     glDrawArrays( GL_LINES, 0, 2 );
 
     
