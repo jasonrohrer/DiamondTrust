@@ -1168,7 +1168,9 @@ void drawTopScreen() {
 
         if( isWaitingOnOpponent && ! networkOpponent ) {
             
-            int progress = getAIProgress( PROGRESS_LENGTH );
+            #define AI_PROG_LENGTH   17
+
+            int progress = getAIProgress( AI_PROG_LENGTH );
 
             if( progress > 0 ) {
                 // After AI finishes, we wait until state is done
@@ -1178,20 +1180,26 @@ void drawTopScreen() {
 
                 // show a progress bar for the AI
                 
-                char progressString[ PROGRESS_LENGTH + 1 ];
+                char progressString[ AI_PROG_LENGTH + 1 ];
                 
-                progressString[ PROGRESS_LENGTH ] = '\0';
+                progressString[ AI_PROG_LENGTH ] = '\0';
                 
 
                 // looks the same as the loading bar
-                memset( progressString, '-', PROGRESS_LENGTH + 1 );
+                memset( progressString, ' ', AI_PROG_LENGTH + 1 );
                 
                 memset( progressString, ')', (unsigned int)progress );
                 
                 
                 font8->drawString( progressString, 
-                                   12, 
-                                   120, white, alignLeft );
+                                   // takes up right half of page
+                                   // leaving room for sub-status message
+                                   169, 
+                                   183,
+                                   getGreenBarInkColor( 183, 
+                                                        getMonthsLeft(), 
+                                                        true ),
+                                   alignLeft );
                 }
             }
         }
