@@ -30,7 +30,7 @@
 // behavior when everything hasn't been loaded yet
 static char stillLoading = true;
 
-#define PROGRESS_LENGTH 58
+#define PROGRESS_LENGTH 55
 static char loadingProgress[ PROGRESS_LENGTH  + 1 ];
 static int currentLoadingProgress = 0;
 
@@ -181,7 +181,7 @@ static char isInside( int inX, int inY,
 void gameInit() {
 
     for( int i=0; i<PROGRESS_LENGTH; i++ ) {
-        loadingProgress[i] = '-';
+        loadingProgress[i] = ' ';
         }
     loadingProgress[ PROGRESS_LENGTH ] = '\0';
     currentLoadingProgress = 0;
@@ -1087,7 +1087,7 @@ void drawTopScreen() {
             printOut( "Progress: %s\n", loadingProgress );
 
             font8->drawString( loadingProgress, 
-                               12, 
+                               greenBarLeftMargin, 
                                183,
                                getGreenBarInkColor( 183, 
                                                     monthsLeftForLoading, 
@@ -1402,7 +1402,7 @@ void updateLoadingProgress() {
     
     // add another tick to progress
     for( int i=0; i<PROGRESS_LENGTH; i++ ) {
-        if( loadingProgress[i] == '-' ) {
+        if( loadingProgress[i] == ' ' ) {
             loadingProgress[i] = ')';
             printOut( "Setting new tick at %d\n", i );
             currentLoadingProgress = i;
