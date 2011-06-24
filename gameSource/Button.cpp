@@ -18,6 +18,15 @@ static int longButtonW, longButtonH;
 // leave 2-pixel border on each side
 static int longButtonDisplayW = 118 - 4;
 
+
+static int buttonOneCharacterSpriteID;
+static int buttonOneCharacterW, buttonOneCharacterH;
+// leave 2-pixel border on each side
+static int buttonOneCharacterDisplayW = 12;
+
+
+
+
 // variable-length button
 static int buttonLeftEndSpriteID;
 static int buttonMiddleSpriteID;
@@ -29,8 +38,13 @@ static int buttonPartW, buttonPartH;
 void initButton() {
     
     buttonSpriteID = loadSprite( "button.tga", &buttonW, &buttonH, true );
+    
     longButtonSpriteID = 
         loadSprite( "longButton.tga", &longButtonW, &longButtonH, true );
+    
+    buttonOneCharacterSpriteID = 
+        loadSprite( "buttonOneCharacter.tga", 
+                    &buttonOneCharacterW, &buttonOneCharacterH, true );
     
 
     buttonLeftEndSpriteID = 
@@ -56,8 +70,19 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     
     mNumMiddleParts = -1;
 
-    if( textWidth <= buttonDisplayW ) {
-        mLong = false;
+    mLong = false;
+    mOneCharacter = false;
+
+
+    if( textWidth <= buttonOneCharacterDisplayW ) {
+        mOneCharacter = true;
+        
+        mClickRadiusX = 13;
+
+        mW = buttonOneCharacterW;
+        mH = buttonOneCharacterH;
+        }
+    else if( textWidth <= buttonDisplayW ) {
         mClickRadiusX = 33;
 
         mW = buttonW;
@@ -65,14 +90,13 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
         }
     else if( textWidth <= longButtonDisplayW ) {
         mLong = true;
+        
         mClickRadiusX = 64;
 
         mW = longButtonW;
         mH = longButtonH;
         }
     else {
-        mLong = false;
-        
         mNumMiddleParts = 0;
         
         while( mNumMiddleParts * buttonPartW < textWidth ) {
@@ -135,6 +159,9 @@ void Button::draw() {
 
         if( mLong ) {
             spriteID = longButtonSpriteID;
+            }
+        else if( mOneCharacter ) {
+            spriteID = buttonOneCharacterSpriteID;
             }
 
         drawSprite( spriteID, mX - mW/2, mY - mH/2, white );

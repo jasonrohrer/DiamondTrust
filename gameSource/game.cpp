@@ -158,6 +158,9 @@ Button *parentButton;
 Button *parentServeCloneDownloaButton;
 Button *childButton;
 
+Button *helpButton;
+
+
 // for testing
 Button *nextSongActButton;
 Button *songRerollButton;
@@ -523,6 +526,10 @@ void gameInit() {
     childButton = new Button( font16, translate( "button_child" ),
                                                  128,
                                                  146 );
+
+    helpButton = new Button( font16, translate( "?" ),
+                             238,
+                             174 );
 
 
     nextSongActButton = new Button( font16, translate( "button_nextSongAct" ),
@@ -1384,10 +1391,12 @@ void drawBottomScreen() {
     
         nextButton->draw();
         }
-    else if( ! currentGameState->isStateDone() &&
-             currentGameState->canStateBeBackedOut() ) {
-        
-        backButton->draw();
+    else if( ! currentGameState->isStateDone() ) {
+        if( currentGameState->canStateBeBackedOut() ) {        
+            backButton->draw();
+            }
+
+        helpButton->draw();
         }
     }
 

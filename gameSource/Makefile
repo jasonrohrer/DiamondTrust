@@ -6,6 +6,7 @@ longButton.tga \
 buttonLeftEnd.tga \
 buttonRightEnd.tga \
 buttonMiddle.tga \
+buttonOneCharacter.tga \
 angola_map.tga \
 font8.tga \
 font16_jcr.tga \

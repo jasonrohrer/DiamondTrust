@@ -41,6 +41,7 @@ class Button {
 
         int mTextX, mTextY;
         char mLong;
+        char mOneCharacter;
         
         // -1 if not variable length
         int mNumMiddleParts;
