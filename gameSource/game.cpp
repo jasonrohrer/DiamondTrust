@@ -35,8 +35,15 @@ static char loadingProgress[ PROGRESS_LENGTH  + 1 ];
 static int currentLoadingProgress = 0;
 
 
-static char creditShown[3] = { false, false, false };
-static unsigned int creditStartTime[3];
+
+
+// starts off the bottom of the screen as credits scroll up
+static int bottomGreenbarSheetTop = 192;
+
+
+// scrolls up, redrawing screen as needed, to show next credit
+static void scrollCreditSheetUp();
+
 
 
 
@@ -327,6 +334,9 @@ void gameInit() {
     // call agin with both fonts (first progress bar step)
     updateLoadingProgress();
     
+
+    scrollCreditSheetUp();
+
     BluePenRGBAFilter penFontFilter;
     font16Hand = 
         new Font( "font16_handwriting2.tga", 2, 6, false, &penFontFilter );
@@ -1295,90 +1305,70 @@ void drawBottomScreen() {
 
         if( font16 != NULL && font8 != NULL ) {
 
-            drawGreenBarPaper( 96, 191 );
+            drawGreenBarPaper( bottomGreenbarSheetTop, 191 );
             
             startNewSpriteLayer();
 
 
             int monthsLeftForCredits = 4;
 
-            if( currentLoadingProgress < PROGRESS_LENGTH / 3 ) {
-                
-                if( !creditShown[0] ) {
-                    creditShown[0] = true;
-                    creditStartTime[0] = getSystemMilliseconds();
-                    }
-                
+            // space out credits evenly down page, relative to page top
+            // so that they move with page as it scrolls up
 
-                // + 19
-                font16->drawString( translate( "credit_1a" ), 
-                                    greenBarLeftMargin, 
-                                    115, 
-                                    getGreenBarInkColor( 115, 
-                                                         monthsLeftForCredits, 
-                                                         false ), 
-                                    alignLeft );
+            font16->drawString( translate( "credit_1a" ), 
+                                greenBarLeftMargin, 
+                                19 + bottomGreenbarSheetTop, 
+                                getGreenBarInkColor( 115, 
+                                                     monthsLeftForCredits, 
+                                                     false ), 
+                                alignLeft );
                 
-                // + 17 more
-                font8->drawString( translate( "credit_1b" ), 
-                                   greenBarLeftMargin, 
-                                   132, 
-                                   getGreenBarInkColor( 132, 
-                                                        monthsLeftForCredits, 
-                                                        true ),
-                                   alignLeft );
-                }
-            else if( currentLoadingProgress < 2 * PROGRESS_LENGTH / 3 ) {
-                
-                if( !creditShown[1] ) {
-                    creditShown[1] = true;
-                    creditStartTime[1] = getSystemMilliseconds();
-                    }
+            font8->drawString( translate( "credit_1b" ), 
+                               greenBarLeftMargin, 
+                               36 + bottomGreenbarSheetTop, 
+                               getGreenBarInkColor( 132, 
+                                                    monthsLeftForCredits, 
+                                                    true ),
+                               alignLeft );
 
 
-                // + 19
-                font16->drawString( translate( "credit_2b" ), 
-                                    greenBarLeftMargin, 
-                                    115,
-                                    getGreenBarInkColor( 115, 
-                                                         monthsLeftForCredits, 
-                                                         false ), 
-                                    alignLeft );
-                
-                // + above
-                font8->drawString( translate( "credit_2a" ), 
-                                   greenBarLeftMargin, 
-                                   102, 
-                                   getGreenBarInkColor( 102, 
-                                                        monthsLeftForCredits, 
-                                                        true ),
-                                   alignLeft );
-                }
-            else {
 
-                if( !creditShown[2] ) {
-                    creditShown[2] = true;
-                    creditStartTime[2] = getSystemMilliseconds();
-                    }
+
+            font8->drawString( translate( "credit_2a" ), 
+                               greenBarLeftMargin, 
+                               68 + bottomGreenbarSheetTop, 
+                               getGreenBarInkColor( 102, 
+                                                    monthsLeftForCredits, 
+                                                    true ),
+                               alignLeft );
+
+            font16->drawString( translate( "credit_2b" ), 
+                                greenBarLeftMargin, 
+                                83 + bottomGreenbarSheetTop,
+                                getGreenBarInkColor( 115, 
+                                                     monthsLeftForCredits, 
+                                                     false ), 
+                                alignLeft );
                 
-                // + 19
-                font16->drawString( translate( "credit_3b" ), 
-                                    greenBarLeftMargin, 
-                                    115,
-                                    getGreenBarInkColor( 115, 
-                                                         monthsLeftForCredits, 
-                                                         false ), 
-                                    alignLeft );
+            
+
+    
+            font8->drawString( translate( "credit_3a" ), 
+                               greenBarLeftMargin, 
+                               116 + bottomGreenbarSheetTop, 
+                               getGreenBarInkColor( 102, 
+                                                    monthsLeftForCredits, 
+                                                    true ),
+                               alignLeft );
+
+            font16->drawString( translate( "credit_3b" ), 
+                                greenBarLeftMargin, 
+                                131 + bottomGreenbarSheetTop,
+                                getGreenBarInkColor( 115, 
+                                                     monthsLeftForCredits, 
+                                                     false ), 
+                                alignLeft );
                 
-                // above
-                font8->drawString( translate( "credit_3a" ), 
-                                   greenBarLeftMargin, 
-                                   102, 
-                                   getGreenBarInkColor( 102, 
-                                                        monthsLeftForCredits, 
-                                                        true ),
-                                   alignLeft );
-                }
             }
 
         return;
@@ -1418,17 +1408,45 @@ void updateLoadingProgress() {
             }
         }
 
-    if( currentLoadingProgress >= PROGRESS_LENGTH / 3 ) {
-        // stall so credit can be shown long enough
-        while( getSystemMilliseconds() - creditStartTime[0] < 5000 ) {
-            platformSleep( 10 );
-            }
+    if( currentLoadingProgress == PROGRESS_LENGTH / 3 ) {
+        scrollCreditSheetUp();
         }
-    if( currentLoadingProgress >= 2 * PROGRESS_LENGTH / 3 ) {
-        // stall so credit can be shown long enough
-        while( getSystemMilliseconds() - creditStartTime[1] < 5000 ) {
-            platformSleep( 10 );
-            }
+    else if( currentLoadingProgress == 2 * PROGRESS_LENGTH / 3 ) {
+        scrollCreditSheetUp();
+        }
+    }
+
+
+
+static int creditScrollCount = 0;
+
+static void scrollCreditSheetUp() {
+    int lastSheetTop = bottomGreenbarSheetTop;
+    
+    int scrollAmount = 64;
+    
+
+    if( creditScrollCount == 0 ) {
+        // only use 64 for first scroll
+        scrollAmount = 48;
+        }
+    else if( creditScrollCount == 2 ) {
+        // more for third scroll
+        scrollAmount = 80;
         }
 
+
+    while( bottomGreenbarSheetTop > lastSheetTop - scrollAmount ) {
+        
+
+        runGameLoopOnce();
+        runGameLoopOnce();
+        
+        bottomGreenbarSheetTop -= 4;
+        }
+
+    creditScrollCount ++;
     }
+
+
+    
