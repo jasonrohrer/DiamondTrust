@@ -98,6 +98,9 @@ Font *font16 = NULL;
 Font *font16Hand = NULL;
 
 
+int greenBarLeftMargin = 18;
+
+
 
 int satPhoneSpriteID = -1;
 
@@ -1067,12 +1070,12 @@ void drawTopScreen() {
             startNewSpriteLayer();
 
             font16->drawString( translate( "status_loading" ), 
-                                128, 
+                                greenBarLeftMargin, 
                                 166, 
                                 getGreenBarInkColor( 166, 
                                                      monthsLeftForLoading, 
                                                      false ), 
-                                alignCenter );
+                                alignLeft );
             }
         else {
             printOut( "Large font not loaded, so not drawing "
@@ -1138,29 +1141,29 @@ void drawTopScreen() {
         startNewSpriteLayer();
 
         font16->drawString( headerString, 
-                            128, 
+                            greenBarLeftMargin, 
                             151, 
                             getGreenBarInkColor( 151, 
                                                  getMonthsLeft(), 
                                                  false ), 
-                            alignCenter );
+                            alignLeft );
         
         font16->drawString( statusMessage, 
-                            128, 
+                            greenBarLeftMargin, 
                             166, 
                             getGreenBarInkColor( 166, 
                                                  getMonthsLeft(), 
                                                  false ), 
-                            alignCenter );
+                            alignLeft );
 
         if( statusSubMessage != NULL ) {
             font8->drawString( statusSubMessage, 
-                               128, 
+                               greenBarLeftMargin, 
                                183,
                                getGreenBarInkColor( 183, 
                                                     getMonthsLeft(), 
                                                     true ), 
-                               alignCenter );
+                               alignLeft );
             }
 
         if( isWaitingOnOpponent && ! networkOpponent ) {
@@ -1301,21 +1304,21 @@ void drawBottomScreen() {
 
                 // + 19
                 font16->drawString( translate( "credit_1a" ), 
-                                    128, 
+                                    greenBarLeftMargin, 
                                     115, 
                                     getGreenBarInkColor( 115, 
                                                          monthsLeftForCredits, 
                                                          false ), 
-                                    alignCenter );
+                                    alignLeft );
                 
                 // + 17 more
                 font8->drawString( translate( "credit_1b" ), 
-                                   128, 
+                                   greenBarLeftMargin, 
                                    132, 
                                    getGreenBarInkColor( 132, 
                                                         monthsLeftForCredits, 
                                                         true ),
-                                   alignCenter );
+                                   alignLeft );
                 }
             else if( currentLoadingProgress < 2 * PROGRESS_LENGTH / 3 ) {
                 
@@ -1327,21 +1330,21 @@ void drawBottomScreen() {
 
                 // + 19
                 font16->drawString( translate( "credit_2b" ), 
-                                    128, 
+                                    greenBarLeftMargin, 
                                     115,
                                     getGreenBarInkColor( 115, 
                                                          monthsLeftForCredits, 
                                                          false ), 
-                                    alignCenter );
+                                    alignLeft );
                 
                 // + above
                 font8->drawString( translate( "credit_2a" ), 
-                                   128, 
+                                   greenBarLeftMargin, 
                                    102, 
                                    getGreenBarInkColor( 102, 
                                                         monthsLeftForCredits, 
                                                         true ),
-                                   alignCenter );
+                                   alignLeft );
                 }
             else {
 
@@ -1352,21 +1355,21 @@ void drawBottomScreen() {
                 
                 // + 19
                 font16->drawString( translate( "credit_3b" ), 
-                                    128, 
+                                    greenBarLeftMargin, 
                                     115,
                                     getGreenBarInkColor( 115, 
                                                          monthsLeftForCredits, 
                                                          false ), 
-                                    alignCenter );
+                                    alignLeft );
                 
                 // above
                 font8->drawString( translate( "credit_3a" ), 
-                                   128, 
+                                   greenBarLeftMargin, 
                                    102, 
                                    getGreenBarInkColor( 102, 
                                                         monthsLeftForCredits, 
                                                         true ),
-                                   alignCenter );
+                                   alignLeft );
                 }
             }
 
