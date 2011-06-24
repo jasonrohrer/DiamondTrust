@@ -9,12 +9,14 @@
 
 static int buttonSpriteID;
 static int buttonW, buttonH;
-static int buttonDisplayW = 60;
+// leave 2-pixel border on each side
+static int buttonDisplayW = 56 - 4;
 
 
 static int longButtonSpriteID;
 static int longButtonW, longButtonH;
-static int longButtonDisplayW = 118;
+// leave 2-pixel border on each side
+static int longButtonDisplayW = 118 - 4;
 
 // variable-length button
 static int buttonLeftEndSpriteID;
@@ -71,7 +73,11 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     else {
         mLong = false;
         
-        mNumMiddleParts = textWidth / buttonPartW;
+        mNumMiddleParts = 0;
+        
+        while( mNumMiddleParts * buttonPartW < textWidth ) {
+            mNumMiddleParts ++;
+            }
         
         mW = ( mNumMiddleParts + 2 ) * buttonPartW;
         mH = buttonPartH;
