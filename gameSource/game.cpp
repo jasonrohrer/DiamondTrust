@@ -22,6 +22,8 @@
 #include "DotMatrixRGBAFilter.h"
 #include "greenBarPaper.h"
 #include "BluePenRGBAFilter.h"
+#include "help.h"
+
 
 
 
@@ -614,6 +616,7 @@ void gameFree() {
     delete nextButton;
     delete backButton;
     delete playAgainButton;
+    delete helpButton;
     
     delete nextSongActButton;
     delete songRerollButton;
@@ -986,6 +989,12 @@ void gameLoopTick() {
         }
     
         
+    if( isHelpShowing() ) {
+        stepHelp();
+        }
+    
+
+
 
     int tx, ty;
     if( getTouch( &tx, &ty ) ) {
@@ -1000,14 +1009,20 @@ void gameLoopTick() {
         
         tx = lastTouchX;
         ty = lastTouchY;
+        char touchEaten = false;
         
         // this achieves the equivalent of a "mouse released" event
         
+
+        if( isHelpShowing() ) {
+            clickHelp( tx, ty );
+            touchEaten = true;
+            }
+        
+
         // don't pass clicks to done states
-        if( !currentGameState->isStateDone() ) {
-            
-            char touchEaten = false;
-            
+        if( !touchEaten && !currentGameState->isStateDone() ) {
+                        
             if( currentGameState->canStateBeBackedOut() ) {
                 
                 if( backButton->getPressed( tx, ty ) ) {
@@ -1018,17 +1033,29 @@ void gameLoopTick() {
                     frameCounter = 0;
                     }
                 }
+
+            if( ! touchEaten && ! isHelpShowing() ) {
+                // help button
+                if( helpButton->getPressed( tx, ty ) ) {
+                    touchEaten = true;
+                    showHelp( "" );
+                    }
+                }
+            
+                
             
             if( ! touchEaten ) {
                 // pass through to state
                 currentGameState->clickState( tx, ty );
                 }
             }
-        else if( currentGameState != gameEndState ) {
+        else if( !touchEaten && currentGameState != gameEndState ) {
         
             // next button visible
 
             if( nextButton->getPressed( tx, ty ) ) {
+                touchEaten = true;
+                
                 goToNextGameState();
                 // reset the frame counter after each NEXT
                 frameCounter = 0;
@@ -1398,6 +1425,13 @@ void drawBottomScreen() {
 
         helpButton->draw();
         }
+
+    startNewSpriteLayer();
+    
+    if( isHelpShowing() ) {
+        drawHelp();
+        }
+    
     }
 
 

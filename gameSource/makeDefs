@@ -41,6 +41,7 @@ crcHash.cpp \
 DotMatrixRGBAFilter.cpp \
 greenBarPaper.cpp \
 BluePenRGBAFilter.cpp \
+help.cpp \
 
 
 
@@ -91,4 +92,5 @@ s/^music\.o/\.\.\/music\.o/; \
 s/^wav\.o/\.\.\/wav\.o/; \
 s/^DotMatrixRGBAFilter\.o/\.\.\/DotMatrixRGBAFilter\.o/; \
 s/^greenBarPaper\.o/\.\.\/greenBarPaper\.o/; \
+s/^help\.o/\.\.\/help\.o/; \
 '
