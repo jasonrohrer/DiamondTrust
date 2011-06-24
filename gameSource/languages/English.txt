@@ -153,3 +153,12 @@ credit_2b "JASON ROHRER"
 
 credit_3a "with interactive music by"
 credit_3b "TOM BAILEY"
+
+
+
+
+
+
+
+
+help_payAgents  "When your own agents are at home in London, you can pay them additional salary.  Salary keeps them loyal even when they get bribed out in the field.  When your own agents are out in the field and occupy the same region as opponent agents, you can pay bribes to those opponent agents.  If an agent receives more total bribe payments than total salary, that agent starts divulging secret information to the other side.  An agent can be brought back to loyalty by paying the agent additional salary."

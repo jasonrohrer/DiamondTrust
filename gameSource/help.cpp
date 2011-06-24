@@ -1,9 +1,20 @@
 #include "help.h"
 #include "Button.h"
 #include "greenBarPaper.h"
+#include "gameStats.h"
+#include "common.h"
+
+
+#include "minorGems/util/SimpleVector.h"
+#include "minorGems/util/stringUtils.h"
 
 
 extern Button *helpButton;
+
+extern Font *font8;
+
+
+extern int greenBarLeftMargin;
 
 
 
@@ -15,6 +26,8 @@ static char helpShouldShow = false;
 
 
 static const char *transKey = NULL;
+
+
 
 
 
@@ -64,6 +77,75 @@ void drawHelp() {
     drawGreenBarPaper( helpGreenbarPageTop, 192 );
     
     startNewSpriteLayer();
+
+
+    char *helpText = translate( (char*)transKey );
+    
+    int lineNumber = 0;
+
+    int lineOffset = 21;
+
+    SimpleVector<char*> *words = tokenizeString( helpText );
+
+
+    int spaceWidth = font8->measureString( " " );
+    
+
+    int wordIndex = 0;
+    int numWords = words->size();
+    
+    while( wordIndex < numWords ) {
+    
+        int currentLineWidth = 0;
+
+
+        SimpleVector<char> currentLine;
+        
+
+        char overflow = false;
+        
+        while( !overflow && wordIndex < numWords ) {
+            
+            char *nextWord = *( words->getElement( wordIndex ) );
+            
+            int wordWidth = font8->measureString( nextWord );
+            wordWidth += spaceWidth;
+
+            if( currentLineWidth + wordWidth > 220 ) {
+                overflow = true;
+                }
+            else {
+                currentLine.push_back( nextWord, strlen( nextWord ) );
+                currentLine.push_back( ' ' );
+            
+                currentLineWidth += wordWidth;
+
+                delete [] nextWord;
+                wordIndex ++;
+                }
+            }
+        
+        char *lineString = currentLine.getElementString();
+        
+
+        int lineY = lineNumber * 16 + lineOffset;
+        
+        font8->drawString( lineString, greenBarLeftMargin,
+                           helpGreenbarPageTop + lineY,
+                           getGreenBarInkColor( lineY, 
+                                                getMonthsLeft(), 
+                                                false ),
+                           alignLeft );
+        
+        delete [] lineString;
+        
+        lineNumber++;
+        }
+    
+    delete words;
+    
+
+
     
     helpButton->draw();
     }

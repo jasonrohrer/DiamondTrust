@@ -1034,11 +1034,13 @@ void gameLoopTick() {
                     }
                 }
 
-            if( ! touchEaten && ! isHelpShowing() ) {
+            if( ! touchEaten && currentGameState->canShowHelp() && 
+                ! isHelpShowing() ) {
+                
                 // help button
                 if( helpButton->getPressed( tx, ty ) ) {
                     touchEaten = true;
-                    showHelp( "" );
+                    showHelp( currentGameState->getHelpTransKey() );
                     }
                 }
             
@@ -1423,7 +1425,9 @@ void drawBottomScreen() {
             backButton->draw();
             }
 
-        helpButton->draw();
+        if( currentGameState->canShowHelp() ) {
+            helpButton->draw();
+            }
         }
 
     startNewSpriteLayer();

@@ -40,6 +40,17 @@ class GameState {
             return false;
             }
         
+
+        virtual char canShowHelp() {
+            return false;
+            }
+        
+        virtual const char *getHelpTransKey() {
+            return "";
+            }
+        
+        
+
         // empty default, so implementation not needed for states that
         // don't need it
         virtual void backOutState() {

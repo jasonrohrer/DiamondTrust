@@ -63,6 +63,17 @@ class SalaryBribeState : public GameState {
             }
         
 
+
+        virtual char canShowHelp() {
+            return true;
+            }
+        
+        virtual const char *getHelpTransKey() {
+            return "help_payAgents";
+            }
+
+
+
         // destructor?
         //virtual ~GameState();
         
