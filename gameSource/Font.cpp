@@ -267,3 +267,11 @@ int Font::measureString( char *inString ) {
     
     return width;
     }
+
+
+
+
+int Font::getCharacterSpacing() {
+    return mCharSpacing;
+    }
+

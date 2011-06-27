@@ -89,6 +89,7 @@ void drawHelp() {
 
 
     int spaceWidth = font8->measureString( " " );
+    int charSpacing = font8->getCharacterSpacing();
     
 
     int wordIndex = 0;
@@ -104,25 +105,41 @@ void drawHelp() {
 
         char overflow = false;
         
+        char firstWord = true;
+
         while( !overflow && wordIndex < numWords ) {
             
             char *nextWord = *( words->getElement( wordIndex ) );
             
             int wordWidth = font8->measureString( nextWord );
-            wordWidth += spaceWidth;
+           
+            
+            if( !firstWord ) {
+                // spacing between last word and this word
+
+                wordWidth += spaceWidth;
+                wordWidth += charSpacing + charSpacing;
+                }
+            
 
             if( currentLineWidth + wordWidth > 220 ) {
                 overflow = true;
                 }
             else {
+                if( ! firstWord ) {
+                    // space to separate from previous word
+                    currentLine.push_back( ' ' );
+                    }
+                
                 currentLine.push_back( nextWord, strlen( nextWord ) );
-                currentLine.push_back( ' ' );
             
                 currentLineWidth += wordWidth;
 
                 delete [] nextWord;
                 wordIndex ++;
                 }
+
+            firstWord = false;
             }
         
         char *lineString = currentLine.getElementString();

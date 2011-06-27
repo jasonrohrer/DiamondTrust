@@ -35,6 +35,10 @@ class Font {
 
 
         int measureString( char *inString );
+        
+
+        int getCharacterSpacing();
+
 
     private:
         
