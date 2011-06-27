@@ -1109,7 +1109,7 @@ void drawTopScreen() {
 
         if( font16 != NULL ) {
             
-            printOut( "Drawing LOADING message on top screen\n" );
+            //printOut( "Drawing LOADING message on top screen\n" );
             
             drawGreenBarPaper( 148, 191 );
             
@@ -1130,7 +1130,7 @@ void drawTopScreen() {
         
  
         if( font8 != NULL ) {
-            printOut( "Progress: %s\n", loadingProgress );
+            //printOut( "Progress: %s\n", loadingProgress );
 
             font8->drawString( loadingProgress, 
                                greenBarLeftMargin, 
@@ -1467,6 +1467,9 @@ void updateLoadingProgress() {
 
 static int creditScrollCount = 0;
 
+static int creditScrollCurrentSpeed = 0;
+
+
 static void scrollCreditSheetUp() {
     int lastSheetTop = bottomGreenbarSheetTop;
     
@@ -1489,7 +1492,22 @@ static void scrollCreditSheetUp() {
         runGameLoopOnce();
         runGameLoopOnce();
         
-        bottomGreenbarSheetTop -= 4;
+        if( bottomGreenbarSheetTop < lastSheetTop - scrollAmount + 10 ) {
+            // start slowing down near end of scroll
+            if( creditScrollCurrentSpeed > 2 ) {
+                creditScrollCurrentSpeed -= 2;
+                }
+            }
+        else if( creditScrollCurrentSpeed < 4 ) {
+            // speed up
+            creditScrollCurrentSpeed += 2;
+            }
+
+        bottomGreenbarSheetTop -= creditScrollCurrentSpeed;
+        
+        if( bottomGreenbarSheetTop == lastSheetTop - scrollAmount ) {
+            creditScrollCurrentSpeed = 0;
+            }
         }
 
     creditScrollCount ++;
