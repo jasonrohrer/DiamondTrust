@@ -529,9 +529,10 @@ void gameInit() {
                                                  128,
                                                  146 );
 
-    helpButton = new Button( font16, translate( "?" ),
-                             238,
-                             174 );
+    helpButton = new Button( "helpToggle.tga",
+                             242,
+                             178,
+                             18, 18 );
 
 
     nextSongActButton = new Button( font16, translate( "button_nextSongAct" ),

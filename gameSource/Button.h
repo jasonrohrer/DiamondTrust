@@ -13,6 +13,12 @@ class Button {
         // center position x,y
         Button( Font *inFont, char *inText, int inX, int inY );
         
+        // a button based on a fixed sprite, no generated text
+        // inW and inH specify the true width/height of the button, which
+        // may be different from the image size due to transparency
+        Button( char *inSpriteFileName, int inX, int inY,
+                int inW, int inH );
+
         ~Button();
         
 
@@ -30,6 +36,8 @@ class Button {
         void draw();
         
     private:
+        int mFixedSprite;
+        
         Font *mFont;
         char *mText;
         int mX, mY;
@@ -41,7 +49,6 @@ class Button {
 
         int mTextX, mTextY;
         char mLong;
-        char mOneCharacter;
         
         // -1 if not variable length
         int mNumMiddleParts;

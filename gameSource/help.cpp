@@ -138,7 +138,7 @@ void drawHelp() {
         
         if( lineNumber == 10 || lineNumber == 11 ) {
             // leave room for help button in lower right corner
-            allowedSpace = 205;
+            allowedSpace = 213;
             }
 
         SimpleVector<char> currentLine;

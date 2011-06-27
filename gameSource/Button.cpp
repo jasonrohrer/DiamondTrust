@@ -18,15 +18,6 @@ static int longButtonW, longButtonH;
 // leave 2-pixel border on each side
 static int longButtonDisplayW = 118 - 4;
 
-
-static int buttonOneCharacterSpriteID;
-static int buttonOneCharacterW, buttonOneCharacterH;
-// leave 2-pixel border on each side
-static int buttonOneCharacterDisplayW = 12;
-
-
-
-
 // variable-length button
 static int buttonLeftEndSpriteID;
 static int buttonMiddleSpriteID;
@@ -38,13 +29,8 @@ static int buttonPartW, buttonPartH;
 void initButton() {
     
     buttonSpriteID = loadSprite( "button.tga", &buttonW, &buttonH, true );
-    
     longButtonSpriteID = 
         loadSprite( "longButton.tga", &longButtonW, &longButtonH, true );
-    
-    buttonOneCharacterSpriteID = 
-        loadSprite( "buttonOneCharacter.tga", 
-                    &buttonOneCharacterW, &buttonOneCharacterH, true );
     
 
     buttonLeftEndSpriteID = 
@@ -70,19 +56,8 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     
     mNumMiddleParts = -1;
 
-    mLong = false;
-    mOneCharacter = false;
-
-
-    if( textWidth <= buttonOneCharacterDisplayW ) {
-        mOneCharacter = true;
-        
-        mClickRadiusX = 13;
-
-        mW = buttonOneCharacterW;
-        mH = buttonOneCharacterH;
-        }
-    else if( textWidth <= buttonDisplayW ) {
+    if( textWidth <= buttonDisplayW ) {
+        mLong = false;
         mClickRadiusX = 33;
 
         mW = buttonW;
@@ -90,13 +65,14 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
         }
     else if( textWidth <= longButtonDisplayW ) {
         mLong = true;
-        
         mClickRadiusX = 64;
 
         mW = longButtonW;
         mH = longButtonH;
         }
     else {
+        mLong = false;
+        
         mNumMiddleParts = 0;
         
         while( mNumMiddleParts * buttonPartW < textWidth ) {
@@ -116,9 +92,23 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     }
 
 
+Button::Button( char *inSpriteFileName, int inX, int inY, int inW, int inH )
+        : mFont( NULL ), mText( NULL ), 
+          mX( inX ), mY( inY ),
+          mClickRadiusX( inW / 2 ), mClickRadiusY( inH / 2 ) {
+
+    mFixedSprite = 
+        loadSprite( inSpriteFileName, &mW, &mH, true );
+    }
+
+
+
+
 
 Button::~Button() {
-    delete [] mText;
+    if( mText != NULL ) {
+        delete [] mText;
+        }
     }
 
 
@@ -152,6 +142,15 @@ char Button::getPressed( int inClickX, int inClickY ) {
 
 
 void Button::draw() {
+    if( mFont == NULL ) {
+        // fixed sprite button
+        
+        drawSprite( mFixedSprite, mX - mW/2, mY - mH/2, white );
+        
+        return;
+        }
+    
+
 
     if( mNumMiddleParts < 0 ) {
         
@@ -159,9 +158,6 @@ void Button::draw() {
 
         if( mLong ) {
             spriteID = longButtonSpriteID;
-            }
-        else if( mOneCharacter ) {
-            spriteID = buttonOneCharacterSpriteID;
             }
 
         drawSprite( spriteID, mX - mW/2, mY - mH/2, white );
