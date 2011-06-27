@@ -158,6 +158,8 @@ credit_3b "TOM BAILEY"
 
 
 
+help_aiLevel "A game involving deception is best played against another human.  The AI provides a reasonable practice opponent, allowing you to learn the game at your own pace before you face a friend.  The AI's skill at lower levels is good but not great, since reasoning about incomplete information requires quite a bit of probabilistic simulation.  Higher levels allow the AI to consider more candidate moves before picking one.  For example, at level 10, ten times more moves are considered, taking ten times as long."
+
 
 
 help_payAgents  "You can pay salary to your agents when they are at home in London.  You can bribe opponent agents when your agents meet them out in the field.  Paying your agents salary keeps them loyal in the face of your opponent's bribes.  If total bribes to an agent exceed total salary, that agent will become loyal to the other side and start quietly revealing secret information (like move destinations and diamond payments).  How do you find out if one of your agents has been successfully bribed?  Bribe the briber."

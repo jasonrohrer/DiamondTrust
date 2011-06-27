@@ -59,6 +59,17 @@ class SetAILevelState : public GameState {
         virtual char canStateBeBackedOut() {
             return true;
             }
+
+        
+        virtual char canShowHelp() {
+            return true;
+            }
+        
+        virtual const char *getHelpTransKey() {
+            return "help_aiLevel";
+            }
+
+
         
         virtual ~SetAILevelState();
         
