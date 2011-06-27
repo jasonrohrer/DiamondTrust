@@ -132,7 +132,14 @@ void drawHelp() {
     while( wordIndex < numWords ) {
     
         int currentLineWidth = 0;
+        
 
+        int allowedSpace = 220;
+        
+        if( lineNumber == 9 || lineNumber == 10 ) {
+            // leave room for help button in lower right corner
+            allowedSpace = 205;
+            }
 
         SimpleVector<char> currentLine;
         
@@ -156,7 +163,7 @@ void drawHelp() {
                 }
             
 
-            if( currentLineWidth + wordWidth > 220 ) {
+            if( currentLineWidth + wordWidth > allowedSpace ) {
                 overflow = true;
                 }
             else {
