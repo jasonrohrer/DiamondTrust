@@ -192,7 +192,7 @@ void drawHelp() {
                            helpGreenbarPageTop + lineY,
                            getGreenBarInkColor( lineY, 
                                                 getMonthsLeft(), 
-                                                false ),
+                                                true ),
                            alignLeft );
         
         delete [] lineString;
