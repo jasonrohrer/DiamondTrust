@@ -57,6 +57,8 @@ static int pictureCountDown = 0;
 static int pictureStepsUntilTick = 30;
 
 
+static char *helpTransKey = "help_sellDiamonds";
+
 
 extern Button *doneButton;
 extern char *statusMessage;
@@ -97,6 +99,16 @@ class SellDiamondsState : public GameState {
         virtual char isConnectionBroken() {
             return connectionBroken;
             }
+
+
+        virtual char canShowHelp() {
+            return true;
+            }
+        
+        virtual const char *getHelpTransKey() {
+            return helpTransKey;
+            }
+
 
         // destructor?
         //virtual ~GameState();
@@ -357,6 +369,8 @@ static void processInitialMove() {
                 
         pickingSale = true;
         waitingForDone = true;
+
+        helpTransKey = "help_sellDiamondsPeek";
         }
     else {
         // no new info, 
@@ -757,6 +771,9 @@ void SellDiamondsState::enterState() {
     // reset sale numbers
     setPlayerNumToSell( 0, 0 );
     setPlayerNumToSell( 1, 0 );
+
+
+    helpTransKey = "help_sellDiamonds";
 
 
     showSale( true );
