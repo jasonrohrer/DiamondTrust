@@ -1479,15 +1479,11 @@ static void scrollCreditSheetUp() {
     int scrollAmount = 64;
     
 
-    if( creditScrollCount == 0 ) {
+    if( creditScrollCount != 0 ) {
         // only use 64 for first scroll
         scrollAmount = 48;
         }
-    else if( creditScrollCount == 2 ) {
-        // more for third scroll
-        scrollAmount = 80;
-        }
-
+    // note that this does NOT fill the screen with a full page.
 
     while( bottomGreenbarSheetTop > lastSheetTop - scrollAmount ) {
         
