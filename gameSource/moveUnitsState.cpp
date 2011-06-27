@@ -22,6 +22,8 @@ static int minSteps = 30;
 static int stepsSinceExecute = 0;
 static int minStepsSinceExecute = 60;
 
+static char *helpTransKey = "help_moveUnits";
+
 
 extern Button *doneButton;
 extern char *statusMessage;
@@ -58,6 +60,16 @@ class MoveUnitsState : public GameState {
         virtual char isConnectionBroken() {
             return connectionBroken;
             }
+
+
+        virtual char canShowHelp() {
+            return true;
+            }
+        
+        virtual const char *getHelpTransKey() {
+            return helpTransKey;
+            }
+
 
         // destructor?
         //virtual ~GameState();
@@ -693,6 +705,8 @@ void MoveUnitsState::stepState() {
                 setMovePeeking( true );
                 
                 setPlayerUnitsSelectable( true );
+                
+                helpTransKey = "help_moveUnitsPeek";
                 }
             else {
                 // no new info, no need to adjust!
@@ -832,6 +846,9 @@ void MoveUnitsState::enterState() {
     showUnitMoves( true );
 
     setMovePeeking( false );
+
+    helpTransKey = "help_moveUnits";
+
     
     for( int i=0; i<numPlayerUnits * 2; i++ ) {
         setUnitBid( i, 0 );

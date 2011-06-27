@@ -117,7 +117,7 @@ void drawHelp() {
     
     int lineNumber = 0;
 
-    int lineOffset = 21;
+    int lineOffset = 5;
 
     SimpleVector<char*> *words = tokenizeString( helpText );
 
@@ -136,7 +136,7 @@ void drawHelp() {
 
         int allowedSpace = 220;
         
-        if( lineNumber == 9 || lineNumber == 10 ) {
+        if( lineNumber == 10 || lineNumber == 11 ) {
             // leave room for help button in lower right corner
             allowedSpace = 205;
             }
