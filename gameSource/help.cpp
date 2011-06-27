@@ -25,6 +25,10 @@ static int helpGreenbarPageTop = 192;
 static char helpShouldShow = false;
 
 
+// for accel
+static int helpPageCurrentSpeed = 0;
+
+
 static const char *transKey = NULL;
 
 
@@ -63,11 +67,41 @@ void clickHelp( int inX, int inY ) {
 void stepHelp() {
     int scrollRate = 8;
 
-    if( helpShouldShow && helpGreenbarPageTop > 0 ) {    
-        helpGreenbarPageTop -= scrollRate;
+    if( helpShouldShow && helpGreenbarPageTop > 0 ) {
+        if( helpGreenbarPageTop < 20 ) {
+            // slow down near top
+            if( helpPageCurrentSpeed < -2 ) {
+                helpPageCurrentSpeed += 2;
+                }
+            }
+        else if( helpPageCurrentSpeed > -scrollRate ) {
+            helpPageCurrentSpeed -= 2;
+            }
+
+        helpGreenbarPageTop += helpPageCurrentSpeed;
+        
+        if( helpGreenbarPageTop == 0 ) {
+            // hit top
+            helpPageCurrentSpeed = 0;
+            }
         }
     else if( !helpShouldShow && helpGreenbarPageTop < 192 ) {
-        helpGreenbarPageTop += scrollRate;
+        if( helpGreenbarPageTop > 172 ) {
+            // slow down near bottom
+            if( helpPageCurrentSpeed > 2 ) {
+                helpPageCurrentSpeed -= 2;
+                }
+            }
+        else if( helpPageCurrentSpeed < scrollRate ) {
+            helpPageCurrentSpeed += 2;
+            }
+
+        helpGreenbarPageTop += helpPageCurrentSpeed;
+
+        if( helpGreenbarPageTop == 192 ) {
+            // hit bottom
+            helpPageCurrentSpeed = 0;
+            }
         }
     }
 
