@@ -55,13 +55,20 @@ int loadSprite( char *inFileName, char inCornerTransparent = false );
 // parts specified by inOffsets and inSizes
 // outSpriteIDs must be allocated by the caller
 // all parameters destroyed by caller
+//
+// if inCornerTransparentColor not NULL, it is used as the transparent
+// color instead of the corner's color
 void loadTiledSprites( char *inFileName, int inNumParts,
                        int *outSpriteIDs, 
                        intPair *inOffsets, intPair *inSizes,
-                       char inCornerTransparent );
+                       char inCornerTransparent,
+                       rgbaColor *inCustomTransparentColor = NULL );
 
 
 void applyCornerTransparency( rgbaColor *inImage, int inNumPixels );
+
+void applyCutomTransparency( rgbaColor *inImage, int inNumPixels,
+                             rgbaColor *inCustomTransparentColor );
 
 
 rgbaColor *extractRegion( rgbaColor *inImage, int inW, int inH,

@@ -207,7 +207,8 @@ int loadSprite( char *inFileName, int *outW, int *outH,
 void loadTiledSprites( char *inFileName, int inNumParts,
                        int *outSpriteIDs, 
                        intPair *inOffsets, intPair *inSizes,
-                       char inCornerTransparent ) {
+                       char inCornerTransparent,
+                       rgbaColor *inCustomTransparentColor ) {
 
     int w, h;
     
@@ -219,7 +220,10 @@ void loadTiledSprites( char *inFileName, int inNumParts,
         return;
         }
     
-    if( inCornerTransparent ) {    
+    if( inCustomTransparentColor != NULL ) {
+        applyCutomTransparency( spriteRGBA, w * h, inCustomTransparentColor );
+        }
+    else if( inCornerTransparent ) {    
         applyCornerTransparency( spriteRGBA, w * h );
         }
     
@@ -247,12 +251,19 @@ void loadTiledSprites( char *inFileName, int inNumParts,
 
 
 void applyCornerTransparency( rgbaColor *inImage, int inNumPixels ) {
-    // use corner color as transparency
-    inImage[0].a = 0;
+    rgbaColor transColor = inImage[0];
+    
+    applyCutomTransparency( inImage, inNumPixels, &transColor );
+    }
+
+
+
+void applyCutomTransparency( rgbaColor *inImage, int inNumPixels,
+                             rgbaColor *inCustomTransparentColor ) {
     unsigned char tr, tg, tb;
-    tr = inImage[0].r;
-    tg = inImage[0].g;
-    tb = inImage[0].b;
+    tr = inCustomTransparentColor->r;
+    tg = inCustomTransparentColor->g;
+    tb = inCustomTransparentColor->b;
     
     for( int i=0; i<inNumPixels; i++ ) {
         if( inImage[i].r == tr 
@@ -264,8 +275,9 @@ void applyCornerTransparency( rgbaColor *inImage, int inNumPixels ) {
             inImage[i].a = 0;
             }
         }
-    
+
     }
+
 
 
 

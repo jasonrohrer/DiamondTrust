@@ -32,9 +32,14 @@ rgbaColor greenBarGreen = { 162, 196, 172, 255 };
 
 
 void initGreenBarPaper() {
+    rgbaColor transColor = red;
+    
     loadTiledSprites( "greenBarSheet.tga", 9,
                       greenBarSprites, 
-                      greenBarPartOffsets, greenBarPartSizes, true );
+                      greenBarPartOffsets, greenBarPartSizes, false, 
+                      // custom trans color so we don't have to have
+                      // one corner of page be transparent
+                      &transColor );
     }
 
 
