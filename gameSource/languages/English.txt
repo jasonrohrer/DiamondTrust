@@ -168,3 +168,7 @@ help_moveUnits  "In an Angola region, you can pay the diamond guide.  He will ac
 
 
 help_moveUnitsPeek  "Units that have been successfully bribed reveal their destinations, diamond payments, and UN Inspector bribes to the other side.  You have a chance to adjust your move now that this information has been revealed to you.  If you opponent is aware of bribes, your opponent has the same chance to adjust.  Adjusted moves are final and are not revealed to the other side before being executed."
+
+
+
+help_moveInspector  "When a player successfully bribes the UN Inspector (by paying a larger bribe than the opponent pays him that turn), that player can send him to a different region.  When the Inspector reaches the new region, he immediately confiscates any diamonds held by agents there and blocks the pending diamond sale.  Players still pay what they have offered for the diamonds, but the diamonds remain in that region."

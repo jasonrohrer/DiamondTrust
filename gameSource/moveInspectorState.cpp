@@ -55,6 +55,16 @@ class MoveInspectorState : public GameState {
             }
 
 
+        virtual char canShowHelp() {
+            // only show help if this player is moving the inspector
+            return moving;
+            }
+        
+        virtual const char *getHelpTransKey() {
+            return "help_moveInspector";
+            }
+
+
         // destructor?
         //virtual ~GameState();
         
