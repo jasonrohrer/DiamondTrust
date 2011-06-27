@@ -310,7 +310,7 @@ void gameInit() {
 
     printOut( "Loading 16-pixel font\n" );
     DotMatrixRGBAFilter fontFilter;
-    font16 = new Font( "font16_jcr.tga", 2, 6, false, &fontFilter );
+    font16 = new Font( "font16_jcr.tga", 2, 5, false, &fontFilter );
 
     printOut( "  ++++++  Init green bar paper\n" );
     initGreenBarPaper();
