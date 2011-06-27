@@ -1121,7 +1121,7 @@ void drawTopScreen() {
             font16->drawString( translate( "status_loading" ), 
                                 greenBarLeftMargin, 
                                 166, 
-                                getGreenBarInkColor( 166, 
+                                getGreenBarInkColor( 166 - 148, 
                                                      monthsLeftForLoading, 
                                                      false ), 
                                 alignLeft );
@@ -1138,7 +1138,7 @@ void drawTopScreen() {
             font8->drawString( loadingProgress, 
                                greenBarLeftMargin, 
                                183,
-                               getGreenBarInkColor( 183, 
+                               getGreenBarInkColor( 183 - 148, 
                                                     monthsLeftForLoading, 
                                                     true ), 
                                alignLeft );
@@ -1192,7 +1192,7 @@ void drawTopScreen() {
         font16->drawString( headerString, 
                             greenBarLeftMargin, 
                             151, 
-                            getGreenBarInkColor( 151, 
+                            getGreenBarInkColor( 151 - 148, 
                                                  getMonthsLeft(), 
                                                  false ), 
                             alignLeft );
@@ -1200,7 +1200,7 @@ void drawTopScreen() {
         font16->drawString( statusMessage, 
                             greenBarLeftMargin, 
                             166, 
-                            getGreenBarInkColor( 166, 
+                            getGreenBarInkColor( 166 - 148, 
                                                  getMonthsLeft(), 
                                                  false ), 
                             alignLeft );
@@ -1209,7 +1209,7 @@ void drawTopScreen() {
             font8->drawString( statusSubMessage, 
                                greenBarLeftMargin, 
                                183,
-                               getGreenBarInkColor( 183, 
+                               getGreenBarInkColor( 183 - 148, 
                                                     getMonthsLeft(), 
                                                     true ), 
                                alignLeft );
@@ -1245,7 +1245,7 @@ void drawTopScreen() {
                                    // leaving room for sub-status message
                                    169, 
                                    183,
-                                   getGreenBarInkColor( 183, 
+                                   getGreenBarInkColor( 183 - 148, 
                                                         getMonthsLeft(), 
                                                         true ),
                                    alignLeft );
@@ -1357,7 +1357,7 @@ void drawBottomScreen() {
             font16->drawString( translate( "credit_1a" ), 
                                 greenBarLeftMargin, 
                                 19 + bottomGreenbarSheetTop, 
-                                getGreenBarInkColor( 115, 
+                                getGreenBarInkColor( 19, 
                                                      monthsLeftForCredits, 
                                                      false ), 
                                 alignLeft );
@@ -1365,7 +1365,7 @@ void drawBottomScreen() {
             font8->drawString( translate( "credit_1b" ), 
                                greenBarLeftMargin, 
                                36 + bottomGreenbarSheetTop, 
-                               getGreenBarInkColor( 132, 
+                               getGreenBarInkColor( 36, 
                                                     monthsLeftForCredits, 
                                                     true ),
                                alignLeft );
@@ -1376,7 +1376,7 @@ void drawBottomScreen() {
             font8->drawString( translate( "credit_2a" ), 
                                greenBarLeftMargin, 
                                68 + bottomGreenbarSheetTop, 
-                               getGreenBarInkColor( 102, 
+                               getGreenBarInkColor( 68, 
                                                     monthsLeftForCredits, 
                                                     true ),
                                alignLeft );
@@ -1384,7 +1384,7 @@ void drawBottomScreen() {
             font16->drawString( translate( "credit_2b" ), 
                                 greenBarLeftMargin, 
                                 83 + bottomGreenbarSheetTop,
-                                getGreenBarInkColor( 115, 
+                                getGreenBarInkColor( 83, 
                                                      monthsLeftForCredits, 
                                                      false ), 
                                 alignLeft );
@@ -1395,7 +1395,7 @@ void drawBottomScreen() {
             font8->drawString( translate( "credit_3a" ), 
                                greenBarLeftMargin, 
                                116 + bottomGreenbarSheetTop, 
-                               getGreenBarInkColor( 102, 
+                               getGreenBarInkColor( 116, 
                                                     monthsLeftForCredits, 
                                                     true ),
                                alignLeft );
@@ -1403,7 +1403,7 @@ void drawBottomScreen() {
             font16->drawString( translate( "credit_3b" ), 
                                 greenBarLeftMargin, 
                                 131 + bottomGreenbarSheetTop,
-                                getGreenBarInkColor( 115, 
+                                getGreenBarInkColor( 131, 
                                                      monthsLeftForCredits, 
                                                      false ), 
                                 alignLeft );
