@@ -984,8 +984,10 @@ void gameLoopTick() {
     else {
         stateDone = false;
 
-        // only step if not done
-        currentGameState->stepState();
+        // only step if not done and help not showing
+        if( ! isHelpShowing() ) {
+            currentGameState->stepState();
+            }
         }
     
         
