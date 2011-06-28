@@ -1507,10 +1507,6 @@ static void scrollCreditSheetUp() {
 
     while( bottomGreenbarSheetTop > lastSheetTop - scrollAmount ) {
         
-
-        runGameLoopOnce();
-        runGameLoopOnce();
-        
         if( bottomGreenbarSheetTop < lastSheetTop - scrollAmount + 10 ) {
             // start slowing down near end of scroll
             if( creditScrollCurrentSpeed > 2 ) {
@@ -1527,6 +1523,9 @@ static void scrollCreditSheetUp() {
         if( bottomGreenbarSheetTop == lastSheetTop - scrollAmount ) {
             creditScrollCurrentSpeed = 0;
             }
+
+        runGameLoopOnce();
+        runGameLoopOnce();
         }
 
     creditScrollCount ++;
