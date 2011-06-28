@@ -13,7 +13,7 @@ void freeMusic();
 
 // passing in the same string will always return the music arrangement to the
 // same state in a given act
-void setMusicState( char *inStateString );
+void setMusicState( const char *inStateString );
 
 
 // NOT destroyed by caller

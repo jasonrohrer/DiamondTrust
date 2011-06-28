@@ -159,7 +159,7 @@ intPair subtract( intPair inA, intPair inB ) {
 
 
 
-int loadSprite( char *inFileName, char inCornerTransparent ) {
+int loadSprite( const char *inFileName, char inCornerTransparent ) {
     int w, h;
 
     return loadSprite( inFileName, &w, &h, inCornerTransparent );
@@ -170,7 +170,7 @@ int loadSprite( char *inFileName, char inCornerTransparent ) {
 
 
 
-int loadSprite( char *inFileName, int *outW, int *outH, 
+int loadSprite( const char *inFileName, int *outW, int *outH, 
                 char inCornerTransparent ) {
     int returnID = -1;
     
@@ -204,7 +204,7 @@ int loadSprite( char *inFileName, int *outW, int *outH,
 
 
 
-void loadTiledSprites( char *inFileName, int inNumParts,
+void loadTiledSprites( const char *inFileName, int inNumParts,
                        int *outSpriteIDs, 
                        intPair *inOffsets, intPair *inSizes,
                        char inCornerTransparent,

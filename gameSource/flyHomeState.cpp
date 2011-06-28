@@ -14,8 +14,8 @@ static int stepsSinceExecute = 0;
 static int minStepsSinceExecute = 60;
 
 
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 
 

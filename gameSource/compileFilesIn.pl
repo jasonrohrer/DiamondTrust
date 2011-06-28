@@ -132,7 +132,7 @@ print OUTFILE "};\n\n\n";
 # print some inlined C code to define the readIncludedFile utility function
 print OUTFILE <<END_OF_FUNCTION;
 
-static unsigned char *readIncludedFile( char *inFileName, int *outSize ) {
+static unsigned char *readIncludedFile( const char *inFileName, int *outSize ) {
     for( int f=0; f<numIncludedDataFiles; f++ ) {
         
         if( strcmp( includedDataFileNames[f], inFileName ) == 0 ) {

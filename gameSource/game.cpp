@@ -117,8 +117,8 @@ int signalSpriteID[4];
 
 
 
-char *statusMessage = NULL;
-char *statusSubMessage = NULL;
+const char *statusMessage = NULL;
+const char *statusSubMessage = NULL;
 
 
 // false if connected to a game hosted elsewhere
@@ -1164,7 +1164,7 @@ void drawTopScreen() {
 
     if( statusMessage != NULL ) {
         
-        char *headerString;
+        const char *headerString;
         
         // Only show "Finished:" if NEXT button displayed
         // avoids a flicker when auto-advancing to the next state
@@ -1315,7 +1315,7 @@ void drawTopScreen() {
         }
 
     if( allowManualSongActSwitching ) {
-        char *stateString = getLastMusicState();
+        const char *stateString = getLastMusicState();
         
         if( stateString == NULL ) {
             stateString = "";

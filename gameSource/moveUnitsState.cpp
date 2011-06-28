@@ -22,12 +22,12 @@ static int minSteps = 30;
 static int stepsSinceExecute = 0;
 static int minStepsSinceExecute = 60;
 
-static char *helpTransKey = "help_moveUnits";
+static const char *helpTransKey = "help_moveUnits";
 
 
 extern Button *doneButton;
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 
 extern char isWaitingOnOpponent;

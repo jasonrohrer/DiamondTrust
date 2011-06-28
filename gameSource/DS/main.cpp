@@ -91,7 +91,7 @@ char isCloneChild = false;
 
 #include "../dataFiles.cpp"
 
-unsigned char *readFile( char *inFileName, int *outSize ) {
+unsigned char *readFile( const char *inFileName, int *outSize ) {
 
     // check if data for this file is inline-included
     unsigned char *inlinedData = readIncludedFile( inFileName, outSize );
@@ -201,7 +201,7 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
 
 
 
-char isDirectory( char *inFileName ) {
+char isDirectory( const char *inFileName ) {
     FSFile file;
     FS_InitFile( &file );
 
@@ -218,7 +218,7 @@ char isDirectory( char *inFileName ) {
 
 
 
-char **listDirectory( char *inFileName, int *outNumEntries ) {
+char **listDirectory( const char *inFileName, int *outNumEntries ) {
     FSFile file;
     FS_InitFile( &file );
     
@@ -249,7 +249,7 @@ char **listDirectory( char *inFileName, int *outNumEntries ) {
 
     
 
-FileHandle openFile( char *inFileName, int *outSize ) {
+FileHandle openFile( const char *inFileName, int *outSize ) {
 
     FSFile *file = new FSFile;
     FS_InitFile( file );

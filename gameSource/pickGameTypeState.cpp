@@ -28,8 +28,8 @@ extern char allowManualSongActSwitching;
 
 extern Button *aiButton;
 extern Button *wifiButton;
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 extern char networkOpponent;
 

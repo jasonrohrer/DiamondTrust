@@ -22,7 +22,7 @@ class Font {
         //
         // inFilter filters whole font image BEFORE characters are split
         // from it.  Defaults to NULL
-        Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
+        Font( const char *inFileName, int inCharSpacing, int inSpaceWidth,
               char inFixedWidth, RGBAFilter *inFilter=NULL );
         
         ~Font();
@@ -30,11 +30,12 @@ class Font {
         
         // draws a string on the current screen
         // returns x coordinate of string end
-        int drawString( char *inString, int inX, int inY, rgbaColor inColor,
-                         TextAlignment inAlign = alignCenter );
+        int drawString( const char *inString, 
+                        int inX, int inY, rgbaColor inColor,
+                        TextAlignment inAlign = alignCenter );
 
 
-        int measureString( char *inString );
+        int measureString( const char *inString );
         
 
         int getCharacterSpacing();

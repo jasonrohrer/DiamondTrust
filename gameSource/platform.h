@@ -30,19 +30,19 @@ void copyMem( void *inDest, void *inSource, unsigned int inSizeInBytes );
 
 
 // reads full contents of a file into newly-allocated memory
-unsigned char *readFile( char *inFileName, int *outSize );
+unsigned char *readFile( const char *inFileName, int *outSize );
 
-char isDirectory( char *inFileName );
+char isDirectory( const char *inFileName );
 
 // newly allocated array of c-strings
 // each string is a full path to a file in the directory
-char **listDirectory( char *inFileName, int *outNumEntries );
+char **listDirectory( const char *inFileName, int *outNumEntries );
 
 
 typedef void*   FileHandle;
 
 // opens a file for incremental reading
-FileHandle openFile( char *inFileName, int *outSize );
+FileHandle openFile( const char *inFileName, int *outSize );
 
 int readFile( FileHandle inFile, unsigned char *inBuffer, int inBytesToRead );
 

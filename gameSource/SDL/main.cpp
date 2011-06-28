@@ -30,7 +30,7 @@ int main( int inArgCount, char **inArgs ) {
 
 
 
-static char *screenShotPrefix = "screen";
+static const char *screenShotPrefix = "screen";
 
 static void takeScreenShot();
 
@@ -867,7 +867,7 @@ char mapSDLKeyToASCII( int inSDLKey ) {
 
 #include "../dataFiles.cpp"
 
-unsigned char *readFile( char *inFileName, int *outSize ) {
+unsigned char *readFile( const char *inFileName, int *outSize ) {
     
      // check if data for this file is inline-included
     unsigned char *inlinedData = readIncludedFile( inFileName, outSize );
@@ -896,7 +896,7 @@ unsigned char *readFile( char *inFileName, int *outSize ) {
 
 
 
-char isDirectory( char *inFileName ) {
+char isDirectory( const char *inFileName ) {
     File f( new Path( "gameData" ), inFileName );
     
     return f.isDirectory();
@@ -904,7 +904,7 @@ char isDirectory( char *inFileName ) {
 
 
 
-char **listDirectory( char *inFileName, int *outNumEntries ) {
+char **listDirectory( const char *inFileName, int *outNumEntries ) {
 
     File f( new Path( "gameData" ), inFileName );
 
@@ -976,7 +976,7 @@ typedef struct FileStream {
 
 
 
-FileHandle openFile( char *inFileName, int *outSize ) {
+FileHandle openFile( const char *inFileName, int *outSize ) {
 
     FileStream *stream = new FileStream;
     

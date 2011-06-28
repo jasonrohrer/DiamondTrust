@@ -854,7 +854,7 @@ char **getTrackInfoStrings( int *outNumTracks ) {
 
 
 
-void setMusicState( char *inStateString ) {
+void setMusicState( const char *inStateString ) {
     // convert to int hash so we can use it to seed a deterministic
     // random process
 

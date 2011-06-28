@@ -46,7 +46,7 @@ void initButton() {
 
 
 
-Button::Button( Font *inFont, char *inText, int inX, int inY )
+Button::Button( Font *inFont, const char *inText, int inX, int inY )
         : mFont( inFont ), mText( stringDuplicate( inText ) ), 
           mX( inX ), mY( inY ) {
     
@@ -92,7 +92,8 @@ Button::Button( Font *inFont, char *inText, int inX, int inY )
     }
 
 
-Button::Button( char *inSpriteFileName, int inX, int inY, int inW, int inH )
+Button::Button( const char *inSpriteFileName, 
+                int inX, int inY, int inW, int inH )
         : mFont( NULL ), mText( NULL ), 
           mX( inX ), mY( inY ),
           mClickRadiusX( inW / 2 ), mClickRadiusY( inH / 2 ) {

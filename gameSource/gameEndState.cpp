@@ -22,8 +22,8 @@ extern char isHost;
 extern char networkOpponent;
 
 
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 
 extern int satelliteTopSpriteID;

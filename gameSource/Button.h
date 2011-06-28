@@ -11,12 +11,12 @@ class Button {
     public:
         
         // center position x,y
-        Button( Font *inFont, char *inText, int inX, int inY );
+        Button( Font *inFont, const char *inText, int inX, int inY );
         
         // a button based on a fixed sprite, no generated text
         // inW and inH specify the true width/height of the button, which
         // may be different from the image size due to transparency
-        Button( char *inSpriteFileName, int inX, int inY,
+        Button( const char *inSpriteFileName, int inX, int inY,
                 int inW, int inH );
 
         ~Button();

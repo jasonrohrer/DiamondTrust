@@ -5,7 +5,7 @@
 
 
 
-Font::Font( char *inFileName, int inCharSpacing, int inSpaceWidth,
+Font::Font( const char *inFileName, int inCharSpacing, int inSpaceWidth,
             char inFixedWidth, RGBAFilter *inFilter  )
         : mCharSpacing( inCharSpacing ), mSpaceWidth( inSpaceWidth ),
           mFixedWidth( inFixedWidth ) {
@@ -178,7 +178,7 @@ Font::~Font() {
 
 
 
-int Font::drawString( char *inString, int inX, int inY, rgbaColor inColor,
+int Font::drawString( const char *inString, int inX, int inY, rgbaColor inColor,
                       TextAlignment inAlign ) {
     unsigned int numChars = strlen( inString );
     
@@ -241,7 +241,7 @@ int Font::drawCharacter( char inC, int inX, int inY, rgbaColor inColor ) {
 
 
 
-int Font::measureString( char *inString ) {
+int Font::measureString( const char *inString ) {
     unsigned int numChars = strlen( inString );
 
     int width = 0;

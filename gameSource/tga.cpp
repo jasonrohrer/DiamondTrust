@@ -164,7 +164,8 @@ rgbaColor *extractTGAData( unsigned char *inData, int inNumBytes,
 #include "minorGems/util/stringUtils.h"
 
 
-rgbaColor *readTGAFile( char *inFileName, int *outWidth, int *outHeight ) {
+rgbaColor *readTGAFile( const char *inFileName, 
+                        int *outWidth, int *outHeight ) {
     
     // read JRI version of file instead (jri saves space, and this is one
     // spot in the code where we can change this globally)

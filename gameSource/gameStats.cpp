@@ -132,7 +132,7 @@ static int pictureSpriteW, pictureSpriteH;
 
 
 
-static void loadMultiSprite( char *inFileName, int inNumFrames,
+static void loadMultiSprite( const char *inFileName, int inNumFrames,
                              int *outSpriteIDs, int *outW, int *outH,
                              int inSetID = -1 ) {
 

@@ -24,8 +24,8 @@ extern int wirelessOnSpriteID;
 extern Button *parentButton;
 extern Button *parentServeCloneDownloaButton;
 extern Button *childButton;
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 extern char isHost;
 static char sentMessage, gotMessage;

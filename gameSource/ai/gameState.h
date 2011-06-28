@@ -91,7 +91,7 @@ enum NextMove {
     };
 
 
-extern char *nextMoveNames[6];
+extern const char *nextMoveNames[6];
 
 
 

@@ -48,7 +48,7 @@ class TranslationManager {
         // the file system.
         // Data string formated the same as a language file.
         // Data string destroyed by caller
-        static void setLanguageData( char *inData );
+        static void setLanguageData( const char *inData );
         
 
         
@@ -81,7 +81,7 @@ class TranslationManager {
          * printf( "%s", translate( "MY_KEY" ) );
          * </PRE>
          */
-        static const char *translate( char *inTranslationKey );
+        static const char *translate( const char *inTranslationKey );
 
         
         
@@ -117,7 +117,7 @@ class TranslationManagerStaticMembers {
         // sets the data from a string
         // string contains same contents as a language file
         // string destroyed by caller
-        void setTranslationData( char *inData );
+        void setTranslationData( const char *inData );
 
         
         

@@ -26,13 +26,13 @@ TranslationManagerStaticMembers TranslationManager::mStaticMembers;
 
 
 
-void TranslationManager::setLanguageData( char *inData ) {
+void TranslationManager::setLanguageData( const char *inData ) {
     mStaticMembers.setTranslationData( inData );
     }
 
 
 
-const char *TranslationManager::translate( char *inTranslationKey ) {
+const char *TranslationManager::translate( const char *inTranslationKey ) {
 
     char *translatedString = NULL;
 
@@ -115,14 +115,15 @@ TranslationManagerStaticMembers::~TranslationManagerStaticMembers() {
         
 
 
-static inline char *stringSkip( char *inString, unsigned int inNumChars ) {
+static inline const char *stringSkip( const char *inString, 
+                                      unsigned int inNumChars ) {
     return &( inString[ inNumChars ] );
     }
 
 
 
 
-void TranslationManagerStaticMembers::setTranslationData( char *inData ) {
+void TranslationManagerStaticMembers::setTranslationData( const char *inData ) {
     
     // clear the old translation table
     if( mTranslationKeys != NULL ) {

@@ -57,12 +57,12 @@ static int pictureCountDown = 0;
 static int pictureStepsUntilTick = 30;
 
 
-static char *helpTransKey = "help_sellDiamonds";
+static const char *helpTransKey = "help_sellDiamonds";
 
 
 extern Button *doneButton;
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 extern char isWaitingOnOpponent;
 
@@ -705,7 +705,7 @@ void SellDiamondsState::drawState() {
         delete [] countString;
 
 
-        char *headerString = translate( "camera_securityHeader" );
+        const char *headerString = translate( "camera_securityHeader" );
             
         font16->drawString( headerString,
                             xOffset + pictureDisplayW / 2,
@@ -716,7 +716,8 @@ void SellDiamondsState::drawState() {
         // show a known breech at the last minute
         if( isPlayerHomeKnownBribed() &&
             pictureCountDown <= 2 ) {
-            char *breechString = translate( "camera_securityCompromised" );
+            const char *breechString = 
+                translate( "camera_securityCompromised" );
             
             font16->drawString( breechString,
                                 xOffset + pictureDisplayW / 2,

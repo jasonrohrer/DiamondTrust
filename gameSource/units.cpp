@@ -68,9 +68,9 @@ int vehicleSpriteW;
 // one set per side (player, enemy, un)
 int vehicleSpriteIDs[3][32];
 int vehicleSpriteAngles[32];
-char *vehicleSpriteFileNames[3] = { "piper_rotated16.tga", 
-                                    "jet_rotated16.tga", 
-                                    "puma_rotated16.tga" };
+const char *vehicleSpriteFileNames[3] = { "piper_rotated16.tga", 
+                                          "jet_rotated16.tga", 
+                                          "puma_rotated16.tga" };
 
 
 

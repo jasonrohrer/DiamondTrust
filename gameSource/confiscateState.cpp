@@ -7,8 +7,8 @@
 //static int activeUnit = -1;
 static char stateDone = false;
 
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 
 

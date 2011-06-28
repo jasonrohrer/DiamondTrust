@@ -50,7 +50,7 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
         }
     
 
-    int bytesLeftInFile = fileSize;
+    unsigned int bytesLeftInFile = fileSize;
     
 
 

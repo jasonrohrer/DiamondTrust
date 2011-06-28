@@ -8,12 +8,12 @@
 #include <assert.h>
 
 
-char *nextMoveNames[6] = { "salaryBribe", "moveUnits", "moveUnitsCommit",
-                           "moveInspector", "sellDiamonds", 
-                           "sellDiamondsCommit" };
+const char *nextMoveNames[6] = { "salaryBribe", "moveUnits", "moveUnitsCommit",
+                                 "moveInspector", "sellDiamonds", 
+                                 "sellDiamondsCommit" };
 
 
-
+/*
 static void checkStateValid( gameState inState ) {
     for( int p=0; p<2; p++ ) {
         
@@ -42,7 +42,7 @@ static void checkStateValid( gameState inState ) {
         }
     
     }
-
+*/
 
 
 possibleMove mutateMove( gameState *inState, possibleMove inMove,

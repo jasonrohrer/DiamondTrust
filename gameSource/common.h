@@ -45,10 +45,10 @@ int roundUpToPowerOfTwo( int inValue );
 
 
 // returns -1 on fail
-int loadSprite( char *inFileName, int *outW, int *outH,
+int loadSprite( const char *inFileName, int *outW, int *outH,
                 char inCornerTransparent = false );
 
-int loadSprite( char *inFileName, char inCornerTransparent = false );
+int loadSprite( const char *inFileName, char inCornerTransparent = false );
 
 
 // breaks an image file up into part-sprites to save space in texture ram
@@ -58,7 +58,7 @@ int loadSprite( char *inFileName, char inCornerTransparent = false );
 //
 // if inCornerTransparentColor not NULL, it is used as the transparent
 // color instead of the corner's color
-void loadTiledSprites( char *inFileName, int inNumParts,
+void loadTiledSprites( const char *inFileName, int inNumParts,
                        int *outSpriteIDs, 
                        intPair *inOffsets, intPair *inSizes,
                        char inCornerTransparent,
@@ -116,8 +116,8 @@ inline void printColor( rgbaColor inC ) {
     }
 
 
-inline char *translate( char *inKey ) {
-    return (char*)TranslationManager::translate( inKey );
+inline const char *translate( const char *inKey ) {
+    return TranslationManager::translate( inKey );
     }
 
 

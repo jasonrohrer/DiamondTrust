@@ -20,8 +20,8 @@ static int stepsWaiting = 0;
 static int minSteps = 30;
 
 extern Button *doneButton;
-extern char *statusMessage;
-extern char *statusSubMessage;
+extern const char *statusMessage;
+extern const char *statusSubMessage;
 
 extern char isWaitingOnOpponent;
 

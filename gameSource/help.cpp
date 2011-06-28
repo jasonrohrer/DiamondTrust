@@ -72,7 +72,7 @@ void showHelp( const char *inHelpTransKey ) {
 
     // compose new lines
     
-    char *helpText = translate( (char*)transKey );
+    const char *helpText = translate( (char*)transKey );
     
     int lineNumber = 0;
 
