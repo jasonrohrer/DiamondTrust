@@ -133,6 +133,10 @@ char networkOpponent;
 char isWaitingOnOpponent = false;
 
 
+// make sure we don't show progress bar for only a brief flicker
+char isAIProgressShowing = false;
+
+
 
 
 GameState *currentGameState;
@@ -1220,35 +1224,51 @@ void drawTopScreen() {
             #define AI_PROG_LENGTH   17
 
             int progress = getAIProgress( AI_PROG_LENGTH );
-
+            
             if( progress > 0 ) {
-                // After AI finishes, we wait until state is done
-                // before isWaitingOnOpponent resets
-                // don't show an empty bar after AI finishes!
+                
+                // don't START showing a progress bar when we've only
+                // got a few steps left, because this causes a visual
+                // flicker
+                
+                if( isAIProgressShowing ||
+                    getAIStepsLeft() > 4 ) {
+                    
+                    isAIProgressShowing = true;
+                    
+
+                    // After AI finishes, we wait until state is done
+                    // before isWaitingOnOpponent resets
+                    // don't show an empty bar after AI finishes!
 
 
-                // show a progress bar for the AI
+                    // show a progress bar for the AI
                 
-                char progressString[ AI_PROG_LENGTH + 1 ];
+                    char progressString[ AI_PROG_LENGTH + 1 ];
                 
-                progressString[ AI_PROG_LENGTH ] = '\0';
+                    progressString[ AI_PROG_LENGTH ] = '\0';
                 
 
-                // looks the same as the loading bar
-                memset( progressString, ' ', AI_PROG_LENGTH + 1 );
+                    // looks the same as the loading bar
+                    memset( progressString, ' ', AI_PROG_LENGTH + 1 );
                 
-                memset( progressString, ')', (unsigned int)progress );
+                    memset( progressString, ')', (unsigned int)progress );
                 
                 
-                font8->drawString( progressString, 
-                                   // takes up right half of page
-                                   // leaving room for sub-status message
-                                   169, 
-                                   183,
-                                   getGreenBarInkColor( 183 - 148, 
-                                                        getMonthsLeft(), 
-                                                        true ),
-                                   alignLeft );
+                    font8->drawString( progressString, 
+                                       // takes up right half of page
+                                       // leaving room for sub-status message
+                                       169, 
+                                       183,
+                                       getGreenBarInkColor( 183 - 148, 
+                                                            getMonthsLeft(), 
+                                                            true ),
+                                       alignLeft );
+                    }
+                }
+            else {
+                // keep reset until next display of progress bar
+                isAIProgressShowing = false;
                 }
             }
         }

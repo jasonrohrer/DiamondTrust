@@ -32,6 +32,10 @@ void stepAI();
 // will be the maximum possible progress value returned
 int getAIProgress( int inMaxProgress );
 
+// number of AI steps left until move picked (based on current CPU mode, which
+// determines how much work is done each step)
+int getAIStepsLeft();
+
 
 
 // returns NULL if move not ready yet

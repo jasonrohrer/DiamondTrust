@@ -76,7 +76,8 @@ int maxSimulationsPerStepAI = simulationsPerStepSlowMode;
 // problem!  This starves audio thread
 // actually, as long as we check isSoundTryingToRun(), more simulations
 // per step are fine
-int simulationsPerStepFastMode = 1000;
+// but don't do TOO many per step, because we want a smoother progress bar
+int simulationsPerStepFastMode = 100;
 //int simulationsPerStepFastMode = 9;
 
 void toggleAICPUMode( char inFullSpeed ) {
@@ -961,4 +962,16 @@ int getAIProgress( int inMaxProgress ) {
 
     return 
         totalMoveSimulationsForThisChoice * inMaxProgress / maxSimulations;
+    }
+
+
+
+int getAIStepsLeft() {
+    
+    int maxSimulations = maxNumSimulationsPerMove * maxNumMovesToTest;
+
+    int simsLeft = maxSimulations - totalMoveSimulationsForThisChoice;
+    
+
+    return simsLeft / maxSimulationsPerStepAI;
     }
