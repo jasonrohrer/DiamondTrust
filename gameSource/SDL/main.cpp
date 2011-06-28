@@ -989,6 +989,8 @@ FileHandle openFile( const char *inFileName, int *outSize ) {
     
     stream->filePosition = 0;
     
+    *outSize = stream->fileSize;
+
     return stream;
     }
 
