@@ -50,7 +50,7 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
         }
     
 
-    unsigned int bytesLeftInFile = fileSize;
+    int bytesLeftInFile = fileSize;
     
 
 
@@ -166,7 +166,7 @@ FileHandle openWavFile( char *inFilePath, wavInfo *outWavInfo ) {
     
     unsigned int dataLength = bytesToInt( chunkBuffer );
     
-    if( bytesLeftInFile < dataLength ) {
+    if( bytesLeftInFile < (int)dataLength ) {
         printOut( "Not enough room for data chunk in WAV file %s\n", 
                   inFilePath );
         closeFile( handle );
