@@ -181,15 +181,6 @@ Button *playAgainButton;
 
 
 
-static char isInside( int inX, int inY, 
-                      int inStartX, int inStartY, int inWidth, int inHeight ) {
-    if( inStartX <= inX && inX < inStartX + inWidth 
-        &&
-        inStartY <= inY && inY < inStartY + inHeight ) {
-        return true;
-        }
-    return false;
-    }
 
 
 #include <stdlib.h>
