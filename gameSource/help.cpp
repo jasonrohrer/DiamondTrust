@@ -172,7 +172,7 @@ void drawHelp() {
                     currentLine.push_back( ' ' );
                     }
                 
-                currentLine.push_back( nextWord, strlen( nextWord ) );
+                currentLine.push_back( nextWord, (int)strlen( nextWord ) );
             
                 currentLineWidth += wordWidth;
 
