@@ -2,6 +2,11 @@
 // help system
 
 
+// call at program termination
+// no init necessary
+void freeHelp();
+
+
 char isHelpShowing();
 
 

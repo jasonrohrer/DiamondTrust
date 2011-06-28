@@ -648,6 +648,8 @@ void gameFree() {
     freeOpponent();
 
     freeMusic();
+
+    freeHelp();
     }
 
 

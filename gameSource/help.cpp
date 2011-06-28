@@ -31,7 +31,7 @@ static int helpPageCurrentSpeed = 0;
 
 static const char *transKey = NULL;
 
-
+SimpleVector<char *> helpLines;
 
 
 
@@ -46,78 +46,37 @@ char isHelpShowing() {
 
 
 
+static void clearOldLines() {
+    for( int i=0; i<helpLines.size(); i++ ) {
+        delete [] *( helpLines.getElement( i ) );
+        }
+    helpLines.deleteAll();
+    }
+
+
+
+void freeHelp() {
+    clearOldLines();
+    }
+
+
+
 void showHelp( const char *inHelpTransKey ) {
     helpShouldShow = true;
     
     transKey = inHelpTransKey;
-    }
 
 
-
-void clickHelp( int inX, int inY ) {
-    if( helpButton->getPressed( inX, inY ) ) {
-        // toggle
-        helpShouldShow = ! helpShouldShow;
-        }
-    }
+    clearOldLines();
 
 
-
-
-void stepHelp() {
-    int scrollRate = 8;
-
-    if( helpShouldShow && helpGreenbarPageTop > 0 ) {
-        if( helpGreenbarPageTop < 20 ) {
-            // slow down near top
-            if( helpPageCurrentSpeed < -2 ) {
-                helpPageCurrentSpeed += 2;
-                }
-            }
-        else if( helpPageCurrentSpeed > -scrollRate ) {
-            helpPageCurrentSpeed -= 2;
-            }
-
-        helpGreenbarPageTop += helpPageCurrentSpeed;
-        
-        if( helpGreenbarPageTop == 0 ) {
-            // hit top
-            helpPageCurrentSpeed = 0;
-            }
-        }
-    else if( !helpShouldShow && helpGreenbarPageTop < 192 ) {
-        if( helpGreenbarPageTop > 172 ) {
-            // slow down near bottom
-            if( helpPageCurrentSpeed > 2 ) {
-                helpPageCurrentSpeed -= 2;
-                }
-            }
-        else if( helpPageCurrentSpeed < scrollRate ) {
-            helpPageCurrentSpeed += 2;
-            }
-
-        helpGreenbarPageTop += helpPageCurrentSpeed;
-
-        if( helpGreenbarPageTop == 192 ) {
-            // hit bottom
-            helpPageCurrentSpeed = 0;
-            }
-        }
-    }
-
+    // compose new lines
     
-
-void drawHelp() {
-    drawGreenBarPaper( helpGreenbarPageTop, 192 );
-    
-    startNewSpriteLayer();
-
-
     char *helpText = translate( (char*)transKey );
     
     int lineNumber = 0;
 
-    int lineOffset = 5;
+
 
     SimpleVector<char*> *words = tokenizeString( helpText );
 
@@ -185,7 +144,83 @@ void drawHelp() {
         
         char *lineString = currentLine.getElementString();
         
+        helpLines.push_back( lineString );
 
+        lineNumber++;
+        }
+    
+    delete words;
+
+    }
+
+
+
+void clickHelp( int inX, int inY ) {
+    if( helpButton->getPressed( inX, inY ) ) {
+        // toggle
+        helpShouldShow = ! helpShouldShow;
+        }
+    }
+
+
+
+
+void stepHelp() {
+    int scrollRate = 8;
+
+    if( helpShouldShow && helpGreenbarPageTop > 0 ) {
+        if( helpGreenbarPageTop < 20 ) {
+            // slow down near top
+            if( helpPageCurrentSpeed < -2 ) {
+                helpPageCurrentSpeed += 2;
+                }
+            }
+        else if( helpPageCurrentSpeed > -scrollRate ) {
+            helpPageCurrentSpeed -= 2;
+            }
+
+        helpGreenbarPageTop += helpPageCurrentSpeed;
+        
+        if( helpGreenbarPageTop == 0 ) {
+            // hit top
+            helpPageCurrentSpeed = 0;
+            }
+        }
+    else if( !helpShouldShow && helpGreenbarPageTop < 192 ) {
+        if( helpGreenbarPageTop > 172 ) {
+            // slow down near bottom
+            if( helpPageCurrentSpeed > 2 ) {
+                helpPageCurrentSpeed -= 2;
+                }
+            }
+        else if( helpPageCurrentSpeed < scrollRate ) {
+            helpPageCurrentSpeed += 2;
+            }
+
+        helpGreenbarPageTop += helpPageCurrentSpeed;
+
+        if( helpGreenbarPageTop == 192 ) {
+            // hit bottom
+            helpPageCurrentSpeed = 0;
+            }
+        }
+    }
+
+    
+
+void drawHelp() {
+    drawGreenBarPaper( helpGreenbarPageTop, 192 );
+    
+    startNewSpriteLayer();
+    
+    int lineNumber = 0;
+
+    int lineOffset = 5;
+
+
+    for( int i=0; i<helpLines.size(); i++ ) {
+        char *lineString = *( helpLines.getElement( i ) );
+        
         int lineY = lineNumber * 16 + lineOffset;
         
         font8->drawString( lineString, greenBarLeftMargin,
@@ -195,15 +230,8 @@ void drawHelp() {
                                                 true ),
                            alignLeft );
         
-        delete [] lineString;
-        
         lineNumber++;
         }
-    
-    delete words;
-    
-
-
     
     helpButton->draw();
     }
