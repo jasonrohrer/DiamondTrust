@@ -203,40 +203,33 @@ int Font::drawString( const char *inString, int inX, int inY, rgbaColor inColor,
         }
     
     for( unsigned int i=0; i<numChars; i++ ) {
-        int charWidth = drawCharacter( inString[i], x, inY, inColor );
-        x += charWidth + mCharSpacing;
+        char c = inString[i];
+        
+        if( c == ' ' ) {
+            x += mSpaceWidth;
+            }
+        else {
+            
+            int charInt = (int)c;
+
+            int spriteID = mSpriteMap[ charInt ];
+            
+            if( spriteID != -1 ) {
+                drawSprite( spriteID, 
+                            x - mCharLeftEdgeOffset[ charInt ],
+                            inY, 
+                            inColor );
+                }
+    
+            x += mCharWidth[ charInt ];
+            }
+        
+        x += mCharSpacing;
         }
     // no spacing after last character
     x -= mCharSpacing;
 
     return x;
-    }
-
-
-
-int Font::drawCharacter( char inC, int inX, int inY, rgbaColor inColor ) {
-    if( inC == ' ' ) {
-        return mSpaceWidth;
-        }
-
-    int charStartX = inX;
-    
-    if( !mFixedWidth ) {
-        charStartX -= mCharLeftEdgeOffset[ (int)inC ];
-        }
-    
-    int spriteID = mSpriteMap[ (int)inC ];
-    
-    if( spriteID != -1 ) {
-        drawSprite( mSpriteMap[ (int)inC ], charStartX, inY, inColor );
-        }
-    
-    if( mFixedWidth ) {
-        return mSpriteWidth;
-        }
-    else {
-        return mCharWidth[ (int)inC ];
-        }
     }
 
 
@@ -251,9 +244,6 @@ int Font::measureString( const char *inString ) {
         
         if( c == ' ' ) {
             width += mSpaceWidth;
-            }
-        else if( mFixedWidth ) {
-            width += mSpriteWidth;
             }
         else {
             width += mCharWidth[ (int)c ];

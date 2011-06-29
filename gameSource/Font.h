@@ -41,11 +41,7 @@ class Font {
         int getCharacterSpacing();
 
 
-    private:
-        
-        // returns x coordinate to right of drawn character
-        int drawCharacter( char inC, int inX, int inY, rgbaColor inColor );
-        
+    private:        
         
         
         int mCharSpacing;
