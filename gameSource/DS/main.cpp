@@ -1286,6 +1286,121 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
 
 
+
+
+void drawSprite( int inHandle, int inNumCopies, int inX[], int inY[], 
+                 rgbaColor inColor ) {
+    //if( true ) return;
+
+    makeSpriteActive( inHandle );
+    
+
+    textureInfo t = textureInfoArray[ inHandle ];
+    
+    //printOut( "Drawing sprite at address %d\n", t.slotAddress );
+
+
+    GXTexPlttColor0 colorZeroFlag;
+    if( ! t.colorZeroTransparent ) {
+        colorZeroFlag = GX_TEXPLTTCOLOR0_USE;
+        }
+    else {
+        colorZeroFlag = GX_TEXPLTTCOLOR0_TRNS;
+        }
+    
+    G3_TexImageParam( t.texFormat,
+                      GX_TEXGEN_TEXCOORD,
+                      t.sizeS,
+                      t.sizeT,
+                      GX_TEXREPEAT_NONE,
+                      GX_TEXFLIP_NONE,
+                      colorZeroFlag,
+                      t.slotAddress );
+    
+    
+    if( t.texFormat != GX_TEXFMT_DIRECT ) {        
+        G3_TexPlttBase( t.paletteSlotAddress,
+                        t.texFormat );
+        }
+    
+    
+    // 5 high-order bits
+    int a = inColor.a >> 3;
+    
+    
+    // avoid wireframe
+    if( a == 0 ) {
+        // draw nothing
+        return;
+        }
+
+
+    G3_PolygonAttr( GX_LIGHTMASK_NONE,
+                    GX_POLYGONMODE_MODULATE,
+                    GX_CULL_NONE,
+                    polyID,
+                    a,
+                    0 );
+
+    G3_PushMtx();
+
+
+    G3_Translate( 0, 
+                  0, 
+                  drawZ );
+
+
+
+    G3_Begin( GX_BEGIN_QUADS );
+
+    // set color once
+    G3_Color( GX_RGB( inColor.r >> 3, inColor.g >> 3, inColor.b >> 3 ) );
+
+
+    // four corners
+
+    // 16 bit fixed point not enough to hold integer values in range 0..255
+    // (screen pixel coordinates) so some shifting is necessary
+    // Make up for this in the setup of Ortho in main function
+    // (shifting by 6 is like dividing by 64, and 256x192 divided by 64
+    //   is 4x3, which is used in Ortho).
+
+    // Note that this was the ONLY coordinate conversion method that didn't
+    // result in distortion as polygons moved in y direction.
+
+    for( int i=0; i<inNumCopies; i++ ) {
+        int x = inX[i];
+        int y = inY[i];
+        
+        G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[0] );
+        G3_Vtx( (short)( x << (FX16_SHIFT - 6) ), 
+                (short)( (y + t.h) << (FX16_SHIFT - 6) ), 
+                0 );
+    
+        G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[1] );
+        G3_Vtx( (short)( x << (FX16_SHIFT - 6) ), 
+                (short)( y << (FX16_SHIFT - 6) ), 
+                0 );
+    
+        G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[2] );
+        G3_Vtx( (short)( (x + t.w) << (FX16_SHIFT - 6) ), 
+                (short)( y << (FX16_SHIFT - 6) ), 
+                0 );
+    
+        G3_Direct1( G3OP_TEXCOORD, t.texCoordCorners[3] );
+        G3_Vtx( (short)( (x + t.w) << (FX16_SHIFT - 6) ), 
+                (short)( (y + t.h) << (FX16_SHIFT - 6) ), 
+                0 );
+        }
+
+    G3_End();
+
+    G3_PopMtx( 1 );
+    }
+
+
+
+
 #define TP_SAMPLE_BUFFER_SIZE 5
 
 static TPData tpAutoSampleBuffer[ TP_SAMPLE_BUFFER_SIZE ];
