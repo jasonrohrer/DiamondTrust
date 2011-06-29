@@ -1286,18 +1286,58 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
 
 
 
-char getTouch( int *outX, int *outY ) {
-    TPData result;
+#define TP_SAMPLE_BUFFER_SIZE 5
+
+static TPData tpAutoSampleBuffer[ TP_SAMPLE_BUFFER_SIZE ];
+
+
+// don't miss any touches, even after they're over, until they are consumed
+// by getTouch
+char touchWasDown = false;
+
+int touchX = 0;
+int touchY = 0;
+
+static void autoTouchCallback( TPRequestCommand inCommand, 
+                               TPRequestResult inResult,
+                               u16 inIndex ) {
     
-    if( TP_RequestCalibratedSampling( &result ) == 0 ) {
-        if( result.touch == TP_TOUCH_ON && 
-            result.validity == TP_VALIDITY_VALID ) { 
+    if( inCommand == TP_REQUEST_COMMAND_AUTO_SAMPLING &&
+        inResult == TP_RESULT_SUCCESS ) {
+        
+        TPData data;
+        
+        TP_GetLatestCalibratedPointInAuto( &data );
+    
+        // clear up unused variable warning
+        inIndex = 0;
+    
+        if( data.touch == TP_TOUCH_ON && 
+            data.validity == TP_VALIDITY_VALID ) { 
+        
+            touchWasDown = true;
             
-            *outX = result.x;
-            *outY = result.y;
-            return true;
+            touchX = data.x;
+            touchY = data.y;
             }
+        
+        
         }
+    }
+
+
+
+
+
+char getTouch( int *outX, int *outY ) {
+    if( touchWasDown ) {
+        *outX = touchX;
+        *outY = touchY;
+        touchWasDown = false;
+        
+        return true;
+        }
+    
     return false;
     }
 
@@ -2890,17 +2930,7 @@ static void SoundAlarmCallback( void *inArg ) {
     //MATH_InitRand32( &randContext, 13728749 );
     
     
-    printOut( "Calibrating touch panel\n" );
     
-    TPCalibrateParam tpCalibrate;
-
-    if( !TP_GetUserInfo( &tpCalibrate ) ) {
-        OS_Panic( "Failed to read touch panel calibration\n" );
-        }
-
-    TP_SetCalibrateParam( &tpCalibrate );
-    
-
     
     GX_Init();
 
@@ -3080,6 +3110,32 @@ static void SoundAlarmCallback( void *inArg ) {
     OS_WaitVBlankIntr();
     GX_DispOn();
     GXS_DispOn();
+
+
+
+    printOut( "Calibrating touch panel\n" );
+    
+    TPCalibrateParam tpCalibrate;
+
+    if( !TP_GetUserInfo( &tpCalibrate ) ) {
+        OS_Panic( "Failed to read touch panel calibration\n" );
+        }
+
+    TP_SetCalibrateParam( &tpCalibrate );
+    
+    TP_SetCallback( autoTouchCallback );
+
+    // start auto-sampling touch panel so we don't miss touch values
+    // that happen during slow frames (like when the AI is running at full
+    // CPU)
+    TP_RequestAutoSamplingStart( 0, 4, tpAutoSampleBuffer, 
+                                 TP_SAMPLE_BUFFER_SIZE );
+
+
+
+
+
+
     
     // init in platform-independent code
     gameInit();
