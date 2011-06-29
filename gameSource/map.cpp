@@ -652,10 +652,15 @@ void drawMap() {
     
 
     for( int c=0; c<numChunks; c++ ) {
+        int chunkX = c * chunkW;
+        int chunkY = 0;
         for( int s=0; s<numSlices; s++ ) {
+            // optimized inner loop (found with profiler)
             drawSprite( mapBackgroundSliceSpriteIDs[c][s], 
-                        c * chunkW, s * sliceH, 
+                        chunkX, chunkY, 
                         backgroundColor );
+            
+            chunkY += sliceH;
             }
         }
     
