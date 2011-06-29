@@ -46,6 +46,18 @@ char isHelpShowing() {
 
 
 
+char isHelpTryingToScroll() {
+    if( helpShouldShow && helpGreenbarPageTop > 0 ||
+        !helpShouldShow && helpGreenbarPageTop < 192 ) {
+        return true;
+        }
+    
+    return false;
+    }
+    
+
+
+
 static void clearOldLines() {
     for( int i=0; i<helpLines.size(); i++ ) {
         delete [] *( helpLines.getElement( i ) );

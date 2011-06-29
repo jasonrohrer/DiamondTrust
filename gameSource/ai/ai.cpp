@@ -5,6 +5,7 @@
 #include "map.h"
 #include "gameStats.h"
 #include "platform.h"
+#include "help.h"
 
 #include <assert.h>
 
@@ -673,7 +674,10 @@ void stepAI() {
         
         while( !moveDone && gamesThisStep < maxSimulationsPerStepAI &&
                // don't starve sound callback with too much AI processing
-               !isSoundTryingToRun() ) {
+               !isSoundTryingToRun() &&
+               // don't starve smooth help scrolling 
+               !isHelpTryingToScroll() ) {
+
             gamesThisStep++;
             
             // simulate one game for our next candidate

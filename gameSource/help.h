@@ -9,6 +9,8 @@ void freeHelp();
 
 char isHelpShowing();
 
+char isHelpTryingToScroll();
+
 
 void showHelp( const char *inHelpTransKey );
 
