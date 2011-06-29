@@ -1089,17 +1089,24 @@ typedef struct texturePalette {
 
 
 
-SimpleVector<SingleTextureGL*> spriteTextures;
-SimpleVector<unsigned int> spriteWidths;
-SimpleVector<unsigned int> spriteHeights;
+typedef struct sprite {
+        SingleTextureGL *texture;
+        unsigned int w;
+        unsigned int h;
+    } sprite;
+
+
+
+SimpleVector<sprite> spriteInfo;
+
 // save palettes to be reused if 8-bit texture data changes
 // these will only contain placeholders for non-8-bit sprites
 SimpleVector<texturePalette> spritePalettes;
 
 
 void freeSprites() {
-    for( int i=0; i<spriteTextures.size(); i++ ) {
-        SingleTextureGL *t = *( spriteTextures.getElement( i ) );
+    for( int i=0; i<spriteInfo.size(); i++ ) {
+        SingleTextureGL *t = spriteInfo.getElement( i )->texture;
         delete t;
         }
     }
@@ -1110,14 +1117,13 @@ static int addSprite( rgbaColor *inDataRGBA, int inWidth, int inHeight,
     
     SingleTextureGL *s = new SingleTextureGL( (unsigned char*)inDataRGBA,
                                               inWidth, inHeight );
-    spriteTextures.push_back( s );
+    sprite thisSprite = { s, inWidth, inHeight };
     
-    spriteWidths.push_back( inWidth );
-    spriteHeights.push_back( inHeight );
-    
+    spriteInfo.push_back( thisSprite );
+        
     spritePalettes.push_back( *inP );
 
-    return spriteTextures.size() - 1;
+    return spriteInfo.size() - 1;
     }
 
 
@@ -1203,7 +1209,7 @@ void replaceSprite256( int inSpriteID,
         fullColorImage[i] = p.fullColorPalette[ inDataBytes[i] ];
         }
     
-    SingleTextureGL *s = *( spriteTextures.getElement( inSpriteID ) );
+    SingleTextureGL *s = spriteInfo.getElement( inSpriteID )->texture;
 
     s->replaceTextureData( (unsigned char*)fullColorImage,
                            false, inWidth, inHeight );
@@ -1214,25 +1220,24 @@ void replaceSprite256( int inSpriteID,
 
 
 
+
+static const GLfloat squareTextureCoords[] = {
+    0, 0,
+    1, 0,
+    0, 1,
+    1, 1
+    };
+
+
+
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
-    drawSprite( inHandle, 1, &inX, &inY, inColor );
-    }
-
-
-
-
-void drawSprite( int inHandle, int inNumCopies, 
-                 int inX[], int inY[], rgbaColor inColor ) {
-
     glColor4ub( inColor.r, inColor.g, inColor.b, inColor.a );
         
-    SingleTextureGL *texture = *( spriteTextures.getElement( inHandle ) );
+    sprite s = *( spriteInfo.getElementFast( inHandle ) );
     
+    SingleTextureGL *texture = s.texture;
 
-    texture->enable(); 
-    unsigned int spriteW = *( spriteWidths.getElement( inHandle ) );
-    unsigned int spriteH = *( spriteHeights.getElement( inHandle ) );
-    
+    texture->enable();
 
     
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST ); 
@@ -1240,13 +1245,49 @@ void drawSprite( int inHandle, int inNumCopies,
 
 
 
+    glTexCoordPointer( 2, GL_FLOAT, 0, squareTextureCoords );
+    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-    const GLfloat squareTextureCoords[] = {
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 1
-        };
+    
+    // account for "screen" being drawn on
+    inY += spriteYOffset;
+        
+    int xEnd = inX + s.w;
+    int yEnd = inY + s.h;
+    
+    const GLfloat squareVertices[] = {
+        inX, inY,
+        xEnd, inY,
+        inX, yEnd,
+        xEnd, yEnd };    
+    
+    glVertexPointer( 2, GL_FLOAT, 0, squareVertices );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    
+    
+    texture->disable();
+    }
+
+
+
+
+
+
+void drawSprite( int inHandle, int inNumCopies, 
+                 int inX[], int inY[], rgbaColor inColor ) {
+    glColor4ub( inColor.r, inColor.g, inColor.b, inColor.a );
+
+    sprite s = *( spriteInfo.getElementFast( inHandle ) );
+    
+    SingleTextureGL *texture = s.texture;
+
+    texture->enable();
+    
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST ); 
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
 
 
     glTexCoordPointer( 2, GL_FLOAT, 0, squareTextureCoords );
@@ -1254,16 +1295,20 @@ void drawSprite( int inHandle, int inNumCopies,
 
 
     for( int i=0; i<inNumCopies; i++ ) {
-
-        // account for "screen" being drawn on
-        inY[i] += spriteYOffset;
+        int x = inX[i];
+        int y = inY[i];
         
+        // account for "screen" being drawn on
+        y += spriteYOffset;
+        
+        int xEnd = x + s.w;
+        int yEnd = y + s.h;
+
         const GLfloat squareVertices[] = {
-            inX[i], inY[i],
-            inX[i] + spriteW, inY[i],
-            inX[i], inY[i] + spriteH,
-            inX[i] + spriteW, inY[i] + spriteH,
-            };    
+            x, y,
+            xEnd, y,
+            x, yEnd,
+            xEnd, yEnd };    
 
         glVertexPointer( 2, GL_FLOAT, 0, squareVertices );
         glEnableClientState( GL_VERTEX_ARRAY );
