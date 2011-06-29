@@ -7,12 +7,19 @@
 static char localAI = false;
 
 
+
+
 void initOpponent( char inLocalAI ) {
     localAI = inLocalAI;
     
     if( localAI ) {
         initAI();
         }
+    }
+
+
+void resetOpponent() {
+    localAI = false;
     }
 
 

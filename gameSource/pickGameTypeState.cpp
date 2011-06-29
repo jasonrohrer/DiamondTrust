@@ -5,6 +5,7 @@
 #include "units.h"
 #include "colors.h"
 #include "music.h"
+#include "opponent.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -204,6 +205,9 @@ void PickGameTypeState::enterState() {
     
     selectionMade = false;
 
+    // turn off AI in case it was running from a previous game
+    // don't want AI picking its next move during our menu screens
+    resetOpponent();
     }
 
 
