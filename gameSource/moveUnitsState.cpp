@@ -237,6 +237,10 @@ void MoveUnitsState::clickState( int inX, int inY ) {
     // also consider switching active unit (when none might be selectable
     int newActiveUnit = getChosenUnit( inX, inY, false );
 
+    // avoid passing first click to bid picker after a unit change,
+    // because the picker only moves after it is next redrawn, and it may
+    // register faulty clicks from it's old position
+    char unitChange = false;
 
     if( considerSwitchingActive &&
         hitBidMarkerUnit != -1 && 
@@ -274,6 +278,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         pickingBid = true;
         pickingBribe = false;
 
+        unitChange = true;
+
         setAllRegionsNotSelectable();
         setAllUnitsNotSelectable();
         }
@@ -298,6 +304,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         
         pickingBid = false;
         pickingBribe = true;
+
+        unitChange = true;
 
         setAllRegionsNotSelectable();
         setAllUnitsNotSelectable();
@@ -363,7 +371,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
 
 
 
-    if( pickingBid ) {
+    if( !unitChange && pickingBid ) {
         
         if( activeUnit == -1 ) {
             printOut( "Error: Picking bid with no active unit!\n" );
@@ -427,7 +435,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         return;
         }
 
-    if( pickingBribe ) {
+    if( !unitChange && pickingBribe ) {
         
         if( activeUnit == -1 ) {
             printOut( "Error: Picking bribe with no active unit!\n" );
