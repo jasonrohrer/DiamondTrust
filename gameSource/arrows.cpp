@@ -551,6 +551,10 @@ void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
             drawLimit = p.mStartupProgress;
             }
         
+        
+        int *spriteX = new int[drawLimit];
+        int *spriteY = new int[drawLimit];
+        
         for( int i=0; i<drawLimit; i++ ) {
             intPair step = p.mLineSteps[i];
             
@@ -582,9 +586,15 @@ void drawArrow( intPair inStart, intPair inEnd, rgbaColor inColor ) {
                 }
             */
 
-            drawSprite( p.mBodySpriteID, step.x - w/2, step.y - h/2, 
-                        inColor );
+            spriteX[i] = step.x - w/2;
+            spriteY[i] = step.y - h/2;
             }
+            
+
+        drawSprite( p.mBodySpriteID, drawLimit, spriteX, spriteY, inColor );
+
+        delete [] spriteX;
+        delete [] spriteY;
         }
     else {
         printOut( "Arrow requested to draw not found\n" );

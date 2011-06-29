@@ -591,19 +591,23 @@ static void drawInfoPanelBackground( int inX, int inY, rgbaColor inC ) {
 
     int xOffset = inX + offset.x;
     
+    int spriteX[30*7];
+    int spriteY[30*7];
 
     for( int x=0; x<30; x++ ) {
         
         int yOffset = inY + offset.y;
         
         for( int y=0; y<7; y++ ) {
-            drawSprite( blockID, 
-                        xOffset, yOffset, inC );
+            spriteX[ x * 7 + y ] = xOffset;
+            spriteY[ x * 7 + y ] = yOffset;
+
             yOffset += offset.y;
             }
         xOffset += offset.x;
         }
-    
+
+    drawSprite( blockID, 30 * 7, spriteX, spriteY, inC );
     }
 
 

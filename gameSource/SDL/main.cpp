@@ -1283,6 +1283,64 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
     }
 
 
+
+
+void drawSprite( int inHandle, int inNumCopies, 
+                 int inX[], int inY[], rgbaColor inColor ) {
+
+    glColor4ub( inColor.r, inColor.g, inColor.b, inColor.a );
+        
+    SingleTextureGL *texture = *( spriteTextures.getElement( inHandle ) );
+    
+
+    texture->enable(); 
+    unsigned int spriteW = *( spriteWidths.getElement( inHandle ) );
+    unsigned int spriteH = *( spriteHeights.getElement( inHandle ) );
+    
+
+    
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST ); 
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+
+
+
+    const GLfloat squareTextureCoords[] = {
+        0, 0,
+        1, 0,
+        0, 1,
+        1, 1
+        };
+
+
+    glTexCoordPointer( 2, GL_FLOAT, 0, squareTextureCoords );
+    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+
+
+    for( int i=0; i<inNumCopies; i++ ) {
+
+        // account for "screen" being drawn on
+        inY[i] += spriteYOffset;
+        
+        const GLfloat squareVertices[] = {
+            inX[i], inY[i],
+            inX[i] + spriteW, inY[i],
+            inX[i], inY[i] + spriteH,
+            inX[i] + spriteW, inY[i] + spriteH,
+            };    
+
+        glVertexPointer( 2, GL_FLOAT, 0, squareVertices );
+        glEnableClientState( GL_VERTEX_ARRAY );
+    
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        }
+    
+    texture->disable();
+    }
+
+
+
+
 void startNewSpriteLayer() {
     // no layering necessary in SDL version
     }

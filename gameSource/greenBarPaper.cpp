@@ -62,11 +62,16 @@ void drawGreenBarPaper( int inSheetTopY, int inBottomY ) {
     
     // top fill
     intPair offset = greenBarPartOffsets[2];
+    int spriteX[14];
+    int spriteY[14];
+    
     for( int f=0; f<14; f++ ) {
-        drawSprite( greenBarSprites[2],
-                    offset.x + 16  * f, inSheetTopY + offset.y, white );
+        spriteX[f] = offset.x + 16  * f;
+        spriteY[f] = inSheetTopY + offset.y;
         }
+    drawSprite( greenBarSprites[2], 14, spriteX, spriteY, white );
 
+    
     // at least the first row, too
     
     // left fill
@@ -86,9 +91,10 @@ void drawGreenBarPaper( int inSheetTopY, int inBottomY ) {
     offset = greenBarPartOffsets[8];
     offset.y += inSheetTopY;
     for( int f=0; f<14; f++ ) {
-        drawSprite( greenBarSprites[8],
-                    offset.x + 16  * f, offset.y, white );
+        spriteX[f] = offset.x + 16  * f;
+        spriteY[f] = offset.y;
         }
+    drawSprite( greenBarSprites[8], 14, spriteX, spriteY, white );
 
 
     
@@ -131,11 +137,11 @@ void drawGreenBarPaper( int inSheetTopY, int inBottomY ) {
         offset = greenBarPartOffsets[8];
         
         for( int f=0; f<14; f++ ) {
-            drawSprite( greenBarSprites[8],
-                        offset.x + 16  * f, 
-                        rowYOffset, white );
+            spriteX[f] = offset.x + 16  * f;
+            spriteY[f] = rowYOffset;
             }      
-
+        drawSprite( greenBarSprites[8], 14, spriteX, spriteY, white );
+        
         yCoverage += 16;
         rowsDrawn ++;
         }
@@ -160,10 +166,11 @@ void drawGreenBarPaper( int inSheetTopY, int inBottomY ) {
         // bottom fill
         intPair offset = greenBarPartOffsets[5];
         for( int f=0; f<14; f++ ) {
-            drawSprite( greenBarSprites[5],
-                        offset.x + 16  * f, inSheetTopY + offset.y, white );
+            spriteX[f] = offset.x + 16  * f;
+            spriteY[f] = inSheetTopY + offset.y;
             }
-        
+
+        drawSprite( greenBarSprites[5], 14, spriteX, spriteY, white );
         }
     
 

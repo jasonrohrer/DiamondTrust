@@ -163,6 +163,13 @@ void replaceSprite256( int inSpriteID,
 // sprite is drawn on the currently-drawing screen
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
 
+// draws multiple copies of a single sprite at different positions with same
+// color
+// More efficient than multiple drawSprite calls 
+void drawSprite( int inHandle, int inNumCopies, int inX[], int inY[], 
+                 rgbaColor inColor );
+
+
 // puts the next batch of sprites on top of the previous batches
 // within a batch, between calls to startNewSpriteLayer, sprites should
 // not overlap (to avoid sorting artifacts)
