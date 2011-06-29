@@ -1215,71 +1215,7 @@ void replaceSprite256( int inSpriteID,
 
 
 void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor ) {
-    
-    // account for "screen" being drawn on
-    inY += spriteYOffset;
-    
-
-    glColor4ub( inColor.r, inColor.g, inColor.b, inColor.a );
-        
-    SingleTextureGL *texture = *( spriteTextures.getElement( inHandle ) );
-    
-
-    texture->enable(); 
-    unsigned int spriteW = *( spriteWidths.getElement( inHandle ) );
-    unsigned int spriteH = *( spriteHeights.getElement( inHandle ) );
-    
-
-    
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST ); 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
-
-    const GLfloat squareVertices[] = {
-        inX, inY,
-        inX + spriteW, inY,
-        inX, inY + spriteH,
-        inX + spriteW, inY + spriteH,
-        };
-
-
-    const GLfloat squareTextureCoords[] = {
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 1
-        };
-
-    
-
-    glVertexPointer( 2, GL_FLOAT, 0, squareVertices );
-    glEnableClientState( GL_VERTEX_ARRAY );
-    
-    
-    glTexCoordPointer( 2, GL_FLOAT, 0, squareTextureCoords );
-    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    /*
-
-    glBegin( GL_QUADS ); {
-    
-        glTexCoord2f( 0, inSubsectionOffset );
-        glVertex2f( inCenterX - inXRadius, inCenterY - inYRadius );
-        
-        glTexCoord2f( 1, inSubsectionOffset );
-        glVertex2f( inCenterX + inXRadius, inCenterY - inYRadius );
-        
-        glTexCoord2f( 1, inSubsectionOffset + inSubsectionExtent );
-        glVertex2f( inCenterX + inXRadius, inCenterY + inYRadius );
-        
-        glTexCoord2f( 0, inSubsectionOffset + inSubsectionExtent );
-        glVertex2f( inCenterX - inXRadius, inCenterY + inYRadius );        
-        }
-    glEnd();
-    */
-    texture->disable();
+    drawSprite( inHandle, 1, &inX, &inY, inColor );
     }
 
 
