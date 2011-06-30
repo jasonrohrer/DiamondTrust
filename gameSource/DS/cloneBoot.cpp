@@ -92,11 +92,9 @@ const MBGameRegistry mbGameInfo = {
     // specify NULL as program path name when clone booting
     NULL,
     // title
-    (u16 *)L"DiamondTrust",
-    // description
     (u16 *)L"Diamond Trust of London",
-    
-    // FIXME!!!
+    // description
+    (u16 *)L"Downloadable Two-Player Game",
 
     // icon character data
     "/icon.nbfc",
