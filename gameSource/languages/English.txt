@@ -2,7 +2,7 @@ status_loading "Loading"
 
 status_next  "Next:"
 status_finished  "Finished:"
-subStatus_moveOn "Press Next to continue"
+subStatus_moveOn "Touch Next to continue"
 
 
 button_done "Done"
@@ -90,15 +90,15 @@ phaseSubStatus_accumulate  "New month, regions produce more diamonds"
 phaseStatus_payAgents  "Pay agents"
 phaseSubStatus_pickSalary  "Select salary payment for this agent"
 phaseSubStatus_pickOpponentBribe  "Select bribe payment for this opponent agent"
-phaseSubStatus_payAgentCannot  "None are payable (hit Done when ready)"
+phaseSubStatus_payAgentCannot  "None are payable (touch Done when ready)"
 
 
 
 phaseStatus_move  "Move your agents"
 phaseStatus_movePeek  "Bribed units reveal moves"
 
-phaseSubStatus_pickAgent  "Pick an agent (or hit Done)"
-phaseSubStatus_pickAgentAdjust  "Adjust move?  Pick an agent (or hit Done)"
+phaseSubStatus_pickAgent  "Pick an agent (or touch Done)"
+phaseSubStatus_pickAgentAdjust  "Adjust move?  Pick an agent (or touch Done)"
 phaseSubStatus_pickRegion  "Pick destination for chosen agent"
 phaseSubStatus_pickBid  "How much to pay diamond guide in this region?"
 phaseSubStatus_pickInspectorBribe  "Bribe the UN Inspector?"
@@ -111,7 +111,7 @@ phaseSubStatus_depositDiamonds "Agents returning home unload their diamonds"
 
 
 phaseStatus_moveInspector  "Move the UN Inspector"
-phaseSubStatus_pickInspectorRegion  "Pick destination (or hit Done)"
+phaseSubStatus_pickInspectorRegion  "Pick destination (or touch Done)"
 
 
 phaseStatus_confiscate  "UN inspection"
@@ -124,9 +124,9 @@ phaseSubStatus_buyDiamonds  "Guides help highest payer get diamonds"
 
 phaseStatus_sellDiamonds  "Sell diamonds"
 phaseStatus_sellPeek  "Bribed units reveal sale"
-phaseSubStatus_sellDiamonds  "Pick number to sell on market (or hit Done)"
-phaseSubStatus_sellDiamondsAdjust  "Adjust sale?  Pick new quanity (or hit Done)"
-phaseSubStatus_sellDiamondsNone "You have none to sell (hit Done when ready)"
+phaseSubStatus_sellDiamonds  "Pick number to sell on market (or touch Done)"
+phaseSubStatus_sellDiamondsAdjust  "Adjust sale?  Pick new quanity (or touch Done)"
+phaseSubStatus_sellDiamondsNone "You have none to sell (touch Done when ready)"
 
 phaseSubStatus_sellDiamondsPicture "Enter vault to remove diamonds"
 
