@@ -49,6 +49,7 @@ signal3.tga \
 wirelessOn.tga \
 greenBarSheet.tga \
 aiLevelSheet.tga \
+nintendoLogo.tga \
 
 
 LANGUAGE_FILES_SOURCE = $(wildcard languages/*.txt)

@@ -417,6 +417,22 @@ SimpleVector<textureSet> textureSetVector;
 
 
 
+// resets all texture information back to starting state, as if
+// no sprites have been added at all
+static void clearAllTextures() {
+    nextTextureInfoIndex = 0;
+    nextTextureSlotAddress = 0x0000;
+    nextTexturePaletteAddress = 0x0000;
+    
+    numTextureBytesAdded = 0;
+    numTexturePaletteBytesAdded = 0;
+    
+    textureSetVector.deleteAll();
+    }
+
+
+
+
 // used as temporary storage when adding a sprite to build up a palette
 unsigned short textureColors[ 256 ] ATTRIBUTE_ALIGN(4);
 
@@ -3019,6 +3035,11 @@ static void SoundAlarmCallback( void *inArg ) {
 
 
 
+static char shouldDrawNintendoLogo = false;
+static unsigned char nintendoLogoFade = 0;
+static int nintendoLogoSpriteID = -1;
+
+
 
 #ifdef SDK_TWL
     void TwlMain( void )    
@@ -3249,6 +3270,58 @@ static void SoundAlarmCallback( void *inArg ) {
 
 
 
+    if( !isThisAClone() ) {
+        // display Licensed By Nintendo logo, as required
+        
+        nintendoLogoSpriteID = loadSprite( "nintendoLogo.tga", false );
+        
+        shouldDrawNintendoLogo = true;
+        
+        // fade in for 0.25 seconds, ~8 frames
+
+        while( nintendoLogoFade < 255 ) {
+            
+            runGameLoopOnce();
+            runGameLoopOnce();
+            
+            if( nintendoLogoFade < 224 ) {
+                nintendoLogoFade += 32;
+                }
+            else {
+                nintendoLogoFade = 255;
+                }
+            }
+        
+        // hold logo for 1 second, 30 frames
+        for( int f=0; f<30; f++ ) {
+            runGameLoopOnce();
+            runGameLoopOnce();
+            }
+        
+        // fade back out for 0.25 seconds
+        while( nintendoLogoFade > 0 ) {
+            
+            
+            if( nintendoLogoFade > 31 ) {
+                nintendoLogoFade -= 32;
+                }
+            else {
+                nintendoLogoFade = 0;
+                }
+
+            runGameLoopOnce();
+            runGameLoopOnce();
+            }
+        
+        shouldDrawNintendoLogo = false;
+        nintendoLogoSpriteID = -1;
+
+        // back to blank slate with textures, ready for game to load
+        clearAllTextures();
+        }
+    
+
+
 
 
     
@@ -3359,6 +3432,14 @@ void runGameLoopOnce() {
 
     if( isEvenFrame ) {
         drawTopScreen();
+
+        if( shouldDrawNintendoLogo ) {
+            rgbaColor logoColor = { 255, 255, 255, nintendoLogoFade };
+
+            drawSprite( nintendoLogoSpriteID, 0, 32, logoColor );
+            }
+
+
         //printOut( "Free bytes on heap after drawTop=%d\n",
         //  OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
             
