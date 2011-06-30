@@ -3330,6 +3330,8 @@ static void SoundAlarmCallback( void *inArg ) {
     }
 
 
+static char lidIsClosed = false;
+
 
 
 void runGameLoopOnce() {
@@ -3385,7 +3387,35 @@ void runGameLoopOnce() {
     G3_SwapBuffers( GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z );
     shouldSwap = true;
     OS_RestoreInterrupts( oldMode );
+
+
+    BOOL detectFold = PAD_DetectFold();
+    
+    if( detectFold && ! lidIsClosed ) {
+        // turn screen off
+        GX_DispOff();
+        GXS_DispOff();
         
+        PM_SetLCDPower( PM_LCD_POWER_OFF );
+        
+        lidIsClosed = true;
+        }
+    else if( !detectFold && lidIsClosed ) {
+        // opened back up
+        
+        // careful:  this call may fail if less than 100ms have passed
+        // since closed.
+        // If so, try again later (don't reset lidIsClosed)
+        
+        if( PM_SetLCDPower( PM_LCD_POWER_ON ) ) {
+            GX_DispOn();
+            GXS_DispOn();
+            
+            lidIsClosed = false;
+            }
+        }
+    
+    
         
     // interrupt will wake swapThread up
     OS_WaitVBlankIntr();
