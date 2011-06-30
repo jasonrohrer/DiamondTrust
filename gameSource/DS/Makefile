@@ -58,17 +58,41 @@ INCDIR = .. ../../.. $(MBP_DIR)
 LCFILE_TEMPLATE	= $(NITRO_SPECDIR)/ARM9-TS-cloneboot-C.lcf.template
 
 
-# FIXME (for final signing only):  
+# (for final signing only):  
 
 # need libsyscall definitions
 
-# need presign and post-sign rules
+# get a replacement from Nintendo (via publisher)
+LIBSYSCALL			 = ./etc/libsyscall.a
+# okay to use the one for the child from the SDK, even in a final build
+# find out about this!
+LIBSYSCALL_CHILD	 = ./etc/libsyscall_child.bin
+
+
 
 
 
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
 do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
+
+
+# need presign and post-sign rules
+
+
+presign:
+	$(EMUCHILD) \
+		bin/$(TWL_BUILDTYPE)/$(TARGET_BIN) \
+		$(LIBSYSCALL_CHILD) \
+		bin/$(TWL_BUILDTYPE)/sign.srl
+
+postsign:
+	$(ATTACHSIGN) \
+		bin/$(TWL_BUILDTYPE)/$(TARGET_BIN) \
+		bin/$(TWL_BUILDTYPE)/sign.sgn  \
+		bin/$(TWL_BUILDTYPE)/mainSigned.srl
+
+
 
 
 # force rebuild of targets if romfiles change
