@@ -77,7 +77,7 @@ LIBSYSCALL_CHILD	 = ./etc/libsyscall_child.bin
 
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
-do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp  banner.bnr $(TARGETS) 
+do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
 
 
 # need presign and post-sign rules
@@ -120,6 +120,11 @@ banner.nbfc banner.nbfp: icon.bmp
 	mv icon.nbfc banner.nbfc
 	mv icon.nbfp banner.nbfp
 
+
+# make sure ROM is rebuilt if banner file changes
+# touch ROM spec file to force ROM to be rebuilt
+$(ROM_SPEC):  banner.bnr
+	touch $(ROM_SPEC)
 
 
 include	$(TWLSDK_ROOT)/build/buildtools/modulerules
