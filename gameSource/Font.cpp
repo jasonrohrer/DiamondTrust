@@ -204,6 +204,12 @@ int Font::drawString( const char *inString, int inX, int inY, rgbaColor inColor,
     
     for( unsigned int i=0; i<numChars; i++ ) {
         char c = inString[i];
+
+        // handle characters that are out of ASCII range
+        if( c < 0 ) {
+            c = '?';
+            }
+        
         
         if( c == ' ' ) {
             x += mSpaceWidth;
