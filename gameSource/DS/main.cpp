@@ -3039,6 +3039,25 @@ static char shouldDrawNintendoLogo = false;
 static unsigned char nintendoLogoFade = 0;
 static int nintendoLogoSpriteID = -1;
 
+static int skipLogo = false;
+
+static char skippingLogo() {
+    if( skipLogo ) {
+        return true;
+        }
+    
+    int x,y;
+    if( getTouch( &x, &y ) || 
+        PAD_Read() != 0 ) {
+        
+        skipLogo = true;
+        return true;
+        }
+
+    return false;
+    }
+
+
 
 
 #ifdef SDK_TWL
@@ -3279,7 +3298,7 @@ static int nintendoLogoSpriteID = -1;
         
         // fade in for 0.25 seconds, ~8 frames
 
-        while( nintendoLogoFade < 255 ) {
+        while( nintendoLogoFade < 255 && ! skippingLogo() ) {
             
             runGameLoopOnce();
             runGameLoopOnce();
@@ -3293,7 +3312,7 @@ static int nintendoLogoSpriteID = -1;
             }
         
         // hold logo for 1 second, 30 frames
-        for( int f=0; f<30; f++ ) {
+        for( int f=0; f<30 && !skippingLogo(); f++ ) {
             runGameLoopOnce();
             runGameLoopOnce();
             }
