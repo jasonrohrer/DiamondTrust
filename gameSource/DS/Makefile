@@ -74,7 +74,7 @@ LIBSYSCALL_CHILD	 = ./etc/libsyscall_child.bin
 
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
-do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
+do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp  banner.bnr $(TARGETS) 
 
 
 # need presign and post-sign rules
@@ -107,6 +107,16 @@ $(TARGETS): $(MAKEROM_ROMROOT)/$(MAKEROM_ROMFILES)
 
 icon.bmp: icon.png
 	convert icon.png icon.bmp
+
+
+banner.bnr: banner.bsf banner.nbfc banner.nbfp
+	$(MAKEBANNER) banner.bsf banner.bnr
+
+banner.nbfc banner.nbfp: icon.bmp
+	$(NTEXCONV) -no -bg -bgb -bgnc -f palette16 -tc=255,0,0 icon.bmp
+	mv icon.nbfc banner.nbfc
+	mv icon.nbfp banner.nbfp
+
 
 
 include	$(TWLSDK_ROOT)/build/buildtools/modulerules
