@@ -17,6 +17,9 @@ cloneBootChild.cpp $(MBP_DIR)/mbp.c
 
 
 
+ROM_SPEC  =  ROM-TS.rsf
+
+
 # NOTE:  if you see linker errors after adding files to ../makeDefs, try
 #   touch Makefile
 # To let build system know that object list has changed.
