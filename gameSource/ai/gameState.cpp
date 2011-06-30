@@ -3366,7 +3366,47 @@ gameState stateTransition( gameState *inState,
             
             accumulateDiamonds( &result );
             
-            result.nextMove = salaryBribe;
+
+
+            // check if any units, on either side, are payable
+            // sometimes we skip salaryBribe state
+            char someUnitPayable = false;
+            
+            for( int p=0; p<2 && !someUnitPayable; p++ ) {
+                for( int u=0; u<3 && !someUnitPayable; u++ ) {
+
+                    int region = result.agentUnits[p][u].region;
+
+                    if( region < 2 ) {
+                        // an agent at home
+                        someUnitPayable = true;
+                        }
+                    }
+                }
+            
+            if( ! someUnitPayable ) {
+                // none at home
+                
+                // check if any opponents share regions
+                for( int i=0; i<3 && !someUnitPayable; i++ ) {
+                    for( int j=0; j<3 && !someUnitPayable; j++ ) {
+                        
+                        if( result.agentUnits[0][i].region ==
+                            result.agentUnits[1][j].region ) {
+                            someUnitPayable = true;
+                            }
+                        }
+                    }
+                }
+            
+            
+            if( someUnitPayable ) {
+                result.nextMove = salaryBribe;
+                }
+            else {
+                // skip salary-bribe state completely if none are payable
+                result.nextMove = moveUnits;
+                }
             }
             break;
         }
