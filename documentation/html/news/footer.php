@@ -8,7 +8,6 @@
 <!-- Copyright (c)2009 Site Meter -->
 
 
-</center>
 
 </body>
 

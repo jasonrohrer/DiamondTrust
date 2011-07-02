@@ -3,21 +3,20 @@ include_once( "seedBlogs.php" );
 include_once( "header.php" );
 ?>
 
-</CENTER>
 
 
+<div class="content">
+
+<div class="topbar">
 
 <table width="100%" border=0><tr>
 
 <td align=left>
-
 <!-- hard-coded clean RSS link -->
-<table BORDER=0 CELLSPACING=0 CELLPADDING=1><tr><td BGCOLOR=#898E79><table BORDER=0 CELLSPACING=0 CELLPADDING=1><tr><td BGCOLOR=#FFFFFF><table BORDER=0 CELLSPACING=0 CELLPADDING=2><tr><td BGCOLOR=#FF6600><a HREF="http://diamondtrustgame.com/rss.xml"><font COLOR=#FFFFFF><b>RSS 2.0</b></font></a></td></tr></table></td></tr></table></td></tr></table>
-
+<a HREF="http://diamondtrustgame.com/rss.xml"><img src='rss.png' width=16 height=16 border=0> RSS Feed</a>
+<br>
+<a HREF="http://twitter.com/diamondtrust77"><img src='twitter.png' width=16 height=16 border=0> @diamondtrust77</a>
 </td>
-
-<td align=center>
-Follow <a href="http://twitter.com/diamondtrust77">@diamondtrust77</a> on Twitter
 
 <td align=right>
 
@@ -32,6 +31,7 @@ seedBlogs_showSearchBox(
 </td>
 </tr>
 </table>
+</div>
 
 
 <?php
@@ -114,12 +114,12 @@ seedBlogRSSButton(
 <table width="100%" border=0><tr>
 
 <td align=right>
-[<a href="newsLogin.php">login</a>]
+[<a href="login.php">login</a>]
 </td>
 </tr>
 </table>
 
-<CENTER>
+</div>
 
 <?php include_once( "footer.php" ); ?>
 
