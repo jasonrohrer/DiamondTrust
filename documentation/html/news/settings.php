@@ -4,17 +4,17 @@
 // You must set these for seedBlogs to work
 
 $databaseServer = "localhost";
-$databaseUsername = "jcr13_sidNwsU";
-$databasePassword = "theGrill";
-$databaseName = "jcr13_sidNews";
+$databaseUsername = "testUser";
+$databasePassword = "testPassword";
+$databaseName = "test";
 
 // The URL of the "homepage" of your seedBlogs site.
 // Used in administrative emails.
-$mainSiteURL = "http://diamondtrustgame.com/news/";
+$mainSiteURL = "http://localhost/jcr13/dtNews/";
 
 // The full URL to the seedBlogs.php script.
 // Used in RSS feeds to uniquely point to specific posts.
-$fullSeedBlogsURL = "http://diamondtrustgame.com/news/seedBlogs.php";
+$fullSeedBlogsURL = "http://localhost/jcr13/dtNews/seedBlogs.php";
 
 
 // End Basic settings
