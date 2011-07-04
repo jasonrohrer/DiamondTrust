@@ -108,19 +108,19 @@ $footer = "footer.php";
 
 // HTML used to open/close each story block (only used in story lists that
 // display intro text for each story)
-$storyBlockFormatOpen = "<TABLE WIDTH=100% cellpadding=0><TR><TD>";
-$storyBlockFormatClose = "</TD></TR></TABLE>";
+$storyBlockFormatOpen = "<div class='postBlock'>";
+$storyBlockFormatClose = "</div>";
 
 
 // HTML used to format headlines when intro text is shown
-$headlineFormatOpen = "<FONT SIZE=6>";
-$headlineFormatClose = "</FONT>";
+$headlineFormatOpen = "<div class='postHeadline'>";
+$headlineFormatClose = "</div>";
 
 // HTML used to open/close the text below each headline
 // this block of text includes:
 //   admin widgets, intro text, Read more link, and comment widget
-$textBlockFormatOpen = "<TABLE WIDTH=100% cellpadding=5><TR><TD bgcolor=#222222>";
-$textBlockFormatClose = "</TD></TR></TABLE>";
+$textBlockFormatOpen = "<div class='postTextBlock'>";
+$textBlockFormatClose = "</div>";
 
 
 // HTML used to open/close each story block (for lists where intro text
@@ -138,7 +138,7 @@ $linkHeadlineFormatClose = "";
 
 
 // HTML to insert between each story in a story list when intro text is shown
-$storySeparator = "<BR><BR><BR>";
+$storySeparator = "<div class='storySeparator'></div>";
 
 // HTML to insert between each headline link when intro text is hidden
 $linkStorySeparator = "";
@@ -146,8 +146,8 @@ $linkStorySeparator = "";
 // used around the list of comments (shown at the bottom of the story display)
 // comment lists are formatted as a seedBlog using the default formatting
 // settings specified above
-$commentListOpen = "<BR><BR><FONT SIZE=5>Comments</FONT><BR>";
-$commentListClose = "";
+$commentListOpen = "<div class='commentsHeading'>Comments</div><div class='comments'>";
+$commentListClose = "</div>";
 
 
 

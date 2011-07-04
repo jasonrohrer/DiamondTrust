@@ -1,3 +1,8 @@
+</center>
+</div>
+
+</div>
+
 <!-- Site Meter -->
 <script type="text/javascript" src="http://s31.sitemeter.com/js/counter.js?site=s31diamondtrust">
 </script>
