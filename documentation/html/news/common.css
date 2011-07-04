@@ -1,3 +1,18 @@
+
+div.logo
+{
+  text-align:center; 
+ }
+
+
+div.summary
+{ 
+  text-align:center;
+  padding-top:0.125in; 
+  }
+
+
+
 div.postBlock
 { 
   margin-top:20px;

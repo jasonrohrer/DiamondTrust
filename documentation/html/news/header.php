@@ -18,6 +18,15 @@
 
 <div class="whitePage">
 
+<div class="logo">
+<a href="index.php"><img src="logo.png" width="244" height="128"></a>
+</div>
+
+
+<div class="summary">
+News about <a href="http://hcsoftware.sf.net/jason-rohrer">Jason Rohrer</a>'s diamond-trading strategy game for the Nintendo DS.
+</div>
+
 <div class="topbar">
 
 <table width=100% border=0>
