@@ -1,33 +1,9 @@
+@import url(common.css);
 
 
-div.topbar 
-{
-  display:none;
-  }
+/* hide top bar when printing */
+div.topbar{ display:none; }
 
 
-div.postBlock
-{ 
-  }
-
-
-div.postHeadline
-{ 
-  font-size:200%;
-  text-align:left;
-  }
-
-
-div.postTextBlock
-{ 
-  text-align:left;
-  border-top:#444 solid 1px;
-  border-bottom:#444 solid 1px;
-  }
-
-
-div.storySeparator
-{
-  height:100px;
-  }
-
+/* hide footer links (useless in print) */
+div.footer{ display:none; }

@@ -1,0 +1,74 @@
+div.postBlock
+{ 
+  margin-top:20px;
+  }
+
+
+div.postHeadline
+{ 
+  font-size:200%;
+  text-align:left;
+  }
+
+
+
+div.postTextBlock
+{ 
+  text-align:left;
+  border-top:#444 solid 2px;
+  padding-top:2px;
+  }
+
+
+div.storySeparator
+{
+  height:75px;
+  }
+
+
+
+
+
+
+div.commentsHeading
+{ 
+  margin-top:50px;
+  font-size:200%;
+  text-align:left;
+  border-bottom:#444 solid 2px;
+  
+ }
+
+
+div.comments
+{ 
+  margin-left:20px;
+  margin-top:20px;
+  }
+
+
+
+div.comments div.postTextBlock
+{ 
+  text-align:left;
+  border-left:#444 solid 2px;
+  padding-left:10px;
+  }
+
+
+
+div.comments div.storySeparator
+{
+  height:50px;
+  }
+
+
+
+a 
+{ 
+  /*color:#262;*/
+  font-weight:bolder;
+  color:#000;
+  text-decoration:none;
+  }
+

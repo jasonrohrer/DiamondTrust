@@ -1,10 +1,11 @@
+@import url(common.css);
+
+
 body 
 {
   margin:0;
   background:#222;
   color:#000;
-  //font-size: 62.5%; /* Resets 1em to 10px */
-  //font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
   text-align:center;
   width:700px;
   margin-left:auto;
@@ -12,6 +13,7 @@ body
   margin-top:0.25in;
   margin-bottom:0.25in;
   }
+
 
 div.whitePage
 {  
@@ -21,13 +23,37 @@ div.whitePage
   }
 
 
+div.footer
+{ 
+  color:#AAA;
+  margin-top:0.125in;
+  margin-bottom:0.125in;
+ }
+
+
+/* footer font color not passing into table cells in some browsers */
+div.footer td
+{   
+  color:#AAA;
+  }
+
+
+div.footer a { 
+  color:#BBB;
+ }
+
+
+
+
 div.topbar 
 {
   margin:0.25in;
+  margin-top:0.5in;
   border-top:#444 solid 2px;
   border-bottom:#444 solid 2px;
   padding:10px;
   }
+
 
 td.followLinks 
 {
@@ -46,9 +72,10 @@ td.searchBox
 
 div.contentBody 
 { 
-  margin-top:10px;
+  margin-top:0.5in;
   margin-left:0.5in;
   margin-right:0.5in;
+  margin-bottom:0.5in;
   }
 
 
@@ -57,69 +84,7 @@ div.contentBody
 
 
 
-div.postBlock
-{ 
-  margin-top:20px;
-  }
 
-
-div.postHeadline
-{ 
-  font-size:200%;
-  text-align:left;
-  }
-
-
-
-div.postTextBlock
-{ 
-  text-align:left;
-  border-top:#444 solid 2px;
-  padding-top:2px;
-  }
-
-
-div.storySeparator
-{
-  height:75px;
-  }
-
-
-
-
-
-
-div.commentsHeading
-{ 
-  margin-top:50px;
-  font-size:200%;
-  text-align:left;
-  border-bottom:#444 solid 2px;
-  
- }
-
-
-div.comments
-{ 
-  margin-left:20px;
-  margin-top:20px;
-  }
-
-
-
-div.comments div.postTextBlock
-{ 
-  text-align:left;
-  border-left:#444 solid 2px;
-  padding-left:10px;
-  }
-
-
-
-div.comments div.storySeparator
-{
-  height:50px;
-  }
 
 
 
@@ -160,13 +125,6 @@ img
   }
 
 
-a 
-{ 
-  //color:#262;
-  font-weight:bolder;
-  color:#000;
-  text-decoration:none;
-  }
 
 
 a:hover 

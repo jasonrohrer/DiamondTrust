@@ -55,13 +55,6 @@ seedBlog(
 */
 ?>
 
-<BR>
-
-
-
-
-<BR>
-
 
 
 
@@ -84,13 +77,6 @@ seedBlogRSSButton(
 ?>
 -->
 
-<table width="100%" border=0><tr>
-
-<td align=right>
-[<a href="login.php">login</a>]
-</td>
-</tr>
-</table>
 
 
 <?php include_once( "footer.php" ); ?>
