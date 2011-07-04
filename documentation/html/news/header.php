@@ -28,8 +28,17 @@ div.topbar {
   border-top:#444 solid 1px;
   border-bottom:#444 solid 1px;
   padding:10px;
-  line-height:80px;
     }
+
+td.followLinks {
+  text-align:left;
+  line-height:1.5;
+    }
+td.searchBox {
+  text-align:right;
+    }
+
+
 
 form {
   margin:0;
@@ -39,6 +48,7 @@ form {
 input {
     background:#fff;
   border:#444 solid 1px;
+    font-family: serif;
     }
 
 

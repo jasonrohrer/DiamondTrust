@@ -3,6 +3,8 @@ include_once( "seedBlogs.php" );
 include_once( "header.php" );
 ?>
 
+<div class="content">
+
 [<a href="index.php">news main</a>]<br>
 
 <center>
@@ -12,7 +14,7 @@ include_once( "header.php" );
 
 </center>
 
-
+</div>
 
 <?php
 include( "footer.php" );

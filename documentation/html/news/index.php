@@ -9,17 +9,15 @@ include_once( "header.php" );
 
 <div class="topbar">
 
-<table width="100%" border=0><tr>
-
-<td align=left>
+<table width=100% border=0>
+<tr><td class="followLinks">
 <!-- hard-coded clean RSS link -->
 <a HREF="http://diamondtrustgame.com/rss.xml"><img src='rss.png' width=16 height=16 border=0> RSS Feed</a>
 <br>
 <a HREF="http://twitter.com/diamondtrust77"><img src='twitter.png' width=16 height=16 border=0> @diamondtrust77</a>
 </td>
 
-<td align=right>
-
+<td class="searchBox">
 <?php
 seedBlogs_showSearchBox(
     // 10 characters wide
@@ -27,10 +25,8 @@ seedBlogs_showSearchBox(
     // show the Search button
     true );
 ?>
+</tr></table>
 
-</td>
-</tr>
-</table>
 </div>
 
 
@@ -51,8 +47,8 @@ seedBlog(
     // 1 = order by creation date (newest first)
     // 0 = order by expiration date (oldest first)
     1,
-    // show at most 5 posts
-    5,
+    // show at most 10 posts
+    10,
     // skip none of them (start with first post)
     0,
     // show the archive link
