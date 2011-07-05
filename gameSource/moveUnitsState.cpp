@@ -324,7 +324,7 @@ void MoveUnitsState::clickState( int inX, int inY ) {
              // to a home-region unit
              ( pickingBid || 
                pickingBribe ||
-               getUnitRegion( activeUnit ) != 0 ) ) {
+               getUnitRegion( newActiveUnit ) != 0 ) ) {
         
         
         // instantly switch to moving this unit
