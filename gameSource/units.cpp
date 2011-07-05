@@ -1920,13 +1920,13 @@ char *getUnitPositionString() {
     
     char *headerString = "Units at: ";
     
-    accumVector.push_back( headerString, strlen( headerString ) );
+    accumVector.push_back( headerString, (int)strlen( headerString ) );
     
 
     for( int i=0; i<numUnits; i++ ) {
         int region = getUnitRegion( i );
         
-        char regionDigit = '0' + region;
+        char regionDigit = (char)( '0' + region );
         
         accumVector.push_back( regionDigit );
         accumVector.push_back( ',' );
