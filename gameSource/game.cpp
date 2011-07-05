@@ -54,7 +54,7 @@ static void scrollCreditSheetUp();
 
 // show extra info about song that's playing, along with a "next act" button,
 // on the title screen, for debugging and testing
-char allowManualSongActSwitching = true;
+char allowManualSongActSwitching = false;
 
 
 
