@@ -8,6 +8,7 @@
 
 <link rel="stylesheet" href="print.css" type="text/css" media="print">
 
+<LINK REL="shortcut icon" HREF="../favicon.ico">
 
 </head>
 
