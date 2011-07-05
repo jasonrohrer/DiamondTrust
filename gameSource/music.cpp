@@ -808,6 +808,24 @@ void nextSongAct() {
 
 
 
+void backToFirstSongAct() {
+    lockAudio();
+    currentSongAct = 0;
+    
+    if( numSongActs > 1 ) {
+        currentSongAct = 1;
+        }
+    
+    if( lastStateString != NULL ) {
+        // redo music state to ensure a new mix after act changes
+        setMusicState( lastStateString );
+        }
+
+    unlockAudio();
+    }
+
+
+
 int getSongAct() {    
     int returnValue;
     

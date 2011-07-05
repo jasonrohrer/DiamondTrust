@@ -25,6 +25,8 @@ char *getLastMusicState();
 // move on to the next act in the song
 void nextSongAct();
 
+void backToFirstSongAct();
+
 
 int getSongAct();
 

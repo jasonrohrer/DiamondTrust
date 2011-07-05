@@ -6,6 +6,8 @@ class GameState {
 
         GameState() {
             mStateName = "GameState";
+            mStateNumber = sNextStateNumber;
+            sNextStateNumber++;
             }
         
         
@@ -78,7 +80,15 @@ class GameState {
 
         // name of state for messages
         const char *mStateName;
-        
+
+
+        // a unique number assigned to each instance
+        // (so that each singleton state has a unique number)
+        int mStateNumber;
+       
+
+    private:
+        static int sNextStateNumber;
         
     };
 

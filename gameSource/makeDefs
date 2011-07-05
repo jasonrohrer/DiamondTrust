@@ -11,6 +11,7 @@ sprite.cpp \
 common.cpp \
 DataFifo.cpp \
 TranslationManager.cpp \
+GameState.cpp \
 pickGameTypeState.cpp \
 setAILevelState.cpp \
 connectState.cpp \

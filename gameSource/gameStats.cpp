@@ -6,6 +6,7 @@
 #include "units.h"
 #include "map.h"
 #include "tga.h"
+#include "music.h"
 
 #include "minorGems/util/stringUtils.h"
 
@@ -48,6 +49,15 @@ void decrementMonthsLeft() {
     if( monthsLeft < 0 ) {
         monthsLeft = 0;
         }
+
+    switch( monthsLeft ) {
+        case 5:
+            nextSongAct();
+            break;
+        case 2:
+            nextSongAct();
+            break;
+        };
     }
 
 
@@ -283,6 +293,8 @@ void resetStats() {
     setMonthsLeft( 8 );
     // for testing
     //setMonthsLeft( 0 );
+
+    backToFirstSongAct();
     }
 
 

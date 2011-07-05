@@ -179,3 +179,9 @@ char isAnyUnitDepositingDiamonds();
 
 
 char isAnyConfiscationNeeded();
+
+
+
+
+
+char *getUnitPositionString();

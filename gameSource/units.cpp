@@ -10,8 +10,11 @@
 
 #include "loading.h"
 
+#include "music.h"
+
 
 #include "minorGems/util/stringUtils.h"
+#include "minorGems/util/SimpleVector.h"
 
 #include <assert.h>
 
@@ -1910,4 +1913,25 @@ char isAnyConfiscationNeeded() {
     }
 
 
+
+
+char *getUnitPositionString() {
+    SimpleVector<char> accumVector;
+    
+    char *headerString = "Units at: ";
+    
+    accumVector.push_back( headerString, strlen( headerString ) );
+    
+
+    for( int i=0; i<numUnits; i++ ) {
+        int region = getUnitRegion( i );
+        
+        char regionDigit = '0' + region;
+        
+        accumVector.push_back( regionDigit );
+        accumVector.push_back( ',' );
+        }
+    
+    return accumVector.getElementString();
+    }
 

@@ -54,7 +54,7 @@ static void scrollCreditSheetUp();
 
 // show extra info about song that's playing, along with a "next act" button,
 // on the title screen, for debugging and testing
-char allowManualSongActSwitching = false;
+char allowManualSongActSwitching = true;
 
 
 
@@ -178,6 +178,20 @@ Button *wifiButton;
 Button *backButton;
 
 Button *playAgainButton;
+
+
+
+static void setMusicBasedOnGameState() {
+    char *posString = getUnitPositionString();
+    
+    char *stateString = autoSprintf( "State%d, %s",
+                                     currentGameState->mStateNumber,
+                                     posString );
+    setMusicState( stateString );
+    
+    delete [] posString;
+    delete [] stateString;    
+    }
 
 
 
@@ -581,7 +595,7 @@ void gameInit() {
 
 
     initMusic();
-    
+
 
     
     if( ! isAutoconnecting() ) {
@@ -594,6 +608,11 @@ void gameInit() {
         // we skip the pickGameTypeState, so set this here
         networkOpponent = true;
         }
+
+
+    // each game starts with inspector in a different spot
+    setMusicBasedOnGameState();    
+
     
     //currentGameState = connectState;
     //currentGameState = sellDiamondsState;
@@ -777,6 +796,8 @@ static void resetToPlayAgain() {
     
     // leave inspector alone
 
+    setMusicBasedOnGameState();    
+
     resetAI();
     }
 
@@ -870,6 +891,8 @@ static void goToNextGameState() {
         }
 
                 
+    setMusicBasedOnGameState();
+
     currentGameState->enterStateCall();
     }
 
@@ -893,7 +916,9 @@ static void goToPreviousGameState() {
         resetToPlayAgain();
         currentGameState = pickGameTypeState;
         }
-                
+              
+    setMusicBasedOnGameState();
+  
     currentGameState->enterStateCall();
     }
 
