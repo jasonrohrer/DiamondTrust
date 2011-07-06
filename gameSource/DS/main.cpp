@@ -3343,6 +3343,9 @@ static char skippingLogo() {
     
 
 
+    // sound mutex is needed even if sound isn't running.
+    OS_InitMutex( &soundMutex );
+
 
 
     
@@ -3360,8 +3363,6 @@ static char skippingLogo() {
         
         // start sound processes
         printOut( "Starting sound process\n" );
-
-        OS_InitMutex( &soundMutex );
 
 
         OS_CreateThread( &soundThread, soundThreadProcess, NULL, 
