@@ -626,6 +626,10 @@ void gameInit() {
     currentGameState->enterStateCall();
 
     stillLoading = false;
+
+    // discard any touch that is lingering from activity during load screen
+    int tx, ty;
+    getTouch( &tx, &ty );
     }
 
 
