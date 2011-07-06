@@ -686,8 +686,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             unsigned int netMS = getSystemMilliseconds() - startMS;
         
             if( netMS > 5 ) {
-                printOut( "Reading from wav file for channel %d took %dms\n",
-                          inChannelNumber, netMS );
+                //printOut( "Reading from wav file for channel %d took %dms\n",
+                //          inChannelNumber, netMS );
                 }
 
 
