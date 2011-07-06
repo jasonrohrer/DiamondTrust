@@ -112,6 +112,12 @@ int greenBarLeftMargin = 18;
 
 
 int satPhoneSpriteID = -1;
+int satPhoneLightSpriteID = -1;
+
+static int satPhoneLightOnIndex = 0;
+static int satPhoneLightFrameCount = 0;
+static int satPhoneLightMoveDirection = 1;
+
 
 int signalSpriteID[4];
 
@@ -332,6 +338,7 @@ void gameInit() {
     
     printOut( "Loading sat phone and signal meter\n" );
     satPhoneSpriteID = loadSprite( "satPhone.tga", true );
+    satPhoneLightSpriteID = loadSprite( "satPhoneLight.tga", true );
 
     for( int i=0; i<4; i++ ) {
         char *fileName = autoSprintf( "signal%d.tga", i );
@@ -1092,6 +1099,38 @@ void gameLoopTick() {
         
         
         }
+
+    
+    if( isWaitingOnOpponent && networkOpponent ) {
+        satPhoneLightFrameCount ++;
+        
+        // switch lights every 1/3 second
+        // chasing lights effect
+
+        if( satPhoneLightFrameCount > 10 ) {
+            satPhoneLightOnIndex += satPhoneLightMoveDirection;
+            
+            if( satPhoneLightOnIndex > 4 ) {
+                // switch dir
+                satPhoneLightOnIndex = 3;
+                satPhoneLightMoveDirection *= -1;
+                }
+            else if( satPhoneLightOnIndex < 0 ) {
+                // switch dir
+                satPhoneLightOnIndex = 1;
+                satPhoneLightMoveDirection *= -1;
+                }
+            
+            satPhoneLightFrameCount = 0;
+            }    
+        }
+    else {
+        // reset back to first light for next time
+        satPhoneLightOnIndex = 0;
+        satPhoneLightFrameCount = 0;
+        satPhoneLightMoveDirection = 1;
+        }
+
     }
 
 
@@ -1289,18 +1328,21 @@ void drawTopScreen() {
                 isAIProgressShowing = false;
                 }
             }
+        
         }
+        
 
 
 
     if( satPhoneSpriteID != -1 ) {
         int sigStrength = getSignalStrength();
         
+        int phoneX = 224;
+        int phoneY = 105;
+
         if( sigStrength >= 0 && sigStrength <= 3 ) {
             
-            int phoneX = 224;
-            int phoneY = 105;
-
+            
             startNewSpriteLayer();
 
             drawSprite( satPhoneSpriteID, 
@@ -1308,6 +1350,17 @@ void drawTopScreen() {
             
             drawSprite( signalSpriteID[ sigStrength ], 
                         phoneX + 8, phoneY + 6, white );
+            }
+
+        
+        if ( isWaitingOnOpponent && networkOpponent ) {
+            // travelling light on of sat phone
+            startNewSpriteLayer();
+            
+            drawSprite( satPhoneLightSpriteID, 
+                        phoneX + 6 + 3 * satPhoneLightOnIndex, 
+                        phoneY + 21, 
+                        satPhoneLightColor );
             }
         }
     

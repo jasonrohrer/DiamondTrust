@@ -26,3 +26,6 @@ extern rgbaColor diamondPurple;
 
 
 extern rgbaColor buttonInkColor;
+
+
+extern rgbaColor satPhoneLightColor;

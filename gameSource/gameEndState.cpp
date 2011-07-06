@@ -32,6 +32,9 @@ extern int satelliteBottomHalfOffset;
 extern unsigned char satelliteFade;
 
 
+extern char isWaitingOnOpponent;
+
+
 
 // tells connected child whether we are playing again or not
 static void sendNextGameFlag( char inPlayAgain ) {
@@ -120,6 +123,7 @@ void GameEndState::clickState( int inX, int inY ) {
             // is clear
             if( !isHost ) {
                 statusSubMessage = translate( "phaseSubStatus_playAgainWait" );
+                isWaitingOnOpponent = true;
                 }
             }
         }
@@ -167,6 +171,7 @@ void GameEndState::stepState() {
             
             // connection broken
             // not playing again
+            isWaitingOnOpponent = false;
             
             playingAgain = false;
             
@@ -180,7 +185,9 @@ void GameEndState::stepState() {
         unsigned char *message = getMessage( &messageLength );
                 
         if( message != NULL ) {
-                
+
+            isWaitingOnOpponent = false;
+
             if( messageLength != 1 ) {
                 printOut( "Bad message length from opponent\n" );
                 playingAgain = false;

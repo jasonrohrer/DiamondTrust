@@ -34,3 +34,6 @@ rgbaColor diamondPurple = {0, 0, 0, 255 };
 
 
 rgbaColor buttonInkColor = { 64, 64, 64, 255 };
+
+
+rgbaColor satPhoneLightColor = { 0, 255, 0, 255 };
