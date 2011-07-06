@@ -860,7 +860,7 @@ static void goToNextGameState() {
         postMoveUnitsTransition();
         }
     else if( currentGameState == flyHomeState ) {
-        currentGameState = depositDiamondsState;
+        postMoveUnitsTransition();
         }
     else if( currentGameState == depositDiamondsState ) {
         postDepositeTransition();
