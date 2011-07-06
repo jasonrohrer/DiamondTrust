@@ -791,6 +791,10 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
 
 void nextSongAct() {    
+    if( isThisAClone() ) {
+        return;
+        }
+
     lockAudio();
     if( currentSongAct < numSongActs - 1 ) {
         currentSongAct ++;
@@ -809,6 +813,10 @@ void nextSongAct() {
 
 
 void backToFirstSongAct() {
+    if( isThisAClone() ) {
+        return;
+        }
+
     lockAudio();
     currentSongAct = 0;
     
@@ -827,6 +835,11 @@ void backToFirstSongAct() {
 
 
 int getSongAct() {    
+    if( isThisAClone() ) {
+        return 0;
+        }
+
+
     int returnValue;
     
     lockAudio();
@@ -873,6 +886,12 @@ char **getTrackInfoStrings( int *outNumTracks ) {
 
 
 void setMusicState( const char *inStateString ) {
+
+    if( isThisAClone() ) {
+        return;
+        }
+    
+
     // convert to int hash so we can use it to seed a deterministic
     // random process
 
