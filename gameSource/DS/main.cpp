@@ -3289,7 +3289,9 @@ static char skippingLogo() {
 
 
 
-    if( !isThisAClone() ) {
+    // can't call isCloneChild yet because it hasn't been inited yet
+    // (inited during gameInit, below)
+    if( ! MB_IsMultiBootChild() ) {
         // display Licensed By Nintendo logo, as required
         
         nintendoLogoSpriteID = loadSprite( "nintendoLogo.tga", false );
