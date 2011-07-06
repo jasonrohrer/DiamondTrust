@@ -3273,10 +3273,13 @@ static char skippingLogo() {
     TPCalibrateParam tpCalibrate;
 
     if( !TP_GetUserInfo( &tpCalibrate ) ) {
-        OS_Panic( "Failed to read touch panel calibration\n" );
+        // don't panic here.
+        // possible to go on with uncalibrated values
+        printOut( "Failed to read touch panel calibration\n" );
         }
-
-    TP_SetCalibrateParam( &tpCalibrate );
+    else {
+        TP_SetCalibrateParam( &tpCalibrate );
+        }
     
     TP_SetCallback( autoTouchCallback );
 
