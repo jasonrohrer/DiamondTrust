@@ -1424,15 +1424,17 @@ void drawTopScreen() {
         }
 
     if( allowManualSongActSwitching ) {
-        const char *stateString = getLastMusicState();
+        char *stateString = getLastMusicState();
         
         if( stateString == NULL ) {
-            stateString = "";
+            stateString = stringDuplicate( "" );
             }
         
         char *actString = autoSprintf( "Act: %d    Seed string: '%s' ", 
                                        getSongAct(), stateString );
+        delete [] stateString;
         
+
         font8->drawString( actString, 5, 35, white, alignLeft );
 
         delete [] actString;

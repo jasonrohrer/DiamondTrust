@@ -16,7 +16,7 @@ void freeMusic();
 void setMusicState( const char *inStateString );
 
 
-// NOT destroyed by caller
+// destroyed by caller
 // can be NULL
 char *getLastMusicState();
 

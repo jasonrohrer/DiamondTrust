@@ -550,6 +550,9 @@ static void unloadSong() {
 
 
 
+// non-thread-safe version
+// internal use only
+static void setMusicStateInternal( const char *inStateString );
 
 
 
@@ -585,7 +588,7 @@ void initMusic() {
 
     loadSong();
 
-    setMusicState( "START STATE" );
+    setMusicStateInternal( "START STATE" );
 
     }
 
@@ -782,7 +785,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
             if( lastStateString != NULL ) {
                 // redo music state to ensure it's consistent with new song
-                setMusicState( lastStateString );
+                setMusicStateInternal( lastStateString );
                 }
 
             songSwitchPending = false;
@@ -998,7 +1001,7 @@ void nextSongAct() {
 
     if( lastStateString != NULL ) {
         // redo music state to ensure a new mix after act changes
-        setMusicState( lastStateString );
+        setMusicStateInternal( lastStateString );
         }
     
     
@@ -1022,7 +1025,7 @@ void backToFirstSongAct() {
     
     if( lastStateString != NULL ) {
         // redo music state to ensure a new mix after act changes
-        setMusicState( lastStateString );
+        setMusicStateInternal( lastStateString );
         }
 
     unlockAudio();
@@ -1125,6 +1128,8 @@ void switchSongs() {
 
 
 char **getTrackInfoStrings( int *outNumTracks ) {
+    lockAudio();
+    
     char **strings = new char*[MAX_SOUND_CHANNELS];
     
     for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
@@ -1148,7 +1153,9 @@ char **getTrackInfoStrings( int *outNumTracks ) {
         }
     
     *outNumTracks = MAX_SOUND_CHANNELS;
-
+    
+    unlockAudio();
+    
     return strings;
     }
 
@@ -1162,6 +1169,17 @@ void setMusicState( const char *inStateString ) {
     if( isThisAClone() ) {
         return;
         }
+    
+    lockAudio();
+    
+    setMusicStateInternal( inStateString );
+    
+    unlockAudio();
+    }
+
+
+
+void setMusicStateInternal( const char *inStateString ) {
     
 
     // convert to int hash so we can use it to seed a deterministic
@@ -1241,7 +1259,18 @@ void setMusicState( const char *inStateString ) {
 
 
 char *getLastMusicState() {
-    return lastStateString;
+    
+    char *returnValue = NULL;
+    
+    lockAudio();
+    
+    if( lastStateString != NULL ) {    
+        returnValue = stringDuplicate( lastStateString );
+        }
+    
+    unlockAudio();
+    
+    return returnValue;
     }
 
 
