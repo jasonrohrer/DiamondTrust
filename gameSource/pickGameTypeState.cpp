@@ -22,6 +22,7 @@ extern unsigned char titleFade;
 
 extern Button *nextSongActButton;
 extern Button *songRerollButton;
+extern Button *switchSongButton;
 
 extern char allowManualSongActSwitching;
 
@@ -117,6 +118,9 @@ void PickGameTypeState::clickState( int inX, int inY ) {
                 
                 setMusicState( newState );
                 }
+            else if( switchSongButton->getPressed( inX, inY ) ) {
+                switchSongs();
+                }
             }
         }
     }
@@ -188,6 +192,7 @@ void PickGameTypeState::drawState() {
         if( allowManualSongActSwitching ) {
             nextSongActButton->draw();
             songRerollButton->draw();
+            switchSongButton->draw();
             }
         }
     

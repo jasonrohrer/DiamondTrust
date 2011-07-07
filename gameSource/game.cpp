@@ -54,7 +54,7 @@ static void scrollCreditSheetUp();
 
 // show extra info about song that's playing, along with a "next act" button,
 // on the title screen, for debugging and testing
-char allowManualSongActSwitching = false;
+char allowManualSongActSwitching = true;
 
 
 
@@ -176,6 +176,7 @@ Button *helpButton;
 // for testing
 Button *nextSongActButton;
 Button *songRerollButton;
+Button *switchSongButton;
 
 
 Button *aiButton;
@@ -557,6 +558,9 @@ void gameInit() {
     songRerollButton = new Button( font16, translate( "button_songReroll" ),
                                     128, 87 );
 
+    switchSongButton = new Button( font16, translate( "button_switchSongs" ),
+                                   218, 87 );
+
 
 
 
@@ -646,6 +650,7 @@ void gameFree() {
     
     delete nextSongActButton;
     delete songRerollButton;
+    delete switchSongButton;
     
     delete aiButton;
     delete wifiButton;

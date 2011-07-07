@@ -15,6 +15,10 @@ int currentSongPick = -1;
 char *currentSongDirName = NULL;
 
 
+char songSwitchPending = false;
+
+
+
 int numSongActs;
 char **songActDirNames = NULL;
 
@@ -39,7 +43,7 @@ char ****songActPartFileBanks = NULL;
 //  to accomodate this file index.  If so, it should wrap around.
 //
 // -1 for a silent track
-int *musicState = NULL;
+int musicState[MAX_SOUND_CHANNELS];
 
 char *lastStateString = NULL;
 
@@ -237,6 +241,11 @@ static char **getAllFilesForActAndPart( int inAct, int inPart,
 // picks a song at random
 // tries to avoid last song as set in currentSongPick
 static void loadSong() {
+
+    // each song may have a different master grid step length
+    gridStepLength = 0;
+    
+
     // pick a song at random
 
     int numSongs;
@@ -246,8 +255,19 @@ static void loadSong() {
     if( numSongs > 0 ) {
         sortStrings( &songList, numSongs );
         
-        currentSongPick = (int)getRandom( (unsigned int)numSongs );
+        int lastSongPick = currentSongPick;
 
+        currentSongPick = (int)getRandom( (unsigned int)numSongs );
+        
+        if( numSongs > 1 ) {
+            // avoid playing the same song again, if possible
+            while( currentSongPick == lastSongPick ) {
+                
+                currentSongPick = (int)getRandom( (unsigned int)numSongs );
+                }
+            }
+        
+                
         currentSongDirName = stringDuplicate( songList[ currentSongPick ] );
 
         
@@ -355,6 +375,20 @@ static void loadSong() {
 
                             
                             wavBank.push_back( stream );
+                            
+
+                            if( stream.info.numSamples > gridStepLength ) {
+                                // an even longer loop encountered
+                                // use this as our grid step
+            
+                                gridStepLength = stream.info.numSamples;
+                                printOut( 
+                                    "New longer grid step discovered:  "
+                                    "%d (%d sec)\n", 
+                                    gridStepLength,
+                                    gridStepLength / 22050 );
+                                }
+                            
                             }
                         }
                     
@@ -423,9 +457,6 @@ static void loadSong() {
             }
 
 
-        // set up an intial music state
-        musicState = new int[ numSongParts];
-        setMusicState( "START STATE" );
 
 
 
@@ -498,13 +529,6 @@ static void unloadSong() {
     songActFilesPerPart = NULL;
     songActPartFileBanks = NULL;
 
-    delete [] musicState;
-    musicState = NULL;
-
-    if( lastStateString != NULL ) {
-        delete [] lastStateString;
-        lastStateString = NULL;
-        }
 
     }
 
@@ -535,6 +559,8 @@ void initMusic() {
         
         s->filePlaying = false;
         s->totalNumSamplesPlayed = 0;
+
+        musicState[i] = -1;
         }
 
 
@@ -545,6 +571,8 @@ void initMusic() {
         }
 
     loadSong();
+
+    setMusicState( "START STATE" );
 
     }
 
@@ -564,6 +592,11 @@ void freeMusic() {
         unloadSong();
         }
 
+
+    if( lastStateString != NULL ) {
+        delete [] lastStateString;
+        lastStateString = NULL;
+        }
     }
 
 
@@ -602,17 +635,6 @@ static void addTrack( int inChannelNumber, int inDelay ) {
         
         printOut( "Adding loop %s on channel %d with delay %d\n", 
                   s->wavBankStream->wavFileName, partPick, inDelay );
-        
-                            
-        if( s->wavBankStream->info.numSamples > gridStepLength ) {
-            // an even longer loop encountered
-            // use this as our grid step
-            
-            gridStepLength = s->wavBankStream->info.numSamples;
-            printOut( "New longer grid step discovered:  %d\n", 
-                      gridStepLength );
-            }
-
         }
     else {
         printOut( "Part %s not found in song act %s (or in base act)\n",
@@ -630,6 +652,80 @@ static void addTrack( int inChannelNumber, int inDelay ) {
 
 void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer, 
                                 int inNumSamples ) {
+
+    // don't switch songs part-way through getting samples from channels
+    if( songSwitchPending && inChannelNumber == 0 ) {
+        char allStopped = true;
+        
+        for( int p=0; p<numSongParts; p++ ) {
+            if( songStreams[p].filePlaying ) {
+                allStopped = false;
+                break;
+                }
+            }
+        /*
+        char allAtSamePosition = true;
+        
+        if( numSongParts > 0 ) {
+            unsigned int targetTotal = songStreams[0].totalNumSamplesPlayed;
+            
+            for( int p=0; p<numSongParts; p++ ) {
+                if( songStreams[p].totalNumSamplesPlayed != targetTotal ) {
+                    allAtSamePosition = false;
+                    break;
+                    }
+                }
+            }
+        */
+
+            
+        
+        if( allStopped ) {
+            
+            // okay to switch songs
+            printOut( "Song switch requested, and all tracks off and "
+                      "at same position\n" );
+            
+            printOut( "Last song had %d acts\n", numSongActs );
+
+            unloadSong();
+            
+            loadSong();
+            
+
+            // ensure a fixed amount of silence between songs (2 seconds)
+            
+            unsigned int sampleDelay = 22050 * 2;
+
+            // reset totalNumSamplesPlayed for each track to set this up
+            // position them each 2 seconds before next grid step
+            for( int p=0; p<MAX_SOUND_CHANNELS; p++ ) {
+                songStreams[p].totalNumSamplesPlayed = 
+                    gridStepLength - sampleDelay;
+                }
+
+
+            // watch for act overflow on song switch
+            while( currentSongAct >= numSongActs ) {
+                currentSongAct --;
+                }
+            
+            printOut( "New song has %d acts\n", numSongActs );
+
+
+            if( lastStateString != NULL ) {
+                // redo music state to ensure it's consistent with new song
+                setMusicState( lastStateString );
+                }
+
+            songSwitchPending = false;
+            }
+        }
+
+    
+
+
+
 
     int numSamplesRequested = inNumSamples;
 
@@ -657,7 +753,9 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 }
             
             // consider adding a new track
-            if( musicState[inChannelNumber] != -1 ) {
+            if( !songSwitchPending && 
+                musicState[inChannelNumber] != -1 ) {
+                
                 addTrack( inChannelNumber, delay );                
                 }
             }
@@ -758,7 +856,9 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                     s->wavBankStream = NULL;
 
                     // consider dropping out
-                    if( musicState[inChannelNumber] == -1 ) {
+                    if( songSwitchPending || 
+                        musicState[inChannelNumber] == -1 ) {
+                        
                         printOut( "Track %d dropping out\n", inChannelNumber );
                         
                         s->filePlaying = false;
@@ -873,6 +973,22 @@ int getSongAct() {
     unlockAudio();
     
     return returnValue;
+    }
+
+
+
+
+
+void switchSongs() {    
+    if( isThisAClone() ) {
+        return;
+        }
+
+    lockAudio();
+
+    songSwitchPending = true;
+
+    unlockAudio();
     }
 
 

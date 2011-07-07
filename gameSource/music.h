@@ -31,5 +31,9 @@ void backToFirstSongAct();
 int getSongAct();
 
 
+void switchSongs();
+
+
+
 // resulting array destroyed by caller
 char **getTrackInfoStrings( int *outNumTracks );
