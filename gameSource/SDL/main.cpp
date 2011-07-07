@@ -923,13 +923,19 @@ char **listDirectory( const char *inFileName, int *outNumEntries ) {
         File *childFile = childFiles[i];
     
         char *childName = childFile->getFileName();
-        
-        char *childFullName =
-            autoSprintf( "%s/%s", inFileName, childName );
+
+        // completely ignore "hidden" files
+        // this avoids trouble caused by .DS_Store files created on Macs
+        if( strlen( childName ) > 0 && childName[0] != '.' ) {
+            
+            char *childFullName =
+                autoSprintf( "%s/%s", inFileName, childName );
+
+            childNames.push_back( childFullName );
+            }
         
         delete [] childName;
 
-        childNames.push_back( childFullName );
 
         delete childFile;
         }

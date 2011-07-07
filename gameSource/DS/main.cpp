@@ -232,9 +232,14 @@ char **listDirectory( const char *inFileName, int *outNumEntries ) {
         
         while( FS_ReadDir( &file, &dirEntry ) ) {
             
-            char *name = autoSprintf( "%s/%s", inFileName, dirEntry.name );
+            // completely ignore "hidden" files
+            // this avoids trouble caused by .DS_Store files created on Macs
+            if( strlen( dirEntry.name ) > 0 && dirEntry.name[0] != '.' ) {    
+                char *name = autoSprintf( "%s/%s", inFileName, dirEntry.name );
             
-            dirFileNames.push_back( name );
+                dirFileNames.push_back( name );
+                }
+            
             }
 
         FS_CloseDirectory( &file );
