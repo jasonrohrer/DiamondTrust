@@ -21,6 +21,10 @@ unsigned int currentSongTargetLength = 0;
 char songSwitchPending = false;
 
 
+static int songEndFadeTime = 22050 * 5;
+
+
+
 
 int numSongActs;
 char **songActDirNames = NULL;
@@ -658,11 +662,47 @@ static void addTrack( int inChannelNumber, int inDelay ) {
 
 
 
+
 void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer, 
                                 int inNumSamples ) {
 
+
+    channelStream *s = &( songStreams[inChannelNumber] );
+
+    int samplesLeftInGridStep = 
+        gridStepLength - s->totalNumSamplesPlayed % gridStepLength;
+    
+
+    if( inChannelNumber == 0 ) {
+        
+        if( s->totalNumSamplesPlayed > currentSongTargetLength ) {
+            // time to auto-switch
+
+            // but not if there's not enough time left in grid step
+            // for a nice fade-out
+            if( samplesLeftInGridStep > songEndFadeTime ) {
+                songSwitchPending = true;
+                }
+            // if not, we have to wait until next grid step before initiating
+            // a song switch
+            }
+        }
+    
+
+
+
+
     // don't switch songs part-way through getting samples from channels
     if( songSwitchPending && inChannelNumber == 0 ) {
+
+
+        
+        
+
+
+
+
+        // don't actually switch until they're all stopped
         char allStopped = true;
         
         for( int p=0; p<numSongParts; p++ ) {
@@ -671,6 +711,29 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 break;
                 }
             }
+
+
+
+        
+        // consider fading-out master volume gradually
+        if( samplesLeftInGridStep < songEndFadeTime || allStopped ) {
+
+            int volume = ( 127 * samplesLeftInGridStep ) / songEndFadeTime;
+            
+            if( allStopped ) {
+                // watch for wrap-around to next grid step
+                // which would cause volume to jump back up
+                volume = 0;
+                }
+            
+
+            for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
+                setSoundChannelVolume( c, volume );
+                }
+            }
+        
+
+
         /*
         char allAtSamePosition = true;
         
@@ -721,6 +784,13 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 }
 
             songSwitchPending = false;
+
+
+            // jump immediately back to full volume for start of next
+            // song
+            for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
+                setSoundChannelVolume( c, 127 );
+                }
             }
         }
 
@@ -732,7 +802,6 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
     int numSamplesRequested = inNumSamples;
 
 
-    channelStream *s = &( songStreams[inChannelNumber] );
 
 
     if( ! s->filePlaying && inChannelNumber < numSongParts ) {
@@ -907,14 +976,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
     s->totalNumSamplesPlayed += numSamplesRequested;
     
-    if( inChannelNumber == 0 ) {
-
-        if( s->totalNumSamplesPlayed > currentSongTargetLength ) {
-            // time to auto-switch
-            songSwitchPending = true;
-            }
-        }
-    
+     
     return;
 
     }
@@ -993,14 +1055,13 @@ int getSongTimeLeft() {
     lockAudio();
     
     if( numSongParts > 0 ) {
-        if( songSwitchPending ) {
+
+        returnValue = 
+            currentSongTargetLength - songStreams[0].totalNumSamplesPlayed;
+
+        if( songSwitchPending || returnValue < 0 ) {
             // show 0 to indicate that song is waiting to switch
             returnValue = 0;
-            }
-        else {
-            
-            returnValue = 
-                currentSongTargetLength - songStreams[0].totalNumSamplesPlayed;
             }
         }
     unlockAudio();
