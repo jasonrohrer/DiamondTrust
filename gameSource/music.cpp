@@ -10,6 +10,8 @@
 
 
 
+int currentSongPick = -1;
+
 char *currentSongDirName = NULL;
 
 
@@ -232,37 +234,9 @@ static char **getAllFilesForActAndPart( int inAct, int inPart,
 
 
 
-
-
-
-
-
-
-void initMusic() {
-
-    
-    
-
-    // all channels start not playing
-    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
-        
-        channelStream *s = &( songStreams[i] );
-
-        s->wavBankStream = NULL;
-        
-        s->filePlaying = false;
-        s->totalNumSamplesPlayed = 0;
-        }
-
-
-    // no music on clones
-    // but at least init all channels to not playing above
-    if( isThisAClone() ) {
-        return;
-        }
-
-
-
+// picks a song at random
+// tries to avoid last song as set in currentSongPick
+static void loadSong() {
     // pick a song at random
 
     int numSongs;
@@ -272,9 +246,9 @@ void initMusic() {
     if( numSongs > 0 ) {
         sortStrings( &songList, numSongs );
         
-        int songPick = (int)getRandom( (unsigned int)numSongs );
+        currentSongPick = (int)getRandom( (unsigned int)numSongs );
 
-        currentSongDirName = stringDuplicate( songList[ songPick ] );
+        currentSongDirName = stringDuplicate( songList[ currentSongPick ] );
 
         
         
@@ -458,6 +432,8 @@ void initMusic() {
         }
     else {
         printOut( "ERROR:  no songs present!\n" );
+
+        currentSongPick = -1;
         }
 
     deleteArrayOfStrings( &songList, numSongs );
@@ -465,16 +441,8 @@ void initMusic() {
 
 
 
-
-
-
-void freeMusic() {
-
-    // no music on clones
-    if( isThisAClone() ) {
-        return;
-        }
-
+// stops song and frees resources
+static void unloadSong() {
 
     if( currentSongDirName != NULL ) {
         delete [] currentSongDirName;
@@ -536,6 +504,64 @@ void freeMusic() {
     if( lastStateString != NULL ) {
         delete [] lastStateString;
         lastStateString = NULL;
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void initMusic() {
+
+    
+    
+
+    // all channels start not playing
+    for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
+        
+        channelStream *s = &( songStreams[i] );
+
+        s->wavBankStream = NULL;
+        
+        s->filePlaying = false;
+        s->totalNumSamplesPlayed = 0;
+        }
+
+
+    // no music on clones
+    // but at least init all channels to not playing above
+    if( isThisAClone() ) {
+        return;
+        }
+
+    loadSong();
+
+    }
+
+
+
+
+
+
+void freeMusic() {
+
+    // no music on clones
+    if( isThisAClone() ) {
+        return;
+        }
+
+    if( currentSongPick != -1 ) {
+        unloadSong();
         }
 
     }
