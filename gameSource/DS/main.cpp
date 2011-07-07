@@ -3563,7 +3563,11 @@ void setSoundChannelVolume( int inChannelNumber, int inVolume ) {
         inVolume,
         SND_CHANNEL_DATASHIFT_NONE );
 
-    SND_FlushCommand( SND_COMMAND_NOBLOCK );
+    BOOL result = SND_FlushCommand( SND_COMMAND_NOBLOCK );
+
+    if( ! result ) {
+        printOut( "SND_FlushCommand failed when trying to set volume\n" );
+        }
     }
 
 

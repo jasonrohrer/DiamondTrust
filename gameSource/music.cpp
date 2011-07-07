@@ -294,7 +294,7 @@ static void loadSong() {
                 }
             }
         else if( numSongActs > 0 && 
-                 currentSongAct > numSongActs ) {
+                 currentSongAct >= numSongActs ) {
             // watch for act overflow on song change
             currentSongAct = numSongActs - 1;
             }
@@ -489,6 +489,7 @@ static void unloadSong() {
 
     if( currentSongDirName != NULL ) {
         delete [] currentSongDirName;
+        currentSongDirName = NULL;
         }
     
     if( songActDirNames != NULL ) {
