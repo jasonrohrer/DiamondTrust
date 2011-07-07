@@ -2062,7 +2062,14 @@ static void wmStartScanCallback( void *inArg ) {
         }
     else {
         if( callbackArg->state == WM_STATECODE_PARENT_FOUND ) {
-            if( callbackArg->gameInfo.ggid == LOCAL_GGID ) {
+            if( callbackArg->gameInfo.ggid == LOCAL_GGID 
+                &&
+                // parent allowing entry
+                ( callbackArg->gameInfo.attribute | WM_ATTR_FLAG_ENTRY ) == 1
+                &&
+                // parent NOT a multiboot parent
+                // we don't want to connect to one of these by accident here
+                ( callbackArg->gameInfo.attribute & WM_ATTR_FLAG_MB ) == 0 ) {
  
                 // use the first parent that we find (ignore rest)
                 
