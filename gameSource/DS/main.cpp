@@ -408,8 +408,8 @@ int nextTextureInfoIndex = 0;
 unsigned int nextTextureSlotAddress = 0x0000;
 unsigned int nextTexturePaletteAddress = 0x0000;
 
-int numTextureBytesAdded = 0;
-int numTexturePaletteBytesAdded = 0;
+unsigned int numTextureBytesAdded = 0;
+unsigned int numTexturePaletteBytesAdded = 0;
 
 
 typedef struct textureSet {

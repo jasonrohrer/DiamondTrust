@@ -581,7 +581,7 @@ void setEnemyMove( unsigned char *inEnemyMove, unsigned int inEnemyLength ) {
         // skip this message
         // do nothing with it
 
-        externalEnemyMoveCharsToSkip -= inEnemyLength;
+        externalEnemyMoveCharsToSkip -= (int)inEnemyLength;
         
         if( externalEnemyMoveCharsToSkip < 0 ) {
             printOut( 

@@ -21,7 +21,7 @@ unsigned int currentSongTargetLength = 0;
 char songSwitchPending = false;
 
 
-static int songEndFadeTime = 22050 * 5;
+static unsigned int songEndFadeTime = 22050 * 5;
 
 
 
@@ -669,7 +669,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
     channelStream *s = &( songStreams[inChannelNumber] );
 
-    int samplesLeftInGridStep = 
+    unsigned int samplesLeftInGridStep = 
         gridStepLength - s->totalNumSamplesPlayed % gridStepLength;
     
 
@@ -718,7 +718,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
         // consider fading-out master volume gradually
         if( samplesLeftInGridStep < songEndFadeTime || allStopped ) {
 
-            int volume = ( 127 * samplesLeftInGridStep ) / songEndFadeTime;
+            int volume = 
+                (int)( ( 127 * samplesLeftInGridStep ) / songEndFadeTime );
             
             if( allStopped ) {
                 // watch for wrap-around to next grid step
@@ -1057,7 +1058,8 @@ int getSongTimeLeft() {
     if( numSongParts > 0 ) {
 
         returnValue = 
-            currentSongTargetLength - songStreams[0].totalNumSamplesPlayed;
+            (int)currentSongTargetLength - 
+            (int)songStreams[0].totalNumSamplesPlayed;
 
         if( songSwitchPending || returnValue < 0 ) {
             // show 0 to indicate that song is waiting to switch
@@ -1084,7 +1086,7 @@ char *getGridStepTimeString() {
     
     if( numSongParts > 0 ) {
 
-        int gridSamplesPlayed = 
+        unsigned int gridSamplesPlayed = 
             songStreams[0].totalNumSamplesPlayed % gridStepLength;
         
             

@@ -404,7 +404,7 @@ static void drawMoneyValue16( int inX, int inY, int inValue,
     // but probably not a 2 for $200+ values
     unsigned int numDigits = strlen( moneyString );
     if( numDigits > 2 && inValue > 199 ) {
-        inX += 11 * (numDigits - 2) + 2 * (numDigits - 2);
+        inX += (int)( 11 * (numDigits - 2) + 2 * (numDigits - 2) );
         }
     
     
@@ -439,7 +439,7 @@ static void drawMoneyValue8( int inX, int inY, int inValue,
     // hackish fix if 3+ digits are required (violate right-alignment)
     unsigned int numDigits = strlen( moneyString );
     if( numDigits > 2 ) {
-        inX += 5 * (numDigits - 2) + 1 * (numDigits - 2);
+        inX += (int)( 5 * (numDigits - 2) + 1 * (numDigits - 2) );
         }
     
     
