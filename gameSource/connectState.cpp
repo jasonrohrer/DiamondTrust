@@ -56,6 +56,12 @@ class ConnectState : public GameState {
         virtual char isStateDone() {
             return stateDone;
             }
+
+
+        virtual char needsNextButton() {
+            return false;
+            }        
+
         
         virtual char canStateBeBackedOut() {
             //return ! isAutoconnecting();
