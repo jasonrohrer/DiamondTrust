@@ -167,6 +167,11 @@ void showHelp( const char *inHelpTransKey ) {
     }
 
 
+void forceHideHelp() {
+    helpShouldShow = false;
+    }
+
+
 
 void clickHelp( int inX, int inY ) {
     if( helpButton->getPressed( inX, inY ) ) {

@@ -14,6 +14,9 @@ char isHelpTryingToScroll();
 
 void showHelp( const char *inHelpTransKey );
 
+// force help to close, even if help button not clicked
+void forceHideHelp();
+
 
 void clickHelp( int inX, int inY );
         

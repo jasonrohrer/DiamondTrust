@@ -818,6 +818,26 @@ static void resetToPlayAgain() {
 static char stateDone = false;
 
 
+
+static char shouldGoToConnectionBrokenState() {
+    
+    if( currentGameState != pickGameTypeState &&
+        currentGameState != setAILevelState &&
+        currentGameState != connectState &&
+        currentGameState != connectionBrokenState ) {
+        
+        if( checkOpponentConnectionStatus() != 1 ) {
+            return true;
+            }
+        }
+    
+    return false;
+    }
+
+
+
+
+
 // only register a click when stylus/mouse lifted
 char touchDownOnLastCheck = false;
 int lastTouchX, lastTouchY;
@@ -828,7 +848,7 @@ static void goToNextGameState() {
 
     // special case if connection ever broken:
     // go right to connectionBrokenState from ANY state
-    if( currentGameState->isConnectionBroken() ) {
+    if( shouldGoToConnectionBrokenState() ) {
         currentGameState = connectionBrokenState;
         }
     else if( currentGameState == pickGameTypeState ) {
@@ -976,8 +996,19 @@ void gameLoopTick() {
     stepOpponent();
     
     
-    
-    if( currentGameState->isStateDone() ) {
+    if( shouldGoToConnectionBrokenState() ) {
+        // connection broken, don't even wait for DONE
+
+        isWaitingOnOpponent = false;
+
+        // what if help is in the way?
+        if( isHelpShowing() ) {
+            forceHideHelp();
+            }
+        // go immediately to next state (the connection BROKEN state)
+        goToNextGameState();
+        }
+    else if( currentGameState->isStateDone() ) {
         // state never ends while we're still waiting for a response!
         isWaitingOnOpponent = false;
         
