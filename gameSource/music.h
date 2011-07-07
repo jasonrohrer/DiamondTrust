@@ -31,6 +31,13 @@ void backToFirstSongAct();
 int getSongAct();
 
 
+// time left in samples
+int getSongTimeLeft();
+
+char *getGridStepTimeString();
+
+
+
 void switchSongs();
 
 

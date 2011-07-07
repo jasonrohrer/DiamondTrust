@@ -1463,6 +1463,31 @@ void drawTopScreen() {
             }
 
         delete [] partStrings;
+
+
+
+        
+        char *gridTimeString = getGridStepTimeString();
+        
+        char *timeLeftString = autoSprintf( "Grid step time: %s", 
+                                            gridTimeString );
+        delete [] gridTimeString;
+        
+        font8->drawString( timeLeftString, 128, 49 + 72, white, alignLeft );
+
+        delete [] timeLeftString;
+
+
+        int secLeft = getSongTimeLeft() / 22050;
+        int minLeft = secLeft / 60;
+        secLeft = secLeft % 60;
+        
+        timeLeftString = autoSprintf( "Song time left: %d:%02d", 
+                                            minLeft, secLeft );
+        
+        font8->drawString( timeLeftString, 128, 49 + 84, white, alignLeft );
+
+        delete [] timeLeftString;
         }
     
     }

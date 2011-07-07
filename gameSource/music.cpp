@@ -15,6 +15,9 @@ int currentSongPick = -1;
 char *currentSongDirName = NULL;
 
 
+int currentSongTargetLength = 0;
+
+
 char songSwitchPending = false;
 
 
@@ -22,7 +25,7 @@ char songSwitchPending = false;
 int numSongActs;
 char **songActDirNames = NULL;
 
-int currentSongAct;
+int currentSongAct = 0;
 
 
 int numSongParts;
@@ -275,18 +278,23 @@ static void loadSong() {
         songActDirNames = listDirectory( currentSongDirName, 
                                          &numSongActs );
 
-        
-        
-
-        currentSongAct = 0;
-        
         if( numSongActs > 1 ) {
             sortStrings( &songActDirNames, numSongActs );
-                    
-            // first act is common tracks for all acts
-            currentSongAct = 1;
             }
-
+        
+        
+        if( currentSongAct == 0 ) {
+            if( numSongActs > 1 ) {
+                // first act is common tracks for all acts
+                currentSongAct = 1;
+                }
+            }
+        else if( numSongActs > 0 && 
+                 currentSongAct > numSongActs ) {
+            // watch for act overflow on song change
+            currentSongAct = numSongActs - 1;
+            }
+        
         
 
         printOut( "Available song parts:\n" );
@@ -458,8 +466,8 @@ static void loadSong() {
 
 
 
-
-
+        // between 3 and 4 minutes long, each
+        currentSongTargetLength = 22050 * 60 * 3 + getRandom( 22050 * 60 );
         }
     else {
         printOut( "ERROR:  no songs present!\n" );
@@ -702,12 +710,6 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             for( int p=0; p<MAX_SOUND_CHANNELS; p++ ) {
                 songStreams[p].totalNumSamplesPlayed = 
                     gridStepLength - sampleDelay;
-                }
-
-
-            // watch for act overflow on song switch
-            while( currentSongAct >= numSongActs ) {
-                currentSongAct --;
                 }
             
             printOut( "New song has %d acts\n", numSongActs );
@@ -974,6 +976,59 @@ int getSongAct() {
     
     return returnValue;
     }
+
+
+
+int getSongTimeLeft() {
+    if( isThisAClone() ) {
+        return 0;
+        }
+    
+    int returnValue = 0;
+    
+    lockAudio();
+    
+    if( numSongParts > 0 ) {
+        returnValue = 
+            currentSongTargetLength - songStreams[0].totalNumSamplesPlayed;
+        }
+    unlockAudio();
+    
+    return returnValue;
+    }
+
+
+
+char *getGridStepTimeString() {
+    if( isThisAClone() ) {
+        return NULL;
+        }
+
+
+    char *returnValue = NULL;
+    
+
+    lockAudio();
+    
+    if( numSongParts > 0 ) {
+
+        int gridSamplesPlayed = 
+            songStreams[0].totalNumSamplesPlayed % gridStepLength;
+        
+            
+        returnValue = autoSprintf( "(%d.%d/%d.%d)",
+                                   gridSamplesPlayed / 22050, 
+                                   gridSamplesPlayed / 2205 - 
+                                   10 * ( gridSamplesPlayed / 22050 ), 
+                                   gridStepLength / 22050,
+                                   gridStepLength / 2205 - 
+                                   10 * ( gridStepLength / 22050 ) );
+        }
+    unlockAudio();
+    
+    return returnValue;
+    }
+
 
 
 
