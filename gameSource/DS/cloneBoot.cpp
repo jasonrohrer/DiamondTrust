@@ -302,7 +302,7 @@ int stepCloneBootParent() {
                     u16 childAID = 1;
                     
                     // look for "1" bit position of child in BMP
-                    while( ( downloadingBMP >> childAID ) & 1 
+                    while( ( ( downloadingBMP >> childAID ) & 1 ) 
                            == 0 ) {
                         childAID ++;
                         }
@@ -355,6 +355,8 @@ int stepCloneBootParent() {
         case MBP_STATE_ERROR:
             printOut( "MBP error received by Clone Parent\n" );
             
+            childUserNameSet = false;
+            
             // cancel MB before reporting error
             MBP_Cancel();
             break;
@@ -367,12 +369,16 @@ int stepCloneBootParent() {
                 cloneBootStartingOver = false;
                 cloneHostState = 1;
                 
+                childUserNameSet = false;
+
                 // use same settings again
                 MBP_Init( LOCAL_GGID, tgid );
                 }
             else if( !cloneBootCanceled ) {
                 // only hit this on error
                 cloneBootError = true;
+
+                childUserNameSet = false;
                 }
             else {
                 // canceled
