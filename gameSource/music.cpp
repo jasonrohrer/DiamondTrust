@@ -15,7 +15,7 @@ int currentSongPick = -1;
 char *currentSongDirName = NULL;
 
 
-int currentSongTargetLength = 0;
+unsigned int currentSongTargetLength = 0;
 
 
 char songSwitchPending = false;
@@ -466,8 +466,8 @@ static void loadSong() {
 
 
 
-        // between 3 and 4 minutes long, each
-        currentSongTargetLength = 22050 * 60 * 3 + getRandom( 22050 * 60 );
+        // between 2 and 4 minutes long, each
+        currentSongTargetLength = 22050 * 60 * 2 + getRandom( 22050 * 60 * 2 );
         }
     else {
         printOut( "ERROR:  no songs present!\n" );
@@ -908,7 +908,11 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
     s->totalNumSamplesPlayed += numSamplesRequested;
     
     if( inChannelNumber == 0 ) {
-        //printOut( "Total played %d\n", s->totalNumSamplesPlayed );
+
+        if( s->totalNumSamplesPlayed > currentSongTargetLength ) {
+            // time to auto-switch
+            songSwitchPending = true;
+            }
         }
     
     return;
@@ -989,8 +993,15 @@ int getSongTimeLeft() {
     lockAudio();
     
     if( numSongParts > 0 ) {
-        returnValue = 
-            currentSongTargetLength - songStreams[0].totalNumSamplesPlayed;
+        if( songSwitchPending ) {
+            // show 0 to indicate that song is waiting to switch
+            returnValue = 0;
+            }
+        else {
+            
+            returnValue = 
+                currentSongTargetLength - songStreams[0].totalNumSamplesPlayed;
+            }
         }
     unlockAudio();
     
