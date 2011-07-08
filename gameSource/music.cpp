@@ -472,6 +472,10 @@ static void loadSong() {
 
         // between 2 and 4 minutes long, each
         currentSongTargetLength = 22050 * 60 * 2 + getRandom( 22050 * 60 * 2 );
+
+        // we skip all but 2 seconds of our first grid step in the delay
+        // between songs
+        currentSongTargetLength += ( gridStepLength - 22050 * 2 );
         }
     else {
         printOut( "ERROR:  no songs present!\n" );
