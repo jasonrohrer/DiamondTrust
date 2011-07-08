@@ -9,7 +9,7 @@ fi
 
 tempFile="$1.temp.wav"
 
-sndfile-convert -pcm16 "$1" "$tempFile"
+#sndfile-convert -pcm16 "$1" "$tempFile"
 
 sox "$1" "$tempFile" trim 0s $2s
 
