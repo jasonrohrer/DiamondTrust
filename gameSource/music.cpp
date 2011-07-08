@@ -662,6 +662,9 @@ static void addTrack( int inChannelNumber, int inDelay ) {
 
 
 
+// use this as a safe way of gradually raising volume back up from zero,
+// outside of audio callback
+extern int globalSoundVolume;
 
 
 
@@ -793,9 +796,26 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
             // jump immediately back to full volume for start of next
             // song
+            // note that calling setSoundChannelVolume directly from inside 
+            // the callback does not always work on the DS
+            // but it works MOST of the time, so it's okay for lowering
+            // the volume gradually above
+            
+            // But here we're trying to raise it all the way back up with a
+            // single call.  If this call fails, then the volume stays at 0
+            /*
             for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
                 setSoundChannelVolume( c, 127 );
                 }
+            */
+
+            // so we let our game loop handle it, gradually raising it
+            // note that we DID NOT set the globalSoundVolume above when
+            // we lowered the volume.  The game loop only tries to adjust
+            // volume up if it's not 127
+            // so we left it at 127 when we turned volume down above
+            // (so that game loop wouldn't touch volume)
+            globalSoundVolume = 0;
             }
         }
 

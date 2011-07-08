@@ -99,6 +99,7 @@ int aiLevelSheetSpriteID;
 
 
 int globalSoundVolume = 0;
+char soundPansSet = false;
 
 
 
@@ -968,7 +969,7 @@ void gameLoopTick() {
         }
     
 
-    if( globalSoundVolume == 0 ) {
+    if( ! soundPansSet ) {
         
         // set up pan for all channels
         
@@ -985,8 +986,9 @@ void gameLoopTick() {
             
             setSoundChannelPan( c, pan  );
             }
-        
+        soundPansSet = true;
         }
+
     if( globalSoundVolume < 127 ) {
         globalSoundVolume++;
         
