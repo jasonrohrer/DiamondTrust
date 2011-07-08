@@ -1245,7 +1245,27 @@ void setMusicStateInternal( const char *inStateString ) {
 
     // keep adding parts until at least one is playing
 
-    while( numPlaying == 0 ) {
+    // and after that, if ONLY one is playing, add one more
+
+    while( numPlaying < 2 ) {
+
+        char justAddOneMore = false;
+        
+        if( numPlaying == 1 ) {
+            // we've already been through our complete loop, where each track
+            // had a fair-coin chance to play, exactly once
+            
+            // but on rare occasions, we only enable one track that way
+            // and one track is too sparse sounding
+
+            // SO, add one more in that case.  Never have just one by itself
+
+            // if we simply run through our entire loop a second time
+            // and flip again for all off tracks again, it ends up turning too
+            // many on, on average
+            justAddOneMore = true;
+            }
+        
         
         // go through all parts and flip a fair coin to decide if it is playing
         // thus, on average, half of our tracks are playing
@@ -1268,6 +1288,10 @@ void setMusicStateInternal( const char *inStateString ) {
                         (int)getRandom( s, (unsigned int)numFilesThisAct );
 
                     numPlaying ++;
+
+                    if( justAddOneMore ) {
+                        break;
+                        }
                     }
                 }
             }
