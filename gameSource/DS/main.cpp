@@ -2958,7 +2958,7 @@ static s16 soundBuffer[MAX_SOUND_CHANNELS]
 static int soundBufferPage[MAX_SOUND_CHANNELS];
 
 
-int soundSampleRate = 22050;
+int soundSampleRate = SOUND_SAMPLE_RATE;
 int soundTimerValue = SND_TIMER_CLOCK / soundSampleRate;
 u32 soundAlarmPeriod = soundTimerValue * SOUND_BUFFER_PAGESIZE / 32U;
 

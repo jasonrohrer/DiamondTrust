@@ -259,6 +259,10 @@ void gameInit() {
         printOut( "%d\n", getRandom( 400 ) );
         }
 
+    // seed with a constant for testing audio
+    setRandomSeed( 23423983, 23783294 );
+
+
     // FIXME:  for testing only
     /*
     printOut( "Testing AI...\n" );
@@ -1482,7 +1486,7 @@ void drawTopScreen() {
         delete [] timeLeftString;
 
 
-        int secLeft = getSongTimeLeft() / 22050;
+        int secLeft = getSongTimeLeft() / SOUND_SAMPLE_RATE;
         int minLeft = secLeft / 60;
         secLeft = secLeft % 60;
         

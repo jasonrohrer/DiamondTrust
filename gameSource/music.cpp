@@ -21,7 +21,12 @@ unsigned int currentSongTargetLength = 0;
 char songSwitchPending = false;
 
 
-static unsigned int songEndFadeTime = 22050 * 5;
+unsigned int rate = SOUND_SAMPLE_RATE;
+
+unsigned int oneTenthRate = rate/10;
+
+
+static unsigned int songEndFadeTime = rate * 5;
 
 
 
@@ -398,7 +403,7 @@ static void loadSong() {
                                     "New longer grid step discovered:  "
                                     "%d (%d sec)\n", 
                                     gridStepLength,
-                                    gridStepLength / 22050 );
+                                    gridStepLength / rate );
                                 }
                             
                             }
@@ -471,11 +476,11 @@ static void loadSong() {
 
 
         // between 2 and 4 minutes long, each
-        currentSongTargetLength = 22050 * 60 * 2 + getRandom( 22050 * 60 * 2 );
+        currentSongTargetLength = rate * 60 * 2 + getRandom( rate * 60 * 2 );
 
         // we skip all but 2 seconds of our first grid step in the delay
         // between songs
-        currentSongTargetLength += ( gridStepLength - 22050 * 2 );
+        currentSongTargetLength += ( gridStepLength - rate * 2 );
         }
     else {
         printOut( "ERROR:  no songs present!\n" );
@@ -778,7 +783,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
             // ensure a fixed amount of silence between songs (2 seconds)
             
-            unsigned int sampleDelay = 22050 * 2;
+            unsigned int sampleDelay = rate * 2;
 
             // reset totalNumSamplesPlayed for each track to set this up
             // position them each 2 seconds before next grid step
@@ -1119,12 +1124,12 @@ char *getGridStepTimeString() {
         
             
         returnValue = autoSprintf( "(%d.%d/%d.%d)",
-                                   gridSamplesPlayed / 22050, 
-                                   gridSamplesPlayed / 2205 - 
-                                   10 * ( gridSamplesPlayed / 22050 ), 
-                                   gridStepLength / 22050,
-                                   gridStepLength / 2205 - 
-                                   10 * ( gridStepLength / 22050 ) );
+                                   gridSamplesPlayed / rate, 
+                                   gridSamplesPlayed / oneTenthRate - 
+                                   10 * ( gridSamplesPlayed / rate ), 
+                                   gridStepLength / rate,
+                                   gridStepLength / oneTenthRate - 
+                                   10 * ( gridStepLength / rate ) );
         }
     unlockAudio();
     
@@ -1163,12 +1168,12 @@ char **getTrackInfoStrings( int *outNumTracks ) {
         if( s->filePlaying ) {
             strings[i] = autoSprintf( 
                 "%d:  %s (%d.%d/%d.%d)", i, s->wavBankStream->wavFileName,
-                s->fileSamplePosition / 22050, 
-                s->fileSamplePosition / 2205 - 
-                  10 * ( s->fileSamplePosition / 22050 ), 
-                s->wavBankStream->info.numSamples / 22050,
-                s->wavBankStream->info.numSamples / 2205 - 
-                  10 * ( s->wavBankStream->info.numSamples / 22050 ) );
+                s->fileSamplePosition / rate, 
+                s->fileSamplePosition / oneTenthRate - 
+                  10 * ( s->fileSamplePosition / rate ), 
+                s->wavBankStream->info.numSamples / rate,
+                s->wavBankStream->info.numSamples / oneTenthRate - 
+                  10 * ( s->wavBankStream->info.numSamples / rate ) );
             }
         else {
             strings[i] = autoSprintf( "%d:  OFF", i );
