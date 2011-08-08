@@ -263,7 +263,7 @@ void gameInit() {
         }
 
     // seed with a constant for testing audio
-    setRandomSeed( 23423983, 23783294 );
+    // setRandomSeed( 23423983, 23783294 );
 
 
     // FIXME:  for testing only

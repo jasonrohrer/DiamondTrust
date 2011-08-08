@@ -10,7 +10,7 @@
 
 
 // for testing
-static char forceFiveTracks = true;
+static char forceFiveTracks = false;
 
 
 
