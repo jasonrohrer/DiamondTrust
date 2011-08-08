@@ -2,7 +2,8 @@
 #include <stdio.h>
 
 
-int sampleRate = 22050;
+//int sampleRate = 22050;
+int sampleRate = 32768;
 
 int main() {
 
