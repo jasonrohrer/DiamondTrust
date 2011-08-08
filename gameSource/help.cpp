@@ -250,6 +250,8 @@ void drawHelp() {
         
         lineNumber++;
         }
+
+    startNewSpriteLayer();
     
     helpButton->draw();
     }
