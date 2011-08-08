@@ -47,6 +47,9 @@ static int bottomGreenbarSheetTop = 192;
 static void scrollCreditSheetUp();
 
 
+// for fading in a black rectangle over game map as help scrolls up
+static int helpFadeStepsMax = 50;
+
 
 
 #include "loading.h"
@@ -1577,27 +1580,42 @@ void drawBottomScreen() {
         return;
         }
     
+    if( !isHelpShowing() || getHelpScrollProgress() < helpFadeStepsMax ) {
+        
+        currentGameState->drawState();
 
-    currentGameState->drawState();
 
-
-    if( currentGameState->isStateDone() 
-        && currentGameState->needsNextButton()
-        && currentGameState != gameEndState ) {
-    
-        nextButton->draw();
-        }
-    else if( ! currentGameState->isStateDone() ) {
-        if( currentGameState->canStateBeBackedOut() ) {        
-            backButton->draw();
+        if( currentGameState->isStateDone() 
+            && currentGameState->needsNextButton()
+            && currentGameState != gameEndState ) {
+            
+            nextButton->draw();
             }
-
-        if( currentGameState->canShowHelp() ) {
-            helpButton->draw();
+        else if( ! currentGameState->isStateDone() ) {
+            if( currentGameState->canStateBeBackedOut() ) {        
+                backButton->draw();
+                }
+            
+            if( currentGameState->canShowHelp() ) {
+                helpButton->draw();
+                }
             }
-        }
+        
+        startNewSpriteLayer();
 
-    startNewSpriteLayer();
+        if( isHelpShowing() ) {
+            // cover with black rectangle to fade out
+            rgbaColor fadingBlack = 
+                { 0, 0, 0, 
+                  (unsigned char)(
+                      ( getHelpScrollProgress() * 255 ) / helpFadeStepsMax ) };
+            
+            drawRect( 0, 0, 256, 192, fadingBlack );
+        
+            startNewSpriteLayer();
+            }
+        
+        }
     
     if( isHelpShowing() ) {
         drawHelp();

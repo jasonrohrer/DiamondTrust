@@ -169,6 +169,11 @@ void drawSprite( int inHandle, int inX, int inY, rgbaColor inColor );
 void drawSprite( int inHandle, int inNumCopies, int inX[], int inY[], 
                  rgbaColor inColor );
 
+// draws rectangle at position and with color, including alpha for transparency
+void drawRect( int inStartX, int inStartY, int inEndX, int inEndY, 
+               rgbaColor inColor );
+
+
 
 // puts the next batch of sprites on top of the previous batches
 // within a batch, between calls to startNewSpriteLayer, sprites should

@@ -22,6 +22,12 @@ extern int greenBarLeftMargin;
 static int helpGreenbarPageTop = 192;
 
 
+int getHelpScrollProgress() {
+    return 192 - helpGreenbarPageTop;
+    }
+
+
+
 static char helpShouldShow = false;
 
 

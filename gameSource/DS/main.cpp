@@ -1421,6 +1421,86 @@ void drawSprite( int inHandle, int inNumCopies, int inX[], int inY[],
 
 
 
+void drawRect( int inStartX, int inStartY, int inEndX, int inEndY, 
+               rgbaColor inColor ) {
+    
+    // disable texture mapping
+    G3_TexImageParam( GX_TEXFMT_NONE,
+                      GX_TEXGEN_NONE,
+                      GX_TEXSIZE_S8,
+                      GX_TEXSIZE_T8,
+                      GX_TEXREPEAT_NONE, 
+                      GX_TEXFLIP_NONE, 
+                      GX_TEXPLTTCOLOR0_USE, 
+                      0 );
+
+    // 5 high-order bits
+    int a = inColor.a >> 3;
+    
+    
+    // avoid wireframe
+    if( a == 0 ) {
+        // draw nothing
+        return;
+        }
+
+
+    G3_PolygonAttr( GX_LIGHTMASK_NONE,
+                    GX_POLYGONMODE_MODULATE,
+                    GX_CULL_NONE,
+                    polyID,
+                    a,
+                    0 );
+
+    G3_PushMtx();
+
+
+    G3_Translate( 0, 
+                  0, 
+                  drawZ );
+
+
+
+    G3_Begin( GX_BEGIN_QUADS );
+
+    // set color once
+    G3_Color( GX_RGB( inColor.r >> 3, inColor.g >> 3, inColor.b >> 3 ) );
+    
+
+    // four corners
+
+    // 16 bit fixed point not enough to hold integer values in range 0..255
+    // (screen pixel coordinates) so some shifting is necessary
+    // Make up for this in the setup of Ortho in main function
+    // (shifting by 6 is like dividing by 64, and 256x192 divided by 64
+    //   is 4x3, which is used in Ortho).
+
+    // Note that this was the ONLY coordinate conversion method that didn't
+    // result in distortion as polygons moved in y direction.
+
+    G3_Vtx( (short)( inStartX << (FX16_SHIFT - 6) ), 
+            (short)( inEndY << (FX16_SHIFT - 6) ), 
+            0 );
+    
+    G3_Vtx( (short)( inStartX << (FX16_SHIFT - 6) ), 
+            (short)( inStartY << (FX16_SHIFT - 6) ), 
+            0 );
+    
+    G3_Vtx( (short)( inEndX << (FX16_SHIFT - 6) ), 
+            (short)( inStartY << (FX16_SHIFT - 6) ), 
+            0 );
+    
+    G3_Vtx( (short)( inEndX << (FX16_SHIFT - 6) ), 
+            (short)( inEndY << (FX16_SHIFT - 6) ), 
+            0 );
+
+    G3_End();
+
+    G3_PopMtx( 1 );
+    }
+
+
+
 
 #define TP_SAMPLE_BUFFER_SIZE 5
 

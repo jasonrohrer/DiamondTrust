@@ -22,6 +22,11 @@ void clickHelp( int inX, int inY );
         
 
 void stepHelp();
+
+
+// from 0 to 192
+int getHelpScrollProgress();
+
         
 
 // draws into bottom screen
