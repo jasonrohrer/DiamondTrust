@@ -4,9 +4,10 @@
 
 
 static void usage() {
-    printf( "Prints the sample rate of a WAV file and exits\n\n" 
+    printf( "Prints the sample rate or length-in-samples of WAV and exits\n\n" 
             "Usage:\n"
-            "  getWaveSampleRate inWavFilePath\n\n" );
+            "  getWaveSampleRate rate inWavFilePath\n\n"
+            "  getWaveSampleRate length inWavFilePath\n" );
     exit(0);
     }
 
@@ -34,11 +35,20 @@ static unsigned short bytesToShort( unsigned char inBuffer[2] ) {
 
 int main( int inNumArgs, const char **inArgs ) {
     
-    if( inNumArgs != 2 ) {
+    if( inNumArgs != 3 ) {
         usage();
         }
     
-    const char *inFilePath = inArgs[1];
+    char printRate = true;
+    
+    if( inArgs[1][0] == 'l' ) {
+        // print length instead
+        printRate = false;
+        }
+    
+
+
+    const char *inFilePath = inArgs[2];
 
 
     int fileSize;
@@ -124,8 +134,53 @@ int main( int inNumArgs, const char **inArgs ) {
     int sampleRate = (int)bytesToInt( chunkBuffer );
 
 
-    printf( "%d", sampleRate );
+    if( printRate ) {
+        printf( "%d", sampleRate );
+        }
     
+    
+    // 4 bytes of ByteRate (ignore)
+    fread( chunkBuffer, 1, 4, handle );
+    
+
+    // 2 bytes of block align (ignore)
+    fread( chunkBuffer, 1, 2, handle );
+    
+
+    // 2 bytes of bits per sample
+    fread( chunkBuffer, 1, 2, handle );
+
+    int bitsPerSample = bytesToShort( chunkBuffer );
+
+
+
+    // look for data
+    fread( chunkBuffer, 1, 4, handle );
+
+    if( strcmp( (char*)chunkBuffer, "data" ) != 0 ) {
+        printf( "'data' not found at start of WAV file %s\n", inFilePath );
+        fclose( handle );
+        return 0;
+        }
+
+    
+    // size of data chunk in bytes
+    fread( chunkBuffer, 1, 4, handle );
+    
+    unsigned int dataLength = bytesToInt( chunkBuffer );
+    
+    
+    int bytesPerFullSample = ( bitsPerSample / 8 ) * numChannels;
+    
+
+    int numSamples = (int)( dataLength / bytesPerFullSample );
+
+    
+    if( !printRate ) {
+        printf( "%d", numSamples );
+        }
+
+
 
     fclose( handle );
 

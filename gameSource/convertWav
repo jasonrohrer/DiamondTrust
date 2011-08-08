@@ -2,7 +2,7 @@
 
 soxPath="/home/jcr13/sox-14.3.2/src/sox"
 
-getWavSampleRatePath="/home/jcr13/cpp/DiamondTrust/gameSource/getWavSampleRate"
+getWavInfoPath="/home/jcr13/cpp/DiamondTrust/gameSource/getWavInfo"
 
 
 
@@ -20,7 +20,7 @@ fileName="$2"
 tempFile="$fileName.temp.wav"
 
 
-oldSampleRate=`$getWavSampleRatePath "$fileName"`
+oldSampleRate=`$getWavInfoPath rate "$fileName"`
 
 echo "Resampling to $newSampleRate:  $fileName"
 
