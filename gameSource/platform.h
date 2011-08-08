@@ -402,8 +402,8 @@ typedef signed short int s16;
 // gets the next audio samples for a given mono channel 
 // up to 8 channels are possible
 // sample rate is 22050 Hz
-#define SOUND_SAMPLE_RATE 22050
-//#define SOUND_SAMPLE_RATE 32768
+//#define SOUND_SAMPLE_RATE 22050
+#define SOUND_SAMPLE_RATE 32768
 
 void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer, 
                                 int inNumSamples );

@@ -403,7 +403,7 @@ int mainFunction( int inNumArgs, char **inArgs ) {
     SDL_AudioSpec audioFormat;
 
     /* Set 16-bit stereo audio at 22Khz */
-    audioFormat.freq = 22050;
+    audioFormat.freq = SOUND_SAMPLE_RATE;
     audioFormat.format = AUDIO_S16;
     audioFormat.channels = 2;
     //audioFormat.samples = 8192;        /* avoid artifacts, ever */
