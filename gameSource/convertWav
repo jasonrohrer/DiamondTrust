@@ -32,7 +32,8 @@ then
 	exit 0
 fi
 
-sox "$fileName" -r $newSampleRate "$tempFile" resample
+# use very high quality rate conversion
+"$soxPath" "$fileName" -r $newSampleRate "$tempFile" rate -v
 
 cp "$tempFile" "$fileName"
 
