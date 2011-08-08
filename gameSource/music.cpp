@@ -9,6 +9,10 @@
 #include "minorGems/util/SimpleVector.h"
 
 
+// for testing
+static char forceFiveTracks = true;
+
+
 
 int currentSongPick = -1;
 
@@ -1256,11 +1260,14 @@ void setMusicStateInternal( const char *inStateString ) {
 
     // and after that, if ONLY one is playing, add one more
 
-    while( numPlaying < 2 ) {
+    // also might force all 5 tracks on, for testing.
+    while( ( !forceFiveTracks && numPlaying < 2 ) 
+           ||
+           ( forceFiveTracks && numPlaying < 5 ) ) {
 
         char justAddOneMore = false;
         
-        if( numPlaying == 1 ) {
+        if( numPlaying == 1 && !forceFiveTracks ) {
             // we've already been through our complete loop, where each track
             // had a fair-coin chance to play, exactly once
             

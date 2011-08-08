@@ -421,7 +421,8 @@ int mainFunction( int inNumArgs, char **inArgs ) {
         printf( "Unable to open audio: %s\n", SDL_GetError() );
         }
     else {
-        printf( "Opened audio with buffer size %d\n", actualFormat.samples );
+        printf( "Opened audio with buffer size %d, sample rate %d\n", 
+                actualFormat.samples, actualFormat.freq );
         }
     
 
