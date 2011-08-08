@@ -1,16 +1,39 @@
 #!/bin/bash
 
-if [ "$#" -lt "1" ]
+soxPath="/home/jcr13/sox-14.3.2/src/sox"
+
+getWavSampleRatePath="/home/jcr13/cpp/DiamondTrust/gameSource/getWavSampleRate"
+
+
+
+if [ "$#" -lt "2" ]
 then
-  echo "Usage:   convertWav file.wav"
+  echo "Usage:   convertWav newSampleRate file.wav"
   exit 1
 fi
 
 
-tempFile="$1.temp.wav"
+newSampleRate="$1"
 
-sndfile-convert -pcm16 "$1" "$tempFile"
+fileName="$2"
 
-sox "$tempFile" -r 22050 -c 1 "$1" avg resample
+tempFile="$fileName.temp.wav"
+
+
+oldSampleRate=`$getWavSampleRatePath "$fileName"`
+
+echo "Resampling to $newSampleRate:  $fileName"
+
+echo "  --Old sample rate = $oldSampleRate"
+
+if [ "$oldSampleRate" -eq "$newSampleRate" ]
+then
+	echo "  --Already at desired rate, skipping"
+	exit 0
+fi
+
+sox "$fileName" -r $newSampleRate "$tempFile" resample
+
+cp "$tempFile" "$fileName"
 
 rm "$tempFile"

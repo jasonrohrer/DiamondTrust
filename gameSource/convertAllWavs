@@ -1,6 +1,14 @@
 #!/bin/bash
 
-list=`find . -name "*.wav"`
+if [ "$#" -lt "2" ]
+then
+  echo "Usage:   convertAllWaves newSampleRate  dir_path"
+  exit 1
+fi
+
+
+
+list=`find $2 -name "*.wav"`
 
 
 # set input field separator to newline for "find" output that contains
@@ -9,18 +17,9 @@ IFS="
 "
 
 
-# first, remove hidden files
 
-for file in $( find . -type f -name ".*" )
-do
-  echo "Deleting hidden file $file..."
-  rm $file
-done 
-
-
-
-for file in $( find . -name "*.wav" )
+for file in $( find "$2" -name "*.wav" )
 do
   echo "Converting $file..."
-  ./convertWav "$file"
+  ./convertWav $1 "$file"
 done 
