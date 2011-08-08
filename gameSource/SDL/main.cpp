@@ -1328,6 +1328,28 @@ void drawSprite( int inHandle, int inNumCopies,
 
 
 
+void drawRect( int inStartX, int inStartY, int inEndX, int inEndY, 
+               rgbaColor inColor ) {
+    glColor4ub( inColor.r, inColor.g, inColor.b, inColor.a );
+    
+    // account for "screen" being drawn on
+    inStartY += spriteYOffset;
+    inEndY += spriteYOffset;
+    
+    const GLfloat squareVertices[] = {
+        inStartX, inStartY,
+        inEndX, inStartY,
+        inStartX, inEndY,
+        inEndX, inEndY };    
+    
+    glVertexPointer( 2, GL_FLOAT, 0, squareVertices );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+
+
 
 void startNewSpriteLayer() {
     // no layering necessary in SDL version
