@@ -1528,7 +1528,7 @@ void drawBottomScreen() {
                 
             font8->drawString( translate( "credit_1b" ), 
                                greenBarLeftMargin, 
-                               36 + bottomGreenbarSheetTop, 
+                               37 + bottomGreenbarSheetTop, 
                                getGreenBarInkColor( 36, 
                                                     monthsLeftForCredits, 
                                                     true ),
@@ -1539,7 +1539,7 @@ void drawBottomScreen() {
 
             font8->drawString( translate( "credit_2a" ), 
                                greenBarLeftMargin, 
-                               68 + bottomGreenbarSheetTop, 
+                               69 + bottomGreenbarSheetTop, 
                                getGreenBarInkColor( 68, 
                                                     monthsLeftForCredits, 
                                                     true ),
@@ -1558,7 +1558,7 @@ void drawBottomScreen() {
     
             font8->drawString( translate( "credit_3a" ), 
                                greenBarLeftMargin, 
-                               116 + bottomGreenbarSheetTop, 
+                               117 + bottomGreenbarSheetTop, 
                                getGreenBarInkColor( 116, 
                                                     monthsLeftForCredits, 
                                                     true ),
