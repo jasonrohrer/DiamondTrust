@@ -241,8 +241,15 @@ void drawHelp() {
         
         int lineY = lineNumber * 16 + lineOffset;
         
+        int lineScreenY = helpGreenbarPageTop + lineY;
+
+        if( lineScreenY > 192 ) {
+            // off bottom of screen, don't draw any more lines
+            break;
+            }
+
         font8->drawString( lineString, greenBarLeftMargin,
-                           helpGreenbarPageTop + lineY,
+                           lineScreenY,
                            getGreenBarInkColor( lineY, 
                                                 getMonthsLeft(), 
                                                 true ),
