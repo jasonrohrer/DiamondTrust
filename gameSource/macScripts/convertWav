@@ -1,0 +1,40 @@
+#!/bin/bash
+
+soxPath="./convertTo32768.app/Contents/MacOS/sox"
+
+getWavInfoPath="./convertTo32768.app/Contents/MacOS/getWavInfo"
+
+
+
+if [ "$#" -lt "2" ]
+then
+  echo "Usage:   convertWav newSampleRate file.wav"
+  exit 1
+fi
+
+
+newSampleRate="$1"
+
+fileName="$2"
+
+tempFile="$fileName.temp.wav"
+
+
+oldSampleRate=`$getWavInfoPath rate "$fileName"`
+
+echo "Resampling to $newSampleRate:  $fileName"
+
+echo "  --Old sample rate = $oldSampleRate"
+
+if [ "$oldSampleRate" -eq "$newSampleRate" ]
+then
+	echo "  --Already at desired rate, skipping"
+	exit 0
+fi
+
+# use very high quality rate conversion
+"$soxPath" "$fileName" -r $newSampleRate "$tempFile" rate -v
+
+cp "$tempFile" "$fileName"
+
+rm "$tempFile"

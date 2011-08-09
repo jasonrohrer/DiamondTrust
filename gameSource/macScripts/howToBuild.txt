@@ -1,0 +1,13 @@
+build an AppBundle for convertTo32768.scpt with the Apple Script Editor
+
+build getWaveInfo.cpp into getWaveInfo in the gameSource folder.
+
+Build sox from source.
+
+
+Copy all this stuff into the App bundle, like so:
+
+cp -r convertAllWavs convertWav ../getWavInfo ~/sox/src/sox ~/sox/src/.libs convertTo32768.app/Contents/MacOS/
+
+
+So now sox and all the support scripts and exes are in the app bundle, ready to go.

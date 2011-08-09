@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ "$#" -lt "2" ]
+then
+  echo "Usage:   convertAllWaves newSampleRate  dir_path"
+  exit 1
+fi
+
+
+
+list=`find $2 -name "*.wav"`
+
+
+# set input field separator to newline for "find" output that contains
+# spaces in file names
+IFS="
+"
+
+
+
+for file in $( find "$2" -name "*.wav" )
+do
+  echo "Converting $file..."
+  ./convertTo32768.app/Contents/MacOS/convertWav $1 "$file"
+  echo ""
+done 
