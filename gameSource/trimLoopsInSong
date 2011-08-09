@@ -1,0 +1,71 @@
+#!/bin/bash
+
+
+getWavInfoPath="/home/jcr13/cpp/DiamondTrust/gameSource/getWavInfo"
+
+
+if [ "$#" -lt "1" ]
+then
+  echo "Trims all loops in a song to be whole multiples of the shortest loop"
+  echo "Usage:   trimLoopsInSong song_dir_path"
+  exit 1
+fi
+
+
+
+# set input field separator to newline for "find" output that contains
+# spaces in file names
+IFS="
+"
+
+
+
+shortestLength="999999999"
+
+
+for file in $( find "$1" -name "*.wav" )
+do
+  thisLength=`"$getWavInfoPath" length "$file"`
+
+  if [ $thisLength -lt $shortestLength ]
+  then
+	  shortestLength=$thisLength
+  fi
+done
+
+
+echo "Shortest loop found has $shortestLength samples"
+echo ""
+
+
+for file in $( find "$1" -name "*.wav" )
+do
+  thisLength=`"$getWavInfoPath" length "$file"`
+
+  if [ $thisLength -gt $shortestLength ]
+  then
+	  echo "$file has sample length $thisLength, considering trimming"
+
+	  wholeMultiple=$shortestLength
+	  
+
+	  while [ $wholeMultiple -lt $thisLength ]
+		do
+		let wholeMultiple=$wholeMultiple+$shortestLength
+	  done
+	  
+	  if [ $wholeMultiple -gt $thisLength ]
+	  then
+		  # went too far, which means we need to trim the loop
+		  let wholeMultiple=$wholeMultiple-$shortestLength
+
+		  # trim it
+		  echo "  --Trimming to $wholeMultiple samples"
+		  
+		  ./trimWav "$file" $wholeMultiple
+	  else
+		  echo "  --No need to trim"
+	  fi
+	  
+  fi
+done
