@@ -8,7 +8,7 @@
 Font::Font( const char *inFileName, int inCharSpacing, int inSpaceWidth,
             char inFixedWidth, RGBAFilter *inFilter  )
         : mCharSpacing( inCharSpacing ), mSpaceWidth( inSpaceWidth ),
-          mFixedWidth( inFixedWidth ) {
+          mFixedWidth( inFixedWidth ), mRaiseDollarSign( false ) {
     
 
     int width, height;
@@ -178,6 +178,13 @@ Font::~Font() {
 
 
 
+void Font::setRaiseDollarSign( char inRaise ) {
+    mRaiseDollarSign = inRaise;
+    }
+
+
+
+
 int Font::drawString( const char *inString, int inX, int inY, rgbaColor inColor,
                       TextAlignment inAlign ) {
     unsigned int numChars = strlen( inString );
@@ -216,6 +223,13 @@ int Font::drawString( const char *inString, int inX, int inY, rgbaColor inColor,
             }
         else {
             
+            int yOffset = 0;
+            
+            if( c == '$' && mRaiseDollarSign ) {
+                yOffset = -1;
+                }
+            
+
             int charInt = (int)c;
 
             int spriteID = mSpriteMap[ charInt ];
@@ -223,7 +237,7 @@ int Font::drawString( const char *inString, int inX, int inY, rgbaColor inColor,
             if( spriteID != -1 ) {
                 drawSprite( spriteID, 
                             x - mCharLeftEdgeOffset[ charInt ],
-                            inY, 
+                            inY + yOffset, 
                             inColor );
                 }
     

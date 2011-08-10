@@ -41,6 +41,10 @@ class Font {
         int getCharacterSpacing();
 
 
+        // defaults to false
+        void setRaiseDollarSign( char inRaise );
+
+
     private:        
         
         
@@ -58,6 +62,11 @@ class Font {
         int mCharLeftEdgeOffset[ 128 ];
         int mCharWidth[ 128 ];
         
+        
+        // for 8x8 fonts, there's not enough room to draw a nice dollar
+        // sign that also lines up with numerals.
+        // manually raise it up
+        char mRaiseDollarSign;
         
     };
 

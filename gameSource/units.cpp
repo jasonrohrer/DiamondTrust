@@ -841,7 +841,7 @@ static void drawUnitPaymentNumber( intPair inPos, int inValue ) {
     
     font8->drawString( "$", 
                        inPos.x - 9, 
-                       inPos.y - 4,
+                       inPos.y - 3,
                        black, 
                        alignLeft );
     

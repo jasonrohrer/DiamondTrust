@@ -360,7 +360,8 @@ void gameInit() {
     
     printOut( "Loading 8-pixel font\n" );
     font8 = new Font( "font8.tga", 1, 4, false );
-
+    font8->setRaiseDollarSign( true );
+    
 
     // call agin with both fonts (first progress bar step)
     updateLoadingProgress();
