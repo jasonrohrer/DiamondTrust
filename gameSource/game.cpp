@@ -1414,17 +1414,17 @@ void drawTopScreen() {
             
             drawSprite( signalSpriteID[ sigStrength ], 
                         phoneX + 8, phoneY + 6, white );
-            }
-
         
-        if ( isWaitingOnOpponent && networkOpponent ) {
-            // travelling light on of sat phone
-            startNewSpriteLayer();
-            
-            drawSprite( satPhoneLightSpriteID, 
-                        phoneX + 6 + 3 * satPhoneLightOnIndex, 
-                        phoneY + 21, 
-                        satPhoneLightColor );
+        
+            if ( isWaitingOnOpponent && networkOpponent ) {
+                // travelling light on of sat phone
+                startNewSpriteLayer();
+                
+                drawSprite( satPhoneLightSpriteID, 
+                            phoneX + 6 + 3 * satPhoneLightOnIndex, 
+                            phoneY + 21, 
+                            satPhoneLightColor );
+                }
             }
         }
     
