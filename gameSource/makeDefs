@@ -43,7 +43,7 @@ DotMatrixRGBAFilter.cpp \
 greenBarPaper.cpp \
 BluePenRGBAFilter.cpp \
 help.cpp \
-
+watch.cpp \
 
 
 

@@ -51,6 +51,11 @@ wirelessOn.tga \
 greenBarSheet.tga \
 aiLevelSheet.tga \
 nintendoLogo.tga \
+watch.tga \
+watchHandVertical.tga \
+watchHandHorizontal.tga \
+watchHandDiagonalLeft.tga \
+watchHandDiagonalRight.tga \
 
 
 LANGUAGE_FILES_SOURCE = $(wildcard languages/*.txt)

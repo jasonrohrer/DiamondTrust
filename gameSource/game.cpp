@@ -23,6 +23,7 @@
 #include "greenBarPaper.h"
 #include "BluePenRGBAFilter.h"
 #include "help.h"
+#include "watch.h"
 
 
 
@@ -606,6 +607,9 @@ void gameInit() {
     initSalePicker();
     updateLoadingProgress();
 
+    printOut( "  ++++++  Init watch display\n" );
+    initWatch();
+    
     
 
 
@@ -679,6 +683,9 @@ void gameFree() {
     freeSalePicker();
     freeGreenBarPaper();
     
+    freeWatch();
+    
+
     freeOpponent();
 
     freeMusic();
@@ -1082,6 +1089,7 @@ void gameLoopTick() {
         touchDownOnLastCheck = true;
         lastTouchX = tx;
         lastTouchY = ty;
+        stepWatch();
         }
     // else not touching
     // was it touching last time?
@@ -1413,7 +1421,11 @@ void drawTopScreen() {
             }
         }
     
-
+    
+    if( true || isWaitingOnOpponent ) {
+        drawWatch();
+        }
+    
 
 
     if( drawFrameCounter ) {
