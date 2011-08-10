@@ -1089,7 +1089,6 @@ void gameLoopTick() {
         touchDownOnLastCheck = true;
         lastTouchX = tx;
         lastTouchY = ty;
-        stepWatch();
         }
     // else not touching
     // was it touching last time?
@@ -1187,6 +1186,14 @@ void gameLoopTick() {
         satPhoneLightFrameCount = 0;
         satPhoneLightMoveDirection = 1;
         }
+
+    if( isWaitingOnOpponent ) {
+        stepWatch();
+        }
+    else {
+        resetWatch();
+        }
+    
 
     }
 
@@ -1422,7 +1429,7 @@ void drawTopScreen() {
         }
     
     
-    if( true || isWaitingOnOpponent ) {
+    if( isWaitingOnOpponent ) {
         drawWatch();
         }
     
