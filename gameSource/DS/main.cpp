@@ -3075,6 +3075,9 @@ static OSMessage soundMessageBuffer[1];
 static OSMutex soundMutex;
 
 
+int soundThreadCallCount = 0;
+
+
 static void soundThreadProcess( void *inData ) {
     
     inData = NULL;
@@ -3094,19 +3097,16 @@ static void soundThreadProcess( void *inData ) {
         for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
             s16 *buffer = soundBuffer[i];
         
-            if( soundBufferPage[i] == 0 ) {
-                soundBufferPage[i] = 1;
-                }
-            else if( soundBufferPage[i] == 1 ) {
+            if( soundBufferPage[i] == 1 ) {
                 // jump int buffer to second page
                 buffer = &( buffer[ SOUND_BUFFER_PAGESIZE ] );
-
-                soundBufferPage[i] = 0;
                 }
             
             getAudioSamplesForChannel( i, buffer, SOUND_BUFFER_PAGESIZE );
             }
-
+        
+        soundThreadCallCount++;
+        
         unlockAudio();
         }
     }
@@ -3115,10 +3115,32 @@ static void soundThreadProcess( void *inData ) {
 
 
 
-
+static int soundAlarmCount = 0;
 
 static void SoundAlarmCallback( void *inArg ) {
-    //printOut( "Alarm called\n" );
+    
+    // switch pages every time alarm is called, not every time thread runs
+    // if we switch pages in thread, we can fall behind after a slow thread
+    // run and be out of sync with the page we should actually be writing
+    // into, leading to persistent glitches
+
+    // do this for all but the first alarm (when we should be writing into
+    // page 0)
+    if( soundAlarmCount != 0 ) {
+        
+        for( int i=0; i<MAX_SOUND_CHANNELS; i++ ) {
+            
+            if( soundBufferPage[i] == 0 ) {
+                soundBufferPage[i] = 1;
+                }
+            else if( soundBufferPage[i] == 1 ) {
+                soundBufferPage[i] = 0;
+                }
+            }
+        }
+
+    // printOut( "Sound Alarm called %d\n", soundAlarmCount );
+    soundAlarmCount ++;
     
     soundTryingToRun = true;
     OS_SendMessage( &soundMessageQueue, (OSMessage)inArg, OS_MESSAGE_NOBLOCK );
