@@ -187,6 +187,10 @@ void startNewSpriteLayer();
 char getTouch( int *outX, int *outY );
 
 
+// gets whether the clamshell lid is closed (can only be true on DS platform)
+char getLidClosed();
+
+
 
 // forces full game loop (update and draw) to run one time
 // Sometimes it is necessary to redraw the screen at specific times, like

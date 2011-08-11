@@ -3545,6 +3545,11 @@ static char skippingLogo() {
 static char lidIsClosed = false;
 
 
+char getLidClosed() {
+    return lidIsClosed;
+    }
+
+
 
 void runGameLoopOnce() {
     G3X_Reset();

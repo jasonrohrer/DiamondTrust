@@ -1525,6 +1525,14 @@ char getTouch( int *outX, int *outY ) {
 
 
 
+char getLidClosed() {
+    // no lid on SDL
+    // maybe check if window is focused here, eventually?
+    return false;
+    }
+
+
+
 
 
 int netStatus = 0;

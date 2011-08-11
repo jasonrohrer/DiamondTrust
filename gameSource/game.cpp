@@ -148,6 +148,11 @@ char isWaitingOnOpponent = false;
 char isAIProgressShowing = false;
 
 
+int stepsSinceLidClosedMusicChange = 0;
+
+int stepsToWaitBeforeLidClosedMusicChange = 0;
+
+
 
 
 GameState *currentGameState;
@@ -1194,6 +1199,41 @@ void gameLoopTick() {
     else {
         resetWatch();
         }
+    
+
+
+    if( getLidClosed() ) {
+        stepsSinceLidClosedMusicChange ++;
+
+        if( stepsSinceLidClosedMusicChange >= 
+            stepsToWaitBeforeLidClosedMusicChange ) {
+            
+            // force the music to change so it doesn't get boring while
+            // the lid is closed
+
+            // set to a random state
+            char newState[12];
+                
+            newState[11] = '\0';
+                
+            for( int i=0; i<11; i++ ) {
+                newState[i] = (char)( 'a' + getRandom( 26 ) );
+                }
+            
+            setMusicState( newState );
+            
+
+            stepsSinceLidClosedMusicChange = 0;
+            
+            // change music every 5 to 25 seconds
+            stepsToWaitBeforeLidClosedMusicChange = 
+                30 * ( 5 + getRandom( 20 ) );
+            }
+        }
+    else {
+        stepsSinceLidClosedMusicChange = 0;
+        }
+    
     
 
     }
