@@ -679,7 +679,7 @@ static void addTrack( int inChannelNumber, int inDelay ) {
 // outside of audio callback
 extern int globalSoundVolume;
 
-
+static char shouldStartVolumeRise = false;
 
 
 
@@ -828,7 +828,23 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             // volume up if it's not 127
             // so we left it at 127 when we turned volume down above
             // (so that game loop wouldn't touch volume)
-            globalSoundVolume = 0;
+
+            // globalSoundVolume = 0;
+
+            // HOWEVER, wait until some loop is about to start
+            // playing before triggering this (so we actually get a 
+            // good fade-in, and don't start fading in during
+            // the two seconds of intermediary silence)
+            
+            // Also, this ensures that we keep the volume down to cover
+            // any glitches that might occur during the transition from
+            // samples lingering in the audio buffer from the last loop
+            // runs at the end of the fade out.
+            // Holding the volume down during the 2 seconds of silence
+            // ensures that these buffers get properly filled with silence
+            // before the volume is raised, replacing any lingering
+            // glitch audio in the buffer.
+            shouldStartVolumeRise = true;
             }
         }
 
@@ -865,7 +881,15 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             if( !songSwitchPending && 
                 musicState[inChannelNumber] != -1 ) {
                 
-                addTrack( inChannelNumber, delay );                
+                addTrack( inChannelNumber, delay );
+
+                if( shouldStartVolumeRise ) {
+                    // this is the first track actually added after
+                    // a song change.  Start the volume rise NOW.
+                    globalSoundVolume = 0;
+                    shouldStartVolumeRise = false;
+                    }
+                
                 }
             }
         
