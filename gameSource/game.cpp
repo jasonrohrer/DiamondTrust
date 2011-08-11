@@ -1388,13 +1388,15 @@ void drawTopScreen() {
                                        alignLeft );
                     }
                 }
-            else {
-                // keep reset until next display of progress bar
-                isAIProgressShowing = false;
-                }
+            }
+        else {
+            // keep reset until next display of progress bar
+            isAIProgressShowing = false;
             }
         
+        
         }
+    
         
 
 
@@ -1430,7 +1432,12 @@ void drawTopScreen() {
         }
     
     
-    if( isWaitingOnOpponent ) {
+    if( isWaitingOnOpponent && networkOpponent
+        ||
+        // avoid flicker when showing clock for AI, just like we do for
+        // AI progress bar
+        isAIProgressShowing ) {
+        
         drawWatch();
         }
     
