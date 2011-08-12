@@ -22,6 +22,7 @@ Property {
     # see demos/tips/BuildFinalROM example
 
 
+    RemasterVersion		0.0
 
     # for now, just specify speed and banner file
 
