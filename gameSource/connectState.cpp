@@ -248,10 +248,10 @@ void ConnectState::stepState() {
                             delete [] mMessage;
                             }
                         mMessage = 
-                            autoSprintf( 
-                                "%s%s",
-                                translate( "phaseSubStatus_sendingDownload" ), 
-                                getCloneChildUserName() );
+                            autoSprintf(
+                               "%s",
+                               translate( "phaseSubStatus_sendingDownload" ) );
+                        
                         statusSubMessage = mMessage;
                         break;
                     case 3:

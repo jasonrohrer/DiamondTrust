@@ -20,12 +20,12 @@ button_switchSongs "song"
 
 
 button_ai "Single Player"
-button_wifi "WiFi Game"
+button_wifi "Two Player"
 
 
 button_parent "Host Game"
-button_parent_muti_card "Host Multi-card"
-button_parent_clone "Host Download Play" 
+button_parent_muti_card "Host Multi-Card Play"
+button_parent_clone "Host Single-Card Play" 
 button_child "Join Game"
 
 
@@ -56,7 +56,7 @@ camera_securityCompromised "SYSTEM COMPROMISED"
 
 
 phaseStatus_gameType  "Select game type"
-phaseSubStatus_gameType  "Play against AI or over local WiFi"
+phaseSubStatus_gameType  "Play against AI or via wireless communications"
 
 
 phaseStatus_aiLevel  "Set AI level"
@@ -73,8 +73,8 @@ phaseSubStatus_connectingToParent  "Searching for a host..."
 phaseSubStatus_connectFailed  "Connection failed"
 
 
-phaseSubStatus_sendingDownload "Transferring download to "
-phaseSubStatus_waitingReconnect "Waiting for child to reconnect"
+phaseSubStatus_sendingDownload "Transferring download to opponent"
+phaseSubStatus_waitingReconnect "Waiting for opponent to reconnect"
 
 phaseSubStatus_waitAgainAfterFailedTransfer "Transfer failed, waiting for a new connection"
 
