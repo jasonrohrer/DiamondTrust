@@ -27,6 +27,9 @@
 	ps2pdf $<
 
 
+manualBody.dvi: design.tex
+
+
 all: manualBody.pdf
 
 clean: 

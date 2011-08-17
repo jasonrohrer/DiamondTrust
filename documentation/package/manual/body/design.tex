@@ -1,0 +1,363 @@
+
+\newcommand{\gtitle}{{\it Diamonds}}
+
+\newcommand{\rc}{resource}
+\newcommand{\rcs}{resources}
+\newcommand{\Rc}{Resource}
+\newcommand{\Rcs}{Resources}
+
+
+{\centering 
+{\huge Design: \gtitle\ (working title)}
+
+{\large Jason Rohrer}
+
+{\large August 24, 2009}
+
+}
+
+
+\subsubsection*{\centering Abstract}
+\begin{quotation}
+\noindent \gtitle\ for the Nintendo DSi is a two-player, turn-based strategy game about the dealings, secrets, and espionage of two diamond trading corporations.  The game takes place in Angola, a nation rich with diamonds but torn by factional conflict.  Each player controls a corporation that deploys hired agents into the region to purchase diamonds.  Agents maintain certain corporate secrets about their dealings, but their loyalty is for sale.  \gtitle\ is a game of incomplete information where opponents can secretly obtain information about each other.
+\end{quotation}
+%\end{abstract}
+
+
+\section{Thematic overview}
+
+The finest diamonds in the world are hidden here.  Not hidden, actually, but dug out of the earth by the teeming masses---bare backs and bare feet, knee deep in the rust-colored mud.  The diamonds are hidden only to those who are too afraid to come here, too afraid of conflict.  These diamonds are just waiting to be plucked, begging to be sold to whoever has the means of carrying them out to the rest of world.  Expensive diamonds out there, but cheap diamonds here.  What use are diamonds, anyway, in Angola?
+
+The local market has been soft ever since the biggest player went back to Johannesburg.   Pressure from the media lead to pressure from the public.  The public buys diamonds, so the biggest player had to listen.  But we fly under the public's radar.  We're not 100-year-old dinosaurs.  We're made-up corporations with made-up names.  Low overhead.  No permanent employees, just field agents hired as needed.  Even our offices are temporary.  Temporary, but in the right locations.  Antwerp and London---the only places that matter.
+
+There are only two firms left with agents in Angola.  We've gotten good takes while it lasted, but big changes are coming.  At first we thought the Kimberley Process was just a toothless promise from the big dealers to soothe public outcry.  Certify the origin of rough diamonds?  Sure, we can handle that.  But now we're hearing whispers about the UN. \ Seems like Kimberley may get herself some teeth in December.  But hey, that's December.  It's January now, and we've still got our contacts in Angola.  Let's make this last year count.
+
+
+\section{Gameplay summary}
+
+Two players each control a team of corporate agents that move between diamond-producing regions.  Unoccupied regions accumulate diamonds during each round, making them more attractive to occupy in future rounds.  Accumulated diamonds are given to the highest bidder occupying a region.  Moves and bids are specified simultaneously in secret, so one strategic aspect involves deciding when to move into a region as more and more diamonds accumulate and how much to pay for them.  If both players move into a region simultaneously, the losing bidder still pays her bid, but she gets nothing.
+
+A player's agents may be secretly bribed by the opponent.  Bribed agents reveal their secret information, such as move destinations and bids, to the opponent.  Bribing costs money, though, so another strategic aspect involves deciding which of your opponent's agents to bribe and which of your own agents to trust.  Bribing the right opponent agents can reveal to you which of your own agents have been bribed, perhaps without your opponent knowing that you know.  You can then use the supposedly secret actions of these agents to mislead your opponent.  For example, if you know your opponent can see your secret bid, you might bid up an auction to push your opponent toward paying a higher price, then retract your bid in the end to let your opponent win.
+
+A UN inspector moves from region to region throughout the game and searches any agents that he encounters, confiscating whatever diamonds that they are carrying.  The inspector's movement can be controlled by players in each round through competitive bribes that are selected simultaneously in secret.  Agents can return to their home regions and deposit their diamonds, thus protecting them from seizure by the UN inspector.
+
+Each player receives a fixed allowance of money each turn, but collected diamonds can be converted into extra money through an open market sale process involving secret choices that are also subject to exposure through agent bribes.  Money earned in either fashion can be used to purchase more diamonds, protect units from bribes, bribe opponent units, or bribe the UN inspector.  
+
+The game lasts for a fixed number of rounds, and the player with the most diamonds at the end of the final round wins.
+
+
+\section{Mechanical overview}
+
+Play occurs on a map of Angola divided into 6 diamond-producing regions.  Two additional regions, Antwerp and London, serve as the home bases for each player's corporation.  Each player has 3 units that represent their corporate agents.  All units start in their home base regions.  Players each start with 18 units of money.  Money balances can never be negative.  Each player's current money balance is secret information.  The UN inspector starts in a randomly-selected region of Angola.
+
+
+\subsection{Rounds}
+
+The game takes place across 12 rounds, each representing a month in the year 2000 before the UN passes the Kimberley Process Certification Scheme in December.  During each round, players carry out various simultaneous actions in a particular order.  The order of actions are summarized as follows:
+\begin{enumerate}
+
+\item Diamonds accumulate in each region.
+\item Players pay unit salaries and bribes.
+\item Players move their units and specify bids or UN inspector bribes.
+\item One player moves the UN inspector.
+\item Diamonds are sold in occupied regions.
+\item Players sell diamonds on the open market. 
+\end{enumerate}
+The following subsections provide details about each action.  
+
+
+\subsubsection{Diamond accumulation}
+
+At the start of each round, additional diamonds accumulate in each of the 6 regions.  Different regions accumulate diamonds at different rates, though the rates are set at the start of the game and never change.  The following distribution of accumulation rates applies:
+\begin{itemize}
+\item Four regions accumulate 1 diamond per round.
+\item One region accumulates 2 diamonds per round.
+\item One region accumulates 2 diamonds in even rounds and 1 diamond in odd rounds.
+\end{itemize}
+Each region displays the total of number of uncollected diamonds that have accumulated there.  The accumulation rate is displayed on the detailed view for a given region.
+
+
+\subsubsection{Unit Salaries and bribes}
+
+After diamond accumulation, players can pay salaries to any units that are in their home base regions.  All units start there, so all salaries can be paid at the start of the first round.  To pay additional salary to a unit later in the game, the unit must return to the home base.  Salaries are specified in money units, and there is no limit on a given unit's salary payment.  Total salaries paid so far for each unit are secret information.  The main purpose of salaries is to prevent a unit from being bribed, which is described below.
+
+Any unit that occupies the same region as an opponent unit can secretly subject the opponent unit to a bribe.  After paying salaries to units in their own home base, a player can pay bribes to any opponent units that they occupy regions with.  Bribes are specified in money units with no upper limit on a given payment.  Bribes are only effective if the total of bribes paid so far to a unit is greater than the total salary paid so far by the unit's owner.  For example, a unit that has received total salary payments of 5 can only be successfully bribed with total bribe payments of 6 or more.  Salary and bribe payments increase the unit's loyalty to its owner or to the opponent, respectively.  In the case of a tie (total salary equals total bribe), the unit's loyalty remains with its owner. 
+
+Once a unit has been successfully bribed, it shares all secret information with the opponent, including information about its current salary.  The bribed status of the unit is hidden from the unit's owner.  The bribe may be thwarted by paying the unit additional salary so that the total salary is at or above the total bribe amount.  If the bribe level rises above the salary again, the unit becomes bribed again. 
+
+To increase the bribe on a unit, an opponent unit must co-occupy a region with that unit again.  Any of the opponent's units may be used to pay more bribe money, not just the unit that originally paid the bribe.  Whatever unit last paid bribe money becomes the bribing unit.
+
+\subsubsection{Moving units and specifying bids or UN inspector bribes}
+
+After paying salaries and bribes, both players simultaneously select moves for their units, though moving units is optional.  Units can jump from their current region to any region on the map in a single move.  Units can move back to their home region from producing regions, but they may never move into the opponent's home region.  Each unit moved between producing regions in Angola costs 1 money unit.  Units moved between Angola and home regions (i.e., across the ocean) cost 2 money units each.
+
+At most one unit from each player can occupy a given producing region.  Units can occupy a producing region alone, or they can co-occupy the region with one opponent unit.  Any number of units can occupy a home region.  
+
+If a unit is moving into a producing region, the unit's bid for the diamonds in that region is specified along with the move.
+
+The UN inspector blocks diamond sale in its region.  Thus, a unit moving into the inspector's region cannot specify a bid.  However, the unit can specify an inspector bribe instead.  A winning bribe allows a player to move the inspector (see below).
+
+Thus, moves are made using the following sequence:
+\begin{enumerate}
+\item Players specify their moves and bids (or inspector bribes) simultaneously, in secret.
+\item Bribed units secretly reveal their destinations and bids (or inspector bribes) to the opponent.
+\item Players modify their moves and bids (or inspector bribes) simultaneously, in secret.
+\item Moves are committed.
+\end{enumerate}
+
+If a unit that is carrying diamonds (see below) moves into the region occupied by the UN inspector, that unit loses all the diamonds that it is carrying.
+
+
+\subsubsection{Moving the UN inspector}
+Players moving into the inspector's region pay their chosen bribes, but only the winner gets to select a new region for the inspector.  Note that the winner can also choose to keep the inspector in the same region.  In the case of tie bribes or no bribes, neither player moves the inspector.  Even if a unit moves into the inspector's region alone, it must specify at least a bribe of 1 money unit in order to move the inspector.
+
+Before moving the inspector, the winning player receives all secret information from opponent units that have been successfully bribed, including their final, unchangeable bids in producing regions.  Thus, the player can take these bids into account when picking a destination for the inspector.
+
+If the UN inspector moves into a region with a unit that is carrying diamonds, that unit loses all the diamonds that it is carrying.
+
+
+\subsubsection{Diamond sale}
+After the UN inspector's move (which may not necessarily occur during every round) accumulated diamonds are given to the high bidder in each region.  If more than one unit bids in a region, both players pay their bids, but only the winner receives the accumulated diamonds.  In the case of a tie, both players still pay, but neither get diamonds, and the diamonds in that region accumulate into the next round.
+
+Thematically, the officials in these regions are unscrupulous---they take money from whoever offers it, even if they give nothing in return.
+
+Units carry whatever diamonds they purchase.  The number of diamonds carried by any unit is visible to both players.  When units are moved back to their home bases, they automatically deposit their diamonds there.  The total balance of diamonds at each home base is visible to both players.
+
+The presence of a UN inspector in a region prevents any sale from taking place there, though diamonds still accumulate in each round.  Once the UN inspector is moved away from that region, normal sales and auctions can take place there for all of the diamonds that have accumulated.
+
+Any bids that were specified immediately before the UN inspector moves into a region are lost and no diamond sale takes place.  In other words, bidding players still pay their bids even if the UN inspector moves in and blocks the diamond sale.  When a UN inspector leaves a region, no diamond sale takes place there until the following round.
+
+\subsubsection{Converting diamonds to cash}
+At the end of each round, players can sell diamonds from their home balance on the open market in exchange for money units.  
+
+If a player decides not to sell any diamonds, the player receives a flat ``allowance'' payment of 18 money units from his or her corporation.  A player that decides to sell diamonds forfeits this allowance payment and instead receives income from the diamonds sold.
+
+There are 24 money units available in the open market each round, and these are split between the two players based on how many diamonds they each decide to sell.  If neither player sells any diamonds in the round, the open market money is forfeited, though each player still receives a flat rate allowance as described above.  If only one player sells diamonds, that player gets all 24 money units, no matter how many diamonds that player sells.  If both players sell, each gets a fraction of the money units according to his or her fraction of the total diamonds sold that round.  For example, if one player sells 1 diamond and the other sells 2, then the first player gets 8 money units and the second player gets 16.  If both sell 2 diamonds each, they each get 12 money units.  Fractions are always rounded down to the nearest whole money unit.   
+
+The number of diamonds to sell is specified simultaneously in secret.  If a bribed unit is present in a player's home base, however, the player's chosen quantity is visible to the opponent.  Thus, selling diamonds on the open market is conducted using the following sequence: 
+\begin{enumerate}
+\item Players specify their quantities to sell, simultaneously, in secret.
+\item Bribed units in the home bases secretly reveal the quantities to the opponent.
+\item Players modify their quantities simultaneously, in secret.
+\item Players are paid based on their fraction of the total sold.
+\item Players who sell none receive their flat rate allowance.
+\end{enumerate}
+
+\subsection{Common play pattern}
+Both of the gameplay systems that involve possibly-revealed hidden information use the same 4-step play pattern:
+\begin{enumerate}
+\item Select.
+\item Peek.
+\item Adjust.
+\item Commit.
+\end{enumerate}
+{\it Peek} means obtaining information from bribed units, and {\it Adjust} means modifying your selection based on the new information obtained from peeking.  This play pattern will feel unfamiliar to new players, but its reuse in two phases of the game will make it easier to learn.
+
+\subsection{Hidden information}
+Units maintain various pieces of hidden information throughout the game.  This information is secretly revealed to the opponent, without the unit's owner knowing, if the unit is successfully bribed.  Hidden information includes:
+\begin{enumerate}
+\item Unit's total salary.
+\item Which opponent units this unit has bribed.
+\item Bribe totals for each bribed opponent unit.
+\item Move destination.
+\item Bids.
+\item UN inspector bribe amounts.
+\end{enumerate}
+By bribing an opponent's unit, a player can find out which of his or her units have been bribed, and for how much.  A player can use this information to counteract the bribes with additional salary payments.  Alternately, the player can use these bribed units to feed misleading information to the opponent.
+
+The home base region also maintains hidden information, including the current money balance and the number of diamonds selected for sale at the end of a round.  This information is revealed to the opponent if a bribed unit is present in the home base region.
+
+
+
+\subsection{Win condition}
+At the end of the 12th round, all units automatically return to their home bases and deposit their last batch of collected diamonds.  Diamonds remaining in producing regions are lost.
+
+The player with the most diamonds at the end of the 12th round is the winner.  In the event of a tie, the player with the largest money balance wins.
+
+
+\section{Platform}
+
+\gtitle\ is designed for the Nintendo DSi.  The bottom screen shows the map and unit locations.  Stylus input is used to specify moves, salaries, bribes, bids, and sale quantities.  The top screen shows context-sensitive information about selected units and regions.
+
+\subsection{Multiplayer}
+
+The game makes use of ad hoc WiFi for 2-player games between two nearby DSi units.  The game also supports single player against various skill levels of AI.
+
+\subsection{Camera integration}
+The game makes use of the DSi's cameras in the following ways:
+\begin{enumerate}
+
+\item During an auction, if your unit's bid is being secretly revealed to your opponent during auction step 2, your DSi's inner camera will be used to secretly snap a picture of your face.  This picture will be sent across the WiFi connection and displayed to your opponent.  The same applies for step 2 of the diamond-selling process and step 2 of the inspector-bribing process.
+
+\item If you have successfully bribed the opponent unit that bribed your unit, so that you know your unit has been bribed, you will be secretly informed when you are about to have your picture taken.  ``Smile, you're being watched!'' \  The picture will still be sent to your opponent, who may not know that you know you're being watched.  Thus, you need to avoid smiling in the photo and maintain a bluffing face.  The same applies during the diamond-selling process.
+
+\end{enumerate}
+
+\section{References}
+
+\subsection{Conceptual references}
+The mechanical concepts of \gtitle\ are primarily inspired by the work of Joe Halpern on reasoning about knowledge and uncertainty.  A particularly important touch-point is the Muddy Children Puzzle, a thought experiment with surprising implications.
+
+
+\subsection{Thematic references}
+\begin{itemize}
+\item The UN's Fowler Report, which gives an account of the De Decker Brothers' activities in Angola.  Published in 2000.\\
+http://www.un.org/News/dh/latest/angolareport\_eng.htm
+
+\item A chronology of Angola history.\\
+http://www.c-r.org/our-work/accord/angola/chronology.php
+\end{itemize}
+
+
+\newpage
+
+\section{Balancing}
+This section contains more detailed information about how the design of \gtitle\ is balanced.
+
+\subsection{Nash Equilibria}
+A pure Nash equilibrium (pure NE), where both player stick with their single, chosen strategies even if they both know the strategy of the other, generally should be avoided in multiplayer game designs.  A pure NE is a dominant strategy set that makes for an uninteresting game, since both players can pick their strategies mechanically.  Pure NEs are especially troublesome in simultaneous-decision games, because they thwart the tension of the simultaneous decisions---if knowledge of the opponent's choice doesn't change your choice, the decisions might as well be made sequentially.
+
+Furthermore, in the game \gtitle, your opponent's secret choices can be revealed to you through well-chosen bribes.  If knowledge of those choices doesn't change your choices, you might as well not pay the bribes.  In other words, if there are pure NEs surrounding other choices in the game, ``don't bribe'' becomes the pure NE for the bribing portion of the game, since bribes would have no value.
+
+Thus, a substantial effort has been made to eliminate all single-decision, pure NEs from all parts of the game.  Play-testing has confirmed that the game is more interesting once all of these NEs have been eliminated.
+
+One method of eliminating pure NEs is to build mechanics with an intransitive relationship among the available strategies.
+
+
+\subsection{Salaries and bribes}
+We want to avoid pure NEs for salaries and bribes.  In the case of salaries and bribes of a given unit, the game is asymmetric, so an intransitive relationship is possible in a 2-strategy model.
+
+Suppose that a successful bribe, along with it's cost in money, has some gameplay benefit $x$, independent of the cost of the bribe, where $x$ is also expressed in money units.  Suppose both owner and opponent have paid $z$ money units of salary and bribe respectively to a given unit (thus they are tied---both are losing the same amount of money, and the opponent is reaping no benefit).  As a base case, let them each consider a 1-unit increment of their salary or bribe.  We get the following 2-strategy payoff matrix:
+
+\newcommand{\subtablesep}{\tabcolsep}
+\newcommand{\maintablesep}{0.04in}
+\renewcommand{\tabcolsep}{\maintablesep}
+
+\newcommand{\payoff}[5]{
+%\renewcommand{\tabcolsep}{\subtablesep}
+\begin{tabular}{cc}
+{\sc #3}&{\sc #4}\\
+(#1)&(#2)\\
+\multicolumn{2}{c}{{\sc #5}}
+\end{tabular}
+%\renewcommand{\tabcolsep}{\maintablesep}
+}
+
+
+\begin{center}
+
+\begin{tabular}{r||c|c}
+&Salary = $z + 0$& Salary = $z + 1$\\
+\hline
+\hline
+Bribe = $z + 0$& \payoff{$-z$}{$-z$}{}{}{tie} & \payoff{$-z$}{$-(z+1)$}{win}{}{} \\
+\hline
+Bribe  = $z + 1$& \payoff{$x-(z+1)$}{$-z$}{win}{}{} & \payoff{$-(z+1)$}{$-(z+1)$}{}{}{tie} \\
+\end{tabular}
+
+\end{center}
+Note that the win for the opponent in the case of $(Bribe(z+1), Salary(z))$ requires that $x>1$.  If this is the case, then we have the required intransitive relationship, since a losing salary player can always switch strategies to tie, and a tied bribing player can always switch strategies to win.  While the benefit of a bribe, $x$, has not been computed, we can speculate that it will be at least greater than 1 money unit.  For example, if a player knows the opponent's choice during the diamond selling phase because of a successful bribe, the player can force an advantage of at least one money unit on average (see below).  The following diagram shows the intransitive relationship, where ``$\Longrightarrow$'' can be read as ``beats or ties'':
+
+\[ Bribe(z+1) \Longrightarrow Salary(z) \Longrightarrow Bribe(z) \Longrightarrow Salary(z+1) \Longrightarrow Bribe(z+1)
+\]  
+
+Using this 2-strategy matrix as a base case, it is possible to prove by induction that an intransitive relationship exists in an N-strategy matrix ($z$ increments up to $N-1$) for any N, assuming only that $x>1$. 
+
+
+\subsection{Auctions}
+Auction-like systems are used in two parts of the game:  bidding for diamond purchases and UN inspector bribes.
+
+First-bid and second-bid auctions, where only the winner pays, have a dominant strategy where both players bid the exact value of the item being auctioned.  Bidding more results in a net loss for the winner, so that choice is beaten by any other bid by the loser.  A low bid is always beaten or tied by any higher bid, up to the actual value of the item (where the winner has a net payoff of zero---the value of the item minus the cost paid).
+
+A game based around winner-pay auctions effectively become games about estimating the value of the items being auctioned.  As players learn this estimation, their decisions become more and more mechanical.
+
+Both-pay auctions, where even the loser must pay her bid, are unfamiliar, but they offer much more interesting gameplay without pure NEs.
+
+In a both-pay auction where the item has value $x$, the following intransitive relationship exists, where ``$\longrightarrow$'' can be read as ``beats'':
+
+\[ \cdots \longrightarrow bid(x+2) \longrightarrow bid(x+1) \longrightarrow bid(x) \longrightarrow bid(x-1) \longrightarrow \cdots \longrightarrow bid(1) \longrightarrow bid(0)
+\]
+This relationship wraps around, with $bid(0)$ beating all bids larger than $x$, as follows:
+\[ \forall z>x, bid(0) \longrightarrow bid(z) \]
+This intransitive relationship means that a losing or tied player, upon learning the bid of the winning player, could win by switching her bid.  Thus, there is no pure NE.
+
+Diamond bidding and inspector bribing use the both-pay model, so it follows that no pure NE exists in those parts of the game.
+
+\subsection{Move selection}
+By rolling move selection into the bidding or inspector-bribing decision, pure NEs for moves are also eliminated.  
+
+``Move in and bid $z+1$'' always beats ``move in and bid $z$'' for any $z$, no matter what the value of the diamonds in a region are. On the other hand, if the diamonds have a value of $x$, then ``move elsewhere'' beats ``move in and bid $x+1$,'' because it entails $bid(0)$ in that region as described earlier.  Furthermore, by moving elsewhere, a player can purchase other diamonds for a low bid, meaning the strategy is an even bigger improvement over ``move in and bid 0.''
+
+The same is true for moving into the inspector's region and specifying a bribe, where $x$ becomes the value of getting to move the inspector.
+
+Note that switching a move destination only figures into a strategy change if moves and bids are specified together.  If moves are made and revealed before bids are set, then a player has no motivation to move elsewhere after learning about an opponent's move, since this would allow the opponent to have the diamonds for 1 money unit in the subsequent bidding phase (the opponent would be able to see that she is alone in the region).  To avoid pure NEs for moving, players must set their bids without knowing whether they are alone in their regions.
+
+\subsection{Money allowances}
+To avoid as much fraction rounding as possible during the diamond-selling phase, the total allowance for open-market sales should be divisible by 2, 3, and 4.  This covers a wide variety of possible player choices for selling diamonds (one player selling 1 and the other selling 3; both selling 2; and so on).  Thus, the smallest possible open-market allowance is 12.  Moving all three units between producing regions consumes 3 of those money units.  If each unit bids 1 in its region, only 6 are left for salaries and bribes.  This would allow for only 1 unit of salary per owned unit and 1 unit of bribe per opponent unit---not enough room for player expression.
+
+The next appropriately-divisible value is 24.  Movement and minimal bids would consume 6 units, leaving 18 for salaries and bribes, at an average of 3 per unit.  This allows for much more player expression without overwhelming players with large numbers.
+
+The fixed-rate allowance of 18 was selected, based on the choice of 24, to fulfill the NE-elimination requirements described below.
+
+
+\subsection{Diamond accumulation rates}
+The number of diamonds added to regions in each round affects the overall value of diamonds in the game, relative to money.  This ``exchange rate'' relationship is important when it comes to selling diamonds in exchange for extra working money.  The sole parameter for victory in the game is the number of diamonds held, so selling diamonds is only useful if the extra money will lead to the acquisition of even more diamonds.
+
+To balance the diamond selling phase, as described below, it was determined that 7.5 diamonds needed to be added to the game during each round, on average, for a total of 90 diamonds added in a 12-round game.  It was necessary for one region to accumulate different amounts of diamonds in odd and even rounds to achieve the fractional average of 7.5 diamonds per round.
+
+
+\subsection{Diamond selling phase}
+We want to avoid pure NEs during the selling phase.  The selling phase is inherently symmetric, and for a symmetric two-strategy game, an intransitive relationship is impossible, so at least a three-strategy game is needed.  The following would work, where ``$\longrightarrow$'' can be read as ``beats'':
+
+\[ sell(2) \longrightarrow sell(1) \longrightarrow sell(0) \longrightarrow sell(2)
+\]
+
+Building this kind of relationship, where selling 0 beats selling 2, requires giving a non-selling player a flat-rate allowance {\it and} taking diamond value into account for the selling player when computing payoffs.  Thus, we must compute diamond value.
+
+As described above, 90 total diamonds are added to the game.  To compute their average value in money units, we need to find the total sum of money added to the game.  Some of this money will not be spent directly on diamonds, but it will all indirectly go toward acquiring diamonds (bribing an opponent unit to gain information that will help you get more diamonds, for example).  Any money spent in a way that does not result in diamond acquisition is not a rational expenditure, given that the diamond balances are the sole victory parameter.
+
+If both players sell diamonds in a given round, at total of \$24 is injected.  If one sells and the other does not, the non-seller gets a flat allowance, so \$24 + \$18 = \$42 is injected.  If both do not sell, they both get flat allowances for a total of \$36 injected.  Thus, the minimum injection per round is \$24, while the maximum is \$42.  Over 12 rounds, the total injected ranges between \$288 and \$504.
+
+Spread over the 90 diamonds available, we have an average value that ranges between \$3.2 and \$5.6 per diamond.
+
+Assume the lower value of \$3.2 for a few examples.  If a player sells 1 diamond when the other sells none, that player gains \$24 but loses \$3.2 for the diamond sold, for a net payoff of \$20.8, thus beating the non-selling player's allowance of \$18.  However, if the selling player sells 2 diamonds, she will lose \$6.4 in value for the diamonds sold---while still gaining \$24---for a net payoff of only \$17.6, making the non-selling player the winner.
+
+If one player sells 1 and the other sells 2, they split the \$24, with one receiving \$8 and the other receiving \$16.  But they lose \$3.2 and \$6.4 for their diamonds sold, respectively, making their net payoffs \$4.8 and \$9.6, so the second player wins.
+
+For the lower bound of \$3.2 on diamond values, the following payoff matrix applies:
+
+
+
+
+\begin{center}
+
+\begin{tabular}{r||c|c|c}
+&Sell 0 & Sell 1 & Sell 2\\
+\hline
+\hline
+Sell 0 & \payoff{18}{18}{}{}{tie} & \payoff{18}{24 - 3.2}{}{win}{} & \payoff{18}{24 - 6.4}{win}{}{} \\
+\hline
+Sell 1 & \payoff{24 - 3.2}{18}{win}{}{} & \payoff{12 - 3.2}{12 - 3.2}{}{}{tie} & \payoff{8 - 3.2}{16 - 6.4}{}{win}{} \\
+\hline
+Sell 2 & \payoff{24 - 6.4}{18}{}{win}{} & \payoff{16 - 6.4}{8 - 3.2}{win}{}{} & \payoff{12 - 6.4}{12 - 6.4}{}{}{tie} \\
+\end{tabular}
+
+\end{center}
+For the upper bound of \$5.6 on diamond values, the following payoff matrix applies:
+
+\begin{center}
+
+\begin{tabular}{r||c|c|c}
+&Sell 0 & Sell 1 & Sell 2\\
+\hline
+\hline
+Sell 0 & \payoff{18}{18}{}{}{tie} & \payoff{18}{24 - 5.6}{}{win}{} & \payoff{18}{24 - 11.2}{win}{}{} \\
+\hline
+Sell 1 & \payoff{24 - 5.6}{18}{win}{}{} & \payoff{12 - 5.6}{12 - 5.6}{}{}{tie} & \payoff{8 - 5.6}{16 - 11.2}{}{win}{} \\
+\hline
+Sell 2 & \payoff{24 - 11.2}{18}{}{win}{} & \payoff{16 - 11.2}{8 - 5.6}{win}{}{} & \payoff{12 - 11.2}{12 - 11.2}{}{}{tie} \\
+\end{tabular}
+
+
+\end{center}
+Note that for both tables, an intransitive relationship is present.  Thus, a losing player who knows the choice of the opponent can always switch strategies to win.  Note also that $sell(0)$ beats $sell(n)$ for all $n\geq 2$, so the other possible strategies are dominated by the three-strategy set.
