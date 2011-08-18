@@ -258,8 +258,11 @@ Bribe  = $z + 1$& \payoff{$x-(z+1)$}{$-z$}{win}{}{} & \payoff{$-(z+1)$}{$-(z+1)$
 \end{center}
 Note that the win for the opponent in the case of $(Bribe(z+1), Salary(z))$ requires that $x>1$.  If this is the case, then we have the required intransitive relationship, since a losing salary player can always switch strategies to tie, and a tied bribing player can always switch strategies to win.  While the benefit of a bribe, $x$, has not been computed, we can speculate that it will be at least greater than 1 money unit.  For example, if a player knows the opponent's choice during the diamond selling phase because of a successful bribe, the player can force an advantage of at least one money unit on average (see below).  The following diagram shows the intransitive relationship, where ``$\Longrightarrow$'' can be read as ``beats or ties'':
 
-\[ Bribe(z+1) \Longrightarrow Salary(z) \Longrightarrow Bribe(z) \Longrightarrow Salary(z+1) \Longrightarrow Bribe(z+1)
-\]  
+\[\begin{array}{l}
+Bribe(z+1) \Longrightarrow Salary(z) \Longrightarrow \\
+Bribe(z) \Longrightarrow Salary(z+1) \Longrightarrow Bribe(z+1)
+\end{array}
+\] 
 
 Using this 2-strategy matrix as a base case, it is possible to prove by induction that an intransitive relationship exists in an N-strategy matrix ($z$ increments up to $N-1$) for any N, assuming only that $x>1$. 
 
@@ -275,7 +278,11 @@ Both-pay auctions, where even the loser must pay her bid, are unfamiliar, but th
 
 In a both-pay auction where the item has value $x$, the following intransitive relationship exists, where ``$\longrightarrow$'' can be read as ``beats'':
 
-\[ \cdots \longrightarrow bid(x+2) \longrightarrow bid(x+1) \longrightarrow bid(x) \longrightarrow bid(x-1) \longrightarrow \cdots \longrightarrow bid(1) \longrightarrow bid(0)
+\[ 
+\begin{array}{l}
+\cdots \longrightarrow bid(x+2) \longrightarrow bid(x+1) \longrightarrow \\ 
+bid(x) \longrightarrow bid(x-1) \longrightarrow \cdots \longrightarrow bid(1) \longrightarrow bid(0)
+\end{array}
 \]
 This relationship wraps around, with $bid(0)$ beating all bids larger than $x$, as follows:
 \[ \forall z>x, bid(0) \longrightarrow bid(z) \]
