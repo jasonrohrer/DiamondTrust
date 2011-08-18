@@ -27,10 +27,11 @@
 	ps2pdf $<
 
 
-manualBody.dvi: design.tex
 
 
 all: manualBody.pdf
 
 clean: 
 	rm *.pdf *.ps *.eps *.dvi *.log *.aux *.toc
+
+manualBody.dvi: design.tex
