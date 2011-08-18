@@ -229,9 +229,9 @@ We want to avoid pure NEs for salaries and bribes.  In the case of salaries and 
 
 Suppose that a successful bribe, along with it's cost in money, has some gameplay benefit $x$, independent of the cost of the bribe, where $x$ is also expressed in money units.  Suppose both owner and opponent have paid $z$ money units of salary and bribe respectively to a given unit (thus they are tied---both are losing the same amount of money, and the opponent is reaping no benefit).  As a base case, let them each consider a 1-unit increment of their salary or bribe.  We get the following 2-strategy payoff matrix:
 
-\newcommand{\subtablesep}{\tabcolsep}
-\newcommand{\maintablesep}{0.04in}
-\renewcommand{\tabcolsep}{\maintablesep}
+\newcommand{\oldtablesep}{\tabcolsep}
+\newcommand{\maintablesep}{0.035in}
+%\renewcommand{\tabcolsep}{\maintablesep}
 
 \newcommand{\payoff}[5]{
 %\renewcommand{\tabcolsep}{\subtablesep}
@@ -244,6 +244,8 @@ Suppose that a successful bribe, along with it's cost in money, has some gamepla
 }
 
 
+
+\renewcommand{\tabcolsep}{0.07in}
 \begin{center}
 
 \begin{tabular}{r||c|c}
@@ -335,7 +337,7 @@ For the lower bound of \$3.2 on diamond values, the following payoff matrix appl
 
 
 
-
+\renewcommand{\tabcolsep}{0.045in}
 \begin{center}
 
 \begin{tabular}{r||c|c|c}
@@ -351,6 +353,8 @@ Sell 2 & \payoff{24 - 6.4}{18}{}{win}{} & \payoff{16 - 6.4}{8 - 3.2}{win}{}{} & 
 
 \end{center}
 For the upper bound of \$5.6 on diamond values, the following payoff matrix applies:
+
+\renewcommand{\tabcolsep}{0.037in}
 
 \begin{center}
 
