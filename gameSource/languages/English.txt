@@ -95,7 +95,7 @@ phaseSubStatus_payAgentCannot  "None are payable (touch Done when ready)"
 
 
 phaseStatus_move  "Move your agents"
-phaseStatus_movePeek  "Bribed units reveal moves"
+phaseStatus_movePeek  "Bribed agents reveal moves"
 
 phaseSubStatus_pickAgent  "Pick an agent (or touch Done)"
 phaseSubStatus_pickAgentAdjust  "Adjust move?  Pick an agent (or touch Done)"
@@ -123,7 +123,7 @@ phaseSubStatus_buyDiamonds  "Guides help highest payer get diamonds"
 
 
 phaseStatus_sellDiamonds  "Sell diamonds"
-phaseStatus_sellPeek  "Bribed units reveal sale"
+phaseStatus_sellPeek  "Bribed agents reveal sale"
 phaseSubStatus_sellDiamonds  "Pick number to sell on market (or touch Done)"
 phaseSubStatus_sellDiamondsAdjust  "Adjust sale?  Pick new quanity (or touch Done)"
 phaseSubStatus_sellDiamondsNone "You have none to sell (touch Done when ready)"
@@ -169,7 +169,7 @@ help_payAgents  "You can pay salary to your agents when they are at home in Lond
 help_moveUnits  "In an Angola region, you can pay the diamond guide.  He will accept money from both players, but he gives all diamonds to the player that pays more.  If players tie, the diamonds stay in that region.  The UN Inspector blocks diamond sales and confiscates agents' diamonds.  If you fly into his region, you can bribe him to move to a different region.  He also accepts money from both players but only obeys the one that pays more.  Fly agents home to drop off their diamonds.  Trips inside Angola are cheaper than international trips."
 
 
-help_moveUnitsPeek  "Units that have been successfully bribed reveal their destinations, diamond payments, and UN Inspector bribes to the other side.  You have a chance to adjust your move now that this information has been revealed.  If you opponent is aware of bribes, your opponent has the same chance to adjust.  Adjusted moves are final and are not revealed to the other side before being executed."
+help_moveUnitsPeek  "Agents that have been successfully bribed reveal their destinations, diamond payments, and UN Inspector bribes to the other side.  You have a chance to adjust your move now that this information has been revealed.  If you opponent is aware of bribes, your opponent has the same chance to adjust.  Adjusted moves are final and are not revealed to the other side before being executed."
 
 
 
@@ -180,4 +180,4 @@ help_moveInspector  "When a player successfully bribes the UN Inspector (by payi
 help_sellDiamonds  "The money you earn from selling diamonds depends on the total number sold by both players.  More diamonds put on the market means that each one is worth less, and $24 total is available each month.  Players split that amount based on each player's fraction of the total sold.  However, Diamond Trust wants to keep diamonds off the market.  If a player sells no diamonds at all, that player gets a flat $18 kickback no matter what the other player sells."
 
 
-help_sellDiamondsPeek  "A bribed unit in a home region reveals the number of diamonds to be sold.  You have a chance to adjust your number to sell now that this information has been revealed.  Adjusted moves are final and are not revealed to the other side before being executed.  Note that a bribed unit at home also reveals a player's money balance to the other side."
+help_sellDiamondsPeek  "A bribed agent in a home region reveals the number of diamonds to be sold.  You have a chance to adjust your number to sell now that this information has been revealed.  Adjusted moves are final and are not revealed to the other side before being executed.  Note that a bribed agent at home also reveals a player's money balance to the other side."
