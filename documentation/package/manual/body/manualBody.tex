@@ -1,5 +1,5 @@
 \documentclass[8pt]{extbook}
-\usepackage{epsfig,fullpage,times}
+\usepackage{epsfig,fullpage,times,graphs}
 
 
 \usepackage[dvips]{geometry}
@@ -57,7 +57,7 @@ Diamond Trust is extremely simple on a basic mechanical level.  However, it's a 
 
 First things first:  your goal is to {\bf have more diamonds than your opponent by the end of the game}.  How you use the mechanics to accomplish that goal is up to you.
 
-Each game is divided into eight-rounds, and during each round, play proceeds through a series of phases.  In each phase, you and your opponent make your move selection simultaneously and in secret.  Then both moves are revealed, the outcomes of the moves are applied, and the game advances to the next phase.
+Each game is divided into nine rounds, and during each round, play proceeds through a series of phases.  In each phase, you and your opponent make your move selection simultaneously and in secret.  Then both moves are revealed, the outcomes of the moves are applied, and the game advances to the next phase.
 
 The mechanics at your disposal in the various phases include moving your agents from region to region, bidding on diamonds, moving the UN Inspector to change which regions are open for play, and selling some of your collected diamonds to raise additional money for future rounds.
 
@@ -98,8 +98,78 @@ Headphones or two separate rooms are recommended to avoid unpleasant music combi
 
 
 
+\begin{figure}[p]
+\begin{center}
+
+\begin{framegraph}(7,8)(-3.5,-.5)
+%\begin{framegraph}(6,5)(-3,0.5)
+\graphnodesize{0.6}
+\graphnodecolour{1}
+\grapharrowlength{0.2}
+\grapharrowwidth{0.75}
+%\opaquetextfalse
+%\fillednodesfalse
+
+\newcommand{\phase}[4] { \textnode{#1}(#2,#3){{\large \begin{tabular}{c}#4\end{tabular}}} }    
 
 
+\phase{pay}{0}{7}{Pay agents}
+
+\phase{move}{0}{5.5}{Move agents\\(specify diamond bids)\\(specify inspector bribes)}
+
+\phase{deposit}{0}{3.75}{Deposit diamonds\\(as agents move home)}
+
+
+\phase{inspector}{0}{2.25}{Move UN inspector\\(inspector confiscates)}
+
+\phase{collect}{0}{1}{Collect diamonds}
+
+\phase{sell}{0}{0}{Sell diamonds}
+
+
+
+\diredge{pay}{move}
+\diredge{move}{deposit}
+\diredge{deposit}{inspector}
+\diredge{inspector}{collect}
+\diredge{collect}{sell}
+
+
+\dirbow{sell}{pay}{0.5}
+\bowtext{sell}{pay}{0.5}{Repeat 9 times}
+
+
+\end{framegraph}
+
+\end{center}
+
+%\caption{Phase progression in Diamond Trust}
+\label{fig:gameFlow}
+
+\end{figure}
+
+
+\section{Structure of the game}
+
+The diagram on page \pageref{fig:gameFlow} shows the phase progression during each round of the game.  That progression is repeated nine times until the end of the game.  Sections \ref{sec:payPhase} through \ref{sec:sellPhase} explain each game phase in detail.
+
+\newpage
+
+
+
+\subsection{Game phase:  Pay agents}
+\label{sec:payPhase}
+
+\subsection{Game phase:  Move agents}
+
+\subsection{Game phase:  Deposit diamonds}
+
+\subsection{Game phase:  Move UN inspector}
+
+\subsection{Game phase:  Collect diamonds}
+
+\subsection{Game phase:  Sell diamonds}
+\label{sec:sellPhase}
 
 
 
