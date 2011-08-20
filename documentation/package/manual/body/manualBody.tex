@@ -1,5 +1,5 @@
 \documentclass[8pt]{extbook}
-\usepackage{epsfig,fullpage,times,graphs}
+\usepackage{epsfig,fullpage,mathptmx,graphs}
 
 \renewcommand{\rmdefault}{phv}
 
@@ -324,8 +324,10 @@ If multiple people want to join chosen partners in the same room, they should pa
 \addtocounter{chapter}{1}
 \setcounter{section}{0}
 
-
+% revert back to Times font for original design doc
+\fontfamily{ptm}\selectfont
 \input{design.tex}
+\fontfamily{phv}\selectfont
 
 
 \part{Credits}
