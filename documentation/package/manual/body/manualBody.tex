@@ -15,7 +15,9 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 
-
+% don't show chapter number in section headings
+% because chapter numbers aren't used anywhere else in the document
+\def\thesection{\arabic{section}}
 
 \fancyhead{} % clear all fields
 \fancyfoot{} % clear all fields
