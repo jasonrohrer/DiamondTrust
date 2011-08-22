@@ -29,9 +29,12 @@
 
 
 
-all: manualBody.pdf
+all: manualBodyFull.pdf
 
 clean: 
 	rm *.pdf *.ps *.eps *.dvi *.log *.aux *.toc
 
-manualBody.dvi: design.tex
+
+
+manualBodyFull.pdf: manualBody.pdf design.pdf
+	gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=manualBodyFull.pdf manualBody.pdf design.pdf

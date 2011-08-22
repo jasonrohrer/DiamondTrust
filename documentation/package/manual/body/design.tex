@@ -1,3 +1,10 @@
+\documentclass[8pt]{extarticle}
+\usepackage{fullpage,mathptmx,abstract}
+
+
+\input{pageGeometry.tex}
+
+%\pagestyle{empty}
 
 \newcommand{\gtitle}{{\it Diamonds}}
 
@@ -7,21 +14,20 @@
 \newcommand{\Rcs}{Resources}
 
 
-{\centering 
-{\huge Design: \gtitle\ (working title)}
+\title{Design: \gtitle\ (working title)}
+\author{Jason Rohrer}
+\date{August 24, 2009}
 
-{\large Jason Rohrer}
+\begin{document}
 
-{\large August 24, 2009}
+\maketitle
 
-}
+\renewcommand{\abstractnamefont}{\normalfont\bfseries}
+\renewcommand{\abstracttextfont}{\normalfont}
 
-
-\subsubsection*{\centering Abstract}
-\begin{quotation}
-\noindent \gtitle\ for the Nintendo DSi is a two-player, turn-based strategy game about the dealings, secrets, and espionage of two diamond trading corporations.  The game takes place in Angola, a nation rich with diamonds but torn by factional conflict.  Each player controls a corporation that deploys hired agents into the region to purchase diamonds.  Agents maintain certain corporate secrets about their dealings, but their loyalty is for sale.  \gtitle\ is a game of incomplete information where opponents can secretly obtain information about each other.
-\end{quotation}
-%\end{abstract}
+\begin{abstract}
+\gtitle\ for the Nintendo DSi is a two-player, turn-based strategy game about the dealings, secrets, and espionage of two diamond trading corporations.  The game takes place in Angola, a nation rich with diamonds but torn by factional conflict.  Each player controls a corporation that deploys hired agents into the region to purchase diamonds.  Agents maintain certain corporate secrets about their dealings, but their loyalty is for sale.  \gtitle\ is a game of incomplete information where opponents can secretly obtain information about each other.  
+\end{abstract}
 
 
 \section{Thematic overview}
@@ -228,21 +234,13 @@ One method of eliminating pure NEs is to build mechanics with an intransitive re
 We want to avoid pure NEs for salaries and bribes.  In the case of salaries and bribes of a given unit, the game is asymmetric, so an intransitive relationship is possible in a 2-strategy model.
 
 Suppose that a successful bribe, along with it's cost in money, has some gameplay benefit $x$, independent of the cost of the bribe, where $x$ is also expressed in money units.  Suppose both owner and opponent have paid $z$ money units of salary and bribe respectively to a given unit (thus they are tied---both are losing the same amount of money, and the opponent is reaping no benefit).  As a base case, let them each consider a 1-unit increment of their salary or bribe.  We get the following 2-strategy payoff matrix:
-
-\newcommand{\oldtablesep}{\tabcolsep}
-\newcommand{\maintablesep}{0.035in}
-%\renewcommand{\tabcolsep}{\maintablesep}
-
 \newcommand{\payoff}[5]{
-%\renewcommand{\tabcolsep}{\subtablesep}
 \begin{tabular}{cc}
 {\sc #3}&{\sc #4}\\
 (#1)&(#2)\\
 \multicolumn{2}{c}{{\sc #5}}
 \end{tabular}
-%\renewcommand{\tabcolsep}{\maintablesep}
 }
-
 
 
 \renewcommand{\tabcolsep}{0.07in}
@@ -260,11 +258,8 @@ Bribe  = $z + 1$& \payoff{$x-(z+1)$}{$-z$}{win}{}{} & \payoff{$-(z+1)$}{$-(z+1)$
 \end{center}
 Note that the win for the opponent in the case of $(Bribe(z+1), Salary(z))$ requires that $x>1$.  If this is the case, then we have the required intransitive relationship, since a losing salary player can always switch strategies to tie, and a tied bribing player can always switch strategies to win.  While the benefit of a bribe, $x$, has not been computed, we can speculate that it will be at least greater than 1 money unit.  For example, if a player knows the opponent's choice during the diamond selling phase because of a successful bribe, the player can force an advantage of at least one money unit on average (see below).  The following diagram shows the intransitive relationship, where ``$\Longrightarrow$'' can be read as ``beats or ties'':
 
-\[\begin{array}{l}
-Bribe(z+1) \Longrightarrow Salary(z) \Longrightarrow \\
-Bribe(z) \Longrightarrow Salary(z+1) \Longrightarrow Bribe(z+1)
-\end{array}
-\] 
+\[ Bribe(z+1) \Longrightarrow Salary(z) \Longrightarrow Bribe(z) \Longrightarrow Salary(z+1) \Longrightarrow Bribe(z+1)
+\]  
 
 Using this 2-strategy matrix as a base case, it is possible to prove by induction that an intransitive relationship exists in an N-strategy matrix ($z$ increments up to $N-1$) for any N, assuming only that $x>1$. 
 
@@ -281,8 +276,8 @@ Both-pay auctions, where even the loser must pay her bid, are unfamiliar, but th
 In a both-pay auction where the item has value $x$, the following intransitive relationship exists, where ``$\longrightarrow$'' can be read as ``beats'':
 
 \[ 
-\begin{array}{l}
-\cdots \longrightarrow bid(x+2) \longrightarrow bid(x+1) \longrightarrow \\ 
+\begin{array}{c}
+\cdots \longrightarrow bid(x+2) \longrightarrow bid(x+1) \longrightarrow \\
 bid(x) \longrightarrow bid(x-1) \longrightarrow \cdots \longrightarrow bid(1) \longrightarrow bid(0)
 \end{array}
 \]
@@ -337,6 +332,7 @@ For the lower bound of \$3.2 on diamond values, the following payoff matrix appl
 
 
 
+
 \renewcommand{\tabcolsep}{0.045in}
 \begin{center}
 
@@ -353,6 +349,7 @@ Sell 2 & \payoff{24 - 6.4}{18}{}{win}{} & \payoff{16 - 6.4}{8 - 3.2}{win}{}{} & 
 
 \end{center}
 For the upper bound of \$5.6 on diamond values, the following payoff matrix applies:
+
 
 \renewcommand{\tabcolsep}{0.037in}
 
@@ -372,3 +369,5 @@ Sell 2 & \payoff{24 - 11.2}{18}{}{win}{} & \payoff{16 - 11.2}{8 - 5.6}{win}{}{} 
 
 \end{center}
 Note that for both tables, an intransitive relationship is present.  Thus, a losing player who knows the choice of the opponent can always switch strategies to win.  Note also that $sell(0)$ beats $sell(n)$ for all $n\geq 2$, so the other possible strategies are dominated by the three-strategy set.
+
+\end{document}

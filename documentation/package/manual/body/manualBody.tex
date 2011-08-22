@@ -1,25 +1,19 @@
 \documentclass[8pt]{extbook}
-\usepackage{epsfig,fullpage,mathptmx,graphs}
+\usepackage{fullpage,mathptmx,graphs}
 
 \renewcommand{\rmdefault}{phv}
 
-\usepackage[dvips]{geometry}
-
-\newlength{\paperWidth}
-\setlength{\paperWidth}{4.125in}
-\newlength{\paperHeight}
-\setlength{\paperHeight}{4.125in}
-
-% trim a bit more to reduce bottom whitespace
-%\setlength{\paperHeight}{0.987\paperHeight}
-
-\geometry{papersize={\paperWidth,\paperHeight},scale=1.0, top=0.25in, bottom=0.375in, left=0.25in, right=0.25in, headheight=0in, headsep=0in, footskip=0.1875in}
-%total={6.5in,5in}}
-
+\input{pageGeometry.tex}
 
 % force all sections to start on new pages
 %\let\stdsection\section  
 %\renewcommand\section{\newpage \stdsection} 
+
+
+\makeatletter %This allows us to turn off and on openright at will.
+\newcommand{\startopenany}{\@openrightfalse}
+\newcommand{\stopopenany}{\@openrighttrue}
+\makeatother
 
 
 \setcounter{tocdepth}{0}
@@ -31,6 +25,7 @@
 \tableofcontents
 
 
+\startopenany
 \chapter{Introduction}
 
 Diamond Trust of London has been a very long time coming, and it's too much of an uneven story to fully relate here.  Suffice it to say that what you hold in your hands right now exists only because of several unlikely and fortunate events.  
@@ -47,9 +42,12 @@ August 2011
 \end{minipage}
 \end{flushright}
 
+
+\stopopenany
+
 \mainmatter
 
-\part{How to play}
+\part{Game Manual}
 \addtocounter{chapter}{1}
 \setcounter{section}{0}
 
@@ -319,30 +317,27 @@ You will now have a room full of friends who all have downloaded the game and ar
 If multiple people want to join chosen partners in the same room, they should pair up and host/join one pair at a time.  The default behavior of Diamond Trust when multiple people are hosting and joining simultaneously is to pair them up randomly with each other (there is no lobby view for selecting among multiple available hosts).  This behavior can be used, if half of the friends host and the other half join simultaneously, to play against a friend whose identity is unknown to you, adding yet another layer of uncertainty and deception.
 
 
+\addcontentsline{toc}{chapter}{Credits}
+\chapter*{Credits}
+
+\paragraph{Jason Rohrer}
+Concept, game design, programming, graphics, pixel fonts, package design, package photography, manual contents.
+
+\paragraph{Tom Bailey}
+Interactive music direction, composition, arrangement, and production.
+
+\paragraph{Thanks}
+Gun Consulting brought indiePub and Diamond Trust together.  Mark Seremet believed in this crazy project.  Lauren Serafin helped to playtest several early versions of the game.  The font used on the title screen is Oxford by Roger White.  The satellite image of Angola is from the NASA Visible Earth project.
+
+
+
 
 \part{Original design document}
 \addtocounter{chapter}{1}
 \setcounter{section}{0}
 
-% revert back to Times font for original design doc
-\fontfamily{ptm}\selectfont
-\input{design.tex}
-\fontfamily{phv}\selectfont
 
-
-\part{Credits}
-\addtocounter{chapter}{1}
-\setcounter{section}{0}
-
-\subsubsection{Jason Rohrer}
-Concept, game design, programming, graphics, pixel fonts, package design, package photography, manual contents.
-
-\subsubsection{Tom Bailey}
-Interactive music direction, composition, arrangement, and production.
-
-\subsubsection{Thanks}
-Gun Consulting brought indiePub and Diamond Trust together.  Mark Seremet believed in this crazy project.  Lauren Serafin helped to playtest several early versions of the game.  The font used on the title screen is Oxford by Roger White.  The satellite image of Angola is from the NASA Visible Earth project.
-
+% this document gets added later with a pdf merge (using gs)
 
 
 
