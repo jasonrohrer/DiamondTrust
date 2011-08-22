@@ -35,6 +35,9 @@ clean:
 	rm *.pdf *.ps *.eps *.dvi *.log *.aux *.toc
 
 
+manualBody.dvi: pageGeometry.tex
+
+design.dvi: pageGeometry.tex
 
 manualBodyFull.pdf: manualBody.pdf design.pdf
 	gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=manualBodyFull.pdf manualBody.pdf design.pdf

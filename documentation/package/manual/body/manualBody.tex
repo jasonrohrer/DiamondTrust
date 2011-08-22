@@ -5,6 +5,27 @@
 
 \input{pageGeometry.tex}
 
+
+% override for ``proper'' book layout, text body has same aspect ratio as page
+% inner margin half of outer margin
+\geometry{papersize={\paperWidth,\paperHeight},scale=1.0, top=0.25in, bottom=0.5in,left=0.25in, right=0.5in,footskip=0.25in}
+%total={6.5in,5in}}
+
+% make page numbers distinct from original design doc, too
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+
+
+\fancyhead{} % clear all fields
+\fancyfoot{} % clear all fields
+\fancyfoot[RO,LE]{\thepage}
+
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+
+
 % force all sections to start on new pages
 %\let\stdsection\section  
 %\renewcommand\section{\newpage \stdsection} 
