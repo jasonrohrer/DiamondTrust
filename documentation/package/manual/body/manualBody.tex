@@ -8,7 +8,9 @@
 
 % override for ``proper'' book layout, text body has same aspect ratio as page
 % inner margin half of outer margin
-\geometry{papersize={\paperWidth,\paperHeight},scale=1.0, top=0.15in, bottom=0.3in,left=0.15in, right=0.3in,footskip=0.18in}
+%\geometry{papersize={\paperWidth,\paperHeight},scale=1.0, top=0.15in, bottom=0.3in,left=0.15in, right=0.3in,footskip=0.18in}
+\geometry{papersize={\paperWidth,\paperHeight},scale=1.0, top=0.2in, bottom=0.4in,left=0.2in, right=0.4in,footskip=0.18in}
+%\geometry{papersize={\paperWidth,\paperHeight},scale=1.0, top=0.25in, bottom=0.5in,left=0.25in, right=0.5in,footskip=0.18in}
 %total={6.5in,5in}}
 
 % make page numbers distinct from original design doc, too
@@ -25,6 +27,8 @@
 
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
+
+
 
 
 
@@ -70,9 +74,54 @@ August 2011
 
 \mainmatter
 
+
+\makeatletter
+\def\myEndPart{\vfil
+\input{gamePhaseDiagram.tex}
+
+              \if@twoside
+                \null
+                \thispagestyle{empty}%
+                \newpage
+              \fi
+              \if@tempswa
+                \twocolumn
+              \fi}
+\makeatother
+
+% from extbook.cls
+\makeatletter
+\def\standardEndPart{\vfil\newpage
+              \if@twoside
+                \null
+                \thispagestyle{empty}%
+                \newpage
+              \fi
+              \if@tempswa
+                \twocolumn
+              \fi}
+\makeatother
+
+
+
+
+% just for this part, remove blank page after so we can stick figure there
+\makeatletter
+\renewcommand\@endpart{\myEndPart}
+\makeatother
+
 \part{Game Manual}
 \addtocounter{chapter}{1}
 \setcounter{section}{0}
+
+%back to normal blank page after part
+\makeatletter
+\renewcommand\@endpart{\standardEndPart}
+\makeatother
+
+
+
+
 
 \section{Overview}
 Diamond Trust is extremely simple on a basic mechanical level.  However, it's a new game design that does not share too many play patterns with other games that you've played before.  When you sit down at new platformer or a new realtime strategy game or a new first person shooter, you already know how to play.  That won't be the case with Diamond Trust---you must learn how to play.
@@ -92,55 +141,6 @@ The diagram on page \pageref{fig:gameFlow} shows the phase progression during ea
 
 
 
-\begin{figure}[p]
-\begin{center}
-
-\begin{graph}(7,8)(-3.5,-.5)
-%\begin{framegraph}(6,5)(-3,0.5)
-\graphnodesize{0.6}
-\graphnodecolour{1}
-\grapharrowlength{0.2}
-\grapharrowwidth{0.75}
-%\opaquetextfalse
-%\fillednodesfalse
-
-\newcommand{\phase}[4] { \textnode{#1}(#2,#3){{\large \begin{tabular}{c}#4\end{tabular}}} }    
-
-
-\phase{pay}{0}{7}{Pay agents}
-
-\phase{move}{0}{5.5}{Move agents\\(specify diamond bids)\\(specify inspector bribes)}
-
-\phase{deposit}{0}{3.75}{Deposit diamonds\\(as agents move home)}
-
-
-\phase{inspector}{0}{2.25}{Move UN inspector\\(inspector confiscates)}
-
-\phase{collect}{0}{1}{Collect diamonds}
-
-\phase{sell}{0}{0}{Sell diamonds}
-
-
-
-\diredge{pay}{move}
-\diredge{move}{deposit}
-\diredge{deposit}{inspector}
-\diredge{inspector}{collect}
-\diredge{collect}{sell}
-
-
-\dirbow{sell}{pay}{0.5}
-\bowtext{sell}{pay}{0.5}{Repeat 9 times}
-
-
-\end{graph}
-
-\end{center}
-
-%\caption{Phase progression in Diamond Trust}
-\label{fig:gameFlow}
-
-\end{figure}
 
 
 
@@ -289,7 +289,9 @@ Agents hold the diamond that they have collected, which are vulnerable to future
 
 Before the start of the next round, players are given the chance to sell some of their accumulated diamonds---those that have been brought back to their home regions---one the open market to raise additional capital.
 
-A player who sells no diamonds at all gets a flat \$18 injection of fresh money.  Players that chose to sell diamonds get a share of \$24 based on how many diamonds are sold in total, by both players, that round.  A player's share is determined by their fraction of the total sold.  If only one player sells, that player gets the entire \$24, no matter how many that player sells.  If both players sell the same amount, no matter how many they each sell, each player gets half of the available money, or \$12.  The following table illustrates this break-down with various examples:
+A player who sells no diamonds at all gets a flat \$18 injection of fresh money.  Players that chose to sell diamonds get a share of \$24 based on how many diamonds are sold in total, by both players, that round.  A player's share is determined by their fraction of the total sold.  If only one player sells, that player gets the entire \$24, no matter how many that player sells.  If both players sell the same amount, no matter how many they each sell, each player gets half of the available money, or \$12.  The table on page \pageref{fig:sellTable} illustrates this break-down with various examples.  Note that if the total sold does not divide 24 evenly, the amount paid to each player is rounded down (as shown in the last line of the table).
+
+\begin{figure}[t]
 \begin{center}
 \begin{tabular}{r|r||r|r}
 Player 1 sells & Player 2 sells & Player 1 gets & Player 2 gets\\
@@ -310,7 +312,11 @@ Player 1 sells & Player 2 sells & Player 1 gets & Player 2 gets\\
 3 & 2 & \$14 & \$9 \\
 \end{tabular} 
 \end{center}
-Note that if the total sold does not divide 24 evenly, the amount paid to each player is rounded down (as shown in the last line of the above table).
+%\caption{Table of sell payoff examples}
+\label{fig:sellTable}
+
+\end{figure}
+
 
 
 \section{End of the game}

@@ -1,0 +1,50 @@
+\begin{figure}[p!]
+\begin{center}
+
+%\begin{graph}(7,8)(-3.5,-.5)
+%\begin{framegraph}(7,8)(-3.5,-.5)
+\begin{framegraph}(8,7.25)(-4,0.125)
+\graphnodesize{0.6}
+\graphnodecolour{1}
+\grapharrowlength{0.2}
+\grapharrowwidth{0.75}
+%\opaquetextfalse
+%\fillednodesfalse
+
+\newcommand{\phase}[4] { \textnode{#1}(#2,#3){{\large \begin{tabular}{c}#4\end{tabular}}} }    
+
+
+\phase{pay}{0}{7}{Pay agents}
+
+\phase{move}{0}{5.5}{Move agents\\(specify diamond bids)\\(specify inspector bribes)}
+
+\phase{deposit}{0}{3.75}{Deposit diamonds\\(as agents move home)}
+
+
+\phase{inspector}{0}{2.25}{Move UN inspector\\(inspector confiscates)}
+
+\phase{collect}{0}{1}{Collect diamonds}
+
+\phase{sell}{0}{0}{Sell diamonds}
+
+
+
+\diredge{pay}{move}
+\diredge{move}{deposit}
+\diredge{deposit}{inspector}
+\diredge{inspector}{collect}
+\diredge{collect}{sell}
+
+
+\dirbow{sell}{pay}{0.55}
+\bowtext{sell}{pay}{0.55}{\begin{tabular}{c}Repeat\\9 times\end{tabular}}
+
+
+\end{framegraph}
+
+\end{center}
+
+%\caption{Phase progression in Diamond Trust}
+\label{fig:gameFlow}
+
+\end{figure}
