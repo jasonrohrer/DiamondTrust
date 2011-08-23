@@ -35,7 +35,7 @@ clean:
 	rm *.pdf *.ps *.eps *.dvi *.log *.aux *.toc
 
 
-manualBody.dvi: pageGeometry.tex
+manualBody.dvi: pageGeometry.tex gamePhaseDiagram.tex
 
 design.dvi: pageGeometry.tex
 
