@@ -238,6 +238,7 @@ Agents that have become loyal to the opponent reveal their hidden information se
 In particular, agents that have been successfully bribed reveal what other agents {\it they} have bribed, and for how much.  How much your own agents have been bribed is hidden from you, unless you successfully bribe the agent that bribed your agent---then you can find out.
 
 \subsection{Game phase:  Move agents}
+\label{sec:movePhase}
 
 During this phase, you can specify destinations for each of your agents.  A trip inside Angola costs \$1 per agent.  A trip between Angola and Europe costs \$2 per agent.  The trip cost for the selected agent is shown at the top of that agent's Rolodex card.
 
@@ -265,9 +266,12 @@ Auctions in Diamond Trust are somewhat unusual:  instead of a standard winner-pa
 Inspector bribes also follow the {\it both-pay} model.  The UN Inspector accepts bribe payments from both players, but only obeys the command of the player who pays him more.  Again, in the case of a tie, he takes money from both players but obeys neither player.
 
 \subsection{Game phase:  Deposit diamonds}
+\label{sec:depositPhase}
+
 After agent moves are executed, any agents that have returned to their home regions deposit any diamonds that they are carrying.  Diamonds deposited at home are permanently safe from confiscation by the UN inspector and are also available for sale during the Sell Diamonds phase.
 
 \subsection{Game phase:  Move UN Inspector}
+\label{sec:inspectorPhase}
 
 The UN Inspector has two functions in the game.  First, he blocks diamond acquisition in whatever region he occupies, effectively freezing the region and allowing diamonds to accumulate there.  Second, he confiscates diamonds carried by any agents that he encounters in his region.  However, if he will move this round due to a player's bribe, he only performs this confiscation after he moves, once he reaches his destination region.
 
@@ -278,6 +282,7 @@ To move the Inspector, if you are the player who has paid him more, touch an Ang
 After he moves, he performs his confiscation.  He also blocks whatever diamond sale was pending in his new region (though both players in that region still pay what they have bid for the diamonds there).  Thus, moving the Inspector can be used to open up an opportunity in one region while simultaneously shutting down an opportunity in another region.
 
 \subsection{Game phase:  Collect diamonds}
+\label{sec:collectPhase}
 
 After the Inspector's move, if he moves at all, and confiscation, agents in the other Angola regions collect diamonds according to the both-pay rule describe above.  Diamonds in regions where no player bids or both players tie simply remain in their region, accumulating for the next round.
 
