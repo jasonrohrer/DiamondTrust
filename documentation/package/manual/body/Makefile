@@ -32,7 +32,7 @@
 all: manualBodyFull.pdf
 
 clean: 
-	rm *.pdf *.ps *.eps *.dvi *.log *.aux *.toc
+	rm *.pdf *.ps *.eps *.dvi *.log *.aux *.toc printPageOrder
 
 
 manualBody.dvi: pageGeometry.tex gamePhaseDiagram.tex
@@ -41,3 +41,14 @@ design.dvi: pageGeometry.tex
 
 manualBodyFull.pdf: manualBody.pdf design.pdf
 	gs -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=manualBodyFull.pdf manualBody.pdf design.pdf
+
+
+printPageOrder: printPageOrder.cpp
+	g++ -o printPageOrder printPageOrder.cpp
+
+
+manualPrintBooklet.pdf:  BOOKLET_PAGE_ORDER = $(shell ./printPageOrder 47 24 )
+
+
+manualPrintBooklet.pdf:  manualBodyFull.pdf printPageOrder
+	pdfnup manualBodyFull.pdf --frame true --paper letterpaper --noautoscale true --outfile manualPrintBooklet.pdf --pages $(BOOKLET_PAGE_ORDER)
