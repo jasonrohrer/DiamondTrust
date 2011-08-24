@@ -1546,6 +1546,14 @@ static void autoTouchCallback( TPRequestCommand inCommand,
 
 
 char getTouch( int *outX, int *outY ) {
+    if( getLidClosed() ) {
+        // block/discard all input when lid is closed
+        touchWasDown = false;
+        
+        return false;
+        }
+    
+
     if( touchWasDown ) {
         *outX = touchX;
         *outY = touchY;
