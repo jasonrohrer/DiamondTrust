@@ -28,7 +28,7 @@
 extern unsigned char wmBuffer[ WM_SYSTEM_BUF_SIZE ];
 
 
-#define LOCAL_GGID 0x003fff63
+#include "ggid.h"
 
 static unsigned short tgid = 0;
 

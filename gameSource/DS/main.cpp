@@ -1577,7 +1577,8 @@ char isFirstConnection = true;
 
 
 #define WM_DMA_NO  2
-#define LOCAL_GGID 0x003fff63
+
+#include "ggid.h"
 
 unsigned short tgid = 0;
 
