@@ -3418,7 +3418,9 @@ static char skippingLogo() {
         
         // fade in for 0.25 seconds, ~8 frames
 
-        while( nintendoLogoFade < 255 && ! skippingLogo() ) {
+        // don't allow skipping during fade-in, to avoid not showing logo
+        // at all if user holds down a button from the IPL screen onward.
+        while( nintendoLogoFade < 255 ) {
             
             runGameLoopOnce();
             runGameLoopOnce();
