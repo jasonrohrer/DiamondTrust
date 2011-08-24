@@ -4,6 +4,16 @@ build getWaveInfo.cpp into getWaveInfo in the gameSource folder.
 
 Build sox from source.
 
+Modify the ~/sox/src/sox  script (a local wrapper script) in the following way:
+
+---Look for these lines and change them to look like this:
+
+    # Add our own library path to DYLD_LIBRARY_PATH
+    DYLD_LIBRARY_PATH="./convertTo32768.app/Contents/MacOS/.libs:$DYLD_LIBRARY_PATH"
+
+In other words, change the DYLD_LIBRAY_PATH addition so that it points into our app
+bundle instead of wherever the SOX build had it point.
+
 
 Copy all this stuff into the App bundle, like so:
 
