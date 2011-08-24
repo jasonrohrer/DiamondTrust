@@ -17,7 +17,7 @@ bundle instead of wherever the SOX build had it point.
 
 Copy all this stuff into the App bundle, like so:
 
-cp -r convertAllWavs convertWav ../getWavInfo ~/sox/src/sox ~/sox/src/.libs convertTo32768.app/Contents/MacOS/
+cp -r /usr/lib/libltdl.3.dylib convertAllWavs convertWav ../getWavInfo ~/sox/src/sox ~/sox/src/.libs convertTo32768.app/Contents/MacOS/
 
 
 So now sox and all the support scripts and exes are in the app bundle, ready to go.
