@@ -177,7 +177,7 @@ Button *doneButton;
 Button *nextButton;
 Button *parentButton;
 // this one can be NULL if not supported
-Button *parentServeCloneDownloaButton;
+Button *parentServeCloneDownloadButton;
 Button *childButton;
 
 Button *helpButton;
@@ -541,7 +541,7 @@ void gameInit() {
             translate( "button_parent_muti_card" ),
             128,
             66 );
-        parentServeCloneDownloaButton = new Button( 
+        parentServeCloneDownloadButton = new Button( 
             font16, 
             translate( "button_parent_clone" ),
             128,
@@ -550,7 +550,7 @@ void gameInit() {
     else {
         // just a straight hosting button
     
-        parentServeCloneDownloaButton = NULL;
+        parentServeCloneDownloadButton = NULL;
         
         parentButton = new Button( font16, translate( "button_parent" ),
                                    128,
@@ -673,9 +673,9 @@ void gameFree() {
     delete aiButton;
     delete wifiButton;
     
-    if( parentServeCloneDownloaButton != NULL ) {
-        delete parentServeCloneDownloaButton;
-        parentServeCloneDownloaButton = NULL;
+    if( parentServeCloneDownloadButton != NULL ) {
+        delete parentServeCloneDownloadButton;
+        parentServeCloneDownloadButton = NULL;
         }
 
     delete parentButton;

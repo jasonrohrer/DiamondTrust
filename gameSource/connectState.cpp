@@ -22,7 +22,7 @@ extern int wirelessOnSpriteID;
 
 
 extern Button *parentButton;
-extern Button *parentServeCloneDownloaButton;
+extern Button *parentServeCloneDownloadButton;
 extern Button *childButton;
 extern const char *statusMessage;
 extern const char *statusSubMessage;
@@ -150,8 +150,8 @@ void ConnectState::clickState( int inX, int inY ) {
             connecting = true;
             stepsSinceConnectTry = 0;
             }
-        else if( parentServeCloneDownloaButton != NULL &&
-                 parentServeCloneDownloaButton->getPressed( inX, inY ) ) {
+        else if( parentServeCloneDownloadButton != NULL &&
+                 parentServeCloneDownloadButton->getPressed( inX, inY ) ) {
             
             isHost = true;
             
@@ -378,11 +378,11 @@ void ConnectState::drawState() {
             }
         
 
-        if( parentServeCloneDownloaButton != NULL ) {
-            parentServeCloneDownloaButton->draw();
+        if( parentServeCloneDownloadButton != NULL ) {
+            parentServeCloneDownloadButton->draw();
 
             if( showIcon ) {
-                drawWirelessIconNextToButton( parentServeCloneDownloaButton );
+                drawWirelessIconNextToButton( parentServeCloneDownloadButton );
                 }
             }
         
