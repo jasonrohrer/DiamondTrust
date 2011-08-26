@@ -136,9 +136,9 @@ Each game is divided into nine rounds, and during each round, play proceeds thro
 
 The basic mechanics at your disposal in the various phases include moving your agents from region to region, bidding on diamonds, moving the UN Inspector to change which regions are open for play, and selling some of your collected diamonds to raise additional money for future rounds.
 
-So far, the game as described might sound like a typical, albeit novel, German-style board game.  However, there are additional mechanics in the game that would be impossible to implement in board-game form, and such mechanics are the reason for Diamond Trust's existence.
+So far, the game as described might sound like a typical German-style board game.  However, there are additional mechanics in the game that would be impossible to implement in board-game form, and such mechanics are the reason for Diamond Trust's existence.
 
-Thus, on top of the basic trading mechanics, there is a layer of agent loyalty mechanics.  You can pay your agents to keep them loyal and bribe opponent agents to acquire their loyalty as well.  When an agent is loyal to the other side, suddenly the ``make your move in secret'' guarantee goes out the window.  Of course, you won't know that your agent has been compromised, unless you manage to bribe the agent that bribed your agent.  And all of this paying and bribing reduces the amount of money you have to bid on diamonds.  You really can't afford to do it.  Then again, you can't afford {\it not} to do it either.
+Thus, on top of the basic trading mechanics, there is a layer of agent loyalty mechanics.  You can pay your agents to keep them loyal and bribe opponent agents to acquire their loyalty as well.  When an agent is loyal to the other side, suddenly the ``make your move in secret'' guarantee goes out the window.  Of course, you won't know that your agent has been compromised, unless you manage to bribe the opponent agent that bribed your agent.  And all of this paying and bribing reduces the amount of money you have to bid on diamonds.  You really can't afford to do it.  Then again, you can't afford {\it not} to do it either.
 
 \section{Structure of the game}
 
@@ -165,27 +165,26 @@ The music goes through transitions based on the decisions made by both players i
 
 \section{Finding an opponent}
 
-Diamond Trust is a game of skill for exactly two players.  You should eventually plan on playing the game exclusively against other people, but such match-ups are not ideal while you're still learning the game.  Maybe you could struggle along with another novice through your first game, but trying to learn while playing against an experienced player will likely be nerve-wracking for you and frustrating for your opponent.  The AI is provided to alleviate this problem.
+Diamond Trust is a game of skill for exactly two players.  You should eventually plan on playing the game exclusively against other people, but such match-ups are not ideal while you're still learning the game.  The AI is provided to alleviate this problem.
 
 \subsection{Practice against the AI}
 
 If you touch ``Single Player'' from the title screen, you can pick an AI level and start a game against the AI.  The single player game works exactly the same way as a two player game, and the AI operates by the same rules as your human opponent would---it doesn't cheat by peaking at your secret information.
 
-Unfortunately, reasoning about incomplete information requires quite a lot of ``possible worlds'' simulation on the part of the AI, which takes a long time in order to pick a good move.  At lower AI levels, the AI picks a move quickly but usually poorly.  At higher skill levels, the AI picks better moves but takes quite a bit longer.
+Unfortunately, reasoning about incomplete information requires quite a lot of ``possible worlds'' simulation on the part of the AI when evaluating potential moves.  At lower levels, the AI picks a move quickly but usually poorly.  At higher levels, the AI picks better moves but takes quite a bit longer.
 
 Each additional level gives the AI more time to consider moves.  At level 2, it takes twice as long, while at level 7, it takes seven times as long.  But even at extremely high levels, where the AI is given an extraordinary amount of time to consider moves, human-level play is not possible.
 
-Thus, the AI should be thought of as a practice opponent only.  Learn how to play the game, learn how to beat the AI at some of the lower skill levels, and then graduate to a human opponent.  
+Thus, the AI should be thought of as a practice opponent only.  Learn how to play the game, learn how to beat the AI at some of the lower skill levels, and then graduate to a human opponent.
 
 \subsection{Single-Card Play}
 \label{sec:singleCard}
-To play against a friend, all you need is two Nintendo DS systems and a single Diamond Trust Game Card.  By touching ``Two Player'' from the title screen, you can touch ``Host Single-Card Play'' serve the game to your friend's DS via DS Download Play.  The only down-sides to this approach are the additional transmission and load time and the fact that the receiving player's game won't output music.
+To play against a friend, all you need are two Nintendo DS systems and a single Diamond Trust Game Card.  By touching ``Two Player'' from the title screen, you can touch ``Host Single-Card Play'' to serve the game to your friend's DS via DS Download Play.  The only down-sides to this approach are the additional transmission time and the fact that the cardless player's game won't output music.
 
-After the game has been served and loaded once, multiple games can be played against that friend.  It is even possible for two DS Download Play recipients to play subsequent games against each other.  Thus, a Diamond Trust party or tournament could be possible with only a few Game Cards shared by many people.
- 
+After the game has been served and loaded once, multiple games can be played against that friend.  It is even possible for two DS Download Play recipients to play subsequent games against each other.
 
 \subsection{Multi-Card Play}
-If both players have Diamond Trust Game Cards, they can connect to each other directly with no download time and both players experiencing the game's music.  After touching ``Two Player'' from the title screen, one player should touch ``Host Multi-Card Play'' while the other player touches ``Join Game.''
+If both players have Diamond Trust Game Cards, they can connect to each other directly with no transmission time and with both players experiencing the game's music.  After touching ``Two Player'' from the title screen, one player should touch ``Host Multi-Card Play'' while the other player touches ``Join Game.''
 
 Headphones or two separate rooms are recommended to avoid unpleasant music combinations from the two Nintendo DS systems.  Another option is to reduce the volume control to the minimum for one DS and plug external speakers into the audio jack for the second DS, which will allow both players to listen to the music emanating from the second DS.
 
@@ -199,16 +198,13 @@ Headphones or two separate rooms are recommended to avoid unpleasant music combi
 
 \section{Game elements}
 
-Each player in the game is in control of three diamond trading agents.  The map is divided into eight regions:  six region in Angola, and one home region for each player (London and Antwerp, in the upper left and right corners of the screen, respectively).  Agents start the game in their home region, but they can move from region to region during the game.  At most one unit from each side is permitted in a given region of Angola.  Moving into the opponent's home region is forbidden.
+Each player in the game is in control of three diamond trading agents.  The map is divided into eight regions:  six region in Angola, and one home region for each player (London and Antwerp, in the upper left and right corners of the screen, respectively).  Agents start the game in their home regions, but they can move from region to region during the game.  At most one unit from each side is permitted in a given region of Angola.  Moving into the opponent's home region is forbidden.
 
 The UN Inspector begins the game in a randomly chosen region of Angola.  The Inspector can be moved to other Angola regions throughout the game in response to player bribes, but he can never move into a player's home region.
 
 Thus, a given home region can hold up to three agents from the same side.  A given region of Angola can hold up to three people total:  one agent from each side and the UN Inspector.
 
-The diamond icon in each Angola region indicates how many diamonds are waiting there.
-
-During the game, various buttons and widgets will appear on the Touch Screen when appropriate.  These include bid, bribe, and sale selectors, as well as buttons for finishing a move and advancing to the next game phase.
-
+The diamond icon in each Angola region indicates how many diamonds are waiting there to be purchased.
 
 
 
@@ -218,13 +214,13 @@ During the game, various buttons and widgets will appear on the Touch Screen whe
 \subsection{Game phase:  Pay agents}
 \label{sec:payPhase}
 
-During this phase, you can pay salary to any of your own agents that are in your home region.  If your agents are out in Angola regions, they cannot be paid salary during this phase.  However, if one of your agents out in the field occupies the same Angola region as an opponent agent, you can pay the opponent agent a bribe during this phase.
+During this phase, you can pay salary to any of your own agents that are in your home region.  If your agents are out in Angola regions, they cannot be paid salary during this phase.  However, if one of your agents occupies the same Angola region as an opponent agent, you can pay the opponent agent a bribe during this phase.
 
 To determine which agents can be paid during this phase, look for agents that are waving their arms.  Touch an agent to adjust the salary or bribe payment to be made this round using the payment selection widget.  Touch the check mark on the widget to set the payment.  Before finishing your move, you can touch agents several times to adjust their salaries and bribes repeatedly.  Touch the ``Done'' button to commit your payments. 
 
 At the start of the game, all of your agents are at home, so you have the opportunity to pay salary to all three of them.  Since your agents aren't in contact with opponent agents, no bribes can be paid at the start of the game.
 
-Salary that you pay to your agents keeps them loyal in the face of bribes that they receive from your opponent.  Bribes that you pay to opponent agents might convert those agents' loyalty to your side.  If an agent's total salary payment meets or exceeds total bribes paid by the opponent to that agent, the agent remains loyal to its side.  However, if total bribes exceed total salary, the agent becomes loyal to the opponent.
+Salary that you pay to your agents keeps them loyal in the face of bribes that they receive from your opponent.  Bribes that you pay to opponent agents might convert those agents' loyalty to your side.  If an agent's total salary payments meet or exceeds total bribes paid to that agent by the opponent, the agent remains loyal to its side.  However, if total bribes exceed total salary, the agent becomes loyal to the opponent.
 
 Agents that have become loyal to the opponent reveal their hidden information secretly to the opponent.  Hidden information is described in greater detail in the following sections, but it includes move destinations, diamond bids, inspector bribes, and the number of diamonds selected to sell.
 
@@ -233,7 +229,7 @@ In particular, agents that have been successfully bribed reveal what other agent
 \subsection{Game phase:  Move agents}
 \label{sec:movePhase}
 
-During this phase, you can specify destinations for each of your agents.  A trip inside Angola costs \$1 per agent.  A trip between Angola and Europe costs \$2 per agent.  The trip cost for the selected agent is shown at the top of that agent's Rolodex card.
+During this phase, you can specify destinations for each of your agents.  A trip inside Angola costs \$1 per agent.  A trip between Angola and Europe costs \$2 per agent.
 
 To set a destination, touch one of your agents and then touch an available destination region.  Unavailable regions are darkened after you pick an agent.  Remember that at most one of your agents can occupy each region of Angola.  You also need to be able to afford the trip cost.
 
@@ -255,7 +251,7 @@ During this step, players pick their final moves simultaneously and in secret.  
 
 \subsubsection{About diamond bids}
 \label{sec:aboutBids}
-Auctions in Diamond Trust are somewhat unusual:  instead of a standard winner-pay auction mechanism (which turn out to be rather boring in a simultaneous-decision game), this game uses {\it both-pay auctions}.  If both players are sending an agent into a given region, they both specify bids, and each player pays the amount that she has bid.  Then the highest payer gets the diamonds in that region.  Even if players tie, each still pays her committed amount, and neither player gets the diamonds.
+Auctions in Diamond Trust are somewhat unusual:  instead of a standard winner-pay auction mechanism (which turn out to be rather boring in a simultaneous-decision game), this game uses {\it both-pay auctions}.  If both players are sending an agent into a given region, they both specify bids, and each player pays the amount that she has bid.  Then the highest payer gets the diamonds in that region.  Even if players tie, each still pays her committed amount, but neither player gets the diamonds.
 
 \subsubsection{About inspector bribes}
 Inspector bribes also follow the {\it both-pay} model.  The UN Inspector accepts bribe payments from both players, but only obeys the command of the player who pays him more.  Again, in the case of a tie, he takes money from both players but obeys neither player.
@@ -263,7 +259,7 @@ Inspector bribes also follow the {\it both-pay} model.  The UN Inspector accepts
 \subsection{Game phase:  Deposit diamonds}
 \label{sec:depositPhase}
 
-After agent moves are executed, any agents that have returned to their home regions deposit any diamonds that they are carrying.  Diamonds deposited at home are permanently safe from confiscation by the UN inspector and are also available for sale during the Sell Diamonds phase.
+After agent moves are executed, agents that have returned to their home regions deposit any diamonds that they are carrying.  Diamonds deposited at home are permanently safe from confiscation by the UN inspector and are also available for sale during the Sell Diamonds phase.
 
 \subsection{Game phase:  Move UN Inspector}
 \label{sec:inspectorPhase}
@@ -279,9 +275,9 @@ After he moves, he performs his confiscation.  He also blocks whatever diamond s
 \subsection{Game phase:  Collect diamonds}
 \label{sec:collectPhase}
 
-After the Inspector moves, if he moves at all, and his confiscation, agents in the other Angola regions collect diamonds according to the both-pay rule describe on page \pageref{sec:aboutBids}.  Diamonds in regions where no player bids or both players tie simply remain in their regions, accumulating for the next round.
+After the Inspector moves, if he moves at all, agents in the other Angola regions collect diamonds according to the both-pay rule describe on page \pageref{sec:aboutBids}.  Diamonds in regions where no player bids or both players tie simply remain in their regions, accumulating for the next round.
 
-Agents hold the diamonds that they have collected, which are vulnerable to future Inspector confiscation, until they return to their home regions to deposit them.
+Agents carry the diamonds that they have collected, which are vulnerable to future Inspector confiscation, until they return to their home regions to deposit them.
 
 
 \subsection{Game phase:  Sell diamonds}
@@ -289,7 +285,7 @@ Agents hold the diamonds that they have collected, which are vulnerable to futur
 
 Before the start of the next round, players are given the chance to sell some of their accumulated diamonds---those that have been brought back to their home regions---to raise additional money for the next round.  Players pick their sell numbers simultaneously and in secret.
 
-A player who sells no diamonds at all gets a flat \$18 injection of fresh money.  Players that chose to sell diamonds get a share of \$24 based on how many diamonds are sold in total, by both players, that round.  A player's share is determined by their fraction of the total sold.  If only one player sells, that player gets the entire \$24, no matter how many that player sells.  If both players sell the same amount, no matter how many they each sell, each player gets half of the available money, or \$12.  The table on page \pageref{fig:sellTable} illustrates this break-down with various examples.  Note that if the total sold does not divide 24 evenly, the amount paid to each player is rounded down (as shown in the last line of the table).
+A player who sells no diamonds at all gets a flat \$18 injection of fresh money.  Players that chose to sell diamonds get a share of \$24 based on how many diamonds are sold in total, by both players, that round.  A player's share is determined by their fraction of the total sold.  If only one player sells, that player gets the entire \$24, no matter how many that player sells.  If both players sell the same amount, no matter how many they each sell, each player gets half of the available money, or \$12.  The table above illustrates this break-down with various examples.  Note that if the total sold does not divide 24 evenly, the amount paid to each player is rounded down (as shown in the last line of the table).
 
 \begin{figure}[t]
 \begin{center}
@@ -317,22 +313,21 @@ Player 1 sells & Player 2 sells & Player 1 gets & Player 2 gets\\
 
 \end{figure}
 
-The Sell Diamonds phase is also subject to a potential ``reveal and adjust'' step, similar to what is described on page \pageref{sec:movesRevealed}, but in this phase, bribed agents in each home region determine whether sell numbers are revealed.  A player with no agents in her home region is guaranteed to have her sell number kept secret in this phase.
+The Sell Diamonds phase is also subject to a potential ``reveal and adjust'' step, similar to what is described on page \pageref{sec:movesRevealed}, but in this phase, the presense of bribed agents in a player's home region trigger the revelation of that players sell number.  Thus, a player with no agents in her home region is guaranteed to have her sell number kept secret in this phase.
 
 
 \section{End of the game}
 
 During the last round of the game, when the calendar display on the upper screen shows ``0 months left,'' the round ends after agents collect diamonds in their regions of Angola.  There is no final Sell Diamonds phase.  All agents immediately fly back to their home regions and deposit whatever diamonds they are carrying.  These final trips home are free of travel costs.
 
-The player with the most diamonds at the end of the game wins.  In the case of a tie in diamond counts, the player with the most money wins.  In the case of a tie in both diamond counts and money balances (a rare occurrence, for sure), a true tie is declared.
+The player with the most diamonds at the end of the game wins.  In the case of a tie in diamond counts, the player with the most money wins.  In the case of a tie in both diamond counts and money balances, a true tie is declared.
 
 
 
 \section{Playing again}
 The host of the game must decide whether to start another game after a game ends.  If the host touches the ``Back'' button, both players will be disconnected and returned to the title screen, where they can each play against the AI or host/join games with other game partners.
 
-As mentioned in section \ref{sec:singleCard}, if the host chooses not to play again during DS Download Play, the cardless player will still be returned to the title screen where she will have full access to all game features, including hosting and joining.  The only thing a cardless player cannot do is host DS Download Play for another Nintendo DS system that still needs to download the game.  A cardless player can continue playing the game indefinitely, hosting and joining subsequent games, until she turns the power OFF.
-
+As mentioned in section \ref{sec:singleCard}, if the host chooses not to play again during Single-Card Play, the cardless player will be returned to the title screen where she will have full access to all game features, including hosting and joining.  The only thing a cardless player cannot do is host DS Download Play for another Nintendo DS system that still needs to download the game.
 
 
 
