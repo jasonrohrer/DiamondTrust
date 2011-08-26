@@ -41,8 +41,6 @@ rolodex_manilla16.tga \
 playerPictures.tga \
 enemyPictures.tga \
 sellingPanel.tga \
-satPhone.tga \
-satPhoneLight.tga \
 signal0.tga \
 signal1.tga \
 signal2.tga \
