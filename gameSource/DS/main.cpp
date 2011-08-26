@@ -2423,7 +2423,8 @@ static void wmInitializeCallback( void *inArg ) {
             nextChannel = 0;
 
 
-            if( !MB_IsMultiBootChild() ) {
+            // only scan just for parent, as clone child, the first time
+            if( !MB_IsMultiBootChild() || !isAutoconnecting() ) {
                 printOut( "Child starting first scanNextChannel() call\n" );
                 scanNextChannel();
                 }
