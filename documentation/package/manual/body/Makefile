@@ -29,7 +29,7 @@
 
 
 
-all: manualBodyFull.pdf
+all: manualBody.pdf
 
 clean: 
 	rm *.pdf *.ps *.eps *.dvi *.log *.aux *.toc printPageOrder

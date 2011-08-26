@@ -43,7 +43,7 @@
 \makeatother
 
 
-\setcounter{tocdepth}{0}
+\setcounter{tocdepth}{1}
 
 \begin{document}
 
@@ -53,7 +53,8 @@
 
 
 \startopenany
-\chapter{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+\chapter*{Introduction}
 
 Diamond Trust of London has been a very long time coming, and it's too much of an uneven story to fully relate here.  Suffice it to say that what you hold in your hands right now exists only because of several unlikely and fortunate events.  
 
@@ -73,6 +74,9 @@ August 2011
 \stopopenany
 
 \mainmatter
+
+
+\input{gamePhaseDiagram.tex}
 
 
 \makeatletter
@@ -110,9 +114,9 @@ August 2011
 \renewcommand\@endpart{\myEndPart}
 \makeatother
 
-\part{Game Manual}
-\addtocounter{chapter}{1}
-\setcounter{section}{0}
+%\part{Game Manual}
+%\addtocounter{chapter}{1}
+%\setcounter{section}{0}
 
 %back to normal blank page after part
 \makeatletter
@@ -153,7 +157,7 @@ The diagram on page \pageref{fig:gameFlow} shows the phase progression during ea
 \section{Controls}
 The game is controlled entirely through single touches on the Touch Screen.  Various buttons and widgets appear on the Touch Screen when appropriate, and other situations require that you touch specific game elements directly.
 
-\section{Hearing the music}
+\section{Game music}
 
 Diamond Trust's soundtrack features near-CD quality interactive music.  High fidelity headphones or external speakers are recommended.  
 
@@ -175,15 +179,15 @@ Thus, the AI should be thought of as a practice opponent only.  Learn how to pla
 
 \subsection{Single-Card Play}
 \label{sec:singleCard}
-To play against a friend, all you need is two Nintendo DS systems and a single Diamond Trust Game Card.  By touching ``Two Player'' from the title screen, you can touch ``Host Single-Card Play'' serve the game to your friend's system via DS Download Play.  The only down-sides to this approach are the additional transmission and load time and the fact that the receiving player's game won't output music.
+To play against a friend, all you need is two Nintendo DS systems and a single Diamond Trust Game Card.  By touching ``Two Player'' from the title screen, you can touch ``Host Single-Card Play'' serve the game to your friend's DS via DS Download Play.  The only down-sides to this approach are the additional transmission and load time and the fact that the receiving player's game won't output music.
 
-After the game has been served and loaded once, multiple games can be played against that friend.  It is even possible for two DS Download Play recipients to play subsequent games against each other.  Thus, a Diamond Trust party or tournament could be possible with only a few Game Cards shared by many people (see section \ref{sec:multiHosting} on page \pageref{sec:multiHosting} for more information).
+After the game has been served and loaded once, multiple games can be played against that friend.  It is even possible for two DS Download Play recipients to play subsequent games against each other.  Thus, a Diamond Trust party or tournament could be possible with only a few Game Cards shared by many people.
  
 
 \subsection{Multi-Card Play}
 If both players have Diamond Trust Game Cards, they can connect to each other directly with no download time and both players experiencing the game's music.  After touching ``Two Player'' from the title screen, one player should touch ``Host Multi-Card Play'' while the other player touches ``Join Game.''
 
-Headphones or two separate rooms are recommended to avoid unpleasant music combinations from the two systems.  Another option is to reduce the volume control to the minimum for one system and plug external speakers into the audio jack for the second system, which will allow both players to listen to the music emanating from the second system.
+Headphones or two separate rooms are recommended to avoid unpleasant music combinations from the two Nintendo DS systems.  Another option is to reduce the volume control to the minimum for one DS and plug external speakers into the audio jack for the second DS, which will allow both players to listen to the music emanating from the second DS.
 
 
 
@@ -195,7 +199,6 @@ Headphones or two separate rooms are recommended to avoid unpleasant music combi
 
 \section{Game elements}
 
-\subsection{Touch Screen elements:  Map and units}
 Each player in the game is in control of three diamond trading agents.  The map is divided into eight regions:  six region in Angola, and one home region for each player (London and Antwerp, in the upper left and right corners of the screen, respectively).  Agents start the game in their home region, but they can move from region to region during the game.  At most one unit from each side is permitted in a given region of Angola.  Moving into the opponent's home region is forbidden.
 
 The UN Inspector begins the game in a randomly chosen region of Angola.  The Inspector can be moved to other Angola regions throughout the game in response to player bribes, but he can never move into a player's home region.
@@ -205,18 +208,6 @@ Thus, a given home region can hold up to three agents from the same side.  A giv
 The diamond icon in each Angola region indicates how many diamonds are waiting there.
 
 During the game, various buttons and widgets will appear on the Touch Screen when appropriate.  These include bid, bribe, and sale selectors, as well as buttons for finishing a move and advancing to the next game phase.
-
-\subsubsection{In-game help}
-
-During most phases of the game, a small ``?'' button in the lower right corner of the Touch Screen can be used to display relevant help text about the current phase.
-
-\subsection{Upper screen elements:  Status displays}
-
-Constant elements on the upper screen include the ledger sheets showing the money and diamond balance for each player (the opponent's money balance might be hidden, depending on what's going on in the game), the calendar showing the number of rounds remaining, and the computer printout at the bottom of the screen with information about the current game phase.
-
-When an agent is selected during the game (when moving or paying that agent), a Rolodex card will appear showing known information about that agent.  Such information might include number of diamonds held, total salary, total bribes, the opponent agent known to have last bribed the agent, and other agents the agent is known to have bribed.  Of course, some of these elements may be unknown, depending on what's going on in the game (for example, an opponent agent's salary might be shown as ``?'' if that information has not been revealed to you).
-
-During the Sell Diamonds phase of the game, additional ledger sheets are displayed showing the number sold and amount earned by each player.
 
 
 
@@ -340,23 +331,14 @@ The player with the most diamonds at the end of the game wins.  In the case of a
 \section{Playing again}
 The host of the game must decide whether to start another game after a game ends.  If the host touches the ``Back'' button, both players will be disconnected and returned to the title screen, where they can each play against the AI or host/join games with other game partners.
 
-As mentioned in section \ref{sec:singleCard}, if the host chooses not to play again during DS Download Play, the cardless player will still be returned to the title screen where she will have full access to all game features, including hosting and joining.  The only thing a cardless player cannot do is host DS Download Play for another DS system that still needs to download the game.  A cardless player can continue playing the game indefinitely, hosting and joining subsequent games, until she turns the power OFF.
+As mentioned in section \ref{sec:singleCard}, if the host chooses not to play again during DS Download Play, the cardless player will still be returned to the title screen where she will have full access to all game features, including hosting and joining.  The only thing a cardless player cannot do is host DS Download Play for another Nintendo DS system that still needs to download the game.  A cardless player can continue playing the game indefinitely, hosting and joining subsequent games, until she turns the power OFF.
 
 
-\section{Multi-hosting tricks}
-\label{sec:multiHosting}
-The hosting, joining, and DS Download Play serving system in Diamond Trust is extremely flexible and allows several interesting play setups.
-
-A single Game Card can be used to distribute the game to multiple cardless DS systems without necessarily starting games with any of them.  To use this trick, host Single-Card Play normally, and after the first cardless system receives the game and displays the ``Loading'' screen with the advancing computer printout, touch the ``Back'' button on the host system to cancel hosting and return to the title screen.  The connecting system will of course be unable to connect to the host after loading, so touch the ``Back'' button on that system as well.  Now you have two systems that are at the title screen and ready to host or join games.
-
-Repeat this process for additional cardless systems, transferring the game to each through DS Download Play, but backing out before the cardless system finishes loading the game.
-
-You will now have a room full of friends who all have downloaded the game and are ready to play games against each other, all from a single Game Card.
-
-If multiple people want to join chosen partners in the same room, they should pair up and host/join one pair at a time.  The default behavior of Diamond Trust when multiple people are hosting and joining simultaneously is to pair them up randomly with each other (there is no lobby view for selecting among multiple available hosts).  This behavior can be used, if half of the friends host and the other half join simultaneously, to play against a friend whose identity is unknown to you, adding yet another layer of uncertainty and deception.
 
 
-\addcontentsline{toc}{chapter}{Credits}
+\startopenany
+%\addcontentsline{toc}{chapter}{Credits}
+\addcontentsline{toc}{section}{Credits}
 \chapter*{Credits}
 
 \paragraph{Jason Rohrer}
@@ -366,14 +348,15 @@ Concept, game design, programming, graphics, pixel fonts, package design, packag
 Interactive music direction, composition, arrangement, and production.
 
 \paragraph{Thanks}
-Gun Consulting brought indiePub and Diamond Trust together.  Mark Seremet believed in this crazy project.  Lauren Serafin helped to playtest several early versions of the game.  The font used on the title screen is Oxford by Roger White.  The satellite image of Angola is from the NASA Visible Earth project.
+Gun Consulting brought indiePub and Diamond Trust together.  Mark Seremet believed in this crazy project.  Lauren Serafin helped to playtest several early versions of the game and proofread this manual.  The font used on the title screen is Oxford by Roger White.  The satellite image of Angola is from the NASA Visible Earth project.
+
+\stopopenany
 
 
 
-
-\part[Original Design Document]{Original Design Document\\{\large(for historical interest only)}}
-\addtocounter{chapter}{1}
-\setcounter{section}{0}
+%\part[Original Design Document]{Original Design Document\\{\large(for historical interest only)}}
+%\addtocounter{chapter}{1}
+%\setcounter{section}{0}
 
 
 % this document gets added later with a pdf merge (using gs)
