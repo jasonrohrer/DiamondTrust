@@ -1227,7 +1227,7 @@ void gameLoopTick() {
             
             // change music every 5 to 25 seconds
             stepsToWaitBeforeLidClosedMusicChange = 
-                30 * ( 5 + getRandom( 20 ) );
+                (int)( 30 * ( 5 + getRandom( 20 ) ) );
             }
         }
     else {
