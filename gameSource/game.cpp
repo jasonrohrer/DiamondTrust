@@ -103,6 +103,10 @@ int aiLevelSheetSpriteID;
 
 
 int globalSoundVolume = 0;
+// start off gradually raising volume, fade in
+// set to false to force a gradual fade-out
+int globalVolumeRise = true;
+
 char soundPansSet = false;
 
 
@@ -1012,8 +1016,17 @@ void gameLoopTick() {
         soundPansSet = true;
         }
 
-    if( globalSoundVolume < 127 ) {
+    if( globalVolumeRise && globalSoundVolume < 127 ) {
+        
         globalSoundVolume++;
+        
+        for( int c=0; c<8; c++ ) {
+            setSoundChannelVolume( c, globalSoundVolume );
+            }
+        }
+    else if( !globalVolumeRise && globalSoundVolume > 0 ) {
+        
+        globalSoundVolume--;
         
         for( int c=0; c<8; c++ ) {
             setSoundChannelVolume( c, globalSoundVolume );

@@ -684,6 +684,7 @@ static void addTrack( int inChannelNumber, int inDelay ) {
 // use this as a safe way of gradually raising volume back up from zero,
 // outside of audio callback
 extern int globalSoundVolume;
+extern char globalVolumeRise;
 
 static char shouldStartVolumeRise = false;
 
@@ -704,13 +705,15 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
         if( s->totalNumSamplesPlayed > currentSongTargetLength ) {
             // time to auto-switch
 
-            // but not if there's not enough time left in grid step
-            // for a nice fade-out
-            if( samplesLeftInGridStep > songEndFadeTime ) {
+            // keep fading out
+            globalVolumeRise = false;
+            
+
+            // but not until we've completed a nice fade-out
+            if( globalSoundVolume == 0 ) {
                 songSwitchPending = true;
                 }
-            // if not, we have to wait until next grid step before initiating
-            // a song switch
+            // if not, we have to keep waiting
             }
         }
     
@@ -737,45 +740,6 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 break;
                 }
             }
-
-
-
-        
-        // consider fading-out master volume gradually
-        if( samplesLeftInGridStep < songEndFadeTime || allStopped ) {
-
-            int volume = 
-                (int)( ( 127 * samplesLeftInGridStep ) / songEndFadeTime );
-            
-            if( allStopped ) {
-                // watch for wrap-around to next grid step
-                // which would cause volume to jump back up
-                volume = 0;
-                }
-            
-
-            for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
-                setSoundChannelVolume( c, volume );
-                }
-            }
-        
-
-
-        /*
-        char allAtSamePosition = true;
-        
-        if( numSongParts > 0 ) {
-            unsigned int targetTotal = songStreams[0].totalNumSamplesPlayed;
-            
-            for( int p=0; p<numSongParts; p++ ) {
-                if( songStreams[p].totalNumSamplesPlayed != targetTotal ) {
-                    allAtSamePosition = false;
-                    break;
-                    }
-                }
-            }
-        */
-
             
         
         if( allStopped ) {
@@ -892,7 +856,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 if( shouldStartVolumeRise ) {
                     // this is the first track actually added after
                     // a song change.  Start the volume rise NOW.
-                    globalSoundVolume = 0;
+                    globalVolumeRise = true;
+                    
                     shouldStartVolumeRise = false;
                     }
                 
