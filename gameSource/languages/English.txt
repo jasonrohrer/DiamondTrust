@@ -8,7 +8,7 @@ subStatus_moveOn "Touch Next to continue"
 button_done "Done"
 button_next "Next"
 
-button_back "Back"
+button_back "Cancel"
 
 button_play_again "Play Again"
 
