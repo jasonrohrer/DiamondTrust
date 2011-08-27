@@ -14,6 +14,12 @@ static char forceFiveTracks = false;
 
 
 
+static char limitTotalTracks = false;
+
+
+
+
+
 int currentSongPick = -1;
 
 char *currentSongDirName = NULL;
@@ -1337,6 +1343,29 @@ void setMusicStateInternal( const char *inStateString ) {
             }
         }
 
+    if( limitTotalTracks && numPlaying > 2 ) {
+        // now go back through and trim out tracks if we have too many
+    
+        while( numPlaying > 2 ) {
+            
+            for( int p=0; p<numSongParts && numPlaying > 2; p++ ) {
+                
+                if( // currently on
+                    musicState[p] != -1 &&
+                    // win a fair coin flip
+                    getRandom( s, 100 ) > 50 ) {
+                    
+                    
+                    // turn off
+                    musicState[p] = -1;
+                    numPlaying--;
+                    }
+                }
+            }
+        }
+    
+
+
     }
 
 
@@ -1355,6 +1384,20 @@ char *getLastMusicState() {
     unlockAudio();
     
     return returnValue;
+    }
+
+
+
+void limitTotalMusicTracks( char inLimit ) {
+    // ignore all of this on a clone (no music)
+    if( isThisAClone() ) {
+        return;
+        }
+
+    limitTotalTracks = inLimit;
+
+    // redo music state to ensure it's consistent with new limit
+    setMusicStateInternal( lastStateString );
     }
 
 

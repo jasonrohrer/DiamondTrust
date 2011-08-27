@@ -612,10 +612,13 @@ void gameInit() {
     resetStats();
     
 
+    
+            
 
     initMusic();
 
-
+    // start off limiting music
+    limitTotalMusicTracks( true );
     
     if( ! isAutoconnecting() ) {
         currentGameState = pickGameTypeState;
@@ -866,6 +869,9 @@ static void goToNextGameState() {
     // go right to connectionBrokenState from ANY state
     if( shouldGoToConnectionBrokenState() ) {
         currentGameState = connectionBrokenState;
+
+        // back to limiting music
+        limitTotalMusicTracks( true );
         }
     else if( currentGameState == pickGameTypeState ) {
 
@@ -884,9 +890,13 @@ static void goToNextGameState() {
     else if( currentGameState == setAILevelState ) {
         // start game
         currentGameState = accumulateDiamondsState;
+        // enable full music now
+        limitTotalMusicTracks( false );
         }
     else if( currentGameState == connectState ) {
         currentGameState = accumulateDiamondsState;
+        // enable full music now
+        limitTotalMusicTracks( false );
         // FIXME  for testing
         //currentGameState = sellDiamondsState;
         }
@@ -923,6 +933,9 @@ static void goToNextGameState() {
         if( gameEndState->getParameter() ) {
             // play again!
             currentGameState = accumulateDiamondsState;
+            
+            // enable full music now
+            limitTotalMusicTracks( false );
             }
         else {
             // back to menu

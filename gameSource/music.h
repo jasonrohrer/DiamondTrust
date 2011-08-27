@@ -21,6 +21,11 @@ void setMusicState( const char *inStateString );
 char *getLastMusicState();
 
 
+// put music into limited mode, where fewer max tracks can play at once
+// (do during cpu-cricital times during game to prevent music from skipping)
+void limitTotalMusicTracks( char inLimit );
+
+
 
 // move on to the next act in the song
 void nextSongAct();

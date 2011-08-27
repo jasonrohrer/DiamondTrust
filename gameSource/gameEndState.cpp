@@ -6,6 +6,7 @@
 #include "ai/ai.h"
 #include "common.h"
 #include "gameStats.h"
+#include "music.h"
 
 //static int activeUnit = -1;
 static char stateDone = false;
@@ -118,7 +119,11 @@ void GameEndState::clickState( int inX, int inY ) {
     if( !donePressed ) {
         if( doneButton->getPressed( inX, inY ) ) {
             donePressed = true;
-            
+
+            // back to limiting total number of tracks (get ready for player
+            // to pick hosting Single-Card Play, which causes a CPU hicup
+            limitTotalMusicTracks( true );
+
             // no explaination needed for parent because Play Again button
             // is clear
             if( !isHost ) {
