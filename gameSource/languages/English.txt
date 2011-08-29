@@ -95,7 +95,7 @@ phaseSubStatus_payAgentCannot  "None are payable (touch Done when ready)"
 
 
 phaseStatus_move  "Move your agents"
-phaseStatus_movePeek  "Bribed agents reveal moves"
+phaseStatus_movePeek  "Bribed agents reveal plan"
 
 phaseSubStatus_pickAgent  "Pick an agent (or touch Done)"
 phaseSubStatus_pickAgentAdjust  "Adjust move?  Pick an agent (or touch Done)"
