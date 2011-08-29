@@ -3162,6 +3162,7 @@ static void SoundAlarmCallback( void *inArg ) {
 static char shouldDrawNintendoLogo = false;
 static unsigned char nintendoLogoFade = 0;
 static int nintendoLogoSpriteID = -1;
+static int indiePubLogoSpriteID = -1;
 
 static int skipLogo = false;
 
@@ -3420,8 +3421,11 @@ static char skippingLogo() {
     // (inited during gameInit, below)
     if( ! MB_IsMultiBootChild() ) {
         // display Licensed By Nintendo logo, as required
+
+        // indiePub logo on bottom screen at the same time
         
         nintendoLogoSpriteID = loadSprite( "nintendoLogo.tga", false );
+        indiePubLogoSpriteID = loadSprite( "indiePubLogo.tga", false );
         
         shouldDrawNintendoLogo = true;
         
@@ -3465,6 +3469,7 @@ static char skippingLogo() {
         
         shouldDrawNintendoLogo = false;
         nintendoLogoSpriteID = -1;
+        indiePubLogoSpriteID = -1;
 
         // back to blank slate with textures, ready for game to load
         clearAllTextures();
@@ -3591,8 +3596,8 @@ void runGameLoopOnce() {
 
         if( shouldDrawNintendoLogo ) {
             rgbaColor logoColor = { 255, 255, 255, nintendoLogoFade };
-
-            drawSprite( nintendoLogoSpriteID, 0, 32, logoColor );
+            
+            drawSprite( indiePubLogoSpriteID, 64, 64, logoColor );
             }
 
 
@@ -3614,6 +3619,13 @@ void runGameLoopOnce() {
     else {
         drawBottomScreen();
             
+        if( shouldDrawNintendoLogo ) {
+            rgbaColor logoColor = { 255, 255, 255, nintendoLogoFade };
+
+            drawSprite( nintendoLogoSpriteID, 0, 32, logoColor );
+            }
+
+
         //printOut( "Free bytes on heap after drawBottom=%d\n",
         //         OS_CheckHeap( OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE ) );
         }

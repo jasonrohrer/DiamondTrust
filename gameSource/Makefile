@@ -49,6 +49,7 @@ wirelessOn.tga \
 greenBarSheet.tga \
 aiLevelSheet.tga \
 nintendoLogo.tga \
+indiePubLogo.tga \
 watch.tga \
 watchHandVertical.tga \
 watchHandHorizontal.tga \
