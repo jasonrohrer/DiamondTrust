@@ -1386,6 +1386,9 @@ void limitTotalMusicTracks( char inLimit ) {
     }
 
 
+char getMusicTrackLimitOn() {
+    return limitTotalTracks;
+    }
 
 
 

@@ -145,9 +145,15 @@ char isWaitingOnOpponent = false;
 char isAIProgressShowing = false;
 
 
-int stepsSinceLidClosedMusicChange = 0;
+unsigned int stepsSinceLidClosed = 0;
 
-int stepsToWaitBeforeLidClosedMusicChange = 0;
+unsigned int stepsSinceLidClosedMusicChange = 0;
+
+unsigned int stepsToWaitBeforeLidClosedMusicChange = 0;
+
+// disable track limit when lid closed so that player can hear full
+// music spectrum
+char renewMusicTrackLimitAfterLidOpened = false;
 
 
 
@@ -1191,6 +1197,22 @@ void gameLoopTick() {
 
 
     if( getLidClosed() ) {
+        
+        
+        if( stepsSinceLidClosed == 0 ) {
+            // newly closed
+
+            renewMusicTrackLimitAfterLidOpened = getMusicTrackLimitOn();
+
+            if( renewMusicTrackLimitAfterLidOpened ) {
+                // turn off two-track limit while lid is closed
+                limitTotalMusicTracks( false );
+                }
+            }
+        
+        stepsSinceLidClosed++;
+        
+
         stepsSinceLidClosedMusicChange ++;
 
         if( stepsSinceLidClosedMusicChange >= 
@@ -1215,10 +1237,20 @@ void gameLoopTick() {
             
             // change music every 5 to 25 seconds
             stepsToWaitBeforeLidClosedMusicChange = 
-                (int)( 30 * ( 5 + getRandom( 20 ) ) );
+                30 * ( 5 + getRandom( 20 ) );
             }
         }
     else {
+        if( renewMusicTrackLimitAfterLidOpened ) {
+          
+            // turn limit back on, now that lid opened
+            limitTotalMusicTracks( true );
+
+            renewMusicTrackLimitAfterLidOpened = false;
+            }
+        
+
+        stepsSinceLidClosed = 0;
         stepsSinceLidClosedMusicChange = 0;
         }
     

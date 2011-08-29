@@ -25,6 +25,9 @@ char *getLastMusicState();
 // (do during cpu-cricital times during game to prevent music from skipping)
 void limitTotalMusicTracks( char inLimit );
 
+char getMusicTrackLimitOn();
+
+
 
 
 // move on to the next act in the song
