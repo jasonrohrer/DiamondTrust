@@ -487,10 +487,6 @@ static void loadSong() {
 
         // between 2 and 4 minutes long, each
         currentSongTargetLength = rate * 60 * 2 + getRandom( rate * 60 * 2 );
-
-        // we skip all but 2 seconds of our first grid step in the delay
-        // between songs
-        currentSongTargetLength += ( gridStepLength - rate * 2 );
         }
     else {
         printOut( "ERROR:  no songs present!\n" );
@@ -712,8 +708,20 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             // but not until we've completed a nice fade-out
             if( globalSoundVolume == 0 ) {
                 songSwitchPending = true;
+
+                // FORCE all tracks to end, now that volume is down
+                for( int p=0; p<numSongParts; p++ ) {
+                    songStreams[p].filePlaying = false;
+                    }
                 }
             // if not, we have to keep waiting
+            }
+        else if( shouldStartVolumeRise ) {
+            // a full buffer from next song has already gone out
+            // safe to start volume rise now
+            globalVolumeRise = true;
+            
+            shouldStartVolumeRise = false;
             }
         }
     
@@ -757,13 +765,14 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
             // ensure a fixed amount of silence between songs (2 seconds)
             
-            unsigned int sampleDelay = rate * 2;
+            // actually, skip this, because fade outs provide enough of a 
+            // silence, especially since we wait to fade back in until
+            // a full buffer of the next song has been sent out
 
-            // reset totalNumSamplesPlayed for each track to set this up
-            // position them each 2 seconds before next grid step
+            
+            // reset totalNumSamplesPlayed for each track
             for( int p=0; p<MAX_SOUND_CHANNELS; p++ ) {
-                songStreams[p].totalNumSamplesPlayed = 
-                    gridStepLength - sampleDelay;
+                songStreams[p].totalNumSamplesPlayed = 0;
                 }
             
             printOut( "New song has %d acts\n", numSongActs );
@@ -814,7 +823,11 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             // ensures that these buffers get properly filled with silence
             // before the volume is raised, replacing any lingering
             // glitch audio in the buffer.
-            shouldStartVolumeRise = true;
+
+
+            //shouldStartVolumeRise = true;
+            // actually, don't even start rise yet
+            // wait until first buffer of newly-added loops has played
             }
         }
 
@@ -853,12 +866,12 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 
                 addTrack( inChannelNumber, delay );
 
-                if( shouldStartVolumeRise ) {
-                    // this is the first track actually added after
-                    // a song change.  Start the volume rise NOW.
-                    globalVolumeRise = true;
+                if( globalVolumeRise == false ) {
                     
-                    shouldStartVolumeRise = false;
+                    // currently faded out
+                    // start fade-in AFTER these samples go out in buffer
+                    // (to avoid glitch of previous loops' samples in buffer)
+                    shouldStartVolumeRise = true;
                     }
                 
                 }
@@ -1147,8 +1160,8 @@ void switchSongs() {
 
     lockAudio();
 
-    songSwitchPending = true;
-
+    currentSongTargetLength = 0;
+    
     unlockAudio();
     }
 

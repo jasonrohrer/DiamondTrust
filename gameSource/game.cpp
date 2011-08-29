@@ -103,9 +103,10 @@ int aiLevelSheetSpriteID;
 
 
 int globalSoundVolume = 0;
-// start off gradually raising volume, fade in
+// start off with volume all the way down, and stuck there
 // set to false to force a gradual fade-out
-int globalVolumeRise = true;
+// set to true to force a gradual fade-in
+int globalVolumeRise = false;
 
 char soundPansSet = false;
 
