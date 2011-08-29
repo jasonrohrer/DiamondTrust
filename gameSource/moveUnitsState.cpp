@@ -92,6 +92,19 @@ static int getMoveCost( int inStartRegion, int inEndRegion ) {
     }
 
 
+static char shouldDrawDoneButton() {
+    int activeUnit = getActiveUnit();
+
+    if( activeUnit == -1 && !sentMove
+        &&
+        !( sentInitialMove && !gotInitialMove ) ) {
+        return true;
+        }
+
+    return false;
+    }
+
+
 
 
 static void sendMoveMessage() {
@@ -211,8 +224,31 @@ static char pickingBribe = false;
 
 void MoveUnitsState::clickState( int inX, int inY ) {
 
-
     int activeUnit = getActiveUnit();
+
+    if( !
+        ( shouldDrawDoneButton() 
+          ||
+          pickingBid
+          ||
+          pickingBribe 
+          ||
+          activeUnit != -1 ) ) {
+    
+        // state is not clickable now, ignore click
+        
+        // since we're also looking for clicks on the bid and bribe markers 
+        // below, we can't simply count on the units not being selectable
+        // while we're waiting for the opponent to move, as we do in the
+        // other states.
+
+        return;
+        }
+    
+
+
+
+    
 
 
     char considerSwitchingActive = true;
@@ -798,9 +834,7 @@ void MoveUnitsState::drawState() {
     
     int activeUnit = getActiveUnit();
 
-    if( activeUnit == -1 && !sentMove
-        &&
-        !( sentInitialMove && !gotInitialMove ) ) {
+    if( shouldDrawDoneButton() ) {
         doneButton->draw();
         }
     
