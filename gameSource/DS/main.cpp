@@ -1654,8 +1654,12 @@ static void wmEndCallback( void *inArg ) {
     // first connection (in case of child) is over
     isFirstConnection = false;
 
-    // back to totally unconnected state
-    wmStatus = -2;
+    // don't hide reporting of an error (which leads to an End call)
+    if( wmStatus != -1 ) {    
+        // back to totally unconnected state
+        wmStatus = -2;
+        }
+    
     }
 
 
@@ -2520,6 +2524,10 @@ static void initWM() {
 
 int getSignalStrength() {
     
+    if( wmStatus == -1 ) {
+        // error
+        return -1;
+        }
 
     if( wmStatus != -2 || isCloneBootRunning() ) {
         
