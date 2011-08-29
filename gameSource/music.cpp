@@ -682,7 +682,7 @@ static void addTrack( int inChannelNumber, int inDelay ) {
 extern int globalSoundVolume;
 extern char globalVolumeRise;
 
-static char shouldStartVolumeRise = false;
+static char shouldStartVolumeRise = 0;
 
 
 
@@ -708,7 +708,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             // but not until we've completed a nice fade-out
             if( globalSoundVolume == 0 ) {
                 songSwitchPending = true;
-
+                
                 // FORCE all tracks to end, now that volume is down
                 for( int p=0; p<numSongParts; p++ ) {
                     songStreams[p].filePlaying = false;
@@ -716,12 +716,18 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 }
             // if not, we have to keep waiting
             }
-        else if( shouldStartVolumeRise ) {
+        else if( shouldStartVolumeRise == 1 ) {
             // a full buffer from next song has already gone out
+            // send a second buffer out before staring the volume rise
+            shouldStartVolumeRise = 2;
+            }
+        else if( shouldStartVolumeRise == 2 ) {
+            
+            // TWO full buffers from next song have already gone out
             // safe to start volume rise now
             globalVolumeRise = true;
             
-            shouldStartVolumeRise = false;
+            shouldStartVolumeRise = 0;
             }
         }
     
@@ -866,12 +872,13 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 
                 addTrack( inChannelNumber, delay );
 
-                if( globalVolumeRise == false ) {
+                if( globalVolumeRise == false && shouldStartVolumeRise == 0 ) {
                     
                     // currently faded out
-                    // start fade-in AFTER these samples go out in buffer
+                    // start fade-in AFTER these samples go out in buffer,
+                    // plus one more buffer full.
                     // (to avoid glitch of previous loops' samples in buffer)
-                    shouldStartVolumeRise = true;
+                    shouldStartVolumeRise = 1;
                     }
                 
                 }
