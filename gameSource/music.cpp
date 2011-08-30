@@ -1333,6 +1333,22 @@ void setMusicStateInternal( const char *inStateString ) {
         int numFilesThisAct = songActFilesPerPart[currentSongAct][p];
             
         weightPerTrack[p] = numFilesThisAct * weightBlock;
+
+        // fix:
+        // This method can result in some tracks having > 100 coin weight,
+        // which means they will always be picked
+
+        // cap the max coin weight at 75 to prevent this
+
+        // note that this breaks our "5/2" tracks on property in cases
+        // where one track gets >100 weight, but that's okay, because it's
+        // really important for each track to have some off time (especially
+        // on menu screens where only two tracks are playing---forcing one
+        // track to be on all the time severely limits variety)
+
+        if( weightPerTrack[p] > 75 ) {
+            weightPerTrack[p] = 75;
+            }
         }
         
         
