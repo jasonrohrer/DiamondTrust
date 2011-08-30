@@ -1309,6 +1309,46 @@ void setMusicStateInternal( const char *inStateString ) {
     
 
 
+
+    // weights for coin flips, below
+
+    unsigned int totalWeight = ( 100 * numSongParts ) / 2;
+        
+    unsigned int numWeightBlocks = 0;
+    
+    for( int p=0; p<numSongParts; p++ ) {
+            
+        int numFilesThisAct = songActFilesPerPart[currentSongAct][p];
+        
+        numWeightBlocks += numFilesThisAct;
+        }
+    
+    unsigned int weightBlock = totalWeight / numWeightBlocks;
+        
+    unsigned int *weightPerTrack = new unsigned int[ numSongParts ];
+        
+
+    for( int p=0; p<numSongParts; p++ ) {
+
+        int numFilesThisAct = songActFilesPerPart[currentSongAct][p];
+            
+        weightPerTrack[p] = numFilesThisAct * weightBlock;
+        }
+        
+        
+    // if all tracks have the same number of available loops
+    // weightPerTrack[p] will be 50 for all p
+    // thus, we will be flipping fair coins, with average number of
+    // tracks on = 5/2
+
+    // if tracks have different numbers of loops, we will flip weighted
+    // coins, and still expect an average of 5/2 tracks playing
+
+
+
+
+
+
     // keep adding parts until at least one is playing
 
     // and after that, if ONLY one is playing, add one more
@@ -1339,17 +1379,33 @@ void setMusicStateInternal( const char *inStateString ) {
         // go through all parts and flip a fair coin to decide if it is playing
         // thus, on average, half of our tracks are playing
         
+        // furthermore, weight coin flips based on how many loops are available
+        // for each track.
+
+        // Thus, a track with only one loop available will play less often
+        // than a track with multiple loops to choose from
+
+        // HOWEVER, don't just increase weights of some tracks, because
+        // that will affect the average number of tracks playing at any one
+        // time.  Want average of 5/2 tracks playing, like before.
+
+        // use weights computed outside while loop, above
+        
+
+        
+        
+
         // rarest to have ALL playing.
         // rarest to have ONE playing.
         
         for( int p=0; p<numSongParts; p++ ) {
+
+            int numFilesThisAct = songActFilesPerPart[currentSongAct][p];
     
             if( // currently off
                 musicState[p] == -1 &&
-                // win a fair coin flip
-                getRandom( s, 100 ) > 50 ) {
-                
-                int numFilesThisAct = songActFilesPerPart[currentSongAct][p];
+                // win a weighted coin flip
+                getRandom( s, 100 ) < weightPerTrack[p] ) {    
                 
                 if( numFilesThisAct > 0 ) {
                     // pick one
@@ -1364,7 +1420,9 @@ void setMusicStateInternal( const char *inStateString ) {
                     }
                 }
             }
+
         }
+
 
     if( limitTotalTracks && numPlaying > 2 ) {
         // now go back through and trim out tracks if we have too many
@@ -1375,8 +1433,8 @@ void setMusicStateInternal( const char *inStateString ) {
                 
                 if( // currently on
                     musicState[p] != -1 &&
-                    // win a fair coin flip
-                    getRandom( s, 100 ) > 50 ) {
+                    // loose a weighted coin flip
+                    getRandom( s, 100 ) > weightPerTrack[p] ) {
                     
                     
                     // turn off
@@ -1387,7 +1445,7 @@ void setMusicStateInternal( const char *inStateString ) {
             }
         }
     
-
+    delete [] weightPerTrack;
 
     }
 
