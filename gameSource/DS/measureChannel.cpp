@@ -5,7 +5,7 @@
 static unsigned short allowedChannels = 0;
 static unsigned short nextChannel = 0;
 
-// FIXME:  replace with actual measurement of traffic when game runs
+// replace with actual measurement of traffic when game runs
 static int requiredTraffic = 20;
 static short bestChannel = -1;
 static int bestBusyRatio = 101;
@@ -97,11 +97,14 @@ void measureNextChannel() {
 
 
 
-void startMeasureChannel( void (*inCallback) (short inBestChannel) ) {
+void startMeasureChannel( void (*inCallback) (short inBestChannel),
+                          int inRequiredTraffic ) {
     allowedChannels = WM_GetAllowedChannel();
     nextChannel = 0;
     bestChannel = -1;
     bestBusyRatio = 101;
+
+    requiredTraffic = inRequiredTraffic;
     
     measureChannelCallback = inCallback;
 

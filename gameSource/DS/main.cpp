@@ -2405,7 +2405,11 @@ static void wmInitializeCallback( void *inArg ) {
             // can't call this from inside a callback
             //tgid = WM_GetNextTgid();
 
-            startMeasureChannel( measureChannelCallback );
+            // only 5 traffic units used by regular game
+            // But game can survive (establish connection, exchange moves)
+            //  with as few as 3 free traffic units.
+            // (measured with WMtest tool)
+            startMeasureChannel( measureChannelCallback, 3 );
             }
         else {
             // child

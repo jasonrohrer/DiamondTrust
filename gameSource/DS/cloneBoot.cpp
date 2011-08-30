@@ -167,7 +167,10 @@ static void wmInitializeCallback( void *inArg ) {
         cloneBootError = true;
         }
     else {
-        startMeasureChannel( measureChannelCallback );
+        // 37 traffic units used during Download Play transfer
+        // DL can succeed with only 15 units, however
+        // (measured with WMtest tool)
+        startMeasureChannel( measureChannelCallback, 15 );
         }
     }
 
