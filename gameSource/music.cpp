@@ -258,6 +258,42 @@ static char **getAllFilesForActAndPart( int inAct, int inPart,
 
 
 
+#define LAST_FEW_SIZE 3
+
+static int lastFewSongs[LAST_FEW_SIZE] = { -1, -1, -1 };
+
+
+static void addLastSong( int inSong ) {
+    for( int i=LAST_FEW_SIZE-1; i>0; i-- ) {
+        lastFewSongs[i] = lastFewSongs[i-1];
+        }
+    lastFewSongs[0] = inSong;
+    }
+
+
+static void printLastFewSongs() {
+    printOut( "Last few songs:  " );
+
+    for( int i=0; i<LAST_FEW_SIZE; i++ ) {
+        printOut( "%d, ", lastFewSongs[i] );
+        }
+    printOut( "\n" );
+    }
+
+
+static char hitsLastFewSongs( int inSong ) {
+    for( int i=0; i<LAST_FEW_SIZE; i++ ) {
+        if( lastFewSongs[i] == inSong ) {
+            return true;
+            }
+        }
+    return false;
+    }
+
+
+
+
+
 
 
 // picks a song at random
@@ -277,17 +313,19 @@ static void loadSong() {
     if( numSongs > 0 ) {
         sortStrings( &songList, numSongs );
         
-        int lastSongPick = currentSongPick;
 
         currentSongPick = (int)getRandom( (unsigned int)numSongs );
         
-        if( numSongs > 1 ) {
-            // avoid playing the same song again, if possible
-            while( currentSongPick == lastSongPick ) {
+        if( numSongs > LAST_FEW_SIZE ) {
+            // avoid playing recently-played songs again, if possible
+            while( hitsLastFewSongs( currentSongPick ) ) {
                 
                 currentSongPick = (int)getRandom( (unsigned int)numSongs );
                 }
             }
+        
+        addLastSong( currentSongPick );
+        printLastFewSongs();
         
                 
         currentSongDirName = stringDuplicate( songList[ currentSongPick ] );
@@ -692,8 +730,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
     channelStream *s = &( songStreams[inChannelNumber] );
 
-    unsigned int samplesLeftInGridStep = 
-        gridStepLength - s->totalNumSamplesPlayed % gridStepLength;
+    //unsigned int samplesLeftInGridStep = 
+    //    gridStepLength - s->totalNumSamplesPlayed % gridStepLength;
     
 
     if( inChannelNumber == 0 ) {
