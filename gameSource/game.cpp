@@ -157,6 +157,7 @@ unsigned int stepsToWaitBeforeLidClosedMusicChange = 0;
 // music spectrum
 char renewMusicTrackLimitAfterLidOpened = false;
 
+int preLidClosedSongAct = -1;
 
 
 
@@ -1221,6 +1222,9 @@ void gameLoopTick() {
                 // turn off two-track limit while lid is closed
                 limitTotalMusicTracks( false );
                 }
+
+            preLidClosedSongAct = getSongAct();
+            enableActChangesWithEverySong( true );
             }
         
         stepsSinceLidClosed++;
@@ -1262,6 +1266,16 @@ void gameLoopTick() {
             renewMusicTrackLimitAfterLidOpened = false;
             }
         
+        if( preLidClosedSongAct >= 0 ) {
+            
+            forceSongAct( preLidClosedSongAct );
+            
+            enableActChangesWithEverySong( false );
+        
+            preLidClosedSongAct = -1;
+            }
+        
+
 
         stepsSinceLidClosed = 0;
         stepsSinceLidClosedMusicChange = 0;

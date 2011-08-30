@@ -46,6 +46,8 @@ char **songActDirNames = NULL;
 
 int currentSongAct = 0;
 
+char actChangesWithEverySong = false;
+
 
 int numSongParts;
 char **songPartNames = NULL;
@@ -802,8 +804,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             
             printOut( "Last song had %d acts\n", numSongActs );
 
-            unloadSong();
-            
+            unloadSong();            
+
             loadSong();
             
 
@@ -820,6 +822,15 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 }
             
             printOut( "New song has %d acts\n", numSongActs );
+
+
+            if( actChangesWithEverySong ) {
+                // in range [1 .. (numSongActs-1)]
+                currentSongAct = getRandom( numSongActs - 1 ) + 1;
+                
+                printOut( "Picking a new song act at random:  %d\n",
+                          currentSongAct );
+                }
 
 
             if( lastStateString != NULL ) {
@@ -1133,6 +1144,35 @@ int getSongAct() {
     
     return returnValue;
     }
+
+
+
+void forceSongAct( int inAct ) {
+    if( isThisAClone() ) {
+        return;
+        }
+    
+    lockAudio();
+    currentSongAct = inAct;
+
+    if( lastStateString != NULL ) {
+        // redo music state to ensure a new mix after act changes
+        setMusicStateInternal( lastStateString );
+        }
+    unlockAudio();
+    }
+
+
+// when enabled, a random act is picked at every song transition
+// otherwise, song acts advance according to nextSongAct calls
+void enableActChangesWithEverySong( int inActChangesWithEverySong ) {
+    lockAudio();
+    actChangesWithEverySong = inActChangesWithEverySong;
+    unlockAudio();
+    }
+
+
+
 
 
 

@@ -38,6 +38,14 @@ void backToFirstSongAct();
 
 int getSongAct();
 
+void forceSongAct( int inAct );
+
+// when enabled, a random act is picked at every song transition
+// otherwise, song acts advance according to nextSongAct calls
+void enableActChangesWithEverySong( int inActChangesWithEverySong );
+
+
+
 
 // time left in samples
 int getSongTimeLeft();
