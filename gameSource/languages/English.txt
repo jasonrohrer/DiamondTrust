@@ -17,7 +17,8 @@ button_play_again "Play Again"
 button_nextSongAct "fwd"
 button_songReroll "rand"
 button_switchSongs "song"
-
+button_closeLid "close lid"
+button_openLid "open lid"
 
 button_ai "Single Player"
 button_wifi "Two Player"

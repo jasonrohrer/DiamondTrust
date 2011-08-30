@@ -60,6 +60,8 @@ static int helpFadeStepsMax = 50;
 // on the title screen, for debugging and testing
 char allowManualSongActSwitching = false;
 
+char manualLidClosed = false;
+
 
 
 int drawFrameCounter = false;
@@ -190,6 +192,10 @@ Button *helpButton;
 Button *nextSongActButton;
 Button *songRerollButton;
 Button *switchSongButton;
+Button *closeLidButton;
+Button *openLidButton;
+
+
 
 
 Button *aiButton;
@@ -577,7 +583,11 @@ void gameInit() {
     switchSongButton = new Button( font16, translate( "button_switchSongs" ),
                                    218, 87 );
 
-
+    closeLidButton = new Button( font16, translate( "button_closeLid" ),
+                                 128, 57 );
+    openLidButton = new Button( font16, translate( "button_openLid" ),
+                                128, 57 );
+    
 
 
 
@@ -673,7 +683,10 @@ void gameFree() {
     delete nextSongActButton;
     delete songRerollButton;
     delete switchSongButton;
+    delete closeLidButton;
+    delete openLidButton;
     
+
     delete aiButton;
     delete wifiButton;
     
@@ -1196,7 +1209,7 @@ void gameLoopTick() {
     
 
 
-    if( getLidClosed() ) {
+    if( getLidClosed() || manualLidClosed ) {
         
         
         if( stepsSinceLidClosed == 0 ) {
@@ -1545,6 +1558,22 @@ void drawTopScreen() {
 
         delete [] partStrings;
 
+
+        if( manualLidClosed ) {
+            
+            int stepsBeforeReseed = 
+                stepsToWaitBeforeLidClosedMusicChange -
+                stepsSinceLidClosedMusicChange;
+        
+            char *reseedTimeString = autoSprintf( "Auto reseed in: %d:%02d\n",
+                                                  stepsBeforeReseed / (30*60),
+                                                  stepsBeforeReseed / 30 );
+            
+            font8->drawString( reseedTimeString, 128, 49 + 60, 
+                               white, alignLeft );
+            delete [] reseedTimeString;
+            }
+        
 
 
         
