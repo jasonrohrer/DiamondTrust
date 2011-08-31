@@ -107,7 +107,12 @@ void PickGameTypeState::clickState( int inX, int inY ) {
             }
         else if( allowManualSongActSwitching ) {
             if( nextSongActButton->getPressed( inX, inY ) ) {
-                nextSongAct();
+                if( getSongAct() < 3 ) {
+                    nextSongAct();
+                    }
+                else {
+                    backToFirstSongAct();
+                    }
                 }
             else if( songRerollButton->getPressed( inX, inY ) ) {   
                 
