@@ -21,12 +21,18 @@ Property {
     # FIXME:  need to add a bunch of other settings here to make a final ROM
     # see demos/tips/BuildFinalROM example
 
+    TitleName		"DIAMONDTRUST"
 
     RemasterVersion		0
 
     # for now, just specify speed and banner file
 
-    RomSpeedType  $(MAKEROM_ROMSPEED)
+	# two largest cart sizes require this
+	RomSpeedType		1TROM
+    
+	RomSize			2G
+
+	RomFootPadding 		TRUE
 
 
     BannerFile    banner.bnr

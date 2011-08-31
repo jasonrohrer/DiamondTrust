@@ -1,6 +1,7 @@
 TWLSDK_PLATFORM = NITRO
 #TWLSDK_PLATFORM = TWL
-TWL_DEBUG = TRUE
+#TWL_DEBUG = TRUE
+TWL_FINALROM = TRUE
 
 #TARGET_PLATFORM = TWL NITRO
 TARGET_PLATFORM = NITRO
@@ -15,6 +16,11 @@ MBP_DIR = $(ROOT)/build/demos/wireless_shared/mbp
 DS_SOURCE = main.cpp measureChannel.cpp cloneBoot.cpp \
 cloneBootChild.cpp $(MBP_DIR)/mbp.c
 
+
+MY_ROM_VERSION = 00
+GAME_CODE = TDTE
+
+ROM_NAME = N$(GAME_CODE)$(MY_ROM_VERSION)
 
 
 ROM_SPEC  =  ROM-TS.rsf
@@ -43,7 +49,7 @@ PATH_MINOR_GEMS_SOURCE = $(patsubst %,../../../minorGems/%,$(MINOR_GEMS_SOURCE))
 SRCS = $(DS_SOURCE) $(PATH_GAME_SOURCE) $(PATH_MINOR_GEMS_SOURCE)
 
 
-TARGET_BIN = main.srl
+TARGET_BIN = $(ROM_NAME)_unsigned.srl
 
 MAKEROM_ROMROOT = ../gameData 
 MAKEROM_ROMFILES = * 
@@ -87,13 +93,13 @@ presign:
 	$(EMUCHILD) \
 		bin/$(TWL_BUILDTYPE)/$(TARGET_BIN) \
 		$(LIBSYSCALL_CHILD) \
-		bin/$(TWL_BUILDTYPE)/sign.srl
+		bin/$(TWL_BUILDTYPE)/$(ROM_NAME)_toSign.srl
 
 postsign:
 	$(ATTACHSIGN) \
 		bin/$(TWL_BUILDTYPE)/$(TARGET_BIN) \
 		bin/$(TWL_BUILDTYPE)/sign.sgn  \
-		bin/$(TWL_BUILDTYPE)/mainSigned.srl
+		bin/$(TWL_BUILDTYPE)/$(ROM_NAME).srl
 
 
 
