@@ -179,8 +179,15 @@ graphics/%_rotated.png: graphics/%.png
 #.INTERMEDIATE: ${JRI_FILES_TO_COMPILE_IN} 
 
 
+# hard for main's dependence on dataFiles.cpp to be represented
+# (or at least it's not working!)
+# so touch both platforms' main files explicitly when dataFiles.cpp is rebuilt.
 dataFiles.cpp: ${JRI_FILES_TO_COMPILE_IN} compileFilesIn.pl
 	./compileFilesIn.pl dataFiles.cpp ${JRI_FILES_TO_COMPILE_IN}
+	touch SDL/main.cpp
+	touch DS/main.cpp
+	@echo "\ndataFiles.cpp has changed.  Please run make again.\n"
+	exit 1
 
 
 

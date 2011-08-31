@@ -197,8 +197,10 @@ Button *songPlusButton;
 Button *songMinusButton;
 Button *closeLidButton;
 Button *openLidButton;
+Button *muteButton;
+Button *unmuteButton;
 
-
+char soundMuted = false;
 
 
 Button *aiButton;
@@ -596,6 +598,11 @@ void gameInit() {
     openLidButton = new Button( font16, translate( "button_openLid" ),
                                 128, 27 );
     
+    muteButton = new Button( font16, translate( "button_mute" ),
+                             38, 57 );
+    unmuteButton = new Button( font16, translate( "button_unmute" ),
+                               38, 57 );
+
 
 
 
@@ -695,8 +702,9 @@ void gameFree() {
     delete songMinusButton;
     delete closeLidButton;
     delete openLidButton;
+    delete muteButton;
+    delete unmuteButton;
     
-
     delete aiButton;
     delete wifiButton;
     
@@ -1046,7 +1054,24 @@ void gameLoopTick() {
         soundPansSet = true;
         }
 
-    if( globalVolumeRise && globalSoundVolume < 127 ) {
+
+    if( soundMuted ) {
+        // ignore other volume transitions until unmuted
+        
+        if( globalSoundVolume > 0 ) {
+            // 4x as fast as normal fade
+            globalSoundVolume -= 4;
+            
+            if( globalSoundVolume < 0 ) {
+                globalSoundVolume = 0;
+                }
+
+            for( int c=0; c<8; c++ ) {
+                setSoundChannelVolume( c, globalSoundVolume );
+                }
+            }
+        }
+    else if( globalVolumeRise && globalSoundVolume < 127 ) {
         
         globalSoundVolume++;
         

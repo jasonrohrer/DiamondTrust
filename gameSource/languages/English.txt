@@ -21,6 +21,9 @@ button_songPlus "song+"
 button_songMinus "song-"
 button_closeLid "close lid"
 button_openLid "open lid"
+button_mute "mute"
+button_unmute "!mute!"
+
 
 button_ai "Single Player"
 button_wifi "Two Player"

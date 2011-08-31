@@ -27,6 +27,11 @@ extern Button *songPlusButton;
 extern Button *songMinusButton;
 extern Button *closeLidButton;
 extern Button *openLidButton;
+extern Button *muteButton;
+extern Button *unmuteButton;
+
+extern char soundMuted;
+
 
 extern char allowManualSongActSwitching;
 extern char manualLidClosed;
@@ -144,7 +149,16 @@ void PickGameTypeState::clickState( int inX, int inY ) {
             else if( ! manualLidClosed && 
                      closeLidButton->getPressed( inX, inY ) ) {
                 manualLidClosed = true;
-                }            
+                }         
+            else if( soundMuted && 
+                     unmuteButton->getPressed( inX, inY ) ) {
+                soundMuted = false;
+                }
+            else if( !soundMuted && 
+                     muteButton->getPressed( inX, inY ) ) {
+                soundMuted = true;
+                }
+            
             }
         }
     }
@@ -225,7 +239,14 @@ void PickGameTypeState::drawState() {
                 }
             else {
                 closeLidButton->draw();
-                }            
+                }    
+
+            if( soundMuted ) {
+                unmuteButton->draw();
+                }
+            else {
+                muteButton->draw();
+                }
             }
         }
     
