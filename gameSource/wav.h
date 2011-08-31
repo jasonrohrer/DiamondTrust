@@ -10,7 +10,7 @@ typedef struct wavInfo {
         int numChannels;
         int bitsPerSample;
         int sampleRate;
-        int numSamples;
+        unsigned int numSamples;
 
         // number of bytes to skip in the file to get to the data
         int startOfDataInFile;

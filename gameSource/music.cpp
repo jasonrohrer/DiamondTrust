@@ -74,7 +74,7 @@ char *lastStateString = NULL;
 
 
 
-int gridStepLength = 0;
+unsigned int gridStepLength = 0;
 
 
 typedef struct wavStream {
@@ -122,7 +122,7 @@ typedef struct channelStream {
         // a pointer to a wavStream in our wavBank
         wavStream *wavBankStream;
         
-        int fileSamplePosition;
+        unsigned int fileSamplePosition;
 
         int startSampleDelay;
         
@@ -752,12 +752,21 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
         
         if( s->totalNumSamplesPlayed > currentSongTargetLength ) {
             // time to auto-switch
+            
+            // only start volume fade for auto-switch if we are at least 
+            // half-way through a current grid step (otherwise, we might 
+            // start a fade immediately after a song texture change, which 
+            // sounds weird)
+            if( s->totalNumSamplesPlayed % gridStepLength > 
+                gridStepLength / 2 ) {
 
-            // keep fading out
-            globalVolumeRise = false;
+                // start (or keep) fading out
+                globalVolumeRise = false;
+                }
             
 
-            // but not until we've completed a nice fade-out
+            // but don't actually start transistion until we've completed 
+            // a nice fade-out
             if( globalSoundVolume == 0 ) {
                 songSwitchPending = true;
                 
@@ -924,8 +933,11 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
 
 
-
-    if( ! s->filePlaying && inChannelNumber < numSongParts ) {
+    // never add a track when volume has already started to fade out, but
+    // hasn't finished yet
+    if( ( globalVolumeRise != false || globalSoundVolume == 0 )
+        &&
+        ! s->filePlaying && inChannelNumber < numSongParts ) {
     
         if( gridStepLength == 0
             ||
@@ -950,7 +962,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 
                 addTrack( inChannelNumber, delay );
 
-                if( globalVolumeRise == false && shouldStartVolumeRise == 0 ) {
+                if( globalVolumeRise == false && globalSoundVolume == 0 &&
+                    shouldStartVolumeRise == 0 ) {
                     
                     // currently faded out
                     // start fade-in AFTER these samples go out in buffer,
@@ -1049,8 +1062,14 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
                 // may leave silence, because the next state's parts
                 // will only come IN on a full grid step
 
+                // also, never drop out or switch while we are already fading
+                // out (song should hold steady during fade out), unless
+                // volume has hit 0 already
+
                 // otherwise, we simply rewind our wav and keep going
-                if( s->totalNumSamplesPlayed / gridStepLength <
+                if( ( globalVolumeRise != false || globalSoundVolume == 0 ) 
+                    &&
+                    s->totalNumSamplesPlayed / gridStepLength <
                     ( s->totalNumSamplesPlayed + numSamplesRequested ) 
                        / gridStepLength ) {
                     
