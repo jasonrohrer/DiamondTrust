@@ -826,7 +826,7 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
 
             if( actChangesWithEverySong ) {
                 // in range [1 .. (numSongActs-1)]
-                currentSongAct = getRandom( numSongActs - 1 ) + 1;
+                currentSongAct = (int)( getRandom( numSongActs - 1 ) + 1 );
                 
                 printOut( "Picking a new song act at random:  %d\n",
                           currentSongAct );
@@ -1165,7 +1165,7 @@ void forceSongAct( int inAct ) {
 
 // when enabled, a random act is picked at every song transition
 // otherwise, song acts advance according to nextSongAct calls
-void enableActChangesWithEverySong( int inActChangesWithEverySong ) {
+void enableActChangesWithEverySong( char inActChangesWithEverySong ) {
     lockAudio();
     actChangesWithEverySong = inActChangesWithEverySong;
     unlockAudio();

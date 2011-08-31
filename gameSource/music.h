@@ -42,7 +42,7 @@ void forceSongAct( int inAct );
 
 // when enabled, a random act is picked at every song transition
 // otherwise, song acts advance according to nextSongAct calls
-void enableActChangesWithEverySong( int inActChangesWithEverySong );
+void enableActChangesWithEverySong( char inActChangesWithEverySong );
 
 
 

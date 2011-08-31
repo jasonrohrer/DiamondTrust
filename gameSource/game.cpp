@@ -1576,8 +1576,8 @@ void drawTopScreen() {
         if( manualLidClosed ) {
             
             int stepsBeforeReseed = 
-                stepsToWaitBeforeLidClosedMusicChange -
-                stepsSinceLidClosedMusicChange;
+                (int)( stepsToWaitBeforeLidClosedMusicChange -
+                       stepsSinceLidClosedMusicChange );
         
             char *reseedTimeString = autoSprintf( "Auto reseed in: %d:%02d\n",
                                                   stepsBeforeReseed / (30*60),
