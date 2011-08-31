@@ -25,6 +25,12 @@ int currentSongPick = -1;
 char *currentSongDirName = NULL;
 
 
+// 0 is default (pick a random song)
+// but can be overridden by manual switching to go forward (+1) or back (-1)
+int nextSongPickDirection = 0;
+
+
+
 unsigned int currentSongTargetLength = 0;
 
 
@@ -311,7 +317,7 @@ static char hitsLastFewSongs( int inSong ) {
 
 
 // picks a song at random
-// tries to avoid last song as set in currentSongPick
+// tries to avoid picking last few songs
 static void loadSong() {
 
     // each song may have a different master grid step length
@@ -327,16 +333,36 @@ static void loadSong() {
     if( numSongs > 0 ) {
         sortStrings( &songList, numSongs );
         
-
-        currentSongPick = (int)getRandom( (unsigned int)numSongs );
         
-        if( numSongs > LAST_FEW_SIZE ) {
-            // avoid playing recently-played songs again, if possible
-            while( hitsLastFewSongs( currentSongPick ) ) {
-                
-                currentSongPick = (int)getRandom( (unsigned int)numSongs );
+        if( nextSongPickDirection == 0 ) {
+            // pick at random
+
+            currentSongPick = (int)getRandom( (unsigned int)numSongs );
+            
+            if( numSongs > LAST_FEW_SIZE ) {
+                // avoid playing recently-played songs again, if possible
+                while( hitsLastFewSongs( currentSongPick ) ) {
+                    
+                    currentSongPick = (int)getRandom( (unsigned int)numSongs );
+                    }
                 }
             }
+        else {
+            currentSongPick += nextSongPickDirection;
+            
+            // wrap around
+            while( currentSongPick >= numSongs ) {
+                currentSongPick -= numSongs;
+                }
+            while( currentSongPick < 0 ) {
+                currentSongPick += numSongs;
+                }
+
+            // back to default
+            nextSongPickDirection = 0;
+            }
+        
+            
         
         addLastSong( currentSongPick );
         printLastFewSongs();
@@ -1286,7 +1312,7 @@ char *getGridStepTimeString() {
 
 
 
-void switchSongs() {    
+void switchSongs( int inNexSong ) {    
     if( isThisAClone() ) {
         return;
         }
@@ -1295,6 +1321,8 @@ void switchSongs() {
 
     currentSongTargetLength = 0;
     
+    nextSongPickDirection += inNexSong;
+
     unlockAudio();
     }
 

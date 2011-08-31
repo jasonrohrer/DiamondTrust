@@ -23,6 +23,8 @@ extern unsigned char titleFade;
 extern Button *nextSongActButton;
 extern Button *songRerollButton;
 extern Button *switchSongButton;
+extern Button *songPlusButton;
+extern Button *songMinusButton;
 extern Button *closeLidButton;
 extern Button *openLidButton;
 
@@ -129,6 +131,12 @@ void PickGameTypeState::clickState( int inX, int inY ) {
             else if( switchSongButton->getPressed( inX, inY ) ) {
                 switchSongs();
                 }
+            else if( songPlusButton->getPressed( inX, inY ) ) {
+                switchSongs( 1 );
+                }
+            else if( songMinusButton->getPressed( inX, inY ) ) {
+                switchSongs( -1 );
+                }
             else if( manualLidClosed && 
                      openLidButton->getPressed( inX, inY ) ) {
                 manualLidClosed = false;
@@ -209,6 +217,8 @@ void PickGameTypeState::drawState() {
             nextSongActButton->draw();
             songRerollButton->draw();
             switchSongButton->draw();
+            songPlusButton->draw();
+            songMinusButton->draw();
             
             if( manualLidClosed ) {
                 openLidButton->draw();

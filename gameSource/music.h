@@ -54,7 +54,12 @@ char *getGridStepTimeString();
 
 
 
-void switchSongs();
+// set inNexSong to 1 to advance song by exactly 1
+// set to -1 to go back by one song
+// 0 (default) picks a random song
+// calling this multiple times, before the actual song transition, 
+// is cumulative (can jump by more than one song)
+void switchSongs( int inNexSong=0 );
 
 
 

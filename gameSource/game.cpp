@@ -193,6 +193,8 @@ Button *helpButton;
 Button *nextSongActButton;
 Button *songRerollButton;
 Button *switchSongButton;
+Button *songPlusButton;
+Button *songMinusButton;
 Button *closeLidButton;
 Button *openLidButton;
 
@@ -584,10 +586,15 @@ void gameInit() {
     switchSongButton = new Button( font16, translate( "button_switchSongs" ),
                                    218, 87 );
 
+    songPlusButton = new Button( font16, translate( "button_songPlus" ),
+                                 218, 57 );
+    songMinusButton = new Button( font16, translate( "button_songMinus" ),
+                                  218, 117 );
+
     closeLidButton = new Button( font16, translate( "button_closeLid" ),
-                                 128, 57 );
+                                 128, 27 );
     openLidButton = new Button( font16, translate( "button_openLid" ),
-                                128, 57 );
+                                128, 27 );
     
 
 
@@ -684,6 +691,8 @@ void gameFree() {
     delete nextSongActButton;
     delete songRerollButton;
     delete switchSongButton;
+    delete songPlusButton;
+    delete songMinusButton;
     delete closeLidButton;
     delete openLidButton;
     
