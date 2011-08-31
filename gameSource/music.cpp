@@ -36,7 +36,7 @@ unsigned int rate = SOUND_SAMPLE_RATE;
 unsigned int oneTenthRate = rate/10;
 
 
-static unsigned int songEndFadeTime = rate * 5;
+//static unsigned int songEndFadeTime = rate * 5;
 
 
 
@@ -263,6 +263,18 @@ static char **getAllFilesForActAndPart( int inAct, int inPart,
 #define LAST_FEW_SIZE 3
 
 static int lastFewSongs[LAST_FEW_SIZE] = { -1, -1, -1 };
+
+
+// also track which act was most recently played for each song
+
+// WARNING:  won't work if game has more than 30 songs
+#define MAX_NUM_SONGS 30
+
+static int lastActPlayedForEachSong[ MAX_NUM_SONGS] = 
+{ -1, -1, -1, -1, -1,  -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1,  -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1,  -1, -1, -1, -1, -1 };
+
 
 
 static void addLastSong( int inSong ) {
@@ -827,11 +839,28 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             if( actChangesWithEverySong ) {
                 // in range [1 .. (numSongActs-1)]
                 currentSongAct = (int)( getRandom( numSongActs - 1 ) + 1 );
-                
+
+                if( currentSongPick >= MAX_NUM_SONGS ) {
+                    printOut( "Warning:  more than %d songs breaks "
+                              "repeat-song-act avoidance\n", MAX_NUM_SONGS );
+                    }
+                else {
+                    while( currentSongAct == 
+                           lastActPlayedForEachSong[ currentSongPick ] ) {
+                        
+                        currentSongAct = 
+                            (int)( getRandom( numSongActs - 1 ) + 1 );
+                        }
+
+                    
+                    }
+
                 printOut( "Picking a new song act at random:  %d\n",
                           currentSongAct );
                 }
 
+            lastActPlayedForEachSong[ currentSongPick ] = 
+                currentSongAct;
 
             if( lastStateString != NULL ) {
                 // redo music state to ensure it's consistent with new song
