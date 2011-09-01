@@ -696,6 +696,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             stepsSinceSentMove = 0;
             
             sentInitialMove = true;
+
+            nextSubState();
             }
         }
     else if( activeUnit == -1 && !sentMove ) {
@@ -708,6 +710,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             stepsSinceSentMove = 0;
 
             sentMove = true;
+
+            nextSubState();
             }
         }
     
@@ -764,6 +768,8 @@ void MoveUnitsState::stepState() {
                 sendMoveMessage();
                 
                 sentMove = true;
+
+                nextSubState();
                 }                
             }        
 
