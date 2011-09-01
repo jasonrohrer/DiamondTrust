@@ -832,8 +832,6 @@ void MoveUnitsState::drawState() {
     
     drawUnits();
     
-    int activeUnit = getActiveUnit();
-
     if( shouldDrawDoneButton() ) {
         doneButton->draw();
         }
