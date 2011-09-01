@@ -1036,8 +1036,8 @@ void getAudioSamplesForChannel( int inChannelNumber, s16 *inBuffer,
             
             int numToGet = inNumSamples;
 
-            int numSamplesLeft = s->wavBankStream->info.numSamples - 
-                s->fileSamplePosition;
+            int numSamplesLeft = (int)( s->wavBankStream->info.numSamples - 
+					s->fileSamplePosition );
             
             if( numToGet > numSamplesLeft ) {
                 numToGet = numSamplesLeft;
