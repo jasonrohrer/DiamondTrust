@@ -283,6 +283,8 @@ void SalaryBribeState::clickState( int inX, int inY ) {
             
             statusSubMessage = translate( "phaseSubStatus_waitingOpponent" );
 
+            nextSubState();
+
             // send our move as a message
 
             // 2 chars per unit (both player and opponent)
