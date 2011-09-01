@@ -98,6 +98,8 @@ static char servingCloneBoot = false;
 
 static int lastCloneHostState = 0;
 
+static char connectionFailedReported = false;
+
 
 
 static void childStartConnect() {
@@ -149,6 +151,8 @@ void ConnectState::clickState( int inX, int inY ) {
             statusSubMessage = mMessage;
             connecting = true;
             stepsSinceConnectTry = 0;
+            
+            nextSubState();
             }
         else if( parentServeCloneDownloadButton != NULL &&
                  parentServeCloneDownloadButton->getPressed( inX, inY ) ) {
@@ -171,9 +175,12 @@ void ConnectState::clickState( int inX, int inY ) {
             servingCloneBoot = true;
             
             stepsSinceConnectTry = 0;
+            
+            nextSubState();
             }
         else if( childButton->getPressed( inX, inY ) ) {
             childStartConnect();
+            nextSubState();
             }
         }
     
@@ -207,8 +214,15 @@ void ConnectState::stepState() {
         
 
         if( checkConnectionStatus() == -1 ) {
-            statusSubMessage = 
-                translate( "phaseSubStatus_connectFailed" );
+            if( !connectionFailedReported ) {
+                
+                printOut( "Failed\n" );
+                statusSubMessage = 
+                    translate( "phaseSubStatus_connectFailed" );
+                nextSubState();
+                connectionFailedReported = true;
+                }
+            
             return;
             }
 
@@ -223,6 +237,12 @@ void ConnectState::stepState() {
                 
             if( lastCloneHostState != cloneState ) {
                 // message change
+
+                // keep advancing sub state throughout various transitions
+                // thus, music changes as we receive multiple connection
+                // tries, etc.
+                // sub state might eventually wrap around back to 'a'.
+                nextSubState();
 
                 switch( cloneState ) {
                     case -1:
@@ -415,6 +435,8 @@ void ConnectState::enterState() {
     servingCloneBoot = false;
     lastCloneHostState = 0;
     
+    connectionFailedReported = false;
+
 
     if( isAutoconnecting() ) {
         // clone boot child?

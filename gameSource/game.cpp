@@ -685,13 +685,15 @@ void gameInit() {
         }
 
 
-    // each game starts with inspector in a different spot
-    setMusicBasedOnGameState();    
 
     
     //currentGameState = connectState;
     //currentGameState = sellDiamondsState;
     currentGameState->enterStateCall();
+
+    // each game starts with inspector in a different spot
+    setMusicBasedOnGameState();    
+
 
     stillLoading = false;
 
@@ -1010,9 +1012,9 @@ static void goToNextGameState() {
         }
 
                 
-    setMusicBasedOnGameState();
-
     currentGameState->enterStateCall();
+
+    setMusicBasedOnGameState();
     }
 
 
@@ -1035,10 +1037,10 @@ static void goToPreviousGameState() {
         resetToPlayAgain();
         currentGameState = pickGameTypeState;
         }
-              
-    setMusicBasedOnGameState();
   
     currentGameState->enterStateCall();
+
+    setMusicBasedOnGameState();
     }
 
     

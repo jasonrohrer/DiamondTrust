@@ -28,6 +28,8 @@ class GameState {
         virtual void enterStateCall() {
             printOut( "Entering GameState [%s]\n", mStateName );
             
+            resetSubState();
+
             enterState();
             }
         
@@ -129,6 +131,10 @@ class GameState {
             // advance through ascii alphabet
             mSubStateLetter ++;
             
+            if( mSubStateLetter > 'z' ) {
+                mSubStateLetter = 'a';
+                }
+
             mSubStateTransitionHappened = true;
             }
         

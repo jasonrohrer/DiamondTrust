@@ -757,9 +757,7 @@ void SellDiamondsState::drawState() {
 
 
 
-void SellDiamondsState::enterState() {
-    resetSubState();
-    
+void SellDiamondsState::enterState() {    
     stateDone = false;
     connectionBroken = false;
     
