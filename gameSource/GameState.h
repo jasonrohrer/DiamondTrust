@@ -6,7 +6,8 @@ class GameState {
     public:
 
         GameState() :
-            mSubStateTransitionHappened( false ) {
+            mSubStateTransitionHappened( false ),
+            mSubStateString( "" ) {
 
             mStateName = "GameState";
             mStateNumber = sNextStateNumber;
@@ -95,9 +96,7 @@ class GameState {
         // Example:  "15b"
         // Result destroyed by caller
         virtual char *getStateShortDescription() {
-            // default implementation (for states without sub-states)
-            // return just state number as a string
-            return autoSprintf( "%d", mStateNumber );
+            return autoSprintf( "%d%s", mStateNumber, mSubStateString );
             }
         
         
@@ -120,7 +119,8 @@ class GameState {
         
         char mSubStateTransitionHappened;
         
-
+        const char *mSubStateString;
+        
         
 
 

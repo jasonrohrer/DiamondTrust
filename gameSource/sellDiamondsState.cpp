@@ -113,6 +113,7 @@ class SellDiamondsState : public GameState {
         // destructor?
         //virtual ~GameState();
         
+        void processInitialMove();
     };
 
 
@@ -291,6 +292,8 @@ void SellDiamondsState::clickState( int inX, int inY ) {
             pickingSale = false;
             waitingForDone = false;
             
+            mSubStateString = "b";
+
             int saleNumber = getPickerSale();
             
             if( saleNumber == 0 ||
@@ -345,7 +348,7 @@ void SellDiamondsState::clickState( int inX, int inY ) {
 
 
 // called after move received or after move+picture received
-static void processInitialMove() {
+void SellDiamondsState::processInitialMove() {
 
     if( getPlayerDiamonds( 0 ) > 0 &&
         ( isOpponentHomeBribed() || isPlayerHomeKnownBribed() ) ) {
@@ -355,6 +358,8 @@ static void processInitialMove() {
         statusSubMessage = 
             translate( "phaseSubStatus_sellDiamondsAdjust" );
 
+        mSubStateString = "c";
+        
         if( isOpponentHomeBribed() ) {
             // only peek at opponent if opponent home is compromised
                     
@@ -601,6 +606,8 @@ void SellDiamondsState::stepState() {
             
             finishSale();
             
+            mSubStateString = "d";
+
             // tally earnings
             for( int i=0; i<2; i++ ) {
                 playerEarnings[i] = getPlayerEarnings(i);
@@ -751,6 +758,8 @@ void SellDiamondsState::drawState() {
 
 
 void SellDiamondsState::enterState() {
+    mSubStateString = "a";
+
     stateDone = false;
     connectionBroken = false;
     
