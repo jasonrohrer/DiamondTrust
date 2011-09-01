@@ -210,8 +210,6 @@ Button *backButton;
 
 Button *playAgainButton;
 
-
-
 static char musicBasedOnHelpShowing = false;
 
 
@@ -1180,6 +1178,8 @@ void gameLoopTick() {
         // current music is based on help screen showing, but it is
         // now out-dated (because help screen is no longer showing
         setMusicBasedOnGameState();
+        
+        musicBasedOnHelpShowing = false;
         }
     
 
