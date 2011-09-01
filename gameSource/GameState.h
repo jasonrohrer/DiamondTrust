@@ -7,7 +7,7 @@ class GameState {
 
         GameState() :
             mSubStateTransitionHappened( false ),
-            mSubStateString( "" ) {
+            mSubStateLetter( 'a' ) {
 
             mStateName = "GameState";
             mStateNumber = sNextStateNumber;
@@ -96,7 +96,7 @@ class GameState {
         // Example:  "15b"
         // Result destroyed by caller
         virtual char *getStateShortDescription() {
-            return autoSprintf( "%d%s", mStateNumber, mSubStateString );
+            return autoSprintf( "%d%c", mStateNumber, mSubStateLetter );
             }
         
         
@@ -119,10 +119,19 @@ class GameState {
         
         char mSubStateTransitionHappened;
         
-        const char *mSubStateString;
+        char mSubStateLetter;
         
+        virtual void resetSubState() {
+            mSubStateLetter = 'a';
+            }
         
-
+        virtual void nextSubState() {
+            // advance through ascii alphabet
+            mSubStateLetter ++;
+            
+            mSubStateTransitionHappened = true;
+            }
+        
 
     private:
         static int sNextStateNumber;

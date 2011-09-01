@@ -292,8 +292,8 @@ void SellDiamondsState::clickState( int inX, int inY ) {
             pickingSale = false;
             waitingForDone = false;
             
-            mSubStateString = "b";
-
+            nextSubState();
+            
             int saleNumber = getPickerSale();
             
             if( saleNumber == 0 ||
@@ -358,7 +358,7 @@ void SellDiamondsState::processInitialMove() {
         statusSubMessage = 
             translate( "phaseSubStatus_sellDiamondsAdjust" );
 
-        mSubStateString = "c";
+        nextSubState();
         
         if( isOpponentHomeBribed() ) {
             // only peek at opponent if opponent home is compromised
@@ -606,8 +606,8 @@ void SellDiamondsState::stepState() {
             
             finishSale();
             
-            mSubStateString = "d";
-
+            nextSubState();
+            
             // tally earnings
             for( int i=0; i<2; i++ ) {
                 playerEarnings[i] = getPlayerEarnings(i);
@@ -758,8 +758,8 @@ void SellDiamondsState::drawState() {
 
 
 void SellDiamondsState::enterState() {
-    mSubStateString = "a";
-
+    resetSubState();
+    
     stateDone = false;
     connectionBroken = false;
     
