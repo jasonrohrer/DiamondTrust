@@ -212,12 +212,29 @@ Button *playAgainButton;
 
 
 
+static char musicBasedOnHelpShowing = false;
+
+
+
 static void setMusicBasedOnGameState() {
     char *posString = getUnitPositionString();
     
-    char *stateString = autoSprintf( "State%d, %s",
-                                     currentGameState->mStateNumber,
+    char *stateShortString = currentGameState->getStateShortDescription();
+
+    const char *stateWord = "State";
+    if( isHelpShowing() ) {
+        stateWord = "Help";
+        musicBasedOnHelpShowing = true;
+        }
+    
+
+    char *stateString = autoSprintf( "%s%s, %s",
+                                     stateWord,
+                                     stateShortString,
                                      posString );
+
+    delete [] stateShortString;
+    
     setMusicState( stateString );
     
     delete [] posString;
@@ -1157,6 +1174,12 @@ void gameLoopTick() {
     if( isHelpShowing() ) {
         stepHelp();
         }
+    else if( musicBasedOnHelpShowing ) {
+        // current music is based on help screen showing, but it is
+        // now out-dated (because help screen is no longer showing
+        setMusicBasedOnGameState();
+        }
+    
     
 
 
@@ -1206,6 +1229,7 @@ void gameLoopTick() {
                 if( helpButton->getPressed( tx, ty ) ) {
                     touchEaten = true;
                     showHelp( currentGameState->getHelpTransKey() );
+                    setMusicBasedOnGameState();
                     }
                 }
             

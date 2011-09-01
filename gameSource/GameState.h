@@ -1,10 +1,13 @@
 #include "platform.h"
 
+#include "minorGems/util/stringUtils.h"
 
 class GameState {
     public:
 
-        GameState() {
+        GameState() :
+            mSubStateTransitionHappened( false ) {
+
             mStateName = "GameState";
             mStateNumber = sNextStateNumber;
             sNextStateNumber++;
@@ -86,6 +89,40 @@ class GameState {
         // (so that each singleton state has a unique number)
         int mStateNumber;
        
+
+        // state number plus a, b, c, d, etc. depending on sub-state 
+        // advancement
+        // Example:  "15b"
+        // Result destroyed by caller
+        virtual char *getStateShortDescription() {
+            // default implementation (for states without sub-states)
+            // return just state number as a string
+            return autoSprintf( "%d", mStateNumber );
+            }
+        
+        
+
+        // Gets the flag that is set when a transition has happened in the
+        // state (so that getStateShortDescription may have changed, for
+        //  example from "15b" to "15c").
+        // Resets the flag to false for detecting additional transitions 
+        //  later.
+        virtual char getSubStateTransitionHappened() {
+            char happened = mSubStateTransitionHappened;
+            mSubStateTransitionHappened = false;
+            return happened;
+            }
+        
+
+
+
+    protected:
+        
+        char mSubStateTransitionHappened;
+        
+
+        
+
 
     private:
         static int sNextStateNumber;
