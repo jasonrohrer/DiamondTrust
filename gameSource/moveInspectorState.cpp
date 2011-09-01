@@ -175,6 +175,11 @@ void MoveInspectorState::stepState() {
                 return;
                 }
             
+
+            // sub-state transition here to indicate that opponent response
+            // has arrived
+            nextSubState();
+            
             
             setUnitDestination( numUnits-1, (int)message[0] );
             

@@ -744,6 +744,10 @@ void MoveUnitsState::stepState() {
         else {
             gotInitialMove = true;
             
+            // advance sub-state whether or not we actually can peek here
+            // (music transition will hint that opponent is peeking)
+            nextSubState();
+
             if( isAnyOpponentBribed() || isAnyPlayerUnitKnownBribed() ) {
                 // show opponent moves to player and let player adjust
 
@@ -768,8 +772,6 @@ void MoveUnitsState::stepState() {
                 sendMoveMessage();
                 
                 sentMove = true;
-
-                nextSubState();
                 }                
             }        
 
@@ -806,6 +808,8 @@ void MoveUnitsState::stepState() {
             setMovePeeking( false );
             
             stepsSinceExecute = 0;
+
+            nextSubState();
             }        
         }
 

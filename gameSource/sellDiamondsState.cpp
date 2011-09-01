@@ -334,6 +334,8 @@ void SellDiamondsState::clickState( int inX, int inY ) {
             stepsSinceSentMove = 0;
 
             sentMove = true;
+
+            nextSubState();
             }
         }
     
@@ -357,8 +359,6 @@ void SellDiamondsState::processInitialMove() {
         statusMessage = translate( "phaseStatus_sellPeek" );
         statusSubMessage = 
             translate( "phaseSubStatus_sellDiamondsAdjust" );
-
-        nextSubState();
         
         if( isOpponentHomeBribed() ) {
             // only peek at opponent if opponent home is compromised
@@ -570,6 +570,10 @@ void SellDiamondsState::stepState() {
             }
         else {
             gotInitialMove = true;
+
+            // advance sub-state whether or not we actually can peek here
+            // (music transition will hint that opponent is peeking)
+            nextSubState();
 
             if( pictureReceiveData == NULL ) {
                 processInitialMove();

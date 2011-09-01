@@ -357,6 +357,9 @@ void SalaryBribeState::stepState() {
             gotMove = true;
             
 
+            nextSubState();
+            
+
             // unpack it
             if( messageLength != numPlayerUnits * 2 * 2 ) {
                 printOut( "Bad message length from opponent\n" );
