@@ -10,11 +10,11 @@ void setRandomSeed( unsigned int inA, unsigned int inB ) {
 
 
 
-randState startCustomRand( unsigned int inSeed ) {
+randState startCustomRand( unsigned int inSeedA, unsigned int inSeedB ) {
     randState state;
     
-    state.z = inSeed;
-    state.v = 521288629;
+    state.z = inSeedA;
+    state.v = inSeedB;
     
     return state;
     }

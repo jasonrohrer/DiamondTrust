@@ -272,7 +272,7 @@ void gameInit() {
     // test customRand to make sure it doesn't interfere with global one
     setRandomSeed( 23423983, 23783294 );
     
-    randState rState = startCustomRand( 23423 );
+    randState rState = startCustomRand( 23423, 348921 );
     
     printOut( "Testing CUSTOM getRandom:\n" );
     for( int i=0; i<10; i++ ) {

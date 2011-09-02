@@ -32,7 +32,7 @@ typedef struct randState {
     } randState;
 
 
-randState startCustomRand( unsigned int inSeed );
+randState startCustomRand( unsigned int inSeedA, unsigned int inSeedB );
 
 
 

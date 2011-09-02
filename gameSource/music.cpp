@@ -1389,13 +1389,19 @@ void setMusicStateInternal( const char *inStateString ) {
 
     // add our act number into it so that different acts with the same
     // state string produce different mixes
-    char *fullStringToHash = autoSprintf( "%s%d", inStateString, 
-                                          currentSongAct );
+    char *fullStringToHashA = autoSprintf( "%s%d", inStateString, 
+                                           currentSongAct );
     
-    unsigned int hash = crcHash( (unsigned char*)fullStringToHash, 
-                                 strlen( fullStringToHash ) );
+    unsigned int hashA = crcHash( (unsigned char*)fullStringToHashA, 
+                                  strlen( fullStringToHashA ) );
     
-    delete [] fullStringToHash;
+    char *fullStringToHashB = autoSprintf( "%s_salt", fullStringToHashA );
+
+    unsigned int hashB = crcHash( (unsigned char*)fullStringToHashB, 
+                                  strlen( fullStringToHashB ) );
+    
+    delete [] fullStringToHashA;
+    delete [] fullStringToHashB;
 
 
     
@@ -1410,7 +1416,7 @@ void setMusicStateInternal( const char *inStateString ) {
     
 
 
-    randState state = startCustomRand( hash );
+    randState state = startCustomRand( hashA, hashB );
     
     randState *s = &state;
     
