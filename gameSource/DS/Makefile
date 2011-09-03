@@ -98,7 +98,7 @@ presign:
 postsign:
 	$(ATTACHSIGN) \
 		bin/$(TWL_BUILDTYPE)/$(TARGET_BIN) \
-		bin/$(TWL_BUILDTYPE)/sign.sgn  \
+		bin/$(TWL_BUILDTYPE)/$(ROM_NAME)_toSign.sgn  \
 		bin/$(TWL_BUILDTYPE)/$(ROM_NAME).srl
 
 
