@@ -58,7 +58,7 @@ static int helpFadeStepsMax = 50;
 
 // show extra info about song that's playing, along with a "next act" button,
 // on the title screen, for debugging and testing
-char allowManualSongActSwitching = true;
+char allowManualSongActSwitching = false;
 
 char manualLidClosed = false;
 

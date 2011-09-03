@@ -30,7 +30,7 @@ Property {
 	# two largest cart sizes require this
 	RomSpeedType		1TROM
     
-	RomSize			2G
+	RomSize			1G
 
 	RomFootPadding 		TRUE
 
