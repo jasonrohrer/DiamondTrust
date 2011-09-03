@@ -1471,6 +1471,10 @@ void setMusicStateInternal( const char *inStateString ) {
         if( weightPerTrack[p] > 75 ) {
             weightPerTrack[p] = 75;
             }
+
+        // override!
+        // Track weighting no longer needed now that random generator is fixed.
+        weightPerTrack[p] = 50;
         }
         
         
