@@ -172,7 +172,7 @@ help_payAgents  "You can pay salary to your agents when they are at home in Lond
 
 
 
-help_moveUnits  "In an Angola region, you can pay the diamond guide.  He will accept money from both players, but he gives all diamonds to the player that pays more.  If players tie, the diamonds stay in that region.  The UN Inspector blocks diamond sales and confiscates agents' diamonds.  If you fly into his region, you can bribe him to move to a different region.  He also accepts money from both players but only obeys the one that pays more.  Fly agents home to drop off their diamonds.  Trips inside Angola are cheaper than international trips."
+help_moveUnits  "In an Angola region, you can pay the diamond guide.  He will accept money from both players, but he gives all diamonds to the player who pays more.  If players tie, the diamonds stay in that region.  The UN Inspector blocks diamond sales and confiscates agents' diamonds.  If you fly into his region, you can bribe him to move to a different region.  He also accepts money from both players but only obeys the one who pays more.  Fly agents home to drop off their diamonds.  Trips inside Angola are cheaper than international trips."
 
 
 help_moveUnitsPeek  "Agents that have been successfully bribed reveal their destinations, diamond payments, and UN Inspector bribes to the other side.  You have a chance to adjust your move now that this information has been revealed.  If your opponent is aware of bribes, your opponent has the same chance to adjust.  Adjusted moves are final and are not revealed to the other side before being executed."
