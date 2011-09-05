@@ -5,6 +5,7 @@ status_finished  "Finished:"
 subStatus_moveOn "Touch Next to continue"
 
 
+button_start "Start"
 button_done "Done"
 button_next "Next"
 

@@ -20,7 +20,7 @@ extern int satelliteBottomHalfOffset;
 extern int aiLevelSheetSpriteID;
 
 
-extern Button *doneButton;
+extern Button *startButton;
 extern const char *statusMessage;
 extern const char *statusSubMessage;
 
@@ -114,7 +114,7 @@ void SetAILevelState::clickState( int inX, int inY ) {
         
         //setPlayerNumToSell( 0, newSale );
         
-        if( doneButton->getPressed( inX, inY ) ) {
+        if( startButton->getPressed( inX, inY ) ) {
             waitingForDone = false;
             stateDone = true;
             
@@ -147,7 +147,7 @@ void SetAILevelState::drawState() {
 
         
     if( waitingForDone ) {
-        doneButton->draw();
+        startButton->draw();
         
 
         // shadow of paper

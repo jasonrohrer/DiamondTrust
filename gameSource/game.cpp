@@ -179,6 +179,7 @@ extern GameState *gameEndState;
 extern GameState *connectionBrokenState;
 
 
+Button *startButton;
 Button *doneButton;
 Button *nextButton;
 Button *parentButton;
@@ -549,6 +550,8 @@ void gameInit() {
     initButton();
     updateLoadingProgress();
 
+    startButton = new Button( font16, translate( "button_start" ), 38, 111 );
+
     doneButton = new Button( font16, translate( "button_done" ), 38, 111 );
     
     nextButton = new Button( font16, translate( "button_next" ), 38, 87 );
@@ -706,6 +709,8 @@ void gameFree() {
     delete font8;
     delete font16;
     delete font16Hand;
+
+    delete startButton;
     delete doneButton;
     delete nextButton;
     delete backButton;
