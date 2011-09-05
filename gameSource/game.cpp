@@ -570,12 +570,12 @@ void gameInit() {
             font16, 
             translate( "button_parent_muti_card" ),
             128,
-            66 );
+            56 );
         parentServeCloneDownloadButton = new Button( 
             font16, 
             translate( "button_parent_clone" ),
             128,
-            106 );
+            96 );
         }
     else {
         // just a straight hosting button
@@ -584,12 +584,12 @@ void gameInit() {
         
         parentButton = new Button( font16, translate( "button_parent" ),
                                    128,
-                                   106 );
+                                   96 );
         }
     
     childButton = new Button( font16, translate( "button_child" ),
                                                  128,
-                                                 146 );
+                                                 136 );
 
     helpButton = new Button( "helpToggle.tga",
                              242,
