@@ -1,0 +1,50 @@
+#!/bin/bash
+
+
+getWavInfoPath="/home/jcr13/cpp/DiamondTrust/gameSource/getWavInfo"
+
+
+if [ "$#" -lt "1" ]
+then
+  echo "Normalizes all loops in a song based on song's global peak"
+  echo "Usage:   normalizeSong song_dir_path"
+  exit 1
+fi
+
+
+
+# set input field separator to newline for "find" output that contains
+# spaces in file names
+IFS="
+"
+
+
+
+normFactor=`./findVolumePeakInSong  "$1"`
+
+
+echo "Song needs normalization factor $normFactor"
+echo ""
+
+
+if [ "$normFactor" = "1.00" ]
+then
+	echo "  --Already at max volume, skipping"
+	echo ""
+	exit 0
+fi
+
+
+
+for file in $( find "$1" -name "*.wav" )
+do
+
+	# normalize it
+	echo "Normalizing $file"
+	./volumeAdjustWav "$file" $normFactor
+
+done
+
+
+
+echo "Done with all loops in $1"

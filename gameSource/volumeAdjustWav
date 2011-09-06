@@ -1,0 +1,23 @@
+#!/bin/bash
+
+soxPath="/home/jcr13/sox-14.3.2/src/sox"
+
+
+
+if [ "$#" -lt "2" ]
+then
+  echo "Usage:   volumeAdjustWav file.wav factor"
+  echo ""
+  echo "Example:   volumeAdjustWav file.wav 1.2"
+  echo ""
+  exit 1
+fi
+
+
+tempFile="$1.temp.wav"
+
+"$soxPath" "$1" "$tempFile" vol $2
+
+cp "$tempFile" "$1"
+
+rm "$tempFile"
