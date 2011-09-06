@@ -1,0 +1,21 @@
+sept2:
+
+9 songs
+All song loop rearrangement done.
+Volume adjust done on certain loops (song 5, and others)
+
+
+
+sept5:
+
+9 songs
+Song 8 volume reduction
+
+
+
+
+sept6:
+
+10 songs
+Song 6 pops removed.
+All songs normalized to 1.0 global peak.
