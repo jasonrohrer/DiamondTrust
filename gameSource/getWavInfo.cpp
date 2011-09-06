@@ -6,8 +6,9 @@
 static void usage() {
     printf( "Prints the sample rate or length-in-samples of WAV and exits\n\n" 
             "Usage:\n"
-            "  getWaveSampleRate rate inWavFilePath\n\n"
-            "  getWaveSampleRate length inWavFilePath\n" );
+            "  getWaveInfo rate inWavFilePath\n\n"
+            "  getWaveInfo peak inWavFilePath\n\n"
+            "  getWaveInfo length inWavFilePath\n" );
     exit(0);
     }
 
@@ -23,11 +24,19 @@ static unsigned int bytesToInt( unsigned char inBuffer[4] ) {
     }
 
 
-static unsigned short bytesToShort( unsigned char inBuffer[2] ) {
+static unsigned short bytesToUnsignedShort( unsigned char inBuffer[2] ) {
     // little endian in a wav file
 
     return (unsigned short) (
-        inBuffer[0] | inBuffer[1] );
+        inBuffer[0] | inBuffer[1] << 8 );
+    }
+
+
+static unsigned short bytesToShort( unsigned char inBuffer[2] ) {
+    // little endian in a wav file
+
+    return (short) (
+        inBuffer[0] | inBuffer[1] << 8 );
     }
 
 
@@ -40,10 +49,15 @@ int main( int inNumArgs, const char **inArgs ) {
         }
     
     char printRate = true;
+    char printPeak = false;
     
     if( inArgs[1][0] == 'l' ) {
         // print length instead
         printRate = false;
+        }
+    else if( inArgs[1][0] == 'p' ) {
+        printRate = false;
+        printPeak = true;
         }
     
 
@@ -113,7 +127,7 @@ int main( int inNumArgs, const char **inArgs ) {
     // 2 bytes of format  1 means PCM
     fread( chunkBuffer, 1, 2, handle );
     
-    if( bytesToShort( chunkBuffer ) != 1 ) {
+    if( bytesToUnsignedShort( chunkBuffer ) != 1 ) {
         printf( "Non-PCM WAV files cannot be read, %s\n",
                   inFilePath );
         fclose( handle );
@@ -125,7 +139,7 @@ int main( int inNumArgs, const char **inArgs ) {
     // 2 bytes encoding number of channels
     fread( chunkBuffer, 1, 2, handle );
     
-    unsigned short numChannels = bytesToShort( chunkBuffer );
+    unsigned short numChannels = bytesToUnsignedShort( chunkBuffer );
 
 
     // 4 bytes encoding sample rate
@@ -150,7 +164,7 @@ int main( int inNumArgs, const char **inArgs ) {
     // 2 bytes of bits per sample
     fread( chunkBuffer, 1, 2, handle );
 
-    int bitsPerSample = bytesToShort( chunkBuffer );
+    int bitsPerSample = bytesToUnsignedShort( chunkBuffer );
 
 
 
@@ -176,10 +190,52 @@ int main( int inNumArgs, const char **inArgs ) {
     int numSamples = (int)( dataLength / bytesPerFullSample );
 
     
-    if( !printRate ) {
+    if( !printRate && !printPeak ) {
         printf( "%d", numSamples );
         }
 
+
+    if( printPeak ) {
+    
+        // walk through whole file and find peak sample    
+        
+        unsigned char *dataBuffer = new unsigned char[ dataLength ];
+        
+        if( dataLength != fread( dataBuffer, 1, dataLength, handle ) ) {
+            printf( "Failed to read full %d bytes of data from WAV file %s\n",
+                    inFilePath );
+            
+            fclose( handle );
+            return 0;
+            }
+        
+
+        int bytesPerSingleSample = bytesPerFullSample / numChannels;
+        
+        int numSingleSamples = dataLength / bytesPerSingleSample;
+
+        short maxSample = 0;
+
+        for( int s=0; s<numSingleSamples; s++ ) {
+        
+            short sample = 
+                bytesToShort( &( dataBuffer[ s * bytesPerSingleSample ] ) );
+            
+            if( sample < 0 ) {
+                sample *= -1;
+                }
+            
+            if( sample > maxSample ) {
+                maxSample = sample;
+                }
+            }
+        
+        printf( "%d", maxSample );
+
+
+        delete [] dataBuffer;
+        }
+    
 
 
     fclose( handle );

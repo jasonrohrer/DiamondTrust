@@ -1,0 +1,37 @@
+#!/bin/bash
+
+
+getWavInfoPath="/home/jcr13/cpp/DiamondTrust/gameSource/getWavInfo"
+
+
+if [ "$#" -lt "1" ]
+then
+  echo "Finds volume peak across an entire song directory of loops"
+  echo "Usage:   findVolumePeakInSong song_dir_path"
+  exit 1
+fi
+
+
+
+# set input field separator to newline for "find" output that contains
+# spaces in file names
+IFS="
+"
+
+
+
+peak="0"
+
+
+for file in $( find "$1" -name "*.wav" )
+do
+  thisPeak=`"$getWavInfoPath" peak "$file"`
+
+  if [ $thisPeak -gt $peak ]
+  then
+	  peak=$thisPeak
+  fi
+done
+
+
+echo -n "$peak"
