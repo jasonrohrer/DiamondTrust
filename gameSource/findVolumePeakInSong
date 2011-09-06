@@ -6,8 +6,11 @@ getWavInfoPath="/home/jcr13/cpp/DiamondTrust/gameSource/getWavInfo"
 
 if [ "$#" -lt "1" ]
 then
-  echo "Finds volume peak across an entire song directory of loops"
+  echo "Finds global normalization factor (1/peak) across an "
+  echo "entire song directory of loops"
+  echo ""
   echo "Usage:   findVolumePeakInSong song_dir_path"
+  echo ""
   exit 1
 fi
 
@@ -33,5 +36,7 @@ do
   fi
 done
 
+# bc truncates, so this is a "safe" normalization factor (won't clip)
+floatPeak=$( echo "scale=2; 32767 / $peak" | bc ); 
 
-echo -n "$peak"
+echo -n "$floatPeak"
