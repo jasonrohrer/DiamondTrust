@@ -65,3 +65,12 @@ void switchSongs( int inNexSong=0 );
 
 // resulting array destroyed by caller
 char **getTrackInfoStrings( int *outNumTracks );
+
+
+int getCurrentSongNumber();
+
+int getCustomSongVolume( int inSongNumber );
+
+// for current song
+// in range [0..127]
+void setCustomSongVolume( int inVolume );

@@ -3,6 +3,7 @@
 #include "music.h"
 #include "wav.h"
 #include "crcHash.h"
+#include "common.h"
 
 
 #include "minorGems/util/stringUtils.h"
@@ -282,6 +283,12 @@ static int lastActPlayedForEachSong[ MAX_NUM_SONGS] =
   -1, -1, -1, -1, -1,  -1, -1, -1, -1, -1 };
 
 
+static int customSongVolumes[ MAX_NUM_SONGS ] =
+{ -1, -1, -1, -1, -1,  -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1,  -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1,  -1, -1, -1, -1, -1 };
+
+
 
 static void addLastSong( int inSong ) {
     for( int i=LAST_FEW_SIZE-1; i>0; i-- ) {
@@ -312,6 +319,7 @@ static char hitsLastFewSongs( int inSong ) {
 
 
 
+extern int globalVolumePeak;
 
 
 
@@ -370,10 +378,79 @@ static void loadSong() {
                 
         currentSongDirName = stringDuplicate( songList[ currentSongPick ] );
 
+
+        // default song volume:
+        globalVolumePeak = 127;
+
+        char customVolumeSet = false;
+
+        if( currentSongPick >= MAX_NUM_SONGS ) {
+            printOut( "Warning:  more than %d songs present, custom volume "
+                      "settings don't work\n", MAX_NUM_SONGS );
+            }
+        else if( customSongVolumes[ currentSongPick ] != -1 ) {
+            globalVolumePeak = customSongVolumes[ currentSongPick ];
+            customVolumeSet = true;
+            }
+        
+            
+            
+
         
         
         songActDirNames = listDirectory( currentSongDirName, 
                                          &numSongActs );
+
+        if( numSongActs > 0 ) {
+            // filter out volume adjustment file
+
+            SimpleVector<char*> trueActDirs;
+            
+            for( int d=0; d<numSongActs; d++ ) {
+                if( strstr( songActDirNames[d], "vol.txt" ) != NULL ) {
+                    // hit
+
+                    if( ! customVolumeSet ) {
+                        // read vol from file
+
+                        char *volString = 
+                            readFileAsString( songActDirNames[d] );
+                    
+                        if( volString != NULL ) {
+                            
+                            // override default volume
+                            sscanf( volString, "%d", &globalVolumePeak );
+
+                            printOut( "Setting custom song volume of %d\n",
+                                      globalVolumePeak );
+                            
+                            // save custom setting
+                            if( currentSongPick < MAX_NUM_SONGS ) {
+                                customSongVolumes[ currentSongPick ] = 
+                                    globalVolumePeak;
+                                }
+
+
+                            delete [] volString;
+                            }
+                        }
+
+                    
+                    // discard it from list of act dirs
+                    delete [] songActDirNames[d];
+                    }
+                else {
+                    // keep it on list of act dirs
+                    trueActDirs.push_back( songActDirNames[d] );
+                    }
+                }
+
+            delete [] songActDirNames;
+            
+            songActDirNames = trueActDirs.getElementArray();
+            numSongActs = trueActDirs.size();
+            }
+        
 
         if( numSongActs > 1 ) {
             sortStrings( &songActDirNames, numSongActs );
@@ -1550,6 +1627,43 @@ void limitTotalMusicTracks( char inLimit ) {
 char getMusicTrackLimitOn() {
     return limitTotalTracks;
     }
+
+
+int getCurrentSongNumber() {
+    return currentSongPick;
+    }
+
+
+
+
+int getCustomSongVolume( int inSongNumber ) {
+    if( inSongNumber < MAX_NUM_SONGS ) {
+        if( customSongVolumes[ inSongNumber ] == -1 ) {
+            return 127;
+            }
+        
+        return customSongVolumes[ inSongNumber ];
+        }
+    
+    return 127;
+    }
+
+
+void setCustomSongVolume( int inVolume ) {
+    if( inVolume > 127 ) {
+        inVolume = 127;
+        }
+    else if( inVolume < 0 ) {
+        inVolume = 0;
+        }
+    
+    customSongVolumes[ currentSongPick ] = inVolume;
+    
+    globalVolumePeak = inVolume;
+    }
+
+
+    
 
 
 

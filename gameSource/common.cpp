@@ -330,3 +330,24 @@ rgbaColor blendColors( rgbaColor inA, rgbaColor inB,
     }
 
 
+
+char *readFileAsString( const char *inFileName ) {
+    int dataSize;
+    unsigned char *data = readFile( inFileName, &dataSize );
+    
+    if( data != NULL ) {
+        char *textData = new char[ dataSize + 1 ];
+        memcpy( textData, data, (unsigned int)dataSize );
+        textData[ dataSize ] = '\0';
+        
+        delete [] data;
+    
+        return textData;
+        }
+
+    return NULL;
+    }
+
+    
+
+

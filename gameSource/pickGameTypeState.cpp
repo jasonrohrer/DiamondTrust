@@ -29,6 +29,9 @@ extern Button *closeLidButton;
 extern Button *openLidButton;
 extern Button *muteButton;
 extern Button *unmuteButton;
+extern Button *volPlusButton;
+extern Button *volMinusButton;
+
 
 extern char soundMuted;
 
@@ -36,6 +39,7 @@ extern char soundMuted;
 extern char allowManualSongActSwitching;
 extern char manualLidClosed;
 
+extern Font *font8;
 
 
 extern Button *aiButton;
@@ -158,6 +162,15 @@ void PickGameTypeState::clickState( int inX, int inY ) {
                      muteButton->getPressed( inX, inY ) ) {
                 soundMuted = true;
                 }
+            else if( volPlusButton->getPressed( inX, inY ) ) {
+                setCustomSongVolume( 
+                    getCustomSongVolume( getCurrentSongNumber() ) + 1 );
+                }
+            else if( volMinusButton->getPressed( inX, inY ) ) {
+                setCustomSongVolume( 
+                    getCustomSongVolume( getCurrentSongNumber() ) - 1 );
+                }
+            
             
             }
         }
@@ -247,6 +260,38 @@ void PickGameTypeState::drawState() {
             else {
                 muteButton->draw();
                 }
+
+            volPlusButton->draw();
+            volMinusButton->draw();
+
+
+            int labelEnd = 
+                font8->drawString( "Song vol:", 2, 2, white, alignLeft );
+
+
+
+            int currentSong = getCurrentSongNumber();
+            
+            for( int s=0; s<10; s++ ) {
+                char *volString = autoSprintf( "%d", 
+                                               getCustomSongVolume( s ) );    
+            
+                rgbaColor drawColor = white;
+                
+                if( currentSong == s ) {
+                    // pink
+                    drawColor.g = 127;
+                    drawColor.b = 127;
+                    }
+    
+                
+                font8->drawString( volString, labelEnd + 5 + 14 + 20 * s, 
+                                   2, drawColor, alignRight );
+
+                delete [] volString;
+                }
+            
+
             }
         }
     

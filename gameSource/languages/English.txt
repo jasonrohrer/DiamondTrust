@@ -17,13 +17,17 @@ button_play_again "Play Again"
 
 button_nextSongAct "fwd"
 button_songReroll "rand"
-button_switchSongs "song"
+button_switchSongs "songR"
 button_songPlus "song+"
 button_songMinus "song-"
 button_closeLid "close lid"
 button_openLid "open lid"
 button_mute "mute"
 button_unmute "!mute!"
+
+button_volPlus "vol+"
+button_volMinus "vol-"
+
 
 
 button_ai "Single Player"

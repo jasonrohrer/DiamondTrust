@@ -121,4 +121,9 @@ inline const char *translate( const char *inKey ) {
     }
 
 
+
+char *readFileAsString( const char *inFileName );
+
+
+
 #endif

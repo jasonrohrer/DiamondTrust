@@ -110,6 +110,11 @@ int globalSoundVolume = 0;
 // set to true to force a gradual fade-in
 int globalVolumeRise = false;
 
+// target to stop at when volume rises
+// allows different songs to have different peak volumes
+int globalVolumePeak = 127;
+
+
 char soundPansSet = false;
 
 
@@ -200,6 +205,10 @@ Button *closeLidButton;
 Button *openLidButton;
 Button *muteButton;
 Button *unmuteButton;
+
+Button *volPlusButton;
+Button *volMinusButton;
+
 
 char soundMuted = false;
 
@@ -354,18 +363,12 @@ void gameInit() {
     */
 
     
-    int dataSize;
-    unsigned char *languageData = readFile( "English.txt", &dataSize );
+    
+    char *languageData = readFileAsString( "English.txt" );
     
     if( languageData != NULL ) {
-        char *textData = new char[ dataSize + 1 ];
-        memcpy( textData, languageData, (unsigned int)dataSize );
-        textData[ dataSize ] = '\0';
-        
+        TranslationManager::setLanguageData( languageData );
         delete [] languageData;
-
-        TranslationManager::setLanguageData( textData );
-        delete [] textData;
         }
 
     printOut( "Loading 16-pixel font\n" );
@@ -622,6 +625,11 @@ void gameInit() {
                                38, 57 );
 
 
+    volPlusButton = new Button( font16, translate( "button_volPlus" ),
+                                 118, 117 );
+    volMinusButton = new Button( font16, translate( "button_volMinus" ),
+                                 48, 117 );
+
 
 
     aiButton = new Button( font16, translate( "button_ai" ),
@@ -727,6 +735,9 @@ void gameFree() {
     delete muteButton;
     delete unmuteButton;
     
+    delete volPlusButton;
+    delete volMinusButton;
+
     delete aiButton;
     delete wifiButton;
     
@@ -1093,9 +1104,18 @@ void gameLoopTick() {
                 }
             }
         }
-    else if( globalVolumeRise && globalSoundVolume < 127 ) {
+    else if( globalVolumeRise && globalSoundVolume < globalVolumePeak ) {
         
         globalSoundVolume++;
+        
+        for( int c=0; c<8; c++ ) {
+            setSoundChannelVolume( c, globalSoundVolume );
+            }
+        }
+    else if( globalVolumeRise && globalSoundVolume > globalVolumePeak ) {
+        // must have changed out from under us
+        // snap back instantly
+        globalSoundVolume = globalVolumePeak; 
         
         for( int c=0; c<8; c++ ) {
             setSoundChannelVolume( c, globalSoundVolume );
