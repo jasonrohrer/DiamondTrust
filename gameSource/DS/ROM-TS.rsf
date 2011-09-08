@@ -23,6 +23,8 @@ Property {
 
     TitleName		"DIAMONDTRUST"
 
+    MakerCode		"20"
+
     RemasterVersion		0
 
     # for now, just specify speed and banner file
