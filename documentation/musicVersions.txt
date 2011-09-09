@@ -24,3 +24,8 @@ Song 6 pops removed.
 sept6_norm:
 
 All songs normalized to 1.0 global peak.
+
+
+sept8:
+
+All songs custom volume-adjusted in game engine.
