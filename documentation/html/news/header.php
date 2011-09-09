@@ -35,7 +35,7 @@ News about <a href="http://hcsoftware.sf.net/jason-rohrer">Jason Rohrer</a>'s di
 <!-- hard-coded clean RSS link -->
 <a HREF="http://diamondtrustgame.com/rss.xml"><img src='rss.png' width=16 height=16 border=0> RSS Feed</a>
 <br>
-<a HREF="http://twitter.com/diamondtrust77"><img src='twitter.png' width=16 height=16 border=0> @diamondtrust77</a>
+<a HREF="http://twitter.com/jasonrohrer"><img src='twitter.png' width=16 height=16 border=0> @jasonrohrer</a>
 </td>
 
 <td class="searchBox">
