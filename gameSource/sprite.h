@@ -3,6 +3,7 @@
 
 void stepSprites();
 
+void resetBlinkingSprites();
 
 void drawBlinkingSprite( int inHandle, 
                          int inX, int inY, rgbaColor inColor );

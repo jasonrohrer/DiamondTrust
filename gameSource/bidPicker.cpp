@@ -15,7 +15,8 @@ static int bid;
 
 static char done;
 
-static intPair lastCenter;
+// start off completely off the screen
+static intPair lastCenter = {-100,-100};
 
 
 void initBidPicker() {
@@ -59,6 +60,15 @@ void drawBidPicker( int inCenterX, int inCenterY ) {
         }
     
     
+    if( inCenterX != lastCenter.x ||
+        inCenterY != lastCenter.y ) {
+        
+        // bid picker moved, maybe instantaly
+        // force reset of blinking to highlight this
+        resetBlinkingSprites();
+        }
+
+
     drawSprite( pickerSprite, 
                 inCenterX - pickerW/2, inCenterY - pickerH/2,
                 white );
