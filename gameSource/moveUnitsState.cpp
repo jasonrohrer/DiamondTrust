@@ -270,6 +270,17 @@ void MoveUnitsState::clickState( int inX, int inY ) {
     int hitBidMarkerUnit = getChosenBidMarker( inX, inY );
     int hitBribeMarkerUnit = getChosenInspectorBribeMarker( inX, inY );
     
+
+    if( hitBidMarkerUnit >= numPlayerUnits ) {
+        // an opponent unit's bid marker hit---never let someone select it!
+        hitBidMarkerUnit = -1;
+        }
+    if( hitBribeMarkerUnit >= numPlayerUnits ) {
+        // an opponent unit's inspector bribe marker hit---never let someone 
+        // select it!
+        hitBribeMarkerUnit = -1;
+        }
+
     // also consider switching active unit (when none might be selectable
     int newActiveUnit = getChosenUnit( inX, inY, false );
 
