@@ -1385,11 +1385,16 @@ int getChosenInspectorBribeMarker( int inClickX, int inClickY ) {
             gameUnit[i].mShowInspectorBribe ) {
             
             intPair bribePos = getUnitInspectorBribePosition( i );
+
+            char hitMarker = ( inClickY > bribePos.y - 7 &&
+                               inClickY < bribePos.y + 7 &&
+                               inClickX > bribePos.x - 14 &&
+                               inClickX < bribePos.x + 14 );
             
-            if( inClickY > bribePos.y - 7 &&
-                inClickY < bribePos.y + 7 &&
-                inClickX > bribePos.x - 14 &&
-                inClickX < bribePos.x + 14 ) {
+            if( hitMarker 
+                ||
+                // also count a direct click on the inspector himself
+                getChosenUnit( inClickX, inClickY, false ) == numUnits - 1 ) {
                 
                 // hit on unit's bribe display
                 return i;
