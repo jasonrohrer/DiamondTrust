@@ -5,7 +5,7 @@
 int blinkingSpriteAlpha = 255;
 int blinkingSpriteMin = 64;
 
-int blinkingSpriteDelta = -18;
+int blinkingSpriteDelta = -16;
 //int blinkingSpriteDelta = -36;
 
 
