@@ -29,6 +29,10 @@ void drawUnit( int inUnit, int inX, int inY );
 // position
 void drawUnitBribe( int inUnit, int inX, int inY );
 
+// draws blinking border on top of a bid/bribe marker at a given marker
+// center position
+void drawBidBorder( int inX, int inY );
+
 
 
 void setUnitSelectable( int inUnit, char inSelectable );

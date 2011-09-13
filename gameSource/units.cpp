@@ -39,7 +39,7 @@ static char showAllMoves = false;
 
 static int activeUnitSprite;
 
-static int bidSprite;
+static int bidSprite, bidBorderSprite;
 static int bidW, bidH;
 extern Font *font8;
 
@@ -494,6 +494,7 @@ void initUnits() {
     activeUnitSprite = loadSprite( "activeUnitHalo.tga", true );
     
     bidSprite = loadSprite( "bid.tga", &bidW, &bidH, true );
+    bidBorderSprite = loadSprite( "bidBorder.tga", &bidW, &bidH, true );
     
     bribedMarkerSprite = loadSprite( "bribedMarker.tga", true );
 
@@ -1242,6 +1243,14 @@ void drawUnitBribe( int inUnit, int inX, int inY ) {
 
     drawUnitPaymentNumber( end, gameUnit[i].mTotalBribe );
     }
+
+
+
+void drawBidBorder( int inX, int inY ) {
+    drawBlinkingSprite( bidBorderSprite, inX - bidW / 2, inY - bidH / 2, 
+                        white );
+    }
+
 
 
 

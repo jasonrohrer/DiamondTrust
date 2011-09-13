@@ -24,6 +24,7 @@ diamondBorder2.tga \
 bidPicker.tga \
 pickerBorder.tga \
 bid.tga \
+bidBorder.tga \
 statsPanel.tga \
 datePanel.tga \
 bribedMarker.tga \

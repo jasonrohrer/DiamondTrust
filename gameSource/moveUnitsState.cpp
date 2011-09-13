@@ -871,6 +871,7 @@ void MoveUnitsState::drawState() {
         
 
         drawBidPicker( bidPos.x - 23, bidPos.y );
+        drawBidBorder( bidPos.x, bidPos.y );
         }
 
     if( pickingBribe ) {
@@ -886,6 +887,7 @@ void MoveUnitsState::drawState() {
         
 
         drawBidPicker( bribePos.x - 23, bribePos.y );
+        drawBidBorder( bribePos.x, bribePos.y );
         }
     
     }
