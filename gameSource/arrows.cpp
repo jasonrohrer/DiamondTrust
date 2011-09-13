@@ -509,7 +509,7 @@ void stepArrows() {
 
             // step it
             if( !p->mStartupDone ) {
-                p->mStartupProgress += 2;
+                p->mStartupProgress += 1;
                 if( p->mStartupProgress >= p->mNumLineSteps ) {
                     p->mStartupDone = true;
                     }
