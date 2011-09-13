@@ -399,7 +399,7 @@ static int playerEarnings[2] = {0,0};
 static int numSold[2] = {0,0};
 
 static int stepsSinceEarningTick = 0;
-static int minEarningsSteps = 10;
+static int minEarningsSteps = 7;
 
 
 void SellDiamondsState::stepState() {
