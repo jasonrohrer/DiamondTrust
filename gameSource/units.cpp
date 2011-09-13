@@ -1321,10 +1321,27 @@ int getChosenUnit( int inClickX, int inClickY, char inOnlySelectable ) {
 
             intPair pos = getUnitPositionInRegion( gameUnit[i].mRegion, i );
 
+            // make horizontal click radius less than full, square sprite width
+            // Most of the square is transparent, and the full squares 
+            // sometimes overlap due to unit map positioning, which makes
+            // it hard to accurately click/differentiate nearby units.
+            // try 1/4 instead of 1/2 width for radius
+            // True sprite width is about 4.5 pixels... this 1/4 width
+            // extends several pixels beyond that
+            // Actually, hard code the horizontal radius here, to give
+            // us more control (Waving arm, or highlighted sprite, sticks
+            // out beyond click radius of 1/4 width)
+
+            // ALSO:
+            // hardcode true sprite height here, because unitSpriteH includes
+            // way too much headroom, making sprite click boxes overlap
+            // in weird ways when sprites are packed closely in the home
+            // region
+            // True height is 18.  Add one extra pixel above that.
             if( inClickY < pos.y &&
-                inClickY > pos.y - unitSpriteH &&
-                inClickX > pos.x - unitSpriteW / 2 &&
-                inClickX < pos.x + unitSpriteW / 2 ) {
+                inClickY > pos.y - 19 &&
+                inClickX > pos.x - 10 &&
+                inClickX < pos.x + 8 ) {
                 
                 // hit on unit's sprite
                 return i;
