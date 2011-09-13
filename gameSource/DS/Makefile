@@ -72,10 +72,11 @@ LCFILE_TEMPLATE	= $(NITRO_SPECDIR)/ARM9-TS-cloneboot-C.lcf.template
 # need libsyscall definitions
 
 # get a replacement from Nintendo (via publisher)
-LIBSYSCALL			 = ./etc/libsyscall.a
+# got one from Nintendo
+LIBSYSCALL			 = ./etcFinal/libsyscall.a
 # okay to use the one for the child from the SDK, even in a final build
-# find out about this!
-LIBSYSCALL_CHILD	 = ./etc/libsyscall_child.bin
+# find out about this---NO, got one from Nintendo, too
+LIBSYSCALL_CHILD	 = ./etcFinal/libsyscall_c.bin
 
 
 

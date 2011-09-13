@@ -34,8 +34,12 @@ Property {
     
 	RomSize			2G
 
+    # true for final
 	RomFootPadding 		TRUE
 
+
+    # provided by Nintendo
+    RomHeaderTemplate	./etcFinal/rom_header_tdte.template.sbin
 
     BannerFile    banner.bnr
     }
