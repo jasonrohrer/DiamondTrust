@@ -1397,20 +1397,25 @@ int getChosenInspectorBribeMarker( int inClickX, int inClickY ) {
     for( int i=0; i<numUnits; i++ ) {
 
         if( getUnitMoveVisible( i ) &&
-            gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion
-            &&
-            gameUnit[i].mShowInspectorBribe ) {
-            
-            intPair bribePos = getUnitInspectorBribePosition( i );
+            gameUnit[i].mDest == gameUnit[ numUnits - 1 ].mRegion ) {
 
-            char hitMarker = ( inClickY > bribePos.y - 7 &&
-                               inClickY < bribePos.y + 7 &&
-                               inClickX > bribePos.x - 14 &&
-                               inClickX < bribePos.x + 14 );
+            // ignore marker hit if marker isn't visible
+            char hitMarker = false;
+
+            if( gameUnit[i].mShowInspectorBribe ) {
+                
+                intPair bribePos = getUnitInspectorBribePosition( i );
+
+                hitMarker = ( inClickY > bribePos.y - 7 &&
+                              inClickY < bribePos.y + 7 &&
+                              inClickX > bribePos.x - 14 &&
+                              inClickX < bribePos.x + 14 );
+                }
             
             if( hitMarker 
                 ||
-                // also count a direct click on the inspector himself
+                // also count a direct click on the inspector himself,
+                // even if inspector's bribe marker is not showing
                 getChosenUnit( inClickX, inClickY, false ) == numUnits - 1 ) {
                 
                 // hit on unit's bribe display
