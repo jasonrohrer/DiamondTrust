@@ -827,6 +827,20 @@ void drawStats() {
                           unitInfoPanelPaperColor, hideSalary );
         
 
+        if( hideSalary && u->mMinKnownTotalSalary > 0 ) {
+
+            
+            char *greaterString = autoSprintf( ">%d",
+                                               u->mMinKnownTotalSalary - 1 );
+            
+            font16Hand->drawString( greaterString, 118, y,
+                                    unitInfoPanelPaperColor, alignLeft );
+            
+            delete [] greaterString;
+            }
+
+
+
 
         y += 20;
         
@@ -862,6 +876,19 @@ void drawStats() {
         drawMoneyValue16( x + xOffset, y, 
                           u->mTotalBribe + u->mLastBribePayment, 
                           unitInfoPanelPaperColor, hideBribe );
+
+
+        if( hideBribe && u->mMinKnownTotalBribe > 0 ) {
+            
+            char *greaterString = autoSprintf( ">%d",
+                                               u->mMinKnownTotalBribe - 1 );
+            
+            font16Hand->drawString( greaterString, 118, y,
+                                    unitInfoPanelPaperColor, alignLeft );
+            
+            delete [] greaterString;
+            }
+
 
         if( ! hideBribe && u->mLastBribingUnit >= 0 ) {            
             x = 242;
