@@ -312,7 +312,10 @@ void MoveUnitsState::clickState( int inX, int inY ) {
         
             
         setActiveUnit( hitBidMarkerUnit );
-        
+
+        statusSubMessage = 
+            translate( "phaseSubStatus_pickBid" );
+
         
         activeUnit = getActiveUnit();
 
@@ -340,6 +343,8 @@ void MoveUnitsState::clickState( int inX, int inY ) {
             
         setActiveUnit( hitBribeMarkerUnit );
         
+        statusSubMessage = 
+            translate( "phaseSubStatus_pickInspectorBribe" );
         
         activeUnit = getActiveUnit();
 
