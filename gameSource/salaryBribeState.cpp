@@ -454,7 +454,7 @@ void SalaryBribeState::stepState() {
                 
                 if( !bribeKnown ) {
                     // is old knowledge still good?
-                    // not if we're in the same region as an enemy
+                    // not if we're in the same region as an UNBRIBED enemy
                 
                     if( u->mRegion > 1 ) {
                         // not home
@@ -462,9 +462,15 @@ void SalaryBribeState::stepState() {
                         for( int j=0; j<numPlayerUnits*2; j++ ) {
                             if( j != i ) {
                                 if( getUnitRegion( j ) == u->mRegion ) {
+
+                                    Unit *contactUnit = getUnit( j );
+
+                                    if( contactUnit->mTotalBribe <= 
+                                        contactUnit->mTotalSalary ) {
                                     
-                                    // unit tainted
-                                    u->mEnemyContactSinceBribeKnown = true;
+                                        // unit tainted by this contact
+                                        u->mEnemyContactSinceBribeKnown = true;
+                                        }
                                     } 
                                 }
                             }
