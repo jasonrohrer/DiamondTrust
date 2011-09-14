@@ -13,6 +13,8 @@ static char stateDone = false;
 static char connectionBroken = false;
 static char sentInitialMove = false;
 static char gotInitialMove = false;
+static int initialOpponentTotalSpent = 0;
+
 static char sentMove = false;
 static char gotMove = false;
 
@@ -759,7 +761,18 @@ void MoveUnitsState::stepState() {
             }
         else {
             gotInitialMove = true;
+
+            // subtract this from opponent money total so that we
+            // see their true money balance if that info has been revealed 
+            // to us
+            // BUT, also remember this value, because we'll have to add
+            // it back in later after the final move arrives, because
+            // they amount they spend might change after peeking.
+            initialOpponentTotalSpent = totalBidsAndBribes;
             
+            addPlayerMoney( 1, -initialOpponentTotalSpent );
+            
+
             // advance sub-state whether or not we actually can peek here
             // (music transition will hint that opponent is peeking)
             nextSubState();
@@ -812,6 +825,11 @@ void MoveUnitsState::stepState() {
         else {
             gotMove = true;
             
+            // amount spent may have changed
+            // add back in old, tentative spend total first
+            addPlayerMoney( 1, initialOpponentTotalSpent );
+            
+            // now subtract the final spend total
             addPlayerMoney( 1, -totalBidsAndBribes );
             
 
