@@ -430,7 +430,12 @@ void SalaryBribeState::stepState() {
 
                 u->mTotalBribe += u->mLastBribePayment;
                 u->mLastBribePayment = 0;
- 
+                }
+            
+
+            // walk through again now that they're all applied
+            for( i=0; i<numPlayerUnits*2; i++ ) {
+                Unit *u = getUnit(i);
 
                 char bribeKnown = false;
                 

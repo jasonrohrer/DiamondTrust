@@ -707,7 +707,9 @@ static char isBribeStatusVisible( int inUnit ) {
             
             int bribingUnit = gameUnit[i].mLastBribingUnit;
             
-            if( gameUnit[bribingUnit].mTotalSalary < 
+            if( bribingUnit >= 0
+                &&
+                gameUnit[bribingUnit].mTotalSalary < 
                 gameUnit[bribingUnit].mTotalBribe ) {
                 
                 // bribing unit has been bribed!
