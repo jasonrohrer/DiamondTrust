@@ -430,6 +430,19 @@ void SalaryBribeState::stepState() {
 
                 u->mTotalBribe += u->mLastBribePayment;
                 u->mLastBribePayment = 0;
+
+                if( u->mTotalBribe > u->mTotalSalary ) {
+                    // bribed!
+                    // we know everything about this unit now
+                    
+                    // (and it might be our own unit, in which case
+                    // we know everything anyway)
+
+                    // so remember what we know now (salary can only
+                    // go up from here)
+                    u->mMinKnownTotalSalary = u->mTotalSalary;
+                    }
+                
                 }
             
 
@@ -449,6 +462,10 @@ void SalaryBribeState::stepState() {
                         // bribe visible to unit's owner
                         u->mEnemyContactSinceBribeKnown = false;
                         bribeKnown = true;
+                        
+                        // we know this unit's current bribe
+                        // remember it (bribe can only go up from here)
+                        u->mMinKnownTotalBribe = u->mTotalBribe;
                         }
                     }
                 

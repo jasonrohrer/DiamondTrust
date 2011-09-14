@@ -587,11 +587,17 @@ void resetUnits() {
     int i;
     
     for( i=0; i<6; i++ ) {
+        gameUnit[ i ].mShowInspectorBribe = false;
+
         gameUnit[ i ].mTotalSalary = 0;
         gameUnit[ i ].mLastSalaryPayment = 0;
-
+        gameUnit[ i ].mShowSalaryPayment = false;
+        gameUnit[ i ].mMinKnownTotalSalary = 0;
+        
         gameUnit[ i ].mTotalBribe = 0;
         gameUnit[ i ].mLastBribePayment = 0;
+        gameUnit[ i ].mShowBribePayment = false;
+        gameUnit[ i ].mMinKnownTotalBribe = 0;
         gameUnit[ i ].mLastBribingUnit = -1;
 
         gameUnit[ i ].mEnemyContactSinceBribeKnown = false;
@@ -703,25 +709,11 @@ static char isBribeStatusVisible( int inUnit ) {
         if( i < 3 ) {
             // one of our units!  Should we let the player know about this?
             
-            // only if bribing unit has been compromised by us
-            
-            int bribingUnit = gameUnit[i].mLastBribingUnit;
-            
-            if( bribingUnit >= 0
-                &&
-                gameUnit[bribingUnit].mTotalSalary < 
-                gameUnit[bribingUnit].mTotalBribe ) {
-                
-                // bribing unit has been bribed!
-                
-                visible = true;
-                }
-            else {
-                visible = false;
-                }
+            // only if what we last knew our bribe to be (the minimum possible
+            // that it could be now, given that it only goes up) is higher
+            // than our salary (which we know for sure)
 
-            if( ! gameUnit[i].mEnemyContactSinceBribeKnown ) {
-                // old bribe knowledge still valid
+            if( gameUnit[i].mTotalSalary < gameUnit[i].mMinKnownTotalBribe ) {
                 visible = true;
                 }
             }
