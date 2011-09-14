@@ -442,7 +442,7 @@ void SalaryBribeState::stepState() {
                         bribingUnit->mTotalSalary ) {
                         
                         // bribe visible to unit's owner
-                        u->mEnemyContactSinceBribeHidden = false;
+                        u->mEnemyContactSinceBribeKnown = false;
                         bribeKnown = true;
                         }
                     }
@@ -459,7 +459,7 @@ void SalaryBribeState::stepState() {
                                 if( getUnitRegion( j ) == u->mRegion ) {
                                     
                                     // unit tainted
-                                    u->mEnemyContactSinceBribeHidden = true;
+                                    u->mEnemyContactSinceBribeKnown = true;
                                     } 
                                 }
                             }

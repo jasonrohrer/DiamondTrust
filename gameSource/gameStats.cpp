@@ -852,7 +852,7 @@ void drawStats() {
                     }
                 }
 
-            if( ! u->mEnemyContactSinceBribeHidden ) {
+            if( ! u->mEnemyContactSinceBribeKnown ) {
                 // old bribe knowledge still valid
                 hideBribe = false;
                 }

@@ -594,7 +594,7 @@ void resetUnits() {
         gameUnit[ i ].mLastBribePayment = 0;
         gameUnit[ i ].mLastBribingUnit = -1;
 
-        gameUnit[ i ].mEnemyContactSinceBribeHidden = false;
+        gameUnit[ i ].mEnemyContactSinceBribeKnown = false;
         }
 
     // destinations -- nowhere
@@ -718,7 +718,7 @@ static char isBribeStatusVisible( int inUnit ) {
                 visible = false;
                 }
 
-            if( ! gameUnit[i].mEnemyContactSinceBribeHidden ) {
+            if( ! gameUnit[i].mEnemyContactSinceBribeKnown ) {
                 // old bribe knowledge still valid
                 visible = true;
                 }

@@ -139,7 +139,7 @@ class Unit {
         int mLastBribePayment;
         char mShowBribePayment;
         
-        char mEnemyContactSinceBribeHidden;
+        char mEnemyContactSinceBribeKnown;
         
         int mLastBribingUnit;
         
