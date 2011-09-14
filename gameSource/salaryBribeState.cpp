@@ -430,19 +430,6 @@ void SalaryBribeState::stepState() {
 
                 u->mTotalBribe += u->mLastBribePayment;
                 u->mLastBribePayment = 0;
-
-                if( u->mTotalBribe > u->mTotalSalary ) {
-                    // bribed!
-                    // we know everything about this unit now
-                    
-                    // (and it might be our own unit, in which case
-                    // we know everything anyway)
-
-                    // so remember what we know now (salary can only
-                    // go up from here)
-                    u->mMinKnownTotalSalary = u->mTotalSalary;
-                    }
-                
                 }
             
 

@@ -592,7 +592,6 @@ void resetUnits() {
         gameUnit[ i ].mTotalSalary = 0;
         gameUnit[ i ].mLastSalaryPayment = 0;
         gameUnit[ i ].mShowSalaryPayment = false;
-        gameUnit[ i ].mMinKnownTotalSalary = 0;
         
         gameUnit[ i ].mTotalBribe = 0;
         gameUnit[ i ].mLastBribePayment = 0;

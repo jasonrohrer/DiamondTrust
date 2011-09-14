@@ -825,20 +825,6 @@ void drawStats() {
         drawMoneyValue16( x + xOffset, y, 
                           u->mTotalSalary + u->mLastSalaryPayment, 
                           unitInfoPanelPaperColor, hideSalary );
-        
-
-        if( hideSalary && u->mMinKnownTotalSalary > 0 ) {
-
-            
-            char *greaterString = autoSprintf( ">%d",
-                                               u->mMinKnownTotalSalary - 1 );
-            
-            font16Hand->drawString( greaterString, 118, y,
-                                    unitInfoPanelPaperColor, alignLeft );
-            
-            delete [] greaterString;
-            }
-
 
 
 

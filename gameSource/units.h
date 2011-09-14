@@ -134,7 +134,6 @@ class Unit {
         int mTotalSalary;
         int mLastSalaryPayment;
         char mShowSalaryPayment;
-        int mMinKnownTotalSalary;
 
         int mTotalBribe;
         int mLastBribePayment;
