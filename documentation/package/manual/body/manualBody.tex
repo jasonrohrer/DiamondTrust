@@ -142,7 +142,7 @@ Thus, on top of the basic trading mechanics, there is a layer of agent loyalty m
 
 \section{Structure of the game}
 
-The diagram on page \pageref{fig:gameFlow} shows the phase progression during each round of the game.  That progression is repeated nine times until the end of the game.  Sections \ref{sec:payPhase} through \ref{sec:sellPhase} explain each game phase in detail.
+The diagram on page \pageref{fig:gameFlow} shows the phase progression during each round of the game.  That progression is repeated nine times until the game ends.  Sections \ref{sec:payPhase} through \ref{sec:sellPhase} explain each game phase in detail.
 
 
 
@@ -222,7 +222,7 @@ At the start of the game, all of your agents are at home, so you have the opport
 
 Salary that you pay to your agents keeps them loyal in the face of bribes that they receive from your opponent.  Bribes that you pay to opponent agents might convert those agents' loyalty to your side.  If an agent's total salary payments meet or exceed total bribes paid to that agent by the opponent, the agent remains loyal to its side.  However, if total bribes exceed total salary, the agent becomes loyal to the opponent.
 
-Agents that have become loyal to the opponent reveal their hidden information secretly to the opponent.  Hidden information is described in greater detail in the following sections, but it includes move destinations, diamond payments, inspector bribes, the number of diamonds selected to sell, and home money balances (if bribe units are at home).
+Agents that have become loyal to the opponent reveal their hidden information secretly to the opponent.  Hidden information is described in greater detail in the following sections, but it includes move destinations, diamond payments, Inspector bribes, the number of diamonds selected to sell, and home money balances (if bribe units are at home).
 
 Crucially, agents that have been successfully bribed reveal what other agents {\it they} have bribed, and for how much.  How much one of your own agents has been bribed is hidden from you, unless you successfully bribe the agent that bribed your agent.
 
@@ -255,7 +255,7 @@ During this step, players pick their final moves simultaneously and in secret.  
 \label{sec:aboutBids}
 Auctions in Diamond Trust are somewhat unusual:  instead of a standard winner-pay auction mechanism (which turns out to be rather boring in a simultaneous-decision game), this game uses {\it both-pay auctions}.  If both players are sending an agent into a given region, they both specify payments, and each player pays the amount that she has offered.  Then the highest payer gets the diamonds in that region.  Even if players tie, each still pays her committed amount, but neither player gets the diamonds.
 
-\subsubsection{About inspector bribes}
+\subsubsection{About Inspector bribes}
 Inspector bribes also follow the {\it both-pay} model.  The UN Inspector accepts bribe payments from both players, but only obeys the command of the player who pays him more.  Again, in the case of a tie, he takes money from both players but obeys neither player.
 
 \subsection{Game phase:  Deposit diamonds}
@@ -277,7 +277,7 @@ After he moves, he performs his confiscation.  He also blocks whatever diamond s
 \subsection{Game phase:  Collect diamonds}
 \label{sec:collectPhase}
 
-After the Inspector moves, if he moves at all, agents in the other Angola regions collect diamonds according to the both-pay rule described on page \pageref{sec:aboutBids}.  Diamonds in regions where no player pays or both players tie simply remain in their regions, accumulating for the next round.
+After the Inspector moves, if he moves at all, agents in the other Angola regions collect diamonds according to the both-pay rule described on page \pageref{sec:aboutBids}.  Diamonds in regions where no player pays or both players tie simply remain in those regions, accumulating for the next round.
 
 Agents carry the diamonds that they have collected, which are vulnerable to future Inspector confiscation, until they return to their home regions to deposit them.
 
