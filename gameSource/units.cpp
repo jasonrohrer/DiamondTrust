@@ -712,8 +712,8 @@ static char isBribeStatusVisible( int inUnit ) {
             // that it could be now, given that it only goes up) is higher
             // than our salary (which we know for sure)
 
-            if( gameUnit[i].mTotalSalary < gameUnit[i].mMinKnownTotalBribe ) {
-                visible = true;
+            if( gameUnit[i].mTotalSalary >= gameUnit[i].mMinKnownTotalBribe ) {
+                visible = false;
                 }
             }
         }
