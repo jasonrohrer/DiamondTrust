@@ -29,3 +29,12 @@ All songs normalized to 1.0 global peak.
 sept8:
 
 All songs custom volume-adjusted in game engine.
+
+
+
+sept15
+
+Fixed so that all songs have 4 acts (DS directory listing doesn't work with
+empty folders).
+
+Fixed lead-in note on Song 1, Act 3, Synth 3.2
