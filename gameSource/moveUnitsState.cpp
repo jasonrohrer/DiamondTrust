@@ -931,6 +931,9 @@ void MoveUnitsState::enterState() {
     setActiveUnit( -1 );
     showUnitMoves( true );
 
+    pickingBid = false;
+    pickingBribe = false;
+
     setMovePeeking( false );
 
     helpTransKey = "help_moveUnits";
