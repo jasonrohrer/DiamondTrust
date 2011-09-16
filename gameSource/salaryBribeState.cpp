@@ -518,7 +518,7 @@ void SalaryBribeState::drawState() {
         int activeUnit = getActiveUnit();
 
         if( activeUnit == -1 ) {
-            printOut( "Error: Picking bid with no active unit!\n" );
+            printOut( "Error: Picking salary with no active unit!\n" );
             return;
             }
     
@@ -558,6 +558,10 @@ void SalaryBribeState::enterState() {
     sentMove = false;
     gotMove = false;
     
+    pickingSalary = false;
+    pickingBribe = false;
+
+
     setActiveUnit( -1 );
     showUnitMoves( false );
     
