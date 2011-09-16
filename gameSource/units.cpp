@@ -1288,6 +1288,8 @@ void setUnitSelectable( int inUnit, char inSelectable ) {
     else if( ! inSelectable ) {
         // back to arm down, not waving
         gameUnit[i].mAnimationFrameNumber = 0;
+        gameUnit[i].mAnimationDirection = 1;
+        gameUnit[i].mStepsUntilNextFrame = 0;
         }
     
     }
