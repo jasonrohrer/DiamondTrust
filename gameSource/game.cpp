@@ -53,6 +53,10 @@ static void scrollCreditSheetUp();
 static int helpFadeStepsMax = 50;
 
 
+// so we can restore full music tracks after ending pause
+static char pauseStarted = false;
+
+
 
 #include "loading.h"
 
@@ -1352,10 +1356,27 @@ void gameLoopTick() {
             }
         
         showPause();
+        pauseStarted = true;
+
+        // back to limiting music
+        limitTotalMusicTracks( true );
+        
+        setMusicBasedOnGameState();
         }
+
+    if( pauseStarted && ! isPauseShowing() ) {
+        // returned from pause without quitting
+        pauseStarted = false;
+        
+        // back to full music
+        limitTotalMusicTracks( false );
+        
+        setMusicBasedOnGameState();
+        }    
 
 
     if( isPauseShowing() && isQuitChosen() ) {
+        pauseStarted = false;
         
         forceHidePause();
 
@@ -1374,8 +1395,6 @@ void gameLoopTick() {
         currentGameState = pickGameTypeState;
         resetToPlayAgain();
 
-        // back to limiting music
-        limitTotalMusicTracks( true );
 
         currentGameState->enterStateCall();
         
