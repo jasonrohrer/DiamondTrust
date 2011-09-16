@@ -574,6 +574,8 @@ void initUnits() {
 
 void resetUnits() {
     
+    executing = false;
+    
     // player
     gameUnit[ 0 ].mRegion = 0;
     gameUnit[ 1 ].mRegion = 0;
@@ -608,7 +610,8 @@ void resetUnits() {
         gameUnit[ i ].mDest = gameUnit[ i ].mRegion;
         gameUnit[ i ].mBid = 0;
         gameUnit[ i ].mExecutionStep = 0;
-
+        gameUnit[ i ].mFlying = 0;
+        
         gameUnit[ i ].mNumDiamondsHeld = 0;
         gameUnit[ i ].mTripCost = 0;
         }
