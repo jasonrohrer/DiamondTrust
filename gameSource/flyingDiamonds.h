@@ -19,3 +19,6 @@ void stepFlyingDiamonds();
 void addFlyingDiamond( intPair inStart, intPair inEnd );
 
 char flyingDiamondAnimationDone();
+
+
+void clearFlyingDiamonds();

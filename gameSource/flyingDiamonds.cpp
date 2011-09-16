@@ -23,9 +23,7 @@ void initFlyingDiamonds() {
     }
 
 void freeFlyingDiamonds() {
-    if( currentDiamond != NULL ) {
-        delete currentDiamond;
-        }
+    clearFlyingDiamonds();
     }
 
 
@@ -63,8 +61,7 @@ void stepFlyingDiamonds() {
         currentDiamond->mStep ++;
         
         if( currentDiamond->mStep >= currentDiamond->mNumSteps ) {
-            delete currentDiamond;
-            currentDiamond = NULL;
+            clearFlyingDiamonds();
             }
         }
     }
@@ -93,4 +90,13 @@ void addFlyingDiamond( intPair inStart, intPair inEnd ) {
 
 char flyingDiamondAnimationDone() {
     return (currentDiamond == NULL);
+    }
+
+
+
+void clearFlyingDiamonds() {
+    if( currentDiamond != NULL ) {
+        delete currentDiamond;
+        currentDiamond = NULL;
+        }
     }

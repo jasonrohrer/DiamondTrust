@@ -902,6 +902,9 @@ static void resetToPlayAgain() {
 
     setAllRegionsNotSelectable();
 
+
+    clearFlyingDiamonds();
+    
     resetStats();
     resetMapDiamondCounts();
     resetUnits();

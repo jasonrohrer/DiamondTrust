@@ -5,6 +5,7 @@
 #include "units.h"
 #include "gameStats.h"
 #include "common.h"
+#include "flyingDiamonds.h"
 
 //static int activeUnit = -1;
 static char stateDone = false;
@@ -97,6 +98,10 @@ void ConnectionBrokenState::drawState() {
     
     drawUnits();
 
+    startNewSpriteLayer();
+
+    drawFlyingDiamonds();
+    
     startNewSpriteLayer();
     
     if( satelliteFade > 0 ) {
