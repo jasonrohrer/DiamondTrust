@@ -22,6 +22,13 @@ class Button {
         ~Button();
         
 
+        // by default, buttons are not drawn when the game is paused
+        // individual buttons (like those on the pause screen) can
+        // be changed to be drawn during a pause.
+        void setShowDuringPause( char inShowDuringPause );
+        
+
+
         int getWidth();
         
         int getCenterX();
@@ -53,6 +60,7 @@ class Button {
         // -1 if not variable length
         int mNumMiddleParts;
         
-        
+        char mShowDuringPause;
+
     };
 

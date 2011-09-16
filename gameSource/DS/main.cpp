@@ -3579,6 +3579,18 @@ char getLidClosed() {
     }
 
 
+static char hasStartBeenPressed = false;
+
+
+char getPauseButtonPressed() {
+    char returnVal = hasStartBeenPressed;
+    
+    hasStartBeenPressed = false;
+    
+    return returnVal;
+    }
+
+
 
 void runGameLoopOnce() {
     G3X_Reset();
@@ -3649,6 +3661,17 @@ void runGameLoopOnce() {
     shouldSwap = true;
     OS_RestoreInterrupts( oldMode );
 
+
+    if( PAD_Read() & PAD_BUTTON_START ) {
+
+        // ignore start button on menu screens or when already paused
+        if( ! isMainMenuShowing() && 
+            ! isPaused() ) {
+            
+            hasStartBeenPressed = true;
+            }
+        }
+    
 
     BOOL detectFold = PAD_DetectFold();
     

@@ -14,6 +14,9 @@ button_back "Cancel"
 button_play_again "Play Again"
 
 
+button_continue "Continue"
+button_quit "Quit"
+
 
 button_nextSongAct "fwd"
 button_songReroll "rand"

@@ -5,6 +5,7 @@
 #include "colors.h"
 #include "minorGems/util/stringUtils.h"
 
+#include "pause.h"
 
 
 static int buttonSpriteID;
@@ -48,7 +49,7 @@ void initButton() {
 
 Button::Button( Font *inFont, const char *inText, int inX, int inY )
         : mFont( inFont ), mText( stringDuplicate( inText ) ), 
-          mX( inX ), mY( inY ) {
+          mX( inX ), mY( inY ), mShowDuringPause( false ) {
     
     int textWidth = mFont->measureString( mText );
 
@@ -113,6 +114,12 @@ Button::~Button() {
     }
 
 
+void Button::setShowDuringPause( char inShowDuringPause ) {
+    mShowDuringPause = inShowDuringPause;
+    }
+
+
+
 
 int Button::getWidth() {
     return mW;
@@ -143,6 +150,11 @@ char Button::getPressed( int inClickX, int inClickY ) {
 
 
 void Button::draw() {
+    if( isPauseShowing() && !mShowDuringPause ) {
+        return;
+        }
+    
+
     if( mFont == NULL ) {
         // fixed sprite button
         

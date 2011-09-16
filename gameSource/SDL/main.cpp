@@ -719,11 +719,34 @@ void callbackMouse( int inButton, int inState, int inX, int inY ) {
     }
 
 
+static char quitKeyHit = false;
+
+
+char getPauseButtonPressed() {
+    char returnValue = quitKeyHit;
+    
+    quitKeyHit = false;
+
+    return returnValue;
+    }
+
+
+
+
 void callbackKeyboard( unsigned char inKey, int inX, int inY ) {
     
     // q or escape
     if( inKey == 'q' || inKey == 'Q' || inKey == 27 ) {
-        exit( 0 );
+
+        if( isMainMenuShowing() ) {
+            // hit these keys again from title screen, can't back out
+            // any farther, full quit
+            exit( 0 );
+            }
+        else if( ! isPaused() ) {
+            // register that pause has been pressed
+            quitKeyHit = true;
+            }    
         }
     
     if( inKey == '=' ) {

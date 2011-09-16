@@ -43,6 +43,7 @@ DotMatrixRGBAFilter.cpp \
 greenBarPaper.cpp \
 BluePenRGBAFilter.cpp \
 help.cpp \
+pause.cpp \
 watch.cpp \
 musicTestUI.cpp \
 

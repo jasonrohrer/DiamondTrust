@@ -23,6 +23,7 @@
 #include "greenBarPaper.h"
 #include "BluePenRGBAFilter.h"
 #include "help.h"
+#include "pause.h"
 #include "watch.h"
 
 
@@ -166,7 +167,7 @@ int preLidClosedSongAct = -1;
 
 
 
-GameState *currentGameState;
+GameState *currentGameState = NULL;
 
 extern GameState *pickGameTypeState;
 extern GameState *setAILevelState;
@@ -193,6 +194,10 @@ Button *parentServeCloneDownloadButton;
 Button *childButton;
 
 Button *helpButton;
+
+// on pause screen
+Button *continueButton;
+Button *quitButton;
 
 
 // for testing
@@ -598,6 +603,22 @@ void gameInit() {
                              242,
                              178,
                              18, 18 );
+
+
+
+
+    continueButton = new Button( font16, translate( "button_continue" ),
+                                 128,
+                                 96 );
+
+    quitButton = new Button( font16, translate( "button_quit" ),
+                             128,
+                             136 );
+    
+    // these two are on the pause screen
+    continueButton->setShowDuringPause( true );
+    quitButton->setShowDuringPause( true );
+    
 
 
     nextSongActButton = new Button( font16, translate( "button_nextSongAct" ),
@@ -1143,7 +1164,10 @@ void gameLoopTick() {
     
 
 
-    stepSprites();
+    if( !isHelpShowing() && !isPauseShowing() ) {
+        stepSprites();
+        }
+    
     stepOpponent();
     
     
@@ -1156,6 +1180,12 @@ void gameLoopTick() {
         if( isHelpShowing() ) {
             forceHideHelp();
             }
+        
+        // what if pause is in the way?
+        if( isPauseShowing() ) {
+            forceHidePause();
+            }
+
         // go immediately to next state (the connection BROKEN state)
         goToNextGameState();
         }
@@ -1201,7 +1231,7 @@ void gameLoopTick() {
         stateDone = false;
 
         // only step if not done and help not showing
-        if( ! isHelpShowing() ) {
+        if( ! isHelpShowing() && ! isPauseShowing() ) {
             currentGameState->stepState();
             }
         }
@@ -1218,6 +1248,10 @@ void gameLoopTick() {
         musicBasedOnHelpShowing = false;
         }
     
+    if( isPauseShowing() ) {
+        stepPause();
+        }
+
 
     if( currentGameState->getSubStateTransitionHappened() ) {
         // our music state is out-dated
@@ -1245,10 +1279,15 @@ void gameLoopTick() {
         // this achieves the equivalent of a "mouse released" event
         
 
-        if( isHelpShowing() ) {
+        if( isPauseShowing() ) {
+            clickPause( tx, ty );
+            touchEaten = true;
+            }
+        else if( isHelpShowing() ) {
             clickHelp( tx, ty );
             touchEaten = true;
             }
+        
         
 
         // don't pass clicks to done states
@@ -1299,6 +1338,47 @@ void gameLoopTick() {
         
         
         }
+
+    if( ! isMainMenuShowing()
+        &&
+        getPauseButtonPressed() ) {
+        
+
+        if( isHelpShowing() ) {
+            forceHideHelp();
+            }
+        
+        showPause();
+        }
+
+
+    if( isPauseShowing() && isQuitChosen() ) {
+        
+        forceHidePause();
+
+        // reset various displays on disconnect
+        showSale( false );
+        
+        showInspectorPanel( false );
+        
+        setActiveUnit( -1 );
+        
+        if( networkOpponent ) {
+            closeConnection();
+            }
+        
+        // back to menu
+        currentGameState = pickGameTypeState;
+        resetToPlayAgain();
+
+        // back to limiting music
+        limitTotalMusicTracks( true );
+
+        currentGameState->enterStateCall();
+        
+        setMusicBasedOnGameState();
+        }
+    
 
     
 
@@ -1834,6 +1914,10 @@ void drawBottomScreen() {
     if( isHelpShowing() ) {
         drawHelp();
         }
+
+    if( isPauseShowing() ) {
+        drawPause();
+        }
     
     }
 
@@ -1906,6 +1990,31 @@ static void scrollCreditSheetUp() {
 
     creditScrollCount ++;
     }
+
+
+
+
+
+char isPaused() {
+    return isPauseShowing();
+    }
+
+
+char isMainMenuShowing() {
+    return 
+        ( currentGameState == NULL )
+        ||
+        ( currentGameState == pickGameTypeState )
+        ||
+        ( currentGameState == setAILevelState )
+        ||
+        ( currentGameState == connectState )
+        ||
+        ( currentGameState == gameEndState )
+        ||
+        ( currentGameState == connectionBrokenState );
+    }
+
 
 
     

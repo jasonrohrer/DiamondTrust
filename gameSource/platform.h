@@ -191,6 +191,11 @@ char getTouch( int *outX, int *outY );
 char getLidClosed();
 
 
+// true if the pause button has been pressed since
+// the last call to getPauseButtonPressed
+char getPauseButtonPressed();
+
+
 
 // forces full game loop (update and draw) to run one time
 // Sometimes it is necessary to redraw the screen at specific times, like
@@ -404,6 +409,16 @@ void gameLoopTick();
 // all drawSprite must occur in these functions.
 void drawTopScreen();
 void drawBottomScreen();
+
+
+// true if main menu screen (title) is currently showing
+// if quit key is pressed from here, can back out no farther and
+// must actually quit
+char isMainMenuShowing();
+
+// true if currently paused
+char isPaused();
+
 
 
 typedef signed short int s16;

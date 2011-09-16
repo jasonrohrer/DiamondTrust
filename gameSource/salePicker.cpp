@@ -2,6 +2,7 @@
 #include "common.h"
 #include "platform.h"
 #include "sprite.h"
+#include "pause.h"
 
 
 static int pickerSprite;
@@ -44,7 +45,10 @@ static rgbaColor white = { 255, 255, 255, 255 };
 
 
 void drawSalePicker( int inCenterX, int inCenterY ) {
-
+    if( isPauseShowing() ) {
+        return;
+        }
+    
     // avoid drawing too close to edge (avoid putting controls in 8-dot
     // border region of screen)
     if( inCenterY + 27 > 191 ) {
