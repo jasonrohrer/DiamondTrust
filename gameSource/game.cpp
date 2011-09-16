@@ -746,6 +746,9 @@ void gameFree() {
     delete playAgainButton;
     delete helpButton;
     
+    delete continueButton;
+    delete quitButton;
+
     delete nextSongActButton;
     delete songRerollButton;
     delete switchSongButton;
