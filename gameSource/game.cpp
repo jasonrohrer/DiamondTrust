@@ -894,6 +894,14 @@ static void postMoveUnitsTransition() {
 
 
 static void resetToPlayAgain() {
+    showUnitMoves( false );
+
+    showAllUnitMoves( false );
+    
+    setAllUnitsNotSelectable();
+
+    setAllRegionsNotSelectable();
+
     resetStats();
     resetMapDiamondCounts();
     resetUnits();

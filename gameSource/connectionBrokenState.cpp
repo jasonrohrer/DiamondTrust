@@ -136,14 +136,6 @@ void ConnectionBrokenState::enterState() {
     showInspectorPanel( false );
     
     setActiveUnit( -1 );
-
-    showUnitMoves( false );
-
-    showAllUnitMoves( false );
-    
-    setAllUnitsNotSelectable();
-
-    setAllRegionsNotSelectable();
     }
 
 
