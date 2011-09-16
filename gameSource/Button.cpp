@@ -97,7 +97,8 @@ Button::Button( const char *inSpriteFileName,
                 int inX, int inY, int inW, int inH )
         : mFont( NULL ), mText( NULL ), 
           mX( inX ), mY( inY ),
-          mClickRadiusX( inW / 2 ), mClickRadiusY( inH / 2 ) {
+          mClickRadiusX( inW / 2 ), mClickRadiusY( inH / 2 ),
+          mShowDuringPause( false ) {
 
     mFixedSprite = 
         loadSprite( inSpriteFileName, &mW, &mH, true );
