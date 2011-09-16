@@ -1282,6 +1282,10 @@ void setUnitSelectable( int inUnit, char inSelectable ) {
         // hold-downs
         gameUnit[i].mStepsUntilNextFrame = getArmHoldDownTime() - 30;
         }
+    else if( ! inSelectable ) {
+        // back to arm down, not waving
+        gameUnit[i].mAnimationFrameNumber = 0;
+        }
     
     }
 
