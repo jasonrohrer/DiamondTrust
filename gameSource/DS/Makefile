@@ -49,7 +49,7 @@ PATH_MINOR_GEMS_SOURCE = $(patsubst %,../../../minorGems/%,$(MINOR_GEMS_SOURCE))
 SRCS = $(DS_SOURCE) $(PATH_GAME_SOURCE) $(PATH_MINOR_GEMS_SOURCE)
 
 
-TARGET_BIN = $(ROM_NAME)_unsigned.SRL
+TARGET_BIN = $(ROM_NAME)_unsigned.srl
 
 MAKEROM_ROMROOT = ../gameData 
 MAKEROM_ROMFILES = * 
@@ -94,7 +94,7 @@ presign:
 	$(EMUCHILD) \
 		bin/$(TWL_BUILDTYPE)/$(TARGET_BIN) \
 		$(LIBSYSCALL_CHILD) \
-		bin/$(TWL_BUILDTYPE)/$(ROM_NAME)_toSign.SRL
+		bin/$(TWL_BUILDTYPE)/$(ROM_NAME)_toSign.srl
 
 postsign:
 	$(ATTACHSIGN) \
