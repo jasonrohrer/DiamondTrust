@@ -36,6 +36,9 @@ static unsigned short tgid = 0;
 extern char isCloneChild;
 
 
+extern int wmStatus;
+
+
 // implements clone booting parts of platform.h
 
 
@@ -179,6 +182,8 @@ static void wmInitializeCallback( void *inArg ) {
 
 // from platform.h
 void acceptCloneDownloadRequest() {
+
+    wmStatus = 0;
 
     cloneBootRunning = true;
     cloneBootError = false;
