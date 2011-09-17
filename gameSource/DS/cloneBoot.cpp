@@ -183,7 +183,10 @@ static void wmInitializeCallback( void *inArg ) {
 // from platform.h
 void acceptCloneDownloadRequest() {
 
-    wmStatus = 0;
+    // clear any errors, but DO NOT go into state 0, because we're
+    // actually not accepting a connection yet (the clone boot transfer
+    //  is separate)
+    wmStatus = -2;
 
     cloneBootRunning = true;
     cloneBootError = false;
