@@ -2026,6 +2026,29 @@ static void wmResetCallback( void *inArg ) {
     }
 
 
+
+void scanNextChannel();
+
+
+static void wmResetToRescanCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+    
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+        wmStatus = -1;
+        printOut( "Error returned to wmResetToRescanCallback\n" );
+        WM_End( wmEndCallback );
+        }
+    else {
+        // reset only called, with this callback, from child
+
+        // start connection process again to same parent
+        printOut( "Trying to scan for parent again after reset\n" );
+        scanNextChannel();
+        }
+    
+    }
+
+
 static void wmResetToEndCallback( void *inArg ) {
     WMCallback *callbackArg = (WMCallback *)inArg;
     
@@ -2058,8 +2081,25 @@ static void wmStartConnectCallback( void *inArg ) {
                   callbackArg->errcode );
 
         if( !wmShouldStop ) {
-            printOut( "Trying to reset\n" );
-            WM_Reset( wmResetCallback );
+            if( callbackArg->errcode == WM_ERRCODE_NO_ENTRY 
+                ||
+                callbackArg->errcode == WM_ERRCODE_OVER_MAX_ENTRY ) {
+                printOut( "Parent that we're trying to connect to is already "
+                          "full.  Resetting and scanning for a "
+                          "different one\n" );
+                WM_Reset( wmResetToRescanCallback );
+                }
+            else if( callbackArg->errcode == WM_ERRCODE_FAILED ) {
+                printOut( "Connection to chosen Parent failed completely.  "
+                          "Resetting and scanning for a "
+                          "different one\n" );
+                WM_Reset( wmResetToRescanCallback );
+                }
+            else {
+                printOut( "Non fatal error when connecting to parent?"
+                          "Trying to reset and reconnect to same parent\n" );
+                WM_Reset( wmResetCallback );
+                }
             }
         else {
             printOut( "Should stop anyway, resetting to end\n" );
@@ -2142,7 +2182,6 @@ static void wmEndScanCallback( void *inArg ) {
 
 
 
-void scanNextChannel();
 
 
 static void wmStartScanCallback( void *inArg ) {
@@ -2164,6 +2203,10 @@ static void wmStartScanCallback( void *inArg ) {
                 // we don't want to connect to one of these by accident here
                 ( callbackArg->gameInfo.attribute & WM_ATTR_FLAG_MB ) == 0 ) {
  
+                printOut( "Parent matches our GGID, is not MB, and is "
+                          "allowing entry, ending scan\n" );
+                
+
                 // use the first parent that we find (ignore rest)
                 
                 // end our scan before connecting
