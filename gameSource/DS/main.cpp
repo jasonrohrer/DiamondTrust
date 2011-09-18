@@ -1859,6 +1859,28 @@ static void startMP() {
     }
 
 
+
+static void wmSetEntryCallback( void *inArg ) {
+    WMCallback *callbackArg = (WMCallback *)inArg;
+
+    if( callbackArg->errcode != WM_ERRCODE_SUCCESS ) {
+
+        wmStatus = -1;
+        printOut( "Fatal error %d returned to wmSetEntryCallback\n",
+                  callbackArg->errcode );
+        }
+    else {
+        // success at blocking future child connection attempts
+        
+        printOut( "Child entry flag successfully disabled, starting MP\n" );
+                
+        // ready for MP
+        startMP();
+        }
+    
+    }
+
+
 static void wmResetToEndCallback( void *inArg );
 
 
@@ -1886,8 +1908,11 @@ static void wmStartParentCallback( void *inArg ) {
                 remoteAID = callbackArg->aid;
                 printOut( "Parent sees child remote AID of %d\n", remoteAID );
                 
-                startMP();
-
+                // stop accepting new child entries BEFORE we start MP
+                printOut( "Disabling child entry flag now that we have one "
+                          " child connected\n" );
+                WM_SetEntry( wmSetEntryCallback, 0 );
+                
                 // FIXME:
                 //parent_load_status();
                 
@@ -2197,7 +2222,7 @@ static void wmStartScanCallback( void *inArg ) {
             if( callbackArg->gameInfo.ggid == LOCAL_GGID 
                 &&
                 // parent allowing entry
-                ( callbackArg->gameInfo.attribute | WM_ATTR_FLAG_ENTRY ) == 1
+                ( callbackArg->gameInfo.attribute & WM_ATTR_FLAG_ENTRY ) != 0
                 &&
                 // parent NOT a multiboot parent
                 // we don't want to connect to one of these by accident here
