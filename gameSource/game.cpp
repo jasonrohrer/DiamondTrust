@@ -943,6 +943,8 @@ static void resetToPlayAgain() {
     setMusicBasedOnGameState();    
 
     resetAI();
+
+    isWaitingOnOpponent = false;
     }
 
 
