@@ -86,9 +86,9 @@ class GameEndState : public GameState {
 
         // back to go back to main menu
         virtual char canStateBeBackedOut() {
-            // but only from parent
-            // and only after sat image faded back in
-            return isHost && satelliteFade == 255;
+            // can back out either from parent or child
+            // but only after sat image faded back in
+            return satelliteFade == 255;
             }
         
 
@@ -308,14 +308,22 @@ void GameEndState::enterState() {
 
 
 void GameEndState::backOutState() {
+    playingAgain = false;
+        
     if( isHost ) {
-        playingAgain = false;
         
         if( networkOpponent ) {
             sendNextGameFlag( false );
             }
         }
-        
+    else {
+        // child ?
+        if( networkOpponent ) {
+            // don't send flag (that's up to parent)
+            // just close connection right away and move on
+            closeConnection();
+            }
+        }
     }
 
 
