@@ -367,9 +367,9 @@ void lockAudio();
 void unlockAudio();
 
 
-// 8 possible channels
+// 5 possible channels
 
-#define MAX_SOUND_CHANNELS 8
+#define MAX_SOUND_CHANNELS 5
 
 // Volume in range [0..127]
 // All volumes start out at 0 by default 
