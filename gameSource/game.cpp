@@ -1116,7 +1116,7 @@ void gameLoopTick() {
         // we don't know how many total channels we're going to have
         int panFlip = -1;
 
-        for( int c=0; c<8; c++ ) {
+        for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
             int pan = 64 + panFlip * 16;
 
             panFlip *= -1;
@@ -1140,7 +1140,7 @@ void gameLoopTick() {
                 globalSoundVolume = 0;
                 }
 
-            for( int c=0; c<8; c++ ) {
+            for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
                 setSoundChannelVolume( c, globalSoundVolume );
                 }
             }
@@ -1149,7 +1149,7 @@ void gameLoopTick() {
         
         globalSoundVolume++;
         
-        for( int c=0; c<8; c++ ) {
+        for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
             setSoundChannelVolume( c, globalSoundVolume );
             }
         }
@@ -1158,7 +1158,7 @@ void gameLoopTick() {
         // snap back instantly
         globalSoundVolume = globalVolumePeak; 
         
-        for( int c=0; c<8; c++ ) {
+        for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
             setSoundChannelVolume( c, globalSoundVolume );
             }
         }
@@ -1166,7 +1166,7 @@ void gameLoopTick() {
         
         globalSoundVolume--;
         
-        for( int c=0; c<8; c++ ) {
+        for( int c=0; c<MAX_SOUND_CHANNELS; c++ ) {
             setSoundChannelVolume( c, globalSoundVolume );
             }
         }
