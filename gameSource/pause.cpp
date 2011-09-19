@@ -29,6 +29,18 @@ char isPauseShowing() {
 
 
 
+char isPauseTransitionHappening() {
+    if( pauseClosing && satelliteFade > 0 ) {
+        return true;
+        }
+    if( pauseShowing && satelliteFade < 255 ) {
+        return true;
+        }
+    return false;
+    }
+            
+
+
 char isQuitChosen() {
     char returnValue = quitChosen;
     quitChosen = false;

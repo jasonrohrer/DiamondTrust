@@ -1,6 +1,9 @@
 char isPauseShowing();
 
 
+char isPauseTransitionHappening();
+
+
 // returns whether quit has been pressed since the last call to isQuitChosen
 char isQuitChosen();
 

@@ -6,6 +6,7 @@
 #include "gameStats.h"
 #include "platform.h"
 #include "help.h"
+#include "pause.h"
 
 #include <assert.h>
 
@@ -676,7 +677,9 @@ void stepAI() {
                // don't starve sound callback with too much AI processing
                !isSoundTryingToRun() &&
                // don't starve smooth help scrolling 
-               !isHelpTryingToScroll() ) {
+               !isHelpTryingToScroll() &&
+               // don't starve smooth pause transitions 
+               !isPauseTransitionHappening() ) {
 
             gamesThisStep++;
             
