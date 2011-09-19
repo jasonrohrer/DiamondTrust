@@ -443,6 +443,8 @@ void resetAI() {
     moveDone = false;
 
     clearNextMove();
+
+    toggleAICPUMode( false );
     }
 
 
