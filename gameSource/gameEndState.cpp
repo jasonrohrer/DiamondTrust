@@ -319,6 +319,8 @@ void GameEndState::backOutState() {
     else {
         // child ?
         if( networkOpponent ) {
+            isWaitingOnOpponent = false;
+
             // don't send flag (that's up to parent)
             // just close connection right away and move on
             closeConnection();
