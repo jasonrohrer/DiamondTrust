@@ -169,13 +169,13 @@ Diamond Trust is a game of skill for exactly two players.  You should eventually
 
 \subsection{Practice against the AI}
 
-If you touch ``Single Player'' from the title screen, you can pick an AI level and start a game against the AI.  The single player game works exactly the same way as a two player game, and the AI operates by the same rules as your human opponent would---it doesn't cheat by peeking at your secret information.
+If you touch ``Single Player'' from the title screen, you can pick an AI level and start a game against the AI.  The single player game works exactly the same way as a two player game, and the AI operates by the same rules as your human opponent would---it doesn't cheat by peeking at your hidden information.
 
 Unfortunately, reasoning about incomplete information requires quite a lot of ``possible worlds'' simulation on the part of the AI when evaluating potential moves.  At lower levels, the AI picks a move quickly but usually poorly.  At higher levels, the AI picks better moves but takes quite a bit longer.
 
 Each additional level gives the AI more time to consider moves.  At level 2, it takes twice as long, while at level 7, it takes seven times as long.  But even at extremely high levels, where the AI is given an extraordinary amount of time to consider moves, human-level play is not possible.
 
-Thus, the AI should be thought of as a practice opponent only.  Learn how to play the game, learn how to beat the AI at some of the lower skill levels, and then graduate to a human opponent.
+Thus, the AI should be used as a practice opponent only.  Learn how to play the game, learn how to beat the AI at some of the lower skill levels, and then graduate to a human opponent.
 
 \subsection{Single-Card Play}
 \label{sec:singleCard}
@@ -184,7 +184,7 @@ To play against a friend, all you need are two Nintendo DS systems and a single 
 After the game has been served and loaded once, multiple games can be played against that friend.  It is even possible for two DS Download Play recipients to play subsequent games against each other.
 
 \subsection{Multi-Card Play}
-If both players have Diamond Trust Game Cards, they can connect to each other directly with no transmission time and with both players experiencing the game's music.  After touching ``Two Player'' from the title screen, one player should touch ``Host Multi-Card Play'' while the other player touches ``Join Game.''
+If both players have Diamond Trust Game Cards, they can connect to each other directly with no transmission time, and both players will experience the game's music.  After touching ``Two Player'' from the title screen, one player should touch ``Host Multi-Card Play'' while the other player touches ``Join Game.''
 
 Headphones or two separate rooms are recommended to avoid unpleasant music combinations from the two Nintendo DS systems.  Another option is to reduce the volume control to the minimum on one DS and plug external speakers into the audio jack of the second DS, which will allow both players to listen to the music emanating from the second DS.
 
@@ -198,7 +198,7 @@ Headphones or two separate rooms are recommended to avoid unpleasant music combi
 
 \section{Game elements}
 
-Each player in the game is in control of three diamond trading agents.  The map is divided into eight regions:  six regions in Angola, and one home region for each player (London and Antwerp, in the upper left and right corners of the screen, respectively).  Agents start the game in their home regions, but they can move from region to region during the game.  At most one agent from each side is permitted in a given region of Angola.  Moving into the opponent's home region is forbidden.
+Each player controls three diamond trading agents.  The map is divided into eight regions:  six regions in Angola, and one home region for each player (London and Antwerp, in the upper left and right corners of the screen, respectively).  Agents start the game in their home regions, and they can move from region to region during the game.  At most one agent from each side is permitted in a given region of Angola.  Moving into the opponent's home region is forbidden.
 
 The UN Inspector begins the game in a randomly chosen region of Angola.  The Inspector can be moved to other Angola regions throughout the game in response to player bribes, but he can never move into a player's home region.
 
@@ -214,7 +214,7 @@ The diamond icon in each Angola region indicates how many diamonds are waiting t
 \subsection{Game phase:  Pay agents}
 \label{sec:payPhase}
 
-During this phase, you can pay salary to any of your own agents that are in your home region.  If your agents are out in Angola regions, you cannot pay them salary during this phase.  However, if one of your agents occupies the same Angola region as an opponent agent, you can pay the opponent agent a bribe during this phase.
+During this phase, you can pay salary to any of your own agents that are in your home region.  If your agents are out in Angola regions, you cannot pay them salary this round.  However, if one of your agents occupies the same Angola region as an opponent agent, you can pay the opponent agent a bribe during this phase.
 
 To determine which agents can be paid during this phase, look for agents that are waving their arms.  Touch an agent to adjust the salary or bribe payment to be made this round using the payment selection widget.  Touch the check mark on the widget to set the payment.  Before finishing your move, you can touch agents several times to adjust their salaries and bribes repeatedly.  Touch the ``Done'' button to commit your payments. 
 
@@ -233,7 +233,7 @@ Agents that have been successfully bribed are marked with hearts of the opposite
 
 During this phase, you can specify destinations for each of your agents.  A trip inside Angola costs \$1 per agent.  A trip between Angola and Europe costs \$2 per agent.
 
-To set a destination, touch one of your agents and then touch an available destination region.  Unavailable regions are darkened after you pick an agent.  Remember that at most one of your agents can occupy each region of Angola.  You also need to be able to afford the trip cost.
+To set a destination, touch one of your agents and then touch an available destination region.  Unavailable regions are darkened after you pick an agent.  Remember that at most one of your agents can occupy each region of Angola.  A region may also be unavailable because you cannot afford the trip cost.
 
 If you pick an Angola region as a destination for an agent, you will then need to pick your payment for the diamonds in that region.  Use the payment selection widget to raise or lower the amount, and then touch the check mark to set the payment.
 
@@ -243,7 +243,7 @@ All of your moves are specified at the same time as your opponent.  When you are
 
 \subsubsection{Moves revealed}
 \label{sec:movesRevealed}
-In the case where secret information is preserved for both sides, moves will be revealed and executed immediately after both players commit their moves.
+In the case where hidden information is preserved for both sides, moves will be revealed and executed immediately after both players commit their moves.
 
 However, in the case where some agents have been successfully compromised by opponent bribes, there will be a separate step where the moves of compromised agents are revealed, and players can adjust their moves before committing.  Of course, you only get to take advantage of this revealed information---and chance to adjust---if you have successfully bribed at least one opponent agent.
 
@@ -266,11 +266,11 @@ After agent moves are executed, agents that have returned to their home regions 
 \subsection{Game phase:  Move UN Inspector}
 \label{sec:inspectorPhase}
 
-The UN Inspector has two functions in the game.  First, he blocks diamond acquisition in whatever region he occupies, effectively freezing the region and allowing diamonds to accumulate there.  Second, he confiscates diamonds carried by any agents that he encounters in his region.  However, if he will move this round due to a player's bribe, he only performs this confiscation after he reaches his destination region.
+The UN Inspector has two functions in the game.  First, he blocks diamond acquisition in whatever region he occupies, effectively freezing the region and allowing diamonds to accumulate there.  Second, he confiscates diamonds carried by any agents that he encounters in his region.  However, if he will move this round due to a player's bribe, he only performs these blocking and confiscation functions after he reaches his destination region.
 
 After agents have moved and deposited any diamonds in home regions, the player who has paid a larger bribe to the UN Inspector gets to move the Inspector to a different region, if desired.  If neither player has paid him anything this round, or both players have tied in terms of his payment, the Inspector does not move.
 
-To move the Inspector, if you are the player who has paid him more, touch an Angola region as his destination.  You can switch regions by touching a different region.  When a region is selected, the upper screen shows information about what the Inspector will do in that region---the diamond sale to be blocked and the number of diamonds to be confiscated from each agent in that region.  When you are satisfied with the Inspector's selected destination, touch the ``Done'' button to make him move there.
+To move the Inspector, if you are the player who has paid him more, touch an Angola region as his destination.  You can switch regions by touching a different region.  When a region is selected, the upper screen shows information about what the Inspector will do in that region---the diamond sale to be blocked and the number of diamonds to be confiscated from each agent.  When you are satisfied with the Inspector's selected destination, touch the ``Done'' button to make him move there.
 
 After he moves, he performs his confiscation.  He also blocks whatever diamond sale was pending in his new region (though both players in that region still pay what they have offered for the diamonds there).  Thus, moving the Inspector can be used to open up an opportunity in one region while simultaneously closing an opportunity in another region.
 
@@ -327,7 +327,7 @@ The player with the most diamonds at the end of the game wins.  In the case of a
 
 
 \section{Playing again}
-The host of the game must decide whether to start another game after a game ends.  If the host touches the ``Back'' button, both players will be disconnected and returned to the title screen where they can each play against the AI or host/join games with other game partners.
+The host of the game must decide whether to start another game after a game ends.  If the host touches the ``Cancel'' button, both players will be disconnected and returned to the title screen where they can each play against the AI or host/join games with other game partners.
 
 As mentioned in section \ref{sec:singleCard}, if the host chooses not to play again during Single-Card Play, the cardless player will be returned to the title screen where she will have full access to all game features, including hosting and joining.  The only thing a cardless player cannot do is host DS Download Play for another Nintendo DS system that still needs to download the game.
 
