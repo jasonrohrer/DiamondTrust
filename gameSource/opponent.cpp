@@ -53,6 +53,14 @@ int checkOpponentConnectionStatus() {
 
 
 
+void closeOpponentConnection() {
+    if( ! localAI ) {
+        closeConnection();
+        }
+    }
+
+
+
 void sendOpponentMessage( unsigned char *inMessage, unsigned int inLength ) {
     if( localAI ) {
         setEnemyMove( inMessage, inLength );

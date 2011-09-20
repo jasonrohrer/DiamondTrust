@@ -363,6 +363,9 @@ void SalaryBribeState::stepState() {
             // unpack it
             if( messageLength != numPlayerUnits * 2 * 2 ) {
                 printOut( "Bad message length from opponent\n" );
+                
+                closeOpponentConnection();
+                connectionBroken = true;
                 stateDone = true;
 
                 delete [] message;

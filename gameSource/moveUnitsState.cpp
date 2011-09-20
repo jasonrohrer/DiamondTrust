@@ -159,6 +159,9 @@ static int getMoveMessage() {
         // unpack it
         if( messageLength != numPlayerUnits * 3 ) {
             printOut( "Bad message length from opponent\n" );
+            
+            closeOpponentConnection();
+            connectionBroken = true;
             stateDone = true;
 
             delete [] message;

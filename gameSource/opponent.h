@@ -28,6 +28,11 @@ void stepOpponent();
 int checkOpponentConnectionStatus();
 
 
+
+void closeOpponentConnection();
+
+
+
 // inMessage destroyed by caller
 void sendOpponentMessage( unsigned char *inMessage, unsigned int inLength );
 

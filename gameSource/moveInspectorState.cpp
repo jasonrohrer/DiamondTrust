@@ -169,6 +169,9 @@ void MoveInspectorState::stepState() {
             // unpack it
             if( messageLength != 1 ) {
                 printOut( "Bad message length from opponent\n" );
+                
+                closeOpponentConnection();
+                connectionBroken = true;
                 stateDone = true;
                 
                 delete [] message;

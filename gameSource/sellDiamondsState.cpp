@@ -207,6 +207,9 @@ static int getMoveMessage() {
         if( messageLength != 3 ) {
             printOut( "Bad message length from opponent, %d\n",
                       messageLength );
+            
+            closeOpponentConnection();
+            connectionBroken = true;
             stateDone = true;
 
             delete [] message;
@@ -495,6 +498,9 @@ void SellDiamondsState::stepState() {
         
             if( messageLength != 300 ) {
                 printOut( "Bad partial image message length from opponent\n" );
+                
+                closeOpponentConnection();
+                connectionBroken = true;
                 stateDone = true;
 
                 delete [] message;
