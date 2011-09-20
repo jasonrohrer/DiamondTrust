@@ -1815,6 +1815,13 @@ static void startMP() {
         receiveBuffer = NULL;
         }
 
+    // we clear these in wmEndCallback, but clear them here too, in 
+    // case wmEnd wasn't called for some reason
+    // don't ever want old, stale messages lingering in the FIFOs
+    sendFifo.clearData();
+    receiveFifo.clearData();
+    sendPending = false;
+
 
     unsigned short sendBufferSize = 
         (unsigned short)WM_GetMPSendBufferSize();
