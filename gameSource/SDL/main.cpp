@@ -1604,14 +1604,51 @@ int portNumber = 8641;
 
 
 
+#include "DataFifo.h"
+
+DataFifo sendFifo;
+DataFifo receiveFifo;
+
+unsigned int nextIncomingMessageSize = 0;
+unsigned char nextIncomingMessageChannel = 0;
+unsigned char *nextIncomingMessage = NULL;
+unsigned int nextIncomingBytesRecievedSoFar = 0;
+
+
+static void clearDataBuffers() {
+    sendFifo.clearData();
+    receiveFifo.clearData();
+    
+    if( nextIncomingMessage != NULL ) {
+        delete [] nextIncomingMessage;
+        nextIncomingMessage = NULL;
+        }
+    
+    nextIncomingMessageSize = 0;
+    nextIncomingMessageChannel = 0;
+    nextIncomingBytesRecievedSoFar = 0;
+    }
+
+
+
+
+
 void acceptConnection() {
     netStatus = 0;
+    
+    // discard any stale messages from previous connections
+    clearDataBuffers();
+
+
     server = new SocketServer( portNumber, 5 );
     }
 
 
 
 void connectToServer( char *inAddress ) {
+    // discard any stale messages from previous connections
+    clearDataBuffers();
+
     
     // ignore address for now
 
@@ -1678,15 +1715,6 @@ void closeConnection() {
 
 
 
-#include "DataFifo.h"
-
-DataFifo sendFifo;
-DataFifo receiveFifo;
-
-unsigned int nextIncomingMessageSize = 0;
-unsigned char nextIncomingMessageChannel = 0;
-unsigned char *nextIncomingMessage = NULL;
-unsigned int nextIncomingBytesRecievedSoFar = 0;
 
 
 
