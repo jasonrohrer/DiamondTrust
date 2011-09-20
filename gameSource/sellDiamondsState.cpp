@@ -199,9 +199,6 @@ static int getMoveMessage() {
     isWaitingOnOpponent = true;
 
     if( message != NULL ) {
-        isWaitingOnOpponent = false;
-        
-        // got move!            
 
         // unpack it
         if( messageLength != 3 ) {
@@ -210,11 +207,16 @@ static int getMoveMessage() {
             
             closeOpponentConnection();
             connectionBroken = true;
-            stateDone = true;
 
             delete [] message;
             return -1;
             }
+
+
+        isWaitingOnOpponent = false;
+        
+        // got move!            
+
             
         int returnVal = (int)message[0];
         
@@ -230,7 +232,9 @@ static int getMoveMessage() {
             
             if( numMessages * 300 != numPixels ) {
                 printOut( "Bad camera image length from opponent\n" );
-                stateDone = true;
+                
+                closeOpponentConnection();
+                connectionBroken = true;
                 
                 delete [] message;
                 return -1;
@@ -501,7 +505,6 @@ void SellDiamondsState::stepState() {
                 
                 closeOpponentConnection();
                 connectionBroken = true;
-                stateDone = true;
 
                 delete [] message;
                 return;

@@ -350,6 +350,18 @@ void SalaryBribeState::stepState() {
         isWaitingOnOpponent = true;
         
         if( message != NULL ) {
+
+            // unpack it
+            if( messageLength != numPlayerUnits * 2 * 2 ) {
+                printOut( "Bad message length from opponent\n" );
+                
+                closeOpponentConnection();
+                connectionBroken = true;
+
+                delete [] message;
+                return;
+                }
+            
             isWaitingOnOpponent = false;
         
             // got move!
@@ -358,20 +370,7 @@ void SalaryBribeState::stepState() {
             
 
             nextSubState();
-            
 
-            // unpack it
-            if( messageLength != numPlayerUnits * 2 * 2 ) {
-                printOut( "Bad message length from opponent\n" );
-                
-                closeOpponentConnection();
-                connectionBroken = true;
-                stateDone = true;
-
-                delete [] message;
-                return;
-                }
-            
 
             int totalSalaryAndBribes = 0;
             

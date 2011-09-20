@@ -152,9 +152,6 @@ static int getMoveMessage() {
     isWaitingOnOpponent = true;
     
     if( message != NULL ) {
-        isWaitingOnOpponent = false;
-        
-        // got move!            
 
         // unpack it
         if( messageLength != numPlayerUnits * 3 ) {
@@ -162,11 +159,14 @@ static int getMoveMessage() {
             
             closeOpponentConnection();
             connectionBroken = true;
-            stateDone = true;
 
             delete [] message;
             return -1;
             }
+
+        isWaitingOnOpponent = false;
+        
+        // got move!            
             
 
         int totalBidsAndBribes = 0;

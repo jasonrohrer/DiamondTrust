@@ -161,10 +161,6 @@ void MoveInspectorState::stepState() {
         isWaitingOnOpponent = true;
 
         if( message != NULL ) {
-            isWaitingOnOpponent = false;
-            
-            // got move!            
-            gotMove = true;
             
             // unpack it
             if( messageLength != 1 ) {
@@ -172,12 +168,17 @@ void MoveInspectorState::stepState() {
                 
                 closeOpponentConnection();
                 connectionBroken = true;
-                stateDone = true;
                 
                 delete [] message;
                 return;
                 }
             
+
+            isWaitingOnOpponent = false;
+            
+            // got move!            
+            gotMove = true;
+
 
             // sub-state transition here to indicate that opponent response
             // has arrived
