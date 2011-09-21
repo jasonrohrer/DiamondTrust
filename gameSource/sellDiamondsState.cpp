@@ -360,6 +360,7 @@ void SellDiamondsState::clickState( int inX, int inY ) {
 void SellDiamondsState::processInitialMove() {
 
     if( getPlayerDiamonds( 0 ) > 0 &&
+        getPlayerDiamonds( 1 ) > 0 &&
         ( isOpponentHomeBribed() || isPlayerHomeKnownBribed() ) ) {
         // show opponent sale to player and let player adjust
 
