@@ -582,12 +582,12 @@ void gameInit() {
             font16, 
             translate( "button_parent_muti_card" ),
             128,
-            56 );
+            96 );
         parentServeCloneDownloadButton = new Button( 
             font16, 
             translate( "button_parent_clone" ),
             128,
-            96 );
+            56 );
         }
     else {
         // just a straight hosting button

@@ -38,8 +38,8 @@ button_wifi "Two Player"
 
 
 button_parent "Host Game"
-button_parent_muti_card "Host Multi-Card Play"
-button_parent_clone "Host Single-Card Play" 
+button_parent_muti_card "Host Game"
+button_parent_clone "Single-Card Play" 
 button_child "Join Game"
 
 
