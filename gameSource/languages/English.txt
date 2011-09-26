@@ -34,7 +34,7 @@ button_volMinus "vol-"
 
 
 button_ai "Single Player"
-button_wifi "Two Player"
+button_wifi "Two Players"
 
 
 button_parent "Host Game"
