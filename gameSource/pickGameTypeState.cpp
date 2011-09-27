@@ -86,7 +86,7 @@ static char selectionMade = false;
 void PickGameTypeState::clickState( int inX, int inY ) {
 
  
-    if( ! selectionMade ) {
+    if( ! selectionMade && titleFade == 255 ) {
         if( aiButton->getPressed( inX, inY ) ) {
             selectionMade = true;
             
