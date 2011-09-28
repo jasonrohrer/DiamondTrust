@@ -20,6 +20,8 @@ extern unsigned char titleFade;
 extern int wirelessOnSpriteID;
 
 
+extern char shouldShowSignalStrength;
+
 
 extern Button *parentButton;
 extern Button *parentServeCloneDownloadButton;
@@ -124,6 +126,7 @@ void ConnectState::clickState( int inX, int inY ) {
     if( ! connecting ) {
         if( parentButton->getPressed( inX, inY ) ) {
             isHost = true;
+            shouldShowSignalStrength = true;
             
             acceptConnection();
             char *serverAddress = getLocalAddress();
@@ -158,7 +161,8 @@ void ConnectState::clickState( int inX, int inY ) {
                  parentServeCloneDownloadButton->getPressed( inX, inY ) ) {
             
             isHost = true;
-            
+            shouldShowSignalStrength = true;
+
             acceptCloneDownloadRequest();
             
          
@@ -179,6 +183,8 @@ void ConnectState::clickState( int inX, int inY ) {
             nextSubState();
             }
         else if( childButton->getPressed( inX, inY ) ) {
+            shouldShowSignalStrength = true;
+            
             childStartConnect();
             nextSubState();
             }

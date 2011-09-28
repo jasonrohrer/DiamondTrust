@@ -224,7 +224,7 @@ void platformSleep( unsigned int inTargetMilliseconds );
 
 // returns 0, 1, 2, or 3
 // OR
-// returns -1 if signal strength should not currently be displayed
+// returns -1 if signal strength should not be displayed on this platform
 int getSignalStrength();
 
 

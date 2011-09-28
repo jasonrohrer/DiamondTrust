@@ -150,6 +150,9 @@ char isHost = true;
 char networkOpponent;
 
 
+char shouldShowSignalStrength = false;
+
+
 char isWaitingOnOpponent = false;
 
 
@@ -1091,6 +1094,7 @@ static void goToPreviousGameState() {
         // back to title
         resetToPlayAgain();
         currentGameState = pickGameTypeState;
+        shouldShowSignalStrength = false;
         }
   
     currentGameState->enterStateCall();
@@ -1394,6 +1398,7 @@ void gameLoopTick() {
             }
         
         // back to menu
+        shouldShowSignalStrength = false;
         currentGameState = pickGameTypeState;
         resetToPlayAgain();
 
@@ -1693,18 +1698,21 @@ void drawTopScreen() {
 
 
     
-    // drawing a sat phone under the signal strength icon was not approved 
-    // by Nintendo
-    int sigStrength = getSignalStrength();
+    if( shouldShowSignalStrength ) {    
+        // drawing a sat phone under the signal strength icon was not approved 
+        // by Nintendo
+        int sigStrength = getSignalStrength();
         
-
-    if( sigStrength >= 0 && sigStrength <= 3 ) {
-                    
-        startNewSpriteLayer();
         
-        drawSprite( signalSpriteID[ sigStrength ], 
-                    232, 121, white );
+        if( sigStrength >= 0 && sigStrength <= 3 ) {
+            
+            startNewSpriteLayer();
+            
+            drawSprite( signalSpriteID[ sigStrength ], 
+                        232, 121, white );
+            }
         }
+    
     
     
     if( isWaitingOnOpponent && networkOpponent

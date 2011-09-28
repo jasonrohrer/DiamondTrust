@@ -2602,19 +2602,7 @@ static void initWM() {
 
 
 int getSignalStrength() {
-    
-    if( wmStatus == -1 ) {
-        // error
-        return -1;
-        }
-
-    if( wmStatus != -2 || isCloneBootRunning() ) {
-        
-        return WM_GetLinkLevel();        
-        }
-    else {
-        return -1;
-        }
+    return WM_GetLinkLevel();
     }
 
 
