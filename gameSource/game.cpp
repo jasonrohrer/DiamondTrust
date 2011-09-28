@@ -1094,7 +1094,6 @@ static void goToPreviousGameState() {
         // back to title
         resetToPlayAgain();
         currentGameState = pickGameTypeState;
-        shouldShowSignalStrength = false;
         }
   
     currentGameState->enterStateCall();
@@ -1398,7 +1397,6 @@ void gameLoopTick() {
             }
         
         // back to menu
-        shouldShowSignalStrength = false;
         currentGameState = pickGameTypeState;
         resetToPlayAgain();
 

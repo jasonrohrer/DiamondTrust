@@ -13,8 +13,6 @@ static char stateDone = false;
 
 extern Button *doneButton;
 
-extern char shouldShowSignalStrength;
-
 
 extern const char *statusMessage;
 extern const char *statusSubMessage;
@@ -71,7 +69,6 @@ class ConnectionBrokenState : public GameState {
 void ConnectionBrokenState::clickState( int inX, int inY ) {
     
     if( doneButton->getPressed( inX, inY ) ) {
-        shouldShowSignalStrength = false;
         stateDone = true;
         }
     }

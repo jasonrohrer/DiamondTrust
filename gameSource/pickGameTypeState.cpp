@@ -31,6 +31,8 @@ extern const char *statusSubMessage;
 
 extern char networkOpponent;
 
+extern char shouldShowSignalStrength;
+
 
 
 class PickGameTypeState : public GameState {
@@ -179,6 +181,10 @@ void PickGameTypeState::drawState() {
 
 void PickGameTypeState::enterState() {
     stateDone = false;
+
+    // connection NEVER open when we return here
+    shouldShowSignalStrength = false;
+    
 
     statusMessage = translate( "phaseStatus_gameType" );
     statusSubMessage = translate( "phaseSubStatus_gameType" ); 
