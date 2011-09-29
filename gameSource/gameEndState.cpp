@@ -15,6 +15,8 @@ static char playingAgain = false;
 
 static char donePressed = false;
 
+static char checkedOnceForPlayAgainMessage = false;
+
 
 extern Button *playAgainButton;
 extern Button *doneButton;
@@ -91,7 +93,20 @@ class GameEndState : public GameState {
             // IF connection has not broken already
             if( checkOpponentConnectionStatus() == 1 ) {
                 // but only after sat image faded back in
-                return satelliteFade == 255;
+                if( satelliteFade == 255 ) {
+                
+                    // don't show cancel button yet, if we haven't
+                    // checked for a PlayAgain message yet, because
+                    // the message might already be waiting there for us,
+                    // which causes the cancel button to flicker for a single
+                    // frame
+                    if( !isHost && !checkedOnceForPlayAgainMessage ) {
+                        return false;
+                        }
+                    else {
+                        return true;
+                        }
+                    }
                 }
 
             return false;
@@ -202,6 +217,8 @@ void GameEndState::stepState() {
 
         unsigned int messageLength;
         unsigned char *message = getMessage( &messageLength );
+
+        checkedOnceForPlayAgainMessage = true;
                 
         if( message != NULL ) {
 
@@ -282,6 +299,8 @@ void GameEndState::enterState() {
     playingAgain = false;
     
     donePressed = false;
+
+    checkedOnceForPlayAgainMessage = false;
 
     int winner = 0;
     
