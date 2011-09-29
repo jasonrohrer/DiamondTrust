@@ -962,13 +962,39 @@ static char shouldGoToConnectionBrokenState() {
     if( currentGameState != pickGameTypeState &&
         currentGameState != setAILevelState &&
         currentGameState != connectState &&
-        currentGameState != connectionBrokenState ) {
+        currentGameState != connectionBrokenState &&
+        // don't interrupt flying home if connection breaks
+        // because game conclusion can be run from here on out
+        // without other player's input
+        currentGameState != flyHomeState &&
+        // don't interrupt FINAL diamond deposite with a broken connection
+        // because game conclusion can be run from here on out
+        // without other player's input
+        ( currentGameState != depositDiamondsState || getMonthsLeft() != 0 ) &&
+        // only interrupt game end state in certain special cases,
+        // see below (game end can continue without other player's input)
+        currentGameState != gameEndState ) {
         
         if( checkOpponentConnectionStatus() != 1 ) {
             return true;
             }
         }
     
+    if( currentGameState == gameEndState &&
+        currentGameState->canStateBeBackedOut() ) {
+    
+        // we're past the point where player has seen game result (win/loss)
+        // and pressed Done
+
+        // NOW we can inform them of a broken connection, if one has occurred
+        
+        if( checkOpponentConnectionStatus() != 1 ) {
+            return true;
+            }
+        
+        }
+    
+
     return false;
     }
 
