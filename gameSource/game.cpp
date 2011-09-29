@@ -981,7 +981,7 @@ static char shouldGoToConnectionBrokenState() {
         }
     
     if( currentGameState == gameEndState &&
-        currentGameState->canStateBeBackedOut() ) {
+        gameEndState->isGameFullyEnded() ) {
     
         // we're past the point where player has seen game result (win/loss)
         // and pressed Done

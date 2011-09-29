@@ -48,6 +48,13 @@ class GameState {
             return false;
             }
         
+        virtual char isGameFullyEnded() {
+            // default for all states
+            // GameEndState overrides to signal very end of game-end 
+            // progression
+            return false;
+            }
+        
 
         virtual char canShowHelp() {
             return false;

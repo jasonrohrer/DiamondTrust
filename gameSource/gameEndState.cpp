@@ -87,7 +87,19 @@ class GameEndState : public GameState {
         // back to go back to main menu
         virtual char canStateBeBackedOut() {
             // can back out either from parent or child
-            // but only after sat image faded back in
+
+            // IF connection has not broken already
+            if( checkOpponentConnectionStatus() == 1 ) {
+                // but only after sat image faded back in
+                return satelliteFade == 255;
+                }
+
+            return false;
+            }
+        
+
+        // override default behavior just for gameEndState
+        virtual char isGameFullyEnded() {
             return satelliteFade == 255;
             }
         
@@ -132,7 +144,9 @@ void GameEndState::clickState( int inX, int inY ) {
                 }
             }
         }
-    else if( isHost && playAgainButton->getPressed( inX, inY ) ) {
+    else if( satelliteFade == 255 && 
+             checkOpponentConnectionStatus() == 1 &&
+             isHost && playAgainButton->getPressed( inX, inY ) ) {
 
         playingAgain = true;
         
@@ -247,7 +261,14 @@ void GameEndState::drawState() {
     if( !donePressed ) {
         doneButton->draw();
         }
-    else if( isHost && satelliteFade == 255 && !stateDone ) {
+    else if( isHost && satelliteFade == 255 && !stateDone &&
+             checkOpponentConnectionStatus() == 1 ) {
+        
+        // Don't draw playAgain button at all if connection is already broken
+        // this prevents it from being drawn for a single frame,
+        // which causes an annoying flicker (in the case where the connection
+        // broke during game-end proceedings but hasn't been reported yet)
+
         playAgainButton->draw();
         }
     }
