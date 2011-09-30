@@ -68,7 +68,7 @@ class ConnectionBrokenState : public GameState {
 
 void ConnectionBrokenState::clickState( int inX, int inY ) {
     
-    if( doneButton->getPressed( inX, inY ) ) {
+    if( satelliteFade == 255 && doneButton->getPressed( inX, inY ) ) {
         stateDone = true;
         }
     }
