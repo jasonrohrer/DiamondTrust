@@ -3240,6 +3240,10 @@ static int nintendoLogoSpriteID = -1;
 static int indiePubLogoSpriteID = -1;
 
 static int skipLogo = false;
+// don't respond to very first touch, if a tap is held down from IPL screen
+// (same for button press)
+// wait for a real tap (or button press) during the logo
+static char skipLogoTouchOffAtLeastOnce = false;
 
 static char skippingLogo() {
     if( skipLogo ) {
@@ -3250,8 +3254,16 @@ static char skippingLogo() {
     if( getTouch( &x, &y ) || 
         PAD_Read() != 0 ) {
         
-        skipLogo = true;
-        return true;
+
+        if( skipLogoTouchOffAtLeastOnce ) {    
+            skipLogo = true;
+            return true;
+            }
+        }
+    else {
+        // screen/button not pressed
+        // that means next press will happen during the logo (and not before)
+        skipLogoTouchOffAtLeastOnce = true;
         }
 
     return false;
@@ -3503,6 +3515,13 @@ static char skippingLogo() {
         indiePubLogoSpriteID = loadSprite( "indiePubLogo.tga", false );
         
         shouldDrawNintendoLogo = true;
+        
+        
+        // test skippingLogo once here and ignore the value to allow
+        // it to detect an un-pressed state
+        // thus, any presses that happen DURING the unskippable logo fade-in 
+        // will be queued and not missed
+        skippingLogo();
         
         // fade in for 0.25 seconds, ~8 frames
 
