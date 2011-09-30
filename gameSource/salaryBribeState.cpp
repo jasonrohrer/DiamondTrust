@@ -275,7 +275,7 @@ void SalaryBribeState::clickState( int inX, int inY ) {
         }
 
  
-    if( activeUnit == -1 ) {
+    if( activeUnit == -1 && ! sentMove ) {
         if( doneButton->getPressed( inX, inY ) ) {
             setAllUnitsNotSelectable();
             
