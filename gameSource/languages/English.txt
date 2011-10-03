@@ -84,7 +84,7 @@ phaseSubStatus_parentOrChild  "Host a game or join one started by a friend"
 phaseSubStatus_waitingConnect  "Waiting for a connection"
 phaseSubStatus_waitingConnectOn  "Waiting for a connection on "
 phaseSubStatus_connectingToParent  "Searching for a host..."
-phaseSubStatus_connectFailed  "Connection failed"
+phaseSubStatus_connectFailed  "Connection lost"
 
 
 phaseSubStatus_sendingDownload "Transferring download to opponent"
