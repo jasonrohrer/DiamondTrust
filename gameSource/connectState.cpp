@@ -445,6 +445,7 @@ void ConnectState::enterState() {
 
 
     if( isAutoconnecting() ) {
+        shouldShowSignalStrength = true;
         // clone boot child?
         childStartConnect();
         }
