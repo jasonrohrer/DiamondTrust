@@ -154,6 +154,7 @@ char shouldShowSignalStrength = false;
 
 
 char isWaitingOnOpponent = false;
+int waitingOnOpponentSteps = 0;
 
 
 // make sure we don't show progress bar for only a brief flicker
@@ -948,6 +949,7 @@ static void resetToPlayAgain() {
     resetAI();
 
     isWaitingOnOpponent = false;
+    waitingOnOpponentSteps = 0;
     }
 
 
@@ -1437,9 +1439,11 @@ void gameLoopTick() {
 
     if( isWaitingOnOpponent ) {
         stepWatch();
+        waitingOnOpponentSteps++;
         }
     else {
         resetWatch();
+        waitingOnOpponentSteps = 0;
         }
     
 
@@ -1743,7 +1747,15 @@ void drawTopScreen() {
         ||
         // avoid flicker when showing clock for AI, just like we do for
         // AI progress bar
-        isAIProgressShowing ) {
+        isAIProgressShowing 
+        ||
+        // BUT, make sure watch shows up right away if we have a long
+        // wait for first step of AI progress bar (like on very high AI
+        // levels)  Otherwise, screen is static until first AI progress
+        // bar step.
+        ( isWaitingOnOpponent && 
+          waitingOnOpponentSteps > 15 &&
+          getAIStepsLeft() > 4 ) ) {
         
         drawWatch();
         }
