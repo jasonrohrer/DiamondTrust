@@ -103,7 +103,7 @@ void SetAILevelState::clickState( int inX, int inY ) {
         
         int newSetting = getPickerSale();
         
-        if( newSetting > 1000 ) {
+        if( newSetting > 999 ) {
             // too many!  stop
             newSetting = oldSetting;
             setPickerSale( oldSetting );
