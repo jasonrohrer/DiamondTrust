@@ -154,7 +154,7 @@ char shouldShowSignalStrength = false;
 
 
 char isWaitingOnOpponent = false;
-int waitingOnOpponentSteps = 0;
+unsigned int waitingOnOpponentStartTime = 0;
 
 
 // make sure we don't show progress bar for only a brief flicker
@@ -949,7 +949,7 @@ static void resetToPlayAgain() {
     resetAI();
 
     isWaitingOnOpponent = false;
-    waitingOnOpponentSteps = 0;
+    waitingOnOpponentStartTime = 0;
     }
 
 
@@ -1439,11 +1439,14 @@ void gameLoopTick() {
 
     if( isWaitingOnOpponent ) {
         stepWatch();
-        waitingOnOpponentSteps++;
+
+        if( waitingOnOpponentStartTime == 0 ) {
+            waitingOnOpponentStartTime = getSecondsSinceEpoc();
+            }
         }
     else {
         resetWatch();
-        waitingOnOpponentSteps = 0;
+        waitingOnOpponentStartTime = 0;
         }
     
 
@@ -1754,7 +1757,9 @@ void drawTopScreen() {
         // levels)  Otherwise, screen is static until first AI progress
         // bar step.
         ( isWaitingOnOpponent && 
-          waitingOnOpponentSteps > 15 &&
+          waitingOnOpponentStartTime > 0 &&
+          // waiting longer than 1 second
+          ( getSecondsSinceEpoc() - waitingOnOpponentStartTime ) > 1 &&
           getAIStepsLeft() > 4 ) ) {
         
         drawWatch();
