@@ -34,10 +34,6 @@ static int currentHourHandDisplaySteps = 0;
 static int stepsPerHourHandPosition = stepsPerHandPostion * 12;
 
 
-static char lastStepTimeSet = false;
-static unsigned int lastStepTimeMS;
-
-
 
 
 void initWatch() {
@@ -72,77 +68,38 @@ void resetWatch() {
     currentHourHand = 0;
     
     currentHourHandDisplaySteps = 0;
-    
-    lastStepTimeSet = false;
     }
 
 
 
 void stepWatch() {
-
-    if( !lastStepTimeSet ) {
-        lastStepTimeMS = getSystemMilliseconds();
+    currentWatchHandDisplaySteps ++;
     
-        lastStepTimeSet = true;
+
+    if( currentWatchHandDisplaySteps >= stepsPerHandPostion ) {
+        currentWatchHandDisplaySteps = 0;
         
-        return;
-        }
-    
-    
-    // normalize step so that watch advances at same realtime speed 
-    // no matter how much time passes between steps (like when AI is
-    // in fully CPU mode an steps are slow)
-    
-    // normalize to 33 ms per step (30 fps)
-
-    unsigned int thisStepTimeMS = getSystemMilliseconds();
-    
-
-    unsigned int dMS = thisStepTimeMS - lastStepTimeMS;
-    
-
-    // take multiple watch steps now to catch up, if needed
-    int numStepsToTake = dMS / 33;
-    
-
-    // always take at least one step
-    if( numStepsToTake < 1 ) {
-        numStepsToTake = 1;
-        }
-    
-    lastStepTimeMS = thisStepTimeMS;
-    
-
-
-    for( int s=0; s<numStepsToTake; s++ ) {
-
-        currentWatchHandDisplaySteps ++;
-    
-
-        if( currentWatchHandDisplaySteps >= stepsPerHandPostion ) {
-            currentWatchHandDisplaySteps = 0;
+        currentWatchHand ++;
         
-            currentWatchHand ++;
-        
-            if( currentWatchHand > 7 ) {
-                // full rotation
+        if( currentWatchHand > 7 ) {
+            // full rotation
 
-                currentWatchHand = 0;
-                }
-            }
-
-        currentHourHandDisplaySteps ++;
-    
-        if( currentHourHandDisplaySteps >= stepsPerHourHandPosition ) {
-            currentHourHandDisplaySteps = 0;
-        
-            currentHourHand ++;
-        
-            if( currentHourHand > 7 ) {
-                currentHourHand = 0;
-                }
+            currentWatchHand = 0;
             }
         }
+
+    currentHourHandDisplaySteps ++;
+    
+    if( currentHourHandDisplaySteps >= stepsPerHourHandPosition ) {
+        currentHourHandDisplaySteps = 0;
+        
+        currentHourHand ++;
+        
+        if( currentHourHand > 7 ) {
+            currentHourHand = 0;
+            }
+        }
+    
     }
 
 
