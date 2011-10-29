@@ -8,7 +8,7 @@ TARGET_PLATFORM = NITRO
 
 # make invoked automatically in these dirs
 # this makes our romfiles 
-SUBDIRS = ..
+SUBDIRS = .. childROM
 
 
 MBP_DIR = $(ROOT)/build/demos/wireless_shared/mbp
@@ -84,7 +84,14 @@ LIBSYSCALL_CHILD	 = ./etcFinal/libsyscall_c.bin
 
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
-do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
+../gameData/childROM.srl:  childROM/bin/$(TWL_BUILDTYPE)/childROM_toSign.srl
+	@echo ""	
+	@echo "childROM_toSign.srl is waiting to be signed.  Please obtain signature, run 'make postign' in childROM folder, and then run make again in this folder."
+	@echo ""
+	exit 1 
+
+
+do-build:  ../gameData/childROM.srl ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
 
 
 # need presign and post-sign rules
