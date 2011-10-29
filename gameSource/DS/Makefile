@@ -49,7 +49,7 @@ PATH_MINOR_GEMS_SOURCE = $(patsubst %,../../../minorGems/%,$(MINOR_GEMS_SOURCE))
 SRCS = $(DS_SOURCE) $(PATH_GAME_SOURCE) $(PATH_MINOR_GEMS_SOURCE)
 
 
-TARGET_BIN = $(ROM_NAME)_unsigned.srl
+TARGET_BIN = $(ROM_NAME).srl
 
 MAKEROM_ROMROOT = ../gameData 
 MAKEROM_ROMFILES = * 
