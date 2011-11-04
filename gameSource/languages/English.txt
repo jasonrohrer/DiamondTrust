@@ -157,7 +157,7 @@ phaseSubStatus_playAgainWait  "Waiting for host to play again..."
 
 
 
-credit_1a "INDIEPUB"
+credit_1a "NO PUBLISHER"
 credit_1b "presents"
 
 
