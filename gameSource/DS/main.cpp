@@ -3511,8 +3511,8 @@ static char skippingLogo() {
 
         // indiePub logo on bottom screen at the same time
         
-        nintendoLogoSpriteID = loadSprite( "nintendoLogo.tga", false );
-        indiePubLogoSpriteID = loadSprite( "indiePubLogo.tga", false );
+        nintendoLogoSpriteID = loadSprite( "nonNintendoLogo.tga", false );
+        indiePubLogoSpriteID = loadSprite( "noPublisherLogo.tga", false );
         
         shouldDrawNintendoLogo = true;
         
