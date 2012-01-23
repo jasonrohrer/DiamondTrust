@@ -8,7 +8,7 @@ TARGET_PLATFORM = NITRO
 
 # make invoked automatically in these dirs
 # this makes our romfiles 
-SUBDIRS = .. childROM
+SUBDIRS = ..
 
 
 MBP_DIR = $(ROOT)/build/demos/wireless_shared/mbp
@@ -49,7 +49,7 @@ PATH_MINOR_GEMS_SOURCE = $(patsubst %,../../../minorGems/%,$(MINOR_GEMS_SOURCE))
 SRCS = $(DS_SOURCE) $(PATH_GAME_SOURCE) $(PATH_MINOR_GEMS_SOURCE)
 
 
-TARGET_BIN = $(ROM_NAME).srl
+TARGET_BIN = $(ROM_NAME)_unsigned.srl
 
 MAKEROM_ROMROOT = ../gameData 
 MAKEROM_ROMFILES = * 
@@ -84,14 +84,7 @@ LIBSYSCALL_CHILD	 = ./etcFinal/libsyscall_c.bin
 
 include	$(TWLSDK_ROOT)/build/buildtools/commondefs
 
-../gameData/childROM.srl:  childROM/bin/$(TWL_BUILDTYPE)/childROM_toSign.srl
-	@echo ""	
-	@echo "childROM_toSign.srl is waiting to be signed.  Please obtain signature, run 'make postign' in childROM folder, and then run make again in this folder."
-	@echo ""
-	exit 1 
-
-
-do-build:  ../gameData/childROM.srl ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
+do-build:  ../gameData/icon.nbfc ../gameData/icon.nbfp $(TARGETS) 
 
 
 # need presign and post-sign rules

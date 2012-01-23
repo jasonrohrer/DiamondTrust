@@ -93,7 +93,7 @@ const char *getCloneChildUserName() {
 // game info sent out to child
 const MBGameRegistry mbGameInfo = {
     // specify NULL as program path name when clone booting
-    "/childROM.srl",
+    NULL,
     // title
     (u16 *)L"Diamond Trust of London",
     // description

@@ -51,8 +51,6 @@ greenBarSheet.tga \
 aiLevelSheet.tga \
 nintendoLogo.tga \
 indiePubLogo.tga \
-nonNintendoLogo.tga \
-noPublisherLogo.tga \
 watch.tga \
 watchHandVertical.tga \
 watchHandHorizontal.tga \
