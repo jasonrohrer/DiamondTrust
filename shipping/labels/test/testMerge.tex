@@ -1,0 +1,17 @@
+\documentclass[12pt]{letter}
+\usepackage[avery5164biglabel]{envlab}
+\usepackage{csvtools}
+\begin{document}
+
+\address{Jason Rohrer\\1208 L St.\\Davis, CA 95616}
+
+\startlabels
+\applyCSVfile{test.csv}{%
+\mlabel{%
+  From:\\
+  \returnaddress}{%
+  To:\\
+  \insertName\\\insertStreet\\\insertCity, \insertState \  \insertZip}
+}
+\end{document}
+
