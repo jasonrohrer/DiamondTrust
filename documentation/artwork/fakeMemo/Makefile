@@ -18,12 +18,27 @@
 	ps2pdf $<
 
 
-all: memo.pdf
+all: memoA.pdf  memoB.pdf  memoC.pdf
 
 sig.eps: sigUpRes.png
 	convert sigUpRes.png sig.eps
 
-memo.dvi: sig.eps
+memoA.dvi: sig.eps memo.tex
+	cp textA.txt textBody.tex
+	latex -jobname=memoA memo.tex
+	rm textBody.tex
+
+memoB.dvi: sig.eps
+	cp textB.txt textBody.tex
+	latex -jobname=memoB memo.tex
+	rm textBody.tex
+
+memoC.dvi: sig.eps
+	cp textC.txt textBody.tex
+	latex -jobname=memoC memo.tex
+	rm textBody.tex
+
+
 
 clean: 
 	rm *.pdf *.ps *.dvi *.log *.aux
