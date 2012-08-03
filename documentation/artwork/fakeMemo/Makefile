@@ -13,12 +13,17 @@
 %.dvi: %.tex
 	latex $<
 %.ps: %.dvi
-	dvips -Ppdf -t letter -o $@ $<
+	dvips -Ppdf -t a4 -o $@ $<
 %.pdf: %.ps
 	ps2pdf $<
 
 
 all: memo.pdf
+
+sig.eps: sigUpRes.png
+	convert sigUpRes.png sig.eps
+
+memo.dvi: sig.eps
 
 clean: 
 	rm *.pdf *.ps *.dvi *.log *.aux
