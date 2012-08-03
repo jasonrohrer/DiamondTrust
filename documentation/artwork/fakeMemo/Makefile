@@ -23,20 +23,23 @@ all: memoA.pdf  memoB.pdf  memoC.pdf
 sig.eps: sigUpRes.png
 	convert sigUpRes.png sig.eps
 
-memoA.dvi: sig.eps memo.tex
+memoA.dvi: sig.eps memo.tex reA.txt textA.txt
 	cp textA.txt textBody.tex
+	cp reA.txt reText.tex
 	latex -jobname=memoA memo.tex
-	rm textBody.tex
+	rm textBody.tex reText.tex
 
-memoB.dvi: sig.eps
+memoB.dvi: sig.eps reB.txt textB.txt
 	cp textB.txt textBody.tex
+	cp reB.txt reText.tex
 	latex -jobname=memoB memo.tex
-	rm textBody.tex
+	rm textBody.tex reText.tex
 
-memoC.dvi: sig.eps
+memoC.dvi: sig.eps reC.txt textC.txt
 	cp textC.txt textBody.tex
+	cp reC.txt reText.tex
 	latex -jobname=memoC memo.tex
-	rm textBody.tex
+	rm textBody.tex reText.tex
 
 
 
