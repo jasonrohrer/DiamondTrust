@@ -1,4 +1,8 @@
-Name,Street,City,State,Zip
-Jason Rohrer,1208 L St.,Davis,CA,95616
-Lauren Serafin,1208 L St.,Davis,CA,95616
-Joanne Rohrer,4675 Arbour Green Dr.,Akron,OH,44333
+Name,Street,City,State,Zip,Code
+Jason Rohrer,1208 L St.,Davis,CA,95616,ABC
+Lauren Serafin,1208 L St.,Davis,CA,95616,CDE
+Joanne Rohrer,4675 Arbour Green Dr.,Akron,OH,44333,EFG
+John Rohrer,4675 Arbour Green Dr.,Akron,OH,44333,HIJ
+Daisy Rohrer,4675 Arbour Green Dr.,Akron,OH,44333,KLM
+Pepper Rohrer,4675 Arbour Green Dr.,Akron,OH,44333,MNO
+Abby Rohrer,4675 Arbour Green Dr.,Akron,OH,44333,PRQ
