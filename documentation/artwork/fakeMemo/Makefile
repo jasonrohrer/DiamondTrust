@@ -18,7 +18,7 @@
 	ps2pdf $<
 
 
-all: memoA.pdf  memoB.pdf  memoC.pdf
+all: memoA.pdf  memoB.pdf  memoC.pdf memoD.pdf
 
 sig.eps: sigUpRes.png
 	convert sigUpRes.png sig.eps
@@ -42,6 +42,13 @@ memoC.dvi: sig.eps memo.tex reC.txt textC.txt dateC.txt
 	cp reC.txt reText.tex
 	cp dateC.txt dateText.tex
 	latex -jobname=memoC memo.tex
+	rm textBody.tex reText.tex dateText.tex
+
+memoD.dvi: sig.eps memo.tex reD.txt textD.txt dateD.txt
+	cp textD.txt textBody.tex
+	cp reD.txt reText.tex
+	cp dateD.txt dateText.tex
+	latex -jobname=memoD memo.tex
 	rm textBody.tex reText.tex dateText.tex
 
 
