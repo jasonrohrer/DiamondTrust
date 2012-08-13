@@ -1,4 +1,4 @@
-Name,Street,City,State,Zip,Code
+Name,LineA,City,State,PostalCode,ShipCode
 Jason Rohrer,1208 L St.,Davis,CA,95616,ABC
 Lauren Serafin,1208 L St.,Davis,CA,95616,CDE
 Joanne Rohrer,4675 Arbour Green Dr.,Akron,OH,44333,EFG
