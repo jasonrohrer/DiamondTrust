@@ -7,7 +7,7 @@ my $wgetPath = "/usr/bin/wget";
 
 my $numArgs = $#ARGV + 1;
 
-if( $numArgs != 3 ) {
+if( $numArgs != 4 ) {
     usage();
     }
 
@@ -28,8 +28,17 @@ while( <TEMPLATE> ) {
 close TEMPLATE;
 
 
+open( TEMPLATE, $ARGV[2] ) or usage();
 
-open( OUTPUT, ">$ARGV[2]" ) or usage();
+$templateUSA = "";
+while( <TEMPLATE> ) {
+	$templateUSA .= $_;
+}
+close TEMPLATE;
+
+
+
+open( OUTPUT, ">$ARGV[3]" ) or usage();
 
 
 
@@ -52,13 +61,38 @@ foreach $name (@columnNames) {
 }
 
 
+$countryIndex = -1;
+$index = 0;
+foreach $name (@columnNames) {
+	if( $name eq "Country" ) {
+		$countryIndex = $index;
+	}
+	$index ++;
+}
+
+
 while( <CSV_FILE> ) {
     if( $csvParser->parse($_) ) {
-		@lineFields = $csvParser->fields();
-    
-		$filledTemplate = $template;
+		@lineFields = $csvParser->fields();		
+		
+		# check if this is a USA address
+		$usa = 0;
 
-	
+		if( $countryIndex != -1 ) {
+			$fieldValue = $lineFields[$countryIndex];
+				
+			if( $fieldValue eq "USA" ) {
+				$usa = 1;
+			}
+		}
+
+		$filledTemplate = $template;
+		
+		if( $usa ) {
+			$filledTemplate = $templateUSA;
+		}
+
+			
 	
 		$index = 0;
 		foreach $name (@columnNames) {
@@ -66,6 +100,10 @@ while( <CSV_FILE> ) {
 
 			if( ( $filledTemplate =~ m/\\insert$name/ ) ) {
 				$fieldValue =~ s/\#/\\\#/g;
+				
+				if( $name eq "ShipCode" ) {
+					$fieldValue =~ s/;/\\\\/g;
+				}
 				$filledTemplate =~ s/\\insert$name/$fieldValue/g;
 			}
 			elsif( ( $filledTemplate =~ m/\\insertNewline$name/ ) ) {
@@ -86,26 +124,14 @@ while( <CSV_FILE> ) {
 
 	}
 
-
-
-    #(my $email, my $name) = split( /,\W*/ );
-    #$name =~ s/ /\+/g;
-
-    #print "  email = ($email), name = ($name)\n";
-
-    #my $url = "http://sleepisdeath.net/ticketServer/server.php?action=sell_ticket&security_data=$ARGV[2]&email=$email&name=$name&reference=manual&tags=$ARGV[1]&security_hash=$ARGV[3]";
-    #print "  url = $url\n";
-    #$result = `$wgetPath "$url" -q -O -`;
-
-    #print "  result = $result\n";
-    }
+}
 close OUTPUT;
 
 
 sub usage {
     print "Usage:\n";
-    print "  merge.pl csv_file template_file output_file\n";
+    print "  merge.pl csv_file template_INTL_file template_USA_file output_file\n";
     print "Example:\n";
-    print "  merge.pl test.csv testIn.tex testOut.tex\n";
+    print "  merge.pl test.csv testIn.tex testUSA.tex testOut.tex\n";
     die;
     }
