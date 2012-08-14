@@ -1,21 +1,29 @@
 \documentclass[12pt]{letter}
-\usepackage[avery5164biglabel]{envlab}
+\usepackage[avery5164biglabel,noprintbarcodes]{envlab}
 \usepackage{csvtools}
 \begin{document}
 
 \address{Jason Rohrer\\1208 L St.\\Davis, CA 95616}
 
 \startlabels
-\applyCSVfile{test.csv}{%
-\mlabel{%
-  From:\\
-  \returnaddress}{%
-  To:\\
-  \insertName\\\insertLineA\\\insertCity, \insertState \  \insertPostalCode \\
-  \\
-  \\
-  \\
-  (\insertShipCode)}
-}
+
+\mlabel{From:\\\returnaddress}{To:\\Malcolm Crum\\100 Null Dr\\apt 3\\Santa Barbara, CA 95070\\USA\\\\\\\\(ABC)}
+\mlabel{From:\\\returnaddress}{To:\\Malcolm Crum\\100 Null Dr\\apt 3\\Santa Barbara, CA 95070\\USA\\\\\\\\(ABC)}
+\mlabel{From:\\\returnaddress}{To:\\Malcolm Crum\\100 Null Dr\\apt 3\\Santa Barbara, CA 95070\\USA\\\\\\\\(ABC)}
+\mlabel{From:\\\returnaddress}{To:\\Malcolm Crum\\100 Null Dr\\apt 3\\Santa Barbara, CA 95070\\USA\\\\\\\\(ABC)}
+\mlabel{From:\\\returnaddress}{To:\\Malcolm Crum\\100 Null Dr\\apt 3\\Santa Barbara, CA 95070\\USA\\\\\\\\(ABC)}
+\mlabel{From:\\\returnaddress}{To:\\Malcolm Crum\\100 Null Dr\\apt 3\\Santa Barbara, CA 95070\\USA\\\\\\\\(ABC)}
+\mlabel{From:\\\returnaddress}{To:\\Malcolm Crum\\100 Null Dr\\apt 3\\Santa Barbara, CA 95070\\USA\\\\\\\\(ABC)}
+
+%\applyCSVfile{test.csv}{%
+% \mlabel{%
+%  From:\\
+%  \returnaddress}{%
+%  To:\\
+%  \insertName\\\insertLineA\\\insertCity, \insertState \  \insertPostalCode\\
+%  \\
+%  \\
+%  (\insertShipCode)}
+%}
 \end{document}
 

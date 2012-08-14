@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w 
 
 
+use Text::CSV_PP;
+
 my $wgetPath = "/usr/bin/wget"; 
 
 my $numArgs = $#ARGV + 1;
@@ -11,6 +13,10 @@ if( $numArgs != 3 ) {
 
 open( CSV_FILE, $ARGV[0] ) or usage();
 
+
+my $csvParser = Text::CSV_PP->new();
+
+$csvParser->binary(1);
 
 
 open( TEMPLATE, $ARGV[1] ) or usage();
@@ -32,42 +38,53 @@ print "opening $ARGV[0] for reading\n";
 # read header for column names
 $_ = <CSV_FILE>;
 
-@columnNames  = split( /,/ );
+
+my @columnNames = ();
+
+print "Trying to parse line $_\n";
+if( $csvParser->parse($_) ) {
+	@columnNames = $csvParser->fields();
+}
+
 
 foreach $name (@columnNames) {
-	$name =~ s/\"//g;
 	print "column $name\n";
 }
 
 
-
 while( <CSV_FILE> ) {
-    chomp;
-	@lineFields  = split( /,/ );
-
-	foreach $field (@lineFields) {
-		$field =~ s/\"//g;
-	}
-
-	$filledTemplate = $template;
+    if( $csvParser->parse($_) ) {
+		@lineFields = $csvParser->fields();
+    
+		$filledTemplate = $template;
 
 	
 	
-	$index = 0;
-	foreach $name (@columnNames) {
-		$fieldValue = $lineFields[$index];
+		$index = 0;
+		foreach $name (@columnNames) {
+			$fieldValue = $lineFields[$index];
 
-		if( ( $filledTemplate =~ m/\\insert$name/ ) ) {
-			print "Template contains \\insert$name, replacing with $fieldValue\n";
-			$filledTemplate =~ s/\\insert$name/$fieldValue/g;
+			if( ( $filledTemplate =~ m/\\insert$name/ ) ) {
+				$fieldValue =~ s/\#/\\\#/g;
+				$filledTemplate =~ s/\\insert$name/$fieldValue/g;
+			}
+			elsif( ( $filledTemplate =~ m/\\insertNewline$name/ ) ) {
+				$fieldValue =~ s/\#/\\\#/g;
+				if( $fieldValue ne "" ) {
+					$filledTemplate =~ 
+						s/\\insertNewline$name/$fieldValue\\\\/g;
+				}
+				else {
+					$filledTemplate =~ s/\\insertNewline$name//g;
+				}
+			}
+			$index ++;
 		}
-		$index ++;
+
+
+		print OUTPUT $filledTemplate;
+
 	}
-
-
-	print OUTPUT $filledTemplate;
-
-	
 
 
 

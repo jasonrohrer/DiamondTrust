@@ -1,27 +1,18 @@
 \documentclass[12pt]{letter}
-\usepackage[avery5164biglabel]{envlab}
-\usepackage{datatool}
+%\usepackage[utf8]{inputenc}
+\usepackage[avery5164biglabel,noprintbarcodes,nocapaddress]{envlab}
+%\usepackage{datatool}
 
 \makelabels
 
 \begin{document}
 
-\address{Jason Rohrer\\1208 L St.\\Davis, CA 95616}
+\address{Jason Rohrer\\1208 L St.\\Davis, CA 95616;  USA}
 
 
 \startlabels
-\DTLloaddb{in}{in.csv}
-\DTLforeach{in}{\insertName=Name,\insertLineA=LineA,\insertLineB=LineB,\insertCity=City,\insertState=State,\insertPostalCode=PostalCode,\insertCountry=Country,\insertShipCode=ShipCode}{%
-\mlabel{%
-  From:\\
-  \returnaddress}{%
-  To:\\
-  \insertName\\\insertLineA\\\insertLineB\\\insertCity, \insertState \  \insertPostalCode \\
-  \\
-  \\
-  \\
-  (\insertShipCode)}
-}
+
+\input{out}
 
 \end{document}
 
