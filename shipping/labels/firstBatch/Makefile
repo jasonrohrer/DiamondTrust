@@ -12,7 +12,7 @@
 	sk2ps $< $@
 #%.dvi: %.tex
 #	latex $<
-%.dvi: %.csv merge.tex
+%.dvi: %.csv merge.tex template.tex templateUSA.tex merge.pl
 	./merge.pl $< template.tex templateUSA.tex out.tex
 	latex merge.tex
 	mv merge.dvi $@
