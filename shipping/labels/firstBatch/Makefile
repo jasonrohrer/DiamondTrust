@@ -14,8 +14,8 @@
 #	latex $<
 %.dvi: %.csv merge.tex
 	cp $< in.csv
-	latex mergeTest.tex
-	mv mergeTest.dvi $@
+	latex merge.tex
+	mv merge.dvi $@
 	rm in.csv
 %.ps: %.dvi
 	dvips -Ppdf -t a4 -o $@ $<
