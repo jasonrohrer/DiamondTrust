@@ -22,7 +22,7 @@
 	ps2pdf $<
 
 
-all: 35.ps 40.ps 50.ps 55.ps 65.ps 80.ps 85.ps 100.ps 105.ps 400.ps
+all: 35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 80.pdf 85.pdf 100.pdf 105.pdf 400.pdf
 
 
 allPages.pdf: 35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 80.pdf 85.pdf 100.pdf 105.pdf 400.pdf
@@ -31,6 +31,14 @@ allPages.pdf: 35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 80.pdf 85.pdf 100.pdf 105.pdf 4
   -sDEVICE=pdfwrite \
   -dPDFSETTINGS=/prepress \
    35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 80.pdf 85.pdf 100.pdf 105.pdf 400.pdf
+
+
+allPagesBut80.pdf: 35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 85.pdf 100.pdf 105.pdf 400.pdf
+	gs \
+  -o allPagesBut80.pdf \
+  -sDEVICE=pdfwrite \
+  -dPDFSETTINGS=/prepress \
+   35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 85.pdf 100.pdf 105.pdf 400.pdf
 
 
 clean: 
