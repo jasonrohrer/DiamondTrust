@@ -219,6 +219,24 @@ void initFrameDrawer( int inWidth, int inHeight, int inTargetFrameRate,
 
         }
     printf( "\nDone placing\n" );
+    
+    int totallyEmpty = 0;
+    
+    for( int e=0; e<1000; e++ ) {
+        char thisEmpty = true;
+
+        for( int i=0; i<NUM_SPECIALS; i++ ) {
+            if( specialDistributions[i][e] ) {
+                thisEmpty = false;
+                break;
+                }
+            }
+
+        if( thisEmpty ) {
+            totallyEmpty ++;
+            }
+        }
+    printf( "%d envelopes have no special items.\n", totallyEmpty );
 
 
     }
