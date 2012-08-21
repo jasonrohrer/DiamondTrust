@@ -50,7 +50,7 @@ int specialCounts[ NUM_SPECIALS ] = { 161,
                                       78,
                                       28,
                                       63,
-                                      300 };
+                                      781 };
 
 // specialCounts[s][e] true if special s occurs in envelope e
 char specialDistributions[ NUM_SPECIALS ][1000];
@@ -178,25 +178,29 @@ void initFrameDrawer( int inWidth, int inHeight, int inTargetFrameRate,
     setViewSize( viewWidth );
 
 
-
-
-    // setup distributions
-
+    // init
     for( int i=0; i<NUM_SPECIALS; i++ ) {
         specialPictures[i] = loadSprite( specialTGAFiles[i], false );
 
         for( int e=0; e<1000; e++ ) {
             specialDistributions[i][e] = false;
             }
-        
+        }
+    
 
 
+
+    // setup distributions
+
+    // place all but extra regular diamonds totally randomly 
+    for( int i=0; i<NUM_SPECIALS - 1; i++ ) {
         int countPlaced = 0;
         
 
         while( countPlaced < specialCounts[i] ) {
             
             int pick = randSource.getRandomBoundedInt( 0, 999 );
+            
             
             while( specialDistributions[i][pick] ) {
                 // already full, pick again
@@ -211,13 +215,69 @@ void initFrameDrawer( int inWidth, int inHeight, int inTargetFrameRate,
             }
         
 
-        printf( "\n\n\nPlacement for special %d:\n\n", i );
+        printf( "\n\n\nPlacement for special %d:\n", i );
         
         for( int e=0; e<1000; e++ ) {
             printf( "%d ", specialDistributions[i][e] );
             }
 
+        int countLowerHalf = 0;
+        for( int e=0; e<500; e++ ) {
+            if( specialDistributions[i][e] ) {
+                countLowerHalf ++;
+                }
+            }
+        printf( "%d%% in lower half\n\n", 
+                (countLowerHalf * 100)/ specialCounts[i] );
+
         }
+
+
+
+
+
+    // now start by placing regular diamonds in EVERY slot that 
+    // has nothing in it
+    int j = NUM_SPECIALS - 1;
+    int countPlaced = 0;
+    for( int e=0; e<1000; e++ ) {
+        char thisEmpty = true;
+
+        for( int i=0; i<NUM_SPECIALS; i++ ) {
+            if( specialDistributions[i][e] ) {
+                thisEmpty = false;
+                break;
+                }
+            }
+
+        if( thisEmpty && countPlaced < specialCounts[j] ) {
+            specialDistributions[j][e] = true;
+            countPlaced ++;
+            }
+        }
+    
+    // now place rest randomly
+    while( countPlaced < specialCounts[j] ) {
+            
+        int pick = randSource.getRandomBoundedInt( 0, 999 );
+            
+            
+        while( specialDistributions[j][pick] ) {
+            // already full, pick again
+            pick = randSource.getRandomBoundedInt( 0, 999 );
+            }
+            
+        // found empty, fill
+        specialDistributions[j][pick] = true;
+        
+        
+        countPlaced++;
+        }
+    
+
+
+
+
     printf( "\nDone placing\n" );
     
     int totallyEmpty = 0;
