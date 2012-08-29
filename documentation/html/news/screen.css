@@ -60,6 +60,12 @@ td.followLinks
   line-height:1.5;
   }
 
+td.buyLink 
+{
+  text-align:center;
+  line-height:1.5;
+  }
+
 
 td.searchBox 
 {

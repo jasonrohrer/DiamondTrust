@@ -13,7 +13,7 @@
 
 <center>
 <font size=6>Diamond Trust of London</font><br>
-A two-player diamond smuggling stragegy game by <a href="http://hcsoftware.sf.net/jason-rohrer">Jason Rohrer</a><br>
+A two-player diamond smuggling strategy game by <a href="http://hcsoftware.sf.net/jason-rohrer">Jason Rohrer</a><br>
 (The world's first <a href="http://www.kickstarter.com/projects/1443658586/diamond-trust-of-london">player-funded<a> Nintendo DS cartridge)<br>
 
 <table border=0>

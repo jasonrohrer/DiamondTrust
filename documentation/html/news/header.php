@@ -37,6 +37,10 @@ News about <a href="http://hcsoftware.sf.net/jason-rohrer">Jason Rohrer</a>'s di
 <br>
 <a HREF="http://twitter.com/jasonrohrer"><img src='twitter.png' width=16 height=16 border=0> @jasonrohrer</a>
 </td>
+<td class="buyLink">
+<!-- hard-coded clean RSS link -->
+<a HREF="http://diamondtrustgame.com/buy.php">Buy the game</a>
+</td>
 
 <td class="searchBox">
 <?php
