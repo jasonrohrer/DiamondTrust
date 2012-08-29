@@ -25,7 +25,7 @@
 
 
 <div class="summary">
-News about <a href="http://hcsoftware.sf.net/jason-rohrer">Jason Rohrer</a>'s diamond-trading strategy game for the Nintendo DS.
+News about <a href="http://hcsoftware.sf.net/jason-rohrer">Jason Rohrer</a>'s diamond smuggling strategy game for the Nintendo DS.
 </div>
 
 <div class="topbar">
