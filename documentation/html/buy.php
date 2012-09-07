@@ -35,7 +35,8 @@ Available now for <b>$30</b>.<br><br>
 <input type="hidden" name="hosted_button_id" value="UJZMPCM79D35C">
 <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form><br>
+</form>
+<b>NOT</b> region locked (playable worldwide).<br>
 <br>
 <b>4215</b> copies are left.
 </td>
