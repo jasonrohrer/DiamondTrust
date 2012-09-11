@@ -22,7 +22,7 @@
 	ps2pdf $<
 
 
-all: 35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 80.pdf 85.pdf 100.pdf 105.pdf 400.pdf
+all: 35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 80.pdf 85.pdf 100.pdf 105.pdf 400.pdf 5.pdf
 
 
 allPages.pdf: 35.pdf 40.pdf 50.pdf 55.pdf 65.pdf 80.pdf 85.pdf 100.pdf 105.pdf 400.pdf
