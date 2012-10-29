@@ -38,7 +38,7 @@ Available now for <b>$30</b>.<br><br>
 </form>
 <b>NOT</b> region locked (playable worldwide).<br>
 <br>
-<b>4,181</b> copies are left.
+<b>4,053</b> copies are left.
 </td>
 </tr>
 </table>
@@ -48,6 +48,19 @@ Available now for <b>$30</b>.<br><br>
 </td>
 </tr>
 </table>
+
+<br>
+<br>
+<br>
+<!-- Site Meter -->
+<script type="text/javascript" src="http://s31.sitemeter.com/js/counter.js?site=s31diamondtrust">
+</script>
+<noscript>
+<a href="http://s31.sitemeter.com/stats.asp?site=s31diamondtrust" target="_top">
+<img src="http://s31.sitemeter.com/meter.asp?site=s31diamondtrust" alt="Site Meter" border="0"/></a>
+</noscript>
+
+</center>
 
 </body>
 
