@@ -38,7 +38,7 @@ Available now for <b>$30</b>.<br><br>
 </form>
 <b>NOT</b> region locked (playable worldwide).<br>
 <br>
-<b>4,053</b> copies are left.
+<b>4,019</b> copies are left.
 </td>
 </tr>
 </table>
