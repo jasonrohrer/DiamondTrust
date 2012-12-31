@@ -26,9 +26,12 @@ A two-player diamond smuggling strategy game by <a href="http://hcsoftware.sf.ne
 "Wonderfully tense stuff" -- <a href="http://www.pocketgamer.co.uk/r/DS/Diamond+Trust+of+London/news.asp?c=34793">Pocket Gamer</a><br><br>
 
 <br>
-<br>
 
 Available now for <b>$30</b>.<br><br>
+
+Shipped to you directly from my home.
+<br>
+<br>
 
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_s-xclick">
@@ -36,9 +39,12 @@ Available now for <b>$30</b>.<br><br>
 <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 </form>
+
+[or <a href="mailOrder.php">pay by mail</a>]<br><br>
+
 <b>NOT</b> region locked (playable worldwide).<br>
 <br>
-<b>4,019</b> copies are left.
+<b>4,004</b> copies are left.
 </td>
 </tr>
 </table>
