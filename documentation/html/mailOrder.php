@@ -16,18 +16,18 @@
 <table border=0 width=75%>
 <tr><td>
 
-The game costs <b>$30</b>, and Priority Mail shipping is <b>$5.15</b> in the US, <b>$12.95</b> to Canada and Mexico, and <b>$16.95</b> to the rest of the world.<br>
+The game costs <b>$30</b>, and Priority Mail shipping is <b>$5.60</b> in the US, <b>$19.95</b> to Canada and Mexico, and <b>$23.95</b> to the rest of the world.<br>
 <br>
 If you want to buy a single copy of the game, then you would send the following amount based on where you are:
 
 <center>
 <table border=1>
 <tr><td colspan=2 align=center>Ordering <b>one</b> game</td></tr>
-<tr><td align=right>USA:</td><td>Send <b>$35.15</b></td></tr>
+<tr><td align=right>USA:</td><td>Send <b>$35.60</b></td></tr>
 
-<tr><td align=right>Canada and Mexico:</td><td>Send <b>$42.95</b></td></tr>
+<tr><td align=right>Canada and Mexico:</td><td>Send <b>$49.95</b></td></tr>
 
-<tr><td align=right>Other Countries:</td><td>Send <b>$46.95</b></td></tr>
+<tr><td align=right>Other Countries:</td><td>Send <b>$53.95</b></td></tr>
 
 </table>
 
@@ -55,11 +55,11 @@ If you want to order <b>two</b> copies of the game, they will both fit in the sa
 <center>
 <table border=1>
 <tr><td colspan=2 align=center>Ordering <b>two</b> games</td></tr>
-<tr><td align=right>USA:</td><td>Send <b>$65.15</b></td></tr>
+<tr><td align=right>USA:</td><td>Send <b>$65.60</b></td></tr>
 
-<tr><td align=right>Canada and Mexico:</td><td>Send <b>$72.95</b></td></tr>
+<tr><td align=right>Canada and Mexico:</td><td>Send <b>$79.95</b></td></tr>
 
-<tr><td align=right>Other Countries:</td><td>Send <b>$76.95</b></td></tr>
+<tr><td align=right>Other Countries:</td><td>Send <b>$83.95</b></td></tr>
 
 </table>
 

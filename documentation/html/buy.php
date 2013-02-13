@@ -44,7 +44,7 @@ Shipped to you directly from my home.
 
 <b>NOT</b> region locked (playable worldwide).<br>
 <br>
-<b>4,004</b> copies are left.
+<b>3,981</b> copies are left.
 </td>
 </tr>
 </table>
