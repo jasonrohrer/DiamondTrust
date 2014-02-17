@@ -58,13 +58,11 @@ Shipped to you directly from my home.
 <br>
 <br>
 <br>
-<!-- Site Meter -->
-<script type="text/javascript" src="http://s31.sitemeter.com/js/counter.js?site=s31diamondtrust">
-</script>
-<noscript>
-<a href="http://s31.sitemeter.com/stats.asp?site=s31diamondtrust" target="_top">
-<img src="http://s31.sitemeter.com/meter.asp?site=s31diamondtrust" alt="Site Meter" border="0"/></a>
-</noscript>
+
+
+<script src="//static.getclicky.com/js" type="text/javascript"></script>
+<script type="text/javascript">try{ clicky.init(100708502); }catch(e){}</script>
+<noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/100708502ns.gif" /></p></noscript>
 
 </center>
 
